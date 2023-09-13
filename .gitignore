@@ -1,0 +1,4 @@
+*.vsidx
+**/.vs/*
+src/**/bin/*
+src/**/obj/*
