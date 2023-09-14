@@ -10,10 +10,10 @@ using Rhino.Runtime.Code.Languages;
 
 using Grasshopper.Kernel.Data;
 
-namespace Rhino.Runtime.Code.Tests
+namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
-    public class GrasshopperTests : Testing.RhinoTestFixture
+    public class GrasshopperTests : Rhino.Testing.RhinoTestFixture
     {
         [Test]
         public void TestGrasshopper1Error()
@@ -77,7 +77,7 @@ namespace Rhino.Runtime.Code.Tests
             if (s_gh1 is null)
             {
                 Eto.Platform.Initialize(Eto.Platforms.Wpf);
-                RhinoCodePlatform.Rhino3D.Rhino3DPlatform.Activate();
+                Rhino3DPlatform.Activate();
 
                 ILanguage gh1 = RhinoCode.Languages.QueryLatest(new LanguageSpec("*.*.grasshopper", "1"));
                 Assert.NotNull(gh1);
@@ -90,9 +90,9 @@ namespace Rhino.Runtime.Code.Tests
 
         static IEnumerable<object[]> GetTestDefinitions()
         {
-            if (Configs.TryGetConfig("Grasshopper1FilesDirectory", out string gh1FilesDir))
+            if (Configs.TryGetConfig("TestFilesDirectory", out string fileDir))
             {
-                string fullpath = Path.GetFullPath(Path.Combine(Configs.SettingsDir, @"..\..\..\", gh1FilesDir));
+                string fullpath = Path.GetFullPath(Path.Combine(Configs.SettingsDir, @"..\..\..\", fileDir, @"gh1\"));
                 if (Directory.Exists(fullpath))
                 {
                     foreach (var filePath in Directory.GetFiles(fullpath, "*.gh"))

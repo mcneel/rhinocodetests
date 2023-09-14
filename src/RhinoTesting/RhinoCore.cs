@@ -9,11 +9,13 @@ namespace Rhino.Testing
         static string _systemDirectory;
         static IDisposable _core;
 
-        public static void Initialize(RhinoTestConfigs configs)
+        public static RhinoTestConfigs Configs = new RhinoTestConfigs();
+
+        public static void Initialize()
         {
             if (_core is null)
             {
-                _systemDirectory = configs.RhinoSystemDir;
+                _systemDirectory = Configs.RhinoSystemDir;
 
                 RhinoInside.Resolver.Initialize();
                 RhinoInside.Resolver.RhinoSystemDirectory = _systemDirectory;
