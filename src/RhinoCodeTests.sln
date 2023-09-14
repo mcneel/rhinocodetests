@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhino.Testing", "RhinoTesti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhino.Runtime.Code.Tests", "Rhino.Runtime.Code.Tests\Rhino.Runtime.Code.Tests.csproj", "{8D09FDC4-B2E8-446B-8181-2677AFACAB88}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RhinoCodePlatform.Rhino3D.Tests", "RhinoCodePlatform.Rhino3D.Tests\RhinoCodePlatform.Rhino3D.Tests.csproj", "{C5C81D12-AE78-4DE1-A06E-546C3F91D392}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,14 @@ Global
 		{8D09FDC4-B2E8-446B-8181-2677AFACAB88}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8D09FDC4-B2E8-446B-8181-2677AFACAB88}.Release|x64.ActiveCfg = Release|x64
 		{8D09FDC4-B2E8-446B-8181-2677AFACAB88}.Release|x64.Build.0 = Release|x64
+		{C5C81D12-AE78-4DE1-A06E-546C3F91D392}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5C81D12-AE78-4DE1-A06E-546C3F91D392}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5C81D12-AE78-4DE1-A06E-546C3F91D392}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C5C81D12-AE78-4DE1-A06E-546C3F91D392}.Debug|x64.Build.0 = Debug|Any CPU
+		{C5C81D12-AE78-4DE1-A06E-546C3F91D392}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5C81D12-AE78-4DE1-A06E-546C3F91D392}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5C81D12-AE78-4DE1-A06E-546C3F91D392}.Release|x64.ActiveCfg = Release|Any CPU
+		{C5C81D12-AE78-4DE1-A06E-546C3F91D392}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

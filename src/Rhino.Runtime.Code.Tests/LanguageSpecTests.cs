@@ -9,7 +9,7 @@ using Rhino.Runtime.Code.Languages;
 namespace Rhino.Runtime.Code.Tests
 {
     [TestFixture]
-    public class LanguageSpecFixture : Testing.RhinoTestFixture
+    public class LanguageSpecTests : Testing.RhinoTestFixture
     {
         [Test]
         public void TestLanguageSpecCtorSingleLetterFamily()

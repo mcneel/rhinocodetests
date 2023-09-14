@@ -18,8 +18,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="RhinoTestConfigs.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\RhinoTesting\Rhino.Testing.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Rhino.Runtime.Code" HintPath="..\Reference\Rhino.Runtime.Code.dll" Private="False" />
+    <Reference Include="RhinoCodePlatform.Rhino3D" HintPath="..\Reference\RhinoCodePlatform.Rhino3D.dll" Private="False" />
   </ItemGroup>
 </Project>
