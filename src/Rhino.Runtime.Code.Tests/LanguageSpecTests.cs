@@ -1,7 +1,6 @@
 using System;
 
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Languages;
