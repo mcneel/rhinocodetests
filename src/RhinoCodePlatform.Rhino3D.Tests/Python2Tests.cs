@@ -26,7 +26,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 },
             };
 
-            code.Run(ctx);
+            Utils.RunCode(code, ctx);
 
             Assert.True(ctx.Outputs.TryGet("result", out bool data));
             Assert.True(data);

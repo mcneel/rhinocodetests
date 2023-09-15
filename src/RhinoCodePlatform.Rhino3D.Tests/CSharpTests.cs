@@ -11,12 +11,12 @@ using Rhino.Runtime.Code.Languages;
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
-    public class Python3Tests : Rhino.Testing.RhinoTestFixture
+    public class CSharpTests : Rhino.Testing.RhinoTestFixture
     {
         [Test, TestCaseSource(nameof(GetTestScripts))]
-        public void TestPython3Script(Uri scriptPath)
+        public void TestCSharpScript(Uri scriptPath)
         {
-            var code = GetPython3().CreateCode(scriptPath);
+            var code = GetCSharp().CreateCode(scriptPath);
 
             var ctx = new ExecuteContext
             {
@@ -32,35 +32,35 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             Assert.True(data);
         }
 
-        static object s_py3 = default;
+        static object s_cs = default;
 
-        static ILanguage GetPython3()
+        static ILanguage GetCSharp()
         {
-            if (s_py3 is null)
+            if (s_cs is null)
             {
                 Rhino3DPlatform.Activate();
                 RhinoCode.Languages.RespondToStatusWaits();
 
-                ILanguage python3 = RhinoCode.Languages.QueryLatest(LanguageSpec.Python3);
-                
-                python3.Status.WaitReady();
-                
-                Assert.NotNull(python3);
+                ILanguage csharp = RhinoCode.Languages.QueryLatest(LanguageSpec.CSharp);
 
-                s_py3 = python3;
+                csharp.Status.WaitReady();
+
+                Assert.NotNull(csharp);
+
+                s_cs = csharp;
             }
 
-            return (ILanguage)s_py3;
+            return (ILanguage)s_cs;
         }
 
         static IEnumerable<object[]> GetTestScripts()
         {
             if (Configs.TryGetConfig("TestFilesDirectory", out string fileDir))
             {
-                string fullpath = Path.GetFullPath(Path.Combine(Configs.SettingsDir, @"..\..\..\", fileDir, @"py3\"));
+                string fullpath = Path.GetFullPath(Path.Combine(Configs.SettingsDir, @"..\..\..\", fileDir, @"cs\"));
                 if (Directory.Exists(fullpath))
                 {
-                    foreach (var filePath in Directory.GetFiles(fullpath, "*.py"))
+                    foreach (var filePath in Directory.GetFiles(fullpath, "*.cs"))
                         yield return new object[] { new Uri(filePath) };
                 }
                 else
