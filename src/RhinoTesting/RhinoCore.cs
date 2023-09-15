@@ -4,6 +4,8 @@ using System.Reflection;
 
 namespace Rhino.Testing
 {
+    // https://docs.nunit.org/articles/vs-test-adapter/AdapterV4-Release-Notes.html
+    // https://github.com/nunit/nunit3-vs-adapter/blob/master/src/NUnitTestAdapter/AdapterSettings.cs#L143
     static class RhinoCore
     {
         static string _systemDirectory;

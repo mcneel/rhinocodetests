@@ -4,8 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 
-using NUnit.Framework;
-
 namespace Rhino.Testing
 {
     public class RhinoTestConfigs
@@ -45,9 +43,6 @@ namespace Rhino.Testing
                 _xml = XDocument.Load(SettingsFile);
                 RhinoSystemDir = _xml.Descendants("RhinoSystemDirectory").FirstOrDefault()?.Value ?? null;
             }
-
-            if (!string.IsNullOrEmpty(RhinoSystemDir))
-                TestContext.WriteLine("RhinoSystemDir is: " + RhinoSystemDir + ".");
         }
     }
 }
