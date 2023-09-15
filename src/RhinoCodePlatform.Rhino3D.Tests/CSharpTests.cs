@@ -6,6 +6,7 @@ using NUnit.Framework;
 
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
+using Rhino.Runtime.Code.Execution.Debugging;
 using Rhino.Runtime.Code.Languages;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
@@ -18,13 +19,14 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             var code = GetCSharp().CreateCode(scriptPath);
 
-            var ctx = new ExecuteContext
-            {
-                OverrideCodeParams = true,
-                Outputs = {
-                    ["result"] = default,
-                },
-            };
+            ExecuteContext ctx;
+            if (scriptPath.ToString().Contains("_DEBUG"))
+                ctx = new DebugContext();
+            else
+                ctx = new ExecuteContext();
+
+            ctx.OverrideCodeParams = true;
+            ctx.Outputs["result"] = default;
 
             Utils.RunCode(code, ctx);
 
