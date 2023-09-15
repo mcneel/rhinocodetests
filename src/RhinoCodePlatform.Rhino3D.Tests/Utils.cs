@@ -16,11 +16,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
             catch (CompileException compileEx)
             {
-                var message = new StringBuilder();
-                foreach (var diag in compileEx.Diagnostics)
-                    message.AppendLine(diag.ToString());
-
-                throw new Exception(message.ToString());
+                throw new Exception(compileEx.ToString());
             }
         }
     }
