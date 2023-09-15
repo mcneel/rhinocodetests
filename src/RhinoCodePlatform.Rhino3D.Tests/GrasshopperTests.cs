@@ -76,7 +76,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             if (s_gh1 is null)
             {
-                Eto.Platform.Initialize(Eto.Platforms.Wpf);
                 Rhino3DPlatform.Activate();
 
                 ILanguage gh1 = RhinoCode.Languages.QueryLatest(new LanguageSpec("*.*.grasshopper", "1"));

@@ -21,6 +21,7 @@ namespace Rhino.Testing
                 RhinoInside.Resolver.RhinoSystemDirectory = _systemDirectory;
                 AppDomain.CurrentDomain.AssemblyResolve += ResolveForRhinoAssemblies;
                 LoadCore();
+                LoadEto();
             }
         }
 
@@ -34,6 +35,13 @@ namespace Rhino.Testing
         static void LoadCore()
         {
             _core = new Rhino.Runtime.InProcess.RhinoCore();
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        static void LoadEto()
+        {
+            Eto.Platform.AllowReinitialize = true;
+            Eto.Platform.Initialize(Eto.Platforms.Wpf);
         }
 
         static readonly string[] s_pluginpaths = new string[]

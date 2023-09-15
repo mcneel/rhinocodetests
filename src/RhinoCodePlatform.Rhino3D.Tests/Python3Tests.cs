@@ -20,6 +20,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             var ctx = new ExecuteContext
             {
+                OverrideCodeParams = true,
                 Outputs = {
                     ["result"] = default,
                 },
@@ -37,11 +38,13 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             if (s_py3 is null)
             {
-                Eto.Platform.Initialize(Eto.Platforms.Wpf);
                 Rhino3DPlatform.Activate();
                 RhinoCode.Languages.RespondToStatusWaits();
 
                 ILanguage python3 = RhinoCode.Languages.QueryLatest(LanguageSpec.Python3);
+                
+                python3.Status.WaitReady();
+                
                 Assert.NotNull(python3);
 
                 s_py3 = python3;
