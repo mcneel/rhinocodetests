@@ -1,7 +1,7 @@
 // #! csharp
 using System;
 
-bool result = false;
+result = false;
 #if DEBUG
 result = true;
 #endif
