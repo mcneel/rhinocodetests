@@ -5,8 +5,6 @@ VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhino.Testing", "RhinoTesting\Rhino.Testing.csproj", "{7A7D328D-0A18-4E96-8BF4-558D6BDEC302}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhino.Runtime.Code.Tests", "Rhino.Runtime.Code.Tests\Rhino.Runtime.Code.Tests.csproj", "{8D09FDC4-B2E8-446B-8181-2677AFACAB88}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RhinoCodePlatform.Rhino3D.Tests", "RhinoCodePlatform.Rhino3D.Tests\RhinoCodePlatform.Rhino3D.Tests.csproj", "{C5C81D12-AE78-4DE1-A06E-546C3F91D392}"
 EndProject
 Global
@@ -19,10 +17,6 @@ Global
 		{7A7D328D-0A18-4E96-8BF4-558D6BDEC302}.Debug|x64.Build.0 = Debug|Any CPU
 		{7A7D328D-0A18-4E96-8BF4-558D6BDEC302}.Release|x64.ActiveCfg = Release|x64
 		{7A7D328D-0A18-4E96-8BF4-558D6BDEC302}.Release|x64.Build.0 = Release|x64
-		{8D09FDC4-B2E8-446B-8181-2677AFACAB88}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{8D09FDC4-B2E8-446B-8181-2677AFACAB88}.Debug|x64.Build.0 = Debug|Any CPU
-		{8D09FDC4-B2E8-446B-8181-2677AFACAB88}.Release|x64.ActiveCfg = Release|x64
-		{8D09FDC4-B2E8-446B-8181-2677AFACAB88}.Release|x64.Build.0 = Release|x64
 		{C5C81D12-AE78-4DE1-A06E-546C3F91D392}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{C5C81D12-AE78-4DE1-A06E-546C3F91D392}.Debug|x64.Build.0 = Debug|Any CPU
 		{C5C81D12-AE78-4DE1-A06E-546C3F91D392}.Release|x64.ActiveCfg = Release|Any CPU
