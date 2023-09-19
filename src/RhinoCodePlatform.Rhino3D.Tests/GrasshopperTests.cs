@@ -9,6 +9,7 @@ using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
 
 using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -65,8 +66,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             foreach (var p in data.Paths)
             {
                 foreach (var d in data.get_Branch(p))
-                    if (d is bool result)
-                        Assert.True(result);
+                    if (d is GH_Boolean result)
+                        Assert.True(result.Value);
             }
         }
 
@@ -77,6 +78,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             if (s_gh1 is null)
             {
                 Rhino3DPlatform.Activate();
+                RhinoCode.Languages.RespondToStatusWaits();
 
                 ILanguage gh1 = RhinoCode.Languages.QueryLatest(new LanguageSpec("*.*.grasshopper", "1"));
                 Assert.NotNull(gh1);
