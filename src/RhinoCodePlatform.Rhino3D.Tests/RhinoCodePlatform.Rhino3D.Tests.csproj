@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Grasshopper" HintPath="..\..\..\..\..\bin\Debug\Plug-ins\Grasshopper\Grasshopper.dll" Private="False"  />
     <Reference Include="Rhino.Runtime.Code" HintPath="..\..\..\..\..\bin\Debug\Rhino.Runtime.Code.dll" Private="True"  />
     <Reference Include="RhinoCodePlatform.Rhino3D" HintPath="..\..\..\..\..\bin\Debug\RhinoCodePlatform.Rhino3D.dll" Private="False" />
   </ItemGroup>

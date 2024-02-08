@@ -15,9 +15,8 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
 
-    <PackageReference Include="RhinoCommon" Version="8.2.*" />
-    <PackageReference Include="Grasshopper" Version="8.2.*" />
-    <PackageReference Include="RhinoWindows" Version="8.2.*" />
+    <PackageReference Include="RhinoCommon" Version="8.*" />
+    <PackageReference Include="RhinoWindows" Version="8.*" />
   </ItemGroup>
 
   <ItemGroup>
