@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 
 using Rhino.Runtime.Code;
@@ -8,7 +8,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 {
     static class Utils
     {
-        public static void RunCode(Code code, ExecuteContext context)
+        public static void RunCode(Code code, RunContext context)
         {
             try
             {

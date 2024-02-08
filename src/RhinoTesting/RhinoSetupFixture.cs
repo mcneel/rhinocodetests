@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using NUnit.Framework;
 
@@ -7,13 +7,13 @@ namespace Rhino.Testing
     public abstract class RhinoSetupFixture
     {
         [OneTimeSetUp]
-        public void OneTimeSetup()
+        public virtual void OneTimeSetup()
         {
             RhinoCore.Initialize();
         }
 
         [OneTimeTearDown]
-        public void OneTimeTearDown()
+        public virtual void OneTimeTearDown()
         {
             RhinoCore.TearDown();
         }

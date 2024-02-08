@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 
@@ -16,9 +16,9 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         [Test, TestCaseSource(nameof(GetTestScripts))]
         public void TestPython3Script(Uri scriptPath)
         {
-            var code = GetPython3().CreateCode(scriptPath);
+            Code code = GetPython3().CreateCode(scriptPath);
 
-            var ctx = new ExecuteContext
+            var ctx = new RunContext
             {
                 OverrideCodeParams = true,
                 Outputs = {
@@ -38,13 +38,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             if (s_py3 is null)
             {
-                Rhino3DPlatform.Activate();
-                RhinoCode.Languages.RespondToStatusWaits();
-
                 ILanguage python3 = RhinoCode.Languages.QueryLatest(LanguageSpec.Python3);
-                
-                python3.Status.WaitReady();
-                
+                                
                 Assert.NotNull(python3);
 
                 s_py3 = python3;

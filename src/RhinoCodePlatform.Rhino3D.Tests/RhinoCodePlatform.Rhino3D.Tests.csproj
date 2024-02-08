@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFrameworks>net48</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <Nullable>disable</Nullable>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*" />
+    <PackageReference Include="NUnit" Version="3.*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Rhino.Runtime.Code" HintPath="..\Reference\Rhino.Runtime.Code.dll" Private="False" />
-    <Reference Include="RhinoCodePlatform.Rhino3D" HintPath="..\Reference\RhinoCodePlatform.Rhino3D.dll" Private="False" />
+    <Reference Include="Rhino.Runtime.Code" HintPath="..\..\..\..\..\bin\Debug\Rhino.Runtime.Code.dll" Private="True"  />
+    <Reference Include="RhinoCodePlatform.Rhino3D" HintPath="..\..\..\..\..\bin\Debug\RhinoCodePlatform.Rhino3D.dll" Private="False" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -8,19 +8,20 @@ namespace Rhino.Testing
     // https://github.com/nunit/nunit3-vs-adapter/blob/master/src/NUnitTestAdapter/AdapterSettings.cs#L143
     static class RhinoCore
     {
-        static string _systemDirectory;
-        static IDisposable _core;
+        static string s_systemDirectory;
+        static IDisposable s_core;
 
-        public static RhinoTestConfigs Configs = new RhinoTestConfigs();
+        public static RhinoTestConfigs Configs { get; } = new RhinoTestConfigs();
 
         public static void Initialize()
         {
-            if (_core is null)
+            if (s_core is null)
             {
-                _systemDirectory = Configs.RhinoSystemDir;
+                s_systemDirectory = Configs.RhinoSystemDir;
 
-                RhinoInside.Resolver.Initialize();
-                RhinoInside.Resolver.RhinoSystemDirectory = _systemDirectory;
+                // NOTE: using custom resolver instead of this
+                //RhinoInside.Resolver.Initialize();
+                //RhinoInside.Resolver.RhinoSystemDirectory = s_systemDirectory;
                 AppDomain.CurrentDomain.AssemblyResolve += ResolveForRhinoAssemblies;
                 LoadCore();
                 LoadEto();
@@ -29,14 +30,14 @@ namespace Rhino.Testing
 
         public static void TearDown()
         {
-            _core?.Dispose();
-            _core = null;
+            s_core?.Dispose();
+            s_core = null;
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         static void LoadCore()
         {
-            _core = new Rhino.Runtime.InProcess.RhinoCore();
+            s_core = new Rhino.Runtime.InProcess.RhinoCore();
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
@@ -46,7 +47,7 @@ namespace Rhino.Testing
             Eto.Platform.Initialize(Eto.Platforms.Wpf);
         }
 
-        static readonly string[] s_pluginpaths = new string[]
+        static readonly string[] s_subpaths = new string[]
         {
             @"Plug-ins\Grasshopper",
         };
@@ -55,11 +56,19 @@ namespace Rhino.Testing
         {
             string name = new AssemblyName(args.Name).Name;
 
-            foreach (var plugin in s_pluginpaths)
+            string file = Path.Combine(s_systemDirectory, name + ".dll");
+            if (File.Exists(file))
             {
-                string file = Path.Combine(_systemDirectory, plugin, name + ".dll");
+                return Assembly.LoadFrom(file);
+            }
+
+            foreach (var plugin in s_subpaths)
+            {
+                file = Path.Combine(s_systemDirectory, plugin, name + ".dll");
                 if (File.Exists(file))
+                {
                     return Assembly.LoadFrom(file);
+                }
             }
 
             return null;

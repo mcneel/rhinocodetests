@@ -1,9 +1,42 @@
-﻿using System;
+using System;
+
+using Rhino.Runtime.Code;
+using Rhino.Runtime.Code.Languages;
 
 using NUnit.Framework;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [SetUpFixture]
-    public sealed class Setup : Rhino.Testing.RhinoSetupFixture { }
+    public sealed class Setup : Rhino.Testing.RhinoSetupFixture
+    {
+        public override void OneTimeSetup()
+        {
+            base.OneTimeSetup();
+            LoadLanguages();
+        }
+
+        sealed class StatusResponder : ProgressStatusResponder
+        {
+            public override void StatusChanged(ILanguage language, ProgressChangedEventArgs args)
+            {
+                int progress = Convert.ToInt32(language.Status.Progress.Value * 100);
+                Console.WriteLine($"Initializing languages {progress}");
+            }
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        void LoadLanguages()
+        {
+            Rhino3DPlatform.Register();
+            RhinoCode.Languages.WaitStatusComplete(LanguageSpec.Any, new StatusResponder());
+            foreach (ILanguage language in RhinoCode.Languages)
+            {
+                if (language.Status.IsErrored)
+                {
+                    throw new Exception($"Language init error | {RhinoCode.Logger.Text}");
+                }
+            }
+        }
+    }
 }

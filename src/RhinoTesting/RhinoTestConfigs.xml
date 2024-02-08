@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Settings>
-  <RhinoSystemDirectory>C:\Users\ein\gits\rhino\src4\bin\Debug</RhinoSystemDirectory>
-  <!--<RhinoSystemDirectory>C:\Program Files\Rhino 8\System\</RhinoSystemDirectory>-->
+  <RhinoSystemDirectory>..\..\..\..\..\..\..\..\bin\Debug</RhinoSystemDirectory>
   <TestFilesDirectory>..\..\files\</TestFilesDirectory> 
 </Settings>

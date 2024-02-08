@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 
@@ -17,13 +17,13 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         [Test, TestCaseSource(nameof(GetTestScripts))]
         public void TestCSharpScript(Uri scriptPath)
         {
-            var code = GetCSharp().CreateCode(scriptPath);
+            Code code = GetCSharp().CreateCode(scriptPath);
 
-            ExecuteContext ctx;
+            RunContext ctx;
             if (scriptPath.ToString().Contains("_DEBUG"))
                 ctx = new DebugContext();
             else
-                ctx = new ExecuteContext();
+                ctx = new RunContext();
 
             ctx.OverrideCodeParams = true;
             ctx.Outputs["result"] = default;
@@ -40,12 +40,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             if (s_cs is null)
             {
-                Rhino3DPlatform.Activate();
-                RhinoCode.Languages.RespondToStatusWaits();
-
                 ILanguage csharp = RhinoCode.Languages.QueryLatest(LanguageSpec.CSharp);
-
-                csharp.Status.WaitReady();
 
                 Assert.NotNull(csharp);
 

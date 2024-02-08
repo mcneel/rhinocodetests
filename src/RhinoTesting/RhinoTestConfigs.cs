@@ -42,6 +42,10 @@ namespace Rhino.Testing
             {
                 _xml = XDocument.Load(SettingsFile);
                 RhinoSystemDir = _xml.Descendants("RhinoSystemDirectory").FirstOrDefault()?.Value ?? null;
+                if (!Path.IsPathRooted(RhinoSystemDir))
+                {
+                    RhinoSystemDir = Path.GetFullPath(Path.Combine(SettingsDir, RhinoSystemDir));
+                }
             }
         }
     }
