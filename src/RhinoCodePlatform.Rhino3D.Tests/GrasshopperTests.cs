@@ -45,9 +45,9 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         }
 
         [Test, TestCaseSource(nameof(GetTestDefinitions))]
-        public void TestGrasshopper1File(Uri filePath)
+        public void TestGrasshopper1File(ScriptInfo scriptInfo)
         {
-            Code code = GetGrasshopper().CreateCode(filePath);
+            Code code = GetGrasshopper().CreateCode(scriptInfo.Uri);
 
             var ctx = new RunContext
             {
@@ -60,14 +60,15 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 }
             };
 
-            code.Run(ctx);
-
-            Assert.True(ctx.Outputs.TryGet("result", out IGH_Structure data));
-            foreach (GH_Path p in data.Paths)
+            if (TryRunCode(scriptInfo, code, ctx))
             {
-                foreach (var d in data.get_Branch(p))
-                    if (d is GH_Boolean result)
-                        Assert.True(result.Value);
+                Assert.True(ctx.Outputs.TryGet("result", out IGH_Structure data));
+                foreach (GH_Path p in data.Paths)
+                {
+                    foreach (var d in data.get_Branch(p))
+                        if (d is GH_Boolean result)
+                            Assert.True(result.Value);
+                }
             }
         }
 

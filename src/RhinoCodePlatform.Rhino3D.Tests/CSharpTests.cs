@@ -15,12 +15,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     public class CSharpTests : ScriptFixture
     {
         [Test, TestCaseSource(nameof(GetTestScripts))]
-        public void TestCSharpScript(Uri scriptPath)
+        public void TestCSharpScript(ScriptInfo scriptInfo)
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(scriptPath);
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(scriptInfo.Uri);
 
             RunContext ctx;
-            if (scriptPath.ToString().Contains("_DEBUG"))
+            if (scriptInfo.IsDebug)
                 ctx = new DebugContext();
             else
                 ctx = new RunContext();
@@ -28,10 +28,13 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             ctx.OverrideCodeParams = true;
             ctx.Outputs["result"] = default;
 
-            RunCompiledCode(code, ctx);
+            TryRunCode(scriptInfo, code, ctx);
 
-            Assert.True(ctx.Outputs.TryGet("result", out bool data));
-            Assert.True(data);
+            if (TryRunCode(scriptInfo, code, ctx))
+            {
+                Assert.True(ctx.Outputs.TryGet("result", out bool data));
+                Assert.True(data);
+            }
         }
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "*.cs");

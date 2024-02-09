@@ -14,9 +14,9 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     public class Python2Tests : ScriptFixture
     {
         [Test, TestCaseSource(nameof(GetTestScripts))]
-        public void TestPython2Script(Uri scriptPath)
+        public void TestPython2Script(ScriptInfo scriptInfo)
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(scriptPath);
+            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(scriptInfo.Uri);
 
             var ctx = new RunContext
             {
@@ -26,10 +26,11 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 },
             };
 
-            RunCompiledCode(code, ctx);
-
-            Assert.True(ctx.Outputs.TryGet("result", out bool data));
-            Assert.True(data);
+            if (TryRunCode(scriptInfo, code, ctx))
+            {
+                Assert.True(ctx.Outputs.TryGet("result", out bool data));
+                Assert.True(data);
+            }
         }
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py2\", "*.py");
