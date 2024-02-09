@@ -35,23 +35,32 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 if (Directory.Exists(fullpath))
                 {
                     foreach (var filePath in Directory.GetFiles(fullpath, fileFilter))
-                        yield return new object[] { new Uri(filePath) };
+                        yield return new object[] { new ScriptInfo(new Uri(filePath)) };
                 }
                 else
                     yield break;
             }
         }
 
-        protected void RunCompiledCode(Code code, RunContext context)
+        protected bool TryRunCode(ScriptInfo scriptInfo, Code code, RunContext context)
         {
             try
             {
                 code.Run(context);
+                return true;
             }
             catch (CompileException compileEx)
             {
-                throw new Exception(compileEx.ToString());
+                if (!scriptInfo.ExpectsError)
+                    throw new Exception(compileEx.ToString());
             }
+            catch (Exception ex)
+            {
+                if (!scriptInfo.ExpectsError)
+                    throw ex;
+            }
+
+            return false;
         }
     }
 }
