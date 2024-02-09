@@ -15,6 +15,12 @@
     </PackageReference>
 
     <PackageReference Include="RhinoWindows" Version="8.*" />
+    <PackageReference Include="RhinoCommon">
+      <Version>8.*</Version>
+      <PrivateAssets>all</PrivateAssets>
+      <ExcludeAssets>runtime</ExcludeAssets>
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

@@ -30,9 +30,10 @@ namespace Rhino.Testing
 
         public static void TearDown()
         {
-            s_inRhino = false;
-            s_core?.Dispose();
-            s_core = null;
+            if (s_core is IDisposable)
+            {
+                DisposeCore();
+            }
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
@@ -52,6 +53,15 @@ namespace Rhino.Testing
         {
             Eto.Platform.AllowReinitialize = true;
             Eto.Platform.Initialize(Eto.Platforms.Wpf);
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        static void DisposeCore()
+        {
+            s_inRhino = false;
+
+            ((Rhino.Runtime.InProcess.RhinoCore)s_core).Dispose();
+            s_core = null;
         }
 
         static readonly string[] s_subpaths = new string[]

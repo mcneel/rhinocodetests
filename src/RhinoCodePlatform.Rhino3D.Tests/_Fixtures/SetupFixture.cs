@@ -21,7 +21,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             public override void StatusChanged(ILanguage language, ProgressChangedEventArgs args)
             {
                 int progress = Convert.ToInt32(language.Status.Progress.Value * 100);
-                Console.WriteLine($"Initializing languages {progress}");
+                Console.WriteLine($"Initializing languages {progress}%");
             }
         }
 
