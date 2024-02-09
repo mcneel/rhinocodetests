@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 
+using NUnit.Framework;
+
 namespace Rhino.Testing
 {
     public class RhinoTestConfigs
@@ -49,8 +51,10 @@ namespace Rhino.Testing
                 RhinoSystemDir = _xml.Descendants("RhinoSystemDirectory").FirstOrDefault()?.Value ?? null;
 
                 RhinoSystemDir = RhinoSystemDir.Replace("$(Configuration)", CONFIGURATION);
-                
-                    if (!Path.IsPathRooted(RhinoSystemDir))
+
+                TestContext.WriteLine($"Rhino system directory is {RhinoSystemDir}");
+
+                if (!Path.IsPathRooted(RhinoSystemDir))
                 {
                     RhinoSystemDir = Path.GetFullPath(Path.Combine(SettingsDir, RhinoSystemDir));
                 }
