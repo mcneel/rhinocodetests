@@ -21,7 +21,7 @@
     <None Update="NUnit.runsettings">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="RhinoTestConfigs.xml">
+    <None Update="Rhino.Testing.Configs.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

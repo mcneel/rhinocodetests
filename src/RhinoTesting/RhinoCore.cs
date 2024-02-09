@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+
 using NUnit.Framework;
 
 namespace Rhino.Testing
@@ -14,13 +15,11 @@ namespace Rhino.Testing
         static IDisposable s_core;
         static bool s_inRhino = false;
 
-        public static RhinoTestConfigs Configs { get; } = new RhinoTestConfigs();
-
         public static void Initialize()
         {
             if (s_core is null)
             {
-                s_systemDirectory = Configs.RhinoSystemDir;
+                s_systemDirectory = Configs.Current.RhinoSystemDir;
 
                 AppDomain.CurrentDomain.AssemblyResolve += ResolveForRhinoAssemblies;
 

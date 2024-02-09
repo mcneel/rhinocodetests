@@ -4,24 +4,24 @@ using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 
-using NUnit.Framework;
-
 namespace Rhino.Testing
 {
-    public class RhinoTestConfigs
+    public class Configs
     {
 #if DEBUG
         const string CONFIGURATION = "Debug";
 #else
         const string CONFIGURATION = "Release";
 #endif
-        static readonly string SETTINGS_FILE = $"{typeof(RhinoTestConfigs).Name}.xml";
-        static readonly Assembly s_assembly = typeof(RhinoTestConfigs).Assembly;
+        static readonly Assembly s_assembly = typeof(Configs).Assembly;
+        static readonly string s_settingsFileName = $"{s_assembly.FullName}.xml";
         readonly XDocument _xml;
 
-        public string RhinoSystemDir { get; private set; }
-        public string SettingsDir { get; private set; }
-        public string SettingsFile { get; private set; }
+        public static Configs Current { get; } = new Configs();
+
+        public string RhinoSystemDir { get; private set; } = string.Empty;
+        public string SettingsDir { get; private set; } = string.Empty;
+        public string SettingsFile { get; private set; } = string.Empty;
 
         public bool TryGetConfig<T>(string name, out T value)
         {
@@ -39,11 +39,11 @@ namespace Rhino.Testing
             return false;
         }
 
-        public RhinoTestConfigs()
+        public Configs()
         {
             RhinoSystemDir = string.Empty;
             SettingsDir = Path.GetDirectoryName(s_assembly.Location);
-            SettingsFile = Path.Combine(SettingsDir, SETTINGS_FILE);
+            SettingsFile = Path.Combine(SettingsDir, s_settingsFileName);
 
             if (File.Exists(SettingsFile))
             {
