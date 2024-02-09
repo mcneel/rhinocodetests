@@ -11,12 +11,12 @@ using Rhino.Runtime.Code.Languages;
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
-    public class Python3Tests : Rhino.Testing.Fixtures.RhinoTestFixture
+    public class Python3Tests : ScriptFixture
     {
         [Test, TestCaseSource(nameof(GetTestScripts))]
         public void TestPython3Script(Uri scriptPath)
         {
-            Code code = GetPython3().CreateCode(scriptPath);
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(scriptPath);
 
             var ctx = new RunContext
             {
@@ -26,41 +26,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 },
             };
 
-            Utils.RunCode(code, ctx);
+            RunCompiledCode(code, ctx);
 
             Assert.True(ctx.Outputs.TryGet("result", out bool data));
             Assert.True(data);
         }
 
-        static object s_py3 = default;
-
-        static ILanguage GetPython3()
-        {
-            if (s_py3 is null)
-            {
-                ILanguage python3 = RhinoCode.Languages.QueryLatest(LanguageSpec.Python3);
-                                
-                Assert.NotNull(python3);
-
-                s_py3 = python3;
-            }
-
-            return (ILanguage)s_py3;
-        }
-
-        static IEnumerable<object[]> GetTestScripts()
-        {
-            if (Configs.TryGetConfig("TestFilesDirectory", out string fileDir))
-            {
-                string fullpath = Path.GetFullPath(Path.Combine(Configs.SettingsDir, @"..\..\..\", fileDir, @"py3\"));
-                if (Directory.Exists(fullpath))
-                {
-                    foreach (var filePath in Directory.GetFiles(fullpath, "*.py"))
-                        yield return new object[] { new Uri(filePath) };
-                }
-                else
-                    yield break;
-            }
-        }
+        static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py3\", "*.py");
     }
 }
