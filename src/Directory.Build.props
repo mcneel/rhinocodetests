@@ -3,4 +3,8 @@
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory).editorconfig" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <RhinoSystemDirectory>$(MSBuildThisFileDirectory)..\..\..\..\bin\$(Configuration)</RhinoSystemDirectory>
+  </PropertyGroup>
 </Project>

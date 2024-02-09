@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -8,6 +8,11 @@ namespace Rhino.Testing
 {
     public class RhinoTestConfigs
     {
+#if DEBUG
+        const string CONFIGURATION = "Debug";
+#else
+        const string CONFIGURATION = "Release";
+#endif
         static readonly string SETTINGS_FILE = $"{typeof(RhinoTestConfigs).Name}.xml";
         static readonly Assembly s_assembly = typeof(RhinoTestConfigs).Assembly;
         readonly XDocument _xml;
@@ -42,7 +47,10 @@ namespace Rhino.Testing
             {
                 _xml = XDocument.Load(SettingsFile);
                 RhinoSystemDir = _xml.Descendants("RhinoSystemDirectory").FirstOrDefault()?.Value ?? null;
-                if (!Path.IsPathRooted(RhinoSystemDir))
+
+                RhinoSystemDir = RhinoSystemDir.Replace("$(Configuration)", CONFIGURATION);
+                
+                    if (!Path.IsPathRooted(RhinoSystemDir))
                 {
                     RhinoSystemDir = Path.GetFullPath(Path.Combine(SettingsDir, RhinoSystemDir));
                 }
