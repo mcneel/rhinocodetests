@@ -2,8 +2,9 @@ using System;
 
 using NUnit.Framework;
 
-namespace Rhino.Testing
+namespace Rhino.Testing.Fixtures
 {
+    [SetUpFixture]
     public abstract class RhinoSetupFixture
     {
         [OneTimeSetUp]
