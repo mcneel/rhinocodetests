@@ -52,8 +52,6 @@ namespace Rhino.Testing
 
                 RhinoSystemDir = RhinoSystemDir.Replace("$(Configuration)", CONFIGURATION);
 
-                TestContext.WriteLine($"Rhino system directory is {RhinoSystemDir}");
-
                 if (!Path.IsPathRooted(RhinoSystemDir))
                 {
                     RhinoSystemDir = Path.GetFullPath(Path.Combine(SettingsDir, RhinoSystemDir));

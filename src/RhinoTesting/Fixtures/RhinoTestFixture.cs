@@ -1,7 +1,10 @@
-﻿using System;
+using System;
 
-namespace Rhino.Testing
+using NUnit.Framework;
+
+namespace Rhino.Testing.Fixtures
 {
+    [TestFixture]
     public abstract class RhinoTestFixture
     {
         public static RhinoTestConfigs Configs => RhinoCore.Configs;

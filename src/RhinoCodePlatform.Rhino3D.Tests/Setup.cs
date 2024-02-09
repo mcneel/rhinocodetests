@@ -1,14 +1,14 @@
 using System;
 
+using NUnit.Framework;
+
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Languages;
-
-using NUnit.Framework;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [SetUpFixture]
-    public sealed class Setup : Rhino.Testing.RhinoSetupFixture
+    public sealed class Setup : Rhino.Testing.Fixtures.RhinoSetupFixture
     {
         public override void OneTimeSetup()
         {

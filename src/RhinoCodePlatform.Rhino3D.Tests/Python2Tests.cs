@@ -11,7 +11,7 @@ using Rhino.Runtime.Code.Languages;
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
-    public class Python2Tests : Rhino.Testing.RhinoTestFixture
+    public class Python2Tests : Rhino.Testing.Fixtures.RhinoTestFixture
     {
         [Test, TestCaseSource(nameof(GetTestScripts))]
         public void TestPython2Script(Uri scriptPath)

@@ -1,6 +1,8 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using NUnit.Framework;
 
 namespace Rhino.Testing
 {
@@ -10,6 +12,7 @@ namespace Rhino.Testing
     {
         static string s_systemDirectory;
         static IDisposable s_core;
+        static bool s_inRhino = false;
 
         public static RhinoTestConfigs Configs { get; } = new RhinoTestConfigs();
 
@@ -19,10 +22,8 @@ namespace Rhino.Testing
             {
                 s_systemDirectory = Configs.RhinoSystemDir;
 
-                // NOTE: using custom resolver instead of this
-                //RhinoInside.Resolver.Initialize();
-                //RhinoInside.Resolver.RhinoSystemDirectory = s_systemDirectory;
                 AppDomain.CurrentDomain.AssemblyResolve += ResolveForRhinoAssemblies;
+
                 LoadCore();
                 LoadEto();
             }
@@ -30,6 +31,7 @@ namespace Rhino.Testing
 
         public static void TearDown()
         {
+            s_inRhino = false;
             s_core?.Dispose();
             s_core = null;
         }
@@ -37,6 +39,12 @@ namespace Rhino.Testing
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         static void LoadCore()
         {
+            s_inRhino = Process.GetCurrentProcess().ProcessName.Equals("Rhino");
+            if (s_inRhino)
+            {
+                return;
+            }
+
             s_core = new Rhino.Runtime.InProcess.RhinoCore();
         }
 
@@ -59,6 +67,7 @@ namespace Rhino.Testing
             string file = Path.Combine(s_systemDirectory, name + ".dll");
             if (File.Exists(file))
             {
+                TestContext.WriteLine($"Loading assembly from file {file}");
                 return Assembly.LoadFrom(file);
             }
 
@@ -67,6 +76,7 @@ namespace Rhino.Testing
                 file = Path.Combine(s_systemDirectory, plugin, name + ".dll");
                 if (File.Exists(file))
                 {
+                    TestContext.WriteLine($"Loading plugin assembly from file {file}");
                     return Assembly.LoadFrom(file);
                 }
             }

@@ -12,7 +12,7 @@ using Rhino.Runtime.Code.Languages;
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
-    public class CSharpTests : Rhino.Testing.RhinoTestFixture
+    public class CSharpTests : Rhino.Testing.Fixtures.RhinoTestFixture
     {
         [Test, TestCaseSource(nameof(GetTestScripts))]
         public void TestCSharpScript(Uri scriptPath)

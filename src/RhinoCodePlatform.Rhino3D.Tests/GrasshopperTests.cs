@@ -14,7 +14,7 @@ using Grasshopper.Kernel.Types;
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
-    public class GrasshopperTests : Rhino.Testing.RhinoTestFixture
+    public class GrasshopperTests : Rhino.Testing.Fixtures.RhinoTestFixture
     {
         [Test]
         public void TestGrasshopper1Error()
