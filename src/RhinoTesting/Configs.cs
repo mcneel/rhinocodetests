@@ -6,7 +6,7 @@ using System.Xml.Linq;
 
 namespace Rhino.Testing
 {
-    public class Configs
+    public sealed class Configs
     {
 #if DEBUG
         const string CONFIGURATION = "Debug";
@@ -14,7 +14,7 @@ namespace Rhino.Testing
         const string CONFIGURATION = "Release";
 #endif
         static readonly Assembly s_assembly = typeof(Configs).Assembly;
-        static readonly string s_settingsFileName = $"{s_assembly.FullName}.xml";
+        static readonly string s_settingsFileName = $"{s_assembly.GetName().Name}.Configs.xml";
         readonly XDocument _xml;
 
         public static Configs Current { get; } = new Configs();
@@ -26,6 +26,11 @@ namespace Rhino.Testing
         public bool TryGetConfig<T>(string name, out T value)
         {
             value = default;
+
+            if (_xml is null)
+            {
+                return false;
+            }
 
             object v = _xml.Descendants(name).FirstOrDefault()?.Value;
 

@@ -8,7 +8,7 @@ using Rhino.Runtime.Code.Languages;
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [SetUpFixture]
-    public sealed class Setup : Rhino.Testing.Fixtures.RhinoSetupFixture
+    public sealed class SetupFixture : Rhino.Testing.Fixtures.RhinoSetupFixture
     {
         public override void OneTimeSetup()
         {
