@@ -49,8 +49,10 @@ namespace Rhino.Testing
                 RhinoSystemDir = _xml.Descendants("RhinoSystemDirectory").FirstOrDefault()?.Value ?? null;
 
                 RhinoSystemDir = RhinoSystemDir.Replace("$(Configuration)", CONFIGURATION);
-                
-                    if (!Path.IsPathRooted(RhinoSystemDir))
+
+                Console.WriteLine($"Rhino system directory is {RhinoSystemDir}");
+
+                if (!Path.IsPathRooted(RhinoSystemDir))
                 {
                     RhinoSystemDir = Path.GetFullPath(Path.Combine(SettingsDir, RhinoSystemDir));
                 }
