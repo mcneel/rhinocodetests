@@ -40,7 +40,7 @@ namespace Rhino.Testing
             }
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         static void LoadCore()
         {
             s_inRhino = Process.GetCurrentProcess().ProcessName.Equals("Rhino");
@@ -50,27 +50,16 @@ namespace Rhino.Testing
             }
 
             s_core = new Rhino.Runtime.InProcess.RhinoCore();
-
-            // configure Rhino
-            Rhino.RhinoApp.SendWriteToConsole = true;
-            if (!Rhino.Runtime.HostUtils.CheckForRdk(false, false))
-            {
-                Rhino.Runtime.HostUtils.InitializeRhinoCommon_RDK();
-            }
-            Rhino.Runtime.HostUtils.OnExceptionReport += (source, ex) =>
-            {
-                TestContext.WriteLine($"Error: {ex}");
-            };
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         static void LoadEto()
         {
             Eto.Platform.AllowReinitialize = true;
             Eto.Platform.Initialize(Eto.Platforms.Wpf);
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         static void LoadPlugins()
         {
             TestContext.WriteLine("Loading grasshopper (Headless)");
@@ -85,7 +74,7 @@ namespace Rhino.Testing
                 TestContext.WriteLine("Failed loading grasshopper (Headless)");
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         static void DisposeCore()
         {
             s_inRhino = false;
