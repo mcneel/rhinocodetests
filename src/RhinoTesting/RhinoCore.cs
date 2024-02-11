@@ -62,16 +62,19 @@ namespace Rhino.Testing
         [MethodImpl(MethodImplOptions.NoInlining)]
         static void LoadPlugins()
         {
-            TestContext.WriteLine("Loading grasshopper (Headless)");
+            //TestContext.WriteLine("Loading rdk");
+            //string rdkPlugin = Path.Combine(s_systemDirectory, "RDK_EtoUI.rhp");
+            //Rhino.PlugIns.PlugIn.LoadPlugIn(rdkPlugin, out Guid _);
 
-            string ghPlugin = Path.Combine(s_systemDirectory, @"Plug-ins\Grasshopper", "GrasshopperPlugin.rhp");
+            //TestContext.WriteLine("Loading grasshopper (Headless)");
+            //string ghPlugin = Path.Combine(s_systemDirectory, @"Plug-ins\Grasshopper", "GrasshopperPlugin.rhp");
+            //Rhino.PlugIns.PlugIn.LoadPlugIn(ghPlugin, out Guid _);
 
-            Rhino.PlugIns.PlugIn.LoadPlugIn(ghPlugin, out Guid _);
-            object ghObj = Rhino.RhinoApp.GetPlugInObject("Grasshopper");
-            if (ghObj?.GetType().GetMethod("RunHeadless") is MethodInfo runHeadLess)
-                runHeadLess.Invoke(ghObj, null);
-            else
-                TestContext.WriteLine("Failed loading grasshopper (Headless)");
+            //object ghObj = Rhino.RhinoApp.GetPlugInObject("Grasshopper");
+            //if (ghObj?.GetType().GetMethod("RunHeadless") is MethodInfo runHeadLess)
+            //    runHeadLess.Invoke(ghObj, null);
+            //else
+            //    TestContext.WriteLine("Failed loading grasshopper (Headless)");
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
