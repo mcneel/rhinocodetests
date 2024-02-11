@@ -1,7 +1,9 @@
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 using NUnit.Framework;
 
@@ -25,6 +27,8 @@ namespace Rhino.Testing
 
                 LoadCore();
                 LoadEto();
+
+                LoadPlugins();
             }
         }
 
@@ -36,7 +40,7 @@ namespace Rhino.Testing
             }
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         static void LoadCore()
         {
             s_inRhino = Process.GetCurrentProcess().ProcessName.Equals("Rhino");
@@ -46,16 +50,42 @@ namespace Rhino.Testing
             }
 
             s_core = new Rhino.Runtime.InProcess.RhinoCore();
+
+            // configure Rhino
+            Rhino.RhinoApp.SendWriteToConsole = true;
+            if (!Rhino.Runtime.HostUtils.CheckForRdk(false, false))
+            {
+                Rhino.Runtime.HostUtils.InitializeRhinoCommon_RDK();
+            }
+            Rhino.Runtime.HostUtils.OnExceptionReport += (source, ex) =>
+            {
+                TestContext.WriteLine($"Error: {ex}");
+            };
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+        static void LoadPlugins()
+        {
+            TestContext.WriteLine("Loading grasshopper (Headless)");
+
+            string ghPlugin = Path.Combine(s_systemDirectory, @"Plug-ins\Grasshopper", "GrasshopperPlugin.rhp");
+
+            Rhino.PlugIns.PlugIn.LoadPlugIn(ghPlugin, out Guid _);
+            object ghObj = Rhino.RhinoApp.GetPlugInObject("Grasshopper");
+            if (ghObj?.GetType().GetMethod("RunHeadless") is MethodInfo runHeadLess)
+                runHeadLess.Invoke(ghObj, null);
+            else
+                TestContext.WriteLine("Failed loading grasshopper (Headless)");
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         static void LoadEto()
         {
             Eto.Platform.AllowReinitialize = true;
             Eto.Platform.Initialize(Eto.Platforms.Wpf);
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         static void DisposeCore()
         {
             s_inRhino = false;
@@ -90,6 +120,7 @@ namespace Rhino.Testing
                 }
             }
 
+            TestContext.WriteLine($"Could not find assembly {name}");
             return null;
         }
     }
