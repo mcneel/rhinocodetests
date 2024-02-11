@@ -64,6 +64,13 @@ namespace Rhino.Testing
         }
 
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+        static void LoadEto()
+        {
+            Eto.Platform.AllowReinitialize = true;
+            Eto.Platform.Initialize(Eto.Platforms.Wpf);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         static void LoadPlugins()
         {
             TestContext.WriteLine("Loading grasshopper (Headless)");
@@ -76,13 +83,6 @@ namespace Rhino.Testing
                 runHeadLess.Invoke(ghObj, null);
             else
                 TestContext.WriteLine("Failed loading grasshopper (Headless)");
-        }
-
-        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-        static void LoadEto()
-        {
-            Eto.Platform.AllowReinitialize = true;
-            Eto.Platform.Initialize(Eto.Platforms.Wpf);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
