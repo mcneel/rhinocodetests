@@ -6,6 +6,8 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Rhino.Testing
 {
@@ -30,9 +32,6 @@ namespace Rhino.Testing
 
                 TestContext.WriteLine("Loading eto platform");
                 LoadEto();
-
-                TestContext.WriteLine("Loading grasshopper (headless)");
-                LoadGrasshopper();
             }
         }
 
@@ -53,7 +52,13 @@ namespace Rhino.Testing
                 return;
             }
 
-            s_core = new Rhino.Runtime.InProcess.RhinoCore();
+#if NET7_0_OR_GREATER
+            string[] args = new string[] { "/netcore " };
+#else
+            string[] args = new string[] { "/netfx " };
+#endif
+
+            s_core = new Rhino.Runtime.InProcess.RhinoCore(args);
 
             // ensure RhinoCommon and its associated native libraries are ready
             Rhino.Runtime.HostUtils.InitializeRhinoCommon();
@@ -74,19 +79,6 @@ namespace Rhino.Testing
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        static void LoadGrasshopper()
-        {
-            string ghPlugin = Path.Combine(s_systemDirectory, @"Plug-ins\Grasshopper", "GrasshopperPlugin.rhp");
-            Rhino.PlugIns.PlugIn.LoadPlugIn(ghPlugin, out Guid _);
-
-            object ghObj = Rhino.RhinoApp.GetPlugInObject("Grasshopper");
-            if (ghObj?.GetType().GetMethod("RunHeadless") is MethodInfo runHeadLess)
-                runHeadLess.Invoke(ghObj, null);
-            else
-                TestContext.WriteLine("Failed loading grasshopper (Headless)");
-        }
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
         static void DisposeCore()
         {
             s_inRhino = false;
@@ -95,28 +87,26 @@ namespace Rhino.Testing
             s_core = null;
         }
 
-        static readonly string[] s_subpaths = new string[]
-        {
-            @"Plug-ins\Grasshopper",
-        };
-
         static Assembly ResolveForRhinoAssemblies(object sender, ResolveEventArgs args)
         {
+            bool netcore =
+                System.Environment.Version.Major >= 5
+             || RuntimeInformation.FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase);
+
             string name = new AssemblyName(args.Name).Name;
 
-            string file = Path.Combine(s_systemDirectory, name + ".dll");
-            if (File.Exists(file))
+            foreach (string path in new List<string>
             {
-                TestContext.WriteLine($"Loading assembly from file {file}");
-                return Assembly.LoadFrom(file);
-            }
-
-            foreach (var plugin in s_subpaths)
+                Path.Combine(s_systemDirectory, netcore ? "netcore" : "netfx"),
+                s_systemDirectory,
+                typeof(RhinoCore).Assembly.Location,
+                Path.Combine(s_systemDirectory, @"Plug-ins\Grasshopper"),
+            })
             {
-                file = Path.Combine(s_systemDirectory, plugin, name + ".dll");
+                string file = Path.Combine(path, name + ".dll");
                 if (File.Exists(file))
                 {
-                    TestContext.WriteLine($"Loading plugin assembly from file {file}");
+                    TestContext.WriteLine($"Loading assembly from file {file}");
                     return Assembly.LoadFrom(file);
                 }
             }
