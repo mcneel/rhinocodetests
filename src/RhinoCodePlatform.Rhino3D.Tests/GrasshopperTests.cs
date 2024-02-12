@@ -60,7 +60,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 }
             };
 
-            if (TryRunCode(scriptInfo, code, ctx))
+            if (ScriptFixture.TryRunCode(scriptInfo, code, ctx))
             {
                 Assert.True(ctx.Outputs.TryGet("result", out IGH_Structure data));
                 foreach (GH_Path p in data.Paths)
