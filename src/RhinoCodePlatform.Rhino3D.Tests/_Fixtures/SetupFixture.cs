@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 
 using NUnit.Framework;
 
@@ -25,8 +26,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        void LoadLanguages()
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+        static void LoadLanguages()
         {
             Rhino3DPlatform.Register();
             RhinoCode.Languages.WaitStatusComplete(LanguageSpec.Any, new StatusResponder());
