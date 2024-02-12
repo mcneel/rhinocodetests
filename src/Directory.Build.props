@@ -5,6 +5,6 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <RhinoSystemDirectory>$(RHINO_DEV_CLONE)$(Configuration)</RhinoSystemDirectory>
+    <RhinoSystemDirectory>C:\Users\ein\gits\rhino\src4\bin\Debug</RhinoSystemDirectory>
   </PropertyGroup>
 </Project>
