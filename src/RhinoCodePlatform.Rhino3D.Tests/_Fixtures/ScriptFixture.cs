@@ -19,7 +19,10 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             if (fixture.m_language is null)
             {
                 fixture.m_language = RhinoCode.Languages.QueryLatest(languageSpec);
-                Assert.NotNull(fixture.m_language);
+                if (fixture.m_language is null)
+                {
+                    throw new Exception($"Language query error | {RhinoCode.Logger.Text}");
+                }
             }
 
             return fixture.m_language;
