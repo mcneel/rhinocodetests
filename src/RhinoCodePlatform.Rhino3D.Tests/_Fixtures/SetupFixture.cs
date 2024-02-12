@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Runtime.CompilerServices;
 
 using NUnit.Framework;
@@ -14,6 +15,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         public override void OneTimeSetup()
         {
             base.OneTimeSetup();
+
+            if (!Directory.Exists(Rhino.Testing.Configs.Current.RhinoSystemDir))
+            {
+                throw new DirectoryNotFoundException(Rhino.Testing.Configs.Current.RhinoSystemDir);
+            }
+
             LoadLanguages();
         }
 
