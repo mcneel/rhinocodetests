@@ -7,12 +7,18 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*" />
-    <ProjectReference Include="..\RhinoTesting\Rhino.Testing.csproj" />
+    <PackageReference Include="NUnit" Version="3.*" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.*" />
+    <PackageReference Include="Rhino.Testing" Version="8.0.0-beta" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Rhino.Runtime.Code" HintPath="$(RhinoSystemDirectory)\Rhino.Runtime.Code.dll" Private="True" />
     <Reference Include="RhinoCodePlatform.Rhino3D" HintPath="$(RhinoSystemDirectory)\RhinoCodePlatform.Rhino3D.dll" Private="False" />
     <Reference Include="Grasshopper" HintPath="$(RhinoSystemDirectory)\Plug-ins\Grasshopper\Grasshopper.dll" Private="False" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Rhino.Testing.Configs.xml" CopyToOutputDirectory="Always" />
   </ItemGroup>
 </Project>
