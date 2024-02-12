@@ -6,8 +6,6 @@ using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
 
-using NUnit.Framework;
-
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     public abstract class ScriptFixture : Rhino.Testing.Fixtures.RhinoTestFixture
@@ -45,7 +43,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
         }
 
-        protected bool TryRunCode(ScriptInfo scriptInfo, Code code, RunContext context)
+        protected static bool TryRunCode(ScriptInfo scriptInfo, Code code, RunContext context)
         {
             try
             {
@@ -57,10 +55,10 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 if (!scriptInfo.ExpectsError)
                     throw new Exception(compileEx.ToString());
             }
-            catch (Exception ex)
+            catch
             {
                 if (!scriptInfo.ExpectsError)
-                    throw ex;
+                    throw;
             }
 
             return false;

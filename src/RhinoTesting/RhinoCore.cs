@@ -2,12 +2,11 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Threading;
-
-using NUnit.Framework;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
+
+using NUnit.Framework;
 
 namespace Rhino.Testing
 {
@@ -25,6 +24,14 @@ namespace Rhino.Testing
             {
                 s_systemDirectory = Configs.Current.RhinoSystemDir;
 
+                s_inRhino = Process.GetCurrentProcess().ProcessName.Equals("Rhino");
+                if (s_inRhino)
+                {
+                    TestContext.WriteLine("Configuring rhino process");
+                    ConfigureRhino();
+                    return;
+                }
+
                 AppDomain.CurrentDomain.AssemblyResolve += ResolveForRhinoAssemblies;
 
                 TestContext.WriteLine("Loading rhino core");
@@ -32,6 +39,9 @@ namespace Rhino.Testing
 
                 TestContext.WriteLine("Loading eto platform");
                 LoadEto();
+
+                TestContext.WriteLine("Loading grasshopper");
+                LoadGrasshopper();
             }
         }
 
@@ -44,14 +54,21 @@ namespace Rhino.Testing
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
+        static void ConfigureRhino()
+        {
+            Action m = () =>
+            {
+                TestContext.WriteLine("Loading grasshopper");
+                LoadGrasshopper();
+            };
+
+            Rhino.RhinoApp.InvokeOnUiThread(m);
+            return;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
         static void LoadCore()
         {
-            s_inRhino = Process.GetCurrentProcess().ProcessName.Equals("Rhino");
-            if (s_inRhino)
-            {
-                return;
-            }
-
 #if NET7_0_OR_GREATER
             string[] args = new string[] { "/netcore " };
 #else
@@ -76,6 +93,19 @@ namespace Rhino.Testing
         {
             Eto.Platform.AllowReinitialize = true;
             Eto.Platform.Initialize(Eto.Platforms.Wpf);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static void LoadGrasshopper()
+        {
+            string ghPlugin = Path.Combine(s_systemDirectory, @"Plug-ins\Grasshopper", "GrasshopperPlugin.rhp");
+            Rhino.PlugIns.PlugIn.LoadPlugIn(ghPlugin, out Guid _);
+
+            object ghObj = Rhino.RhinoApp.GetPlugInObject("Grasshopper");
+            if (ghObj?.GetType().GetMethod("RunHeadless") is MethodInfo runHeadLess)
+                runHeadLess.Invoke(ghObj, null);
+            else
+                TestContext.WriteLine("Failed loading grasshopper (Headless)");
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
