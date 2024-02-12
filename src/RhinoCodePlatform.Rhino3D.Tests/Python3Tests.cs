@@ -26,7 +26,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 },
             };
 
-            if (ScriptFixture.TryRunCode(scriptInfo, code, ctx))
+            if (TryRunCode(scriptInfo, code, ctx))
             {
                 Assert.True(ctx.Outputs.TryGet("result", out bool data));
                 Assert.True(data);
