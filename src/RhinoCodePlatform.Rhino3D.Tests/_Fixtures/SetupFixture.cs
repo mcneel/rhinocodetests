@@ -36,7 +36,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         static void LoadLanguages()
         {
-            Rhino3DPlatform.Register();
+            Registrar.StartScripting();
             RhinoCode.Languages.WaitStatusComplete(LanguageSpec.Any, new StatusResponder());
             foreach (ILanguage language in RhinoCode.Languages)
             {
