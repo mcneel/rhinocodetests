@@ -60,7 +60,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 }
             };
 
-            if (TryRunCode(scriptInfo, code, ctx))
+            if (TryRunCode(scriptInfo, code, ctx, out string errorMessage))
             {
                 Assert.True(ctx.Outputs.TryGet("result", out IGH_Structure data));
                 foreach (GH_Path p in data.Paths)
@@ -68,6 +68,16 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                     foreach (var d in data.get_Branch(p))
                         if (d is GH_Boolean result)
                             Assert.True(result.Value);
+                }
+            }
+            else if (scriptInfo.ExpectsError)
+            {
+                if (ctx.Outputs.TryGet("result", out IGH_Structure errors))
+                {
+                    foreach (GH_Path p in errors.Paths)
+                        foreach (var d in errors.get_Branch(p))
+                            if (d is GH_String error)
+                                Assert.True(errorMessage.Contains(error.Value));
                 }
             }
         }

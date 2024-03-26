@@ -44,8 +44,10 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
         }
 
-        protected static bool TryRunCode(ScriptInfo scriptInfo, Code code, RunContext context)
+        protected static bool TryRunCode(ScriptInfo scriptInfo, Code code, RunContext context, out string errorMessage)
         {
+            errorMessage = default;
+
             try
             {
                 code.Run(context);
@@ -53,12 +55,16 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
             catch (CompileException compileEx)
             {
-                if (!scriptInfo.ExpectsError)
+                if (scriptInfo.ExpectsError)
+                    errorMessage = compileEx.ToString();
+                else
                     throw new Exception(compileEx.ToString());
             }
-            catch
+            catch (Exception runEx)
             {
-                if (!scriptInfo.ExpectsError)
+                if (scriptInfo.ExpectsError)
+                    errorMessage = runEx.ToString();
+                else
                     throw;
             }
 
