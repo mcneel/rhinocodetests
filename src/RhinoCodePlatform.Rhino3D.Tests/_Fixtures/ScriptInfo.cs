@@ -1,4 +1,7 @@
+#pragma warning disable SYSLIB1045 // Convert to 'GeneratedRegexAttribute'.
+#pragma warning disable IDE0090 // Use 'new(...)'
 using System;
+using System.IO;
 using System.Text.RegularExpressions;
 
 using Rhino.Runtime.Code.Storage;
@@ -7,17 +10,15 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 {
     public sealed class ScriptInfo
     {
-        static readonly Regex s_errorMatcher = new(@"_error\((?<message>.+)\)");
-        
         public Uri Uri { get; }
+
+        public string Name { get; }
 
         public bool IsDebug { get; } = false;
 
-        public bool ExpectsError { get; } = false;
-        
-        public string ExpectsErrorMessage { get; }
-
         public bool IsSkipped { get; } = false;
+
+        public bool ExpectsError { get; } = false;
 
         public ScriptInfo(Uri scriptPath)
         {
@@ -27,18 +28,30 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             string uriStr = scriptPath.ToString().ToLower();
 
             Uri = scriptPath;
+            Name = Uri.GetEndpointTitle();
             IsDebug = uriStr.Contains("_debug");
-
-            ExpectsError = uriStr.Contains("_error");
-            Match m = s_errorMatcher.Match(uriStr);
-            if (m.Success)
-            {
-                ExpectsErrorMessage = m.Groups["message"].Value;
-            }
-
             IsSkipped = uriStr.Contains("_skip");
+            ExpectsError = uriStr.Contains("_error");
         }
 
-        public override string ToString() => Uri.GetEndpointTitle();
+        public bool MatchesError(string errorMessage)
+        {
+            string errorsFile = Path.ChangeExtension(Uri.ToString(), ".txt");
+
+            if (File.Exists(errorsFile))
+            {
+                foreach (string line in File.ReadAllLines(errorsFile))
+                {
+                    if (new Regex(line).IsMatch(errorMessage))
+                        return true;
+                }
+
+                return false;
+            }
+
+            return true;
+        }
+
+        public override string ToString() => Name;
     }
 }

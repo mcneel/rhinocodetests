@@ -28,11 +28,13 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 },
             };
 
-            if (TryRunCode(scriptInfo, code, ctx, out string _))
+            if (TryRunCode(scriptInfo, code, ctx, out string errorMessage))
             {
                 Assert.True(ctx.Outputs.TryGet("result", out bool data));
                 Assert.True(data);
             }
+            else
+                Assert.True(scriptInfo.MatchesError(errorMessage));
         }
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py3\", "*.py");

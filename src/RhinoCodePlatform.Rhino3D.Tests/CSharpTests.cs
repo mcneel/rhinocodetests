@@ -30,11 +30,13 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             ctx.OverrideCodeParams = true;
             ctx.Outputs["result"] = default;
 
-            if (TryRunCode(scriptInfo, code, ctx, out string _))
+            if (TryRunCode(scriptInfo, code, ctx, out string errorMessage))
             {
                 Assert.True(ctx.Outputs.TryGet("result", out bool data));
                 Assert.True(data);
             }
+            else
+                Assert.True(scriptInfo.MatchesError(errorMessage));
         }
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "*.cs");
