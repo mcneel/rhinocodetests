@@ -47,10 +47,13 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         [Test, TestCaseSource(nameof(GetTestDefinitions))]
         public void TestGrasshopper1File(ScriptInfo scriptInfo)
         {
+            Assume.That(scriptInfo.IsSkipped == false);
+            
             Code code = GetGrasshopper().CreateCode(scriptInfo.Uri);
 
             var ctx = new RunContext
             {
+                OverrideCodeParams = true,
                 Outputs = {
                     ["result"] = default,
                 },
@@ -70,15 +73,10 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                             Assert.True(result.Value);
                 }
             }
-            else if (scriptInfo.ExpectsError)
+            else if (scriptInfo.ExpectsError
+                        && !string.IsNullOrWhiteSpace(scriptInfo.ExpectsErrorMessage))
             {
-                if (ctx.Outputs.TryGet("result", out IGH_Structure errors))
-                {
-                    foreach (GH_Path p in errors.Paths)
-                        foreach (var d in errors.get_Branch(p))
-                            if (d is GH_String error)
-                                Assert.True(errorMessage.Contains(error.Value));
-                }
+                Assert.True(errorMessage.Contains(scriptInfo.ExpectsErrorMessage));
             }
         }
 
