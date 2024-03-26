@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Settings>
   <RhinoSystemDirectory>..\..\..\..\..\..\..\..\bin\Release</RhinoSystemDirectory>
+  <LoadGrasshopper>true</LoadGrasshopper>
   <TestFilesDirectory>..\..\..\..\..\files\</TestFilesDirectory> 
 </Settings>
