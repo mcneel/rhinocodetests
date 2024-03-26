@@ -73,11 +73,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                             Assert.True(result.Value);
                 }
             }
-            else if (scriptInfo.ExpectsError
-                        && !string.IsNullOrWhiteSpace(scriptInfo.ExpectsErrorMessage))
-            {
-                Assert.True(errorMessage.Contains(scriptInfo.ExpectsErrorMessage));
-            }
+            else
+                Assert.True(scriptInfo.MatchesError(errorMessage));
         }
 
         ILanguage GetGrasshopper() => GetLanguage(this, new LanguageSpec("*.*.grasshopper", "1"));
