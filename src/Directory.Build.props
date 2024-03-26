@@ -6,5 +6,6 @@
 
   <PropertyGroup>
     <RhinoSystemDirectory>$(MSBuildThisFileDirectory)..\..\..\..\bin\$(Configuration)</RhinoSystemDirectory>
+    <RhinoPluginsDirectory>$(MSBuildThisFileDirectory)..\..\..\..\bin\$(Configuration)\Plug-ins</RhinoPluginsDirectory>
   </PropertyGroup>
 </Project>
