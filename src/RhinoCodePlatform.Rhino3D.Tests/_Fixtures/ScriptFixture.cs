@@ -33,7 +33,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             if (SetupFixture.TryGetTestFiles(out string fileDir))
             {
-                string fullpath = Path.GetFullPath(Path.Combine(configs.SettingsDir, @"..\..\..\", fileDir, subPath));
+                string fullpath = Path.GetFullPath(Path.Combine(configs.SettingsDir, fileDir, subPath));
                 if (Directory.Exists(fullpath))
                 {
                     foreach (var filePath in Directory.GetFiles(fullpath, fileFilter))
