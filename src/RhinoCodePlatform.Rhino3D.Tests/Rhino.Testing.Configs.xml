@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Settings>
   <RhinoSystemDirectory>..\..\..\..\..\..\..\..\bin\Release</RhinoSystemDirectory>
-  <TestFilesDirectory>..\..\files\</TestFilesDirectory>
+  <TestFilesDirectory>..\..\..\..\..\files\</TestFilesDirectory> 
 </Settings>
