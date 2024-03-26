@@ -1,0 +1,2 @@
+\'return\' outside function  \[13\:1\]
+\'return\' outside function
