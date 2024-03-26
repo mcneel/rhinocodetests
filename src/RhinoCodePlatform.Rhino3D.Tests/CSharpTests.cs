@@ -28,9 +28,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             ctx.OverrideCodeParams = true;
             ctx.Outputs["result"] = default;
 
-            TryRunCode(scriptInfo, code, ctx);
-
-            if (TryRunCode(scriptInfo, code, ctx))
+            if (TryRunCode(scriptInfo, code, ctx, out string _))
             {
                 Assert.True(ctx.Outputs.TryGet("result", out bool data));
                 Assert.True(data);
