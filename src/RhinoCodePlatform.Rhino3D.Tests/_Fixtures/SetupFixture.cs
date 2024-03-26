@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Xml.Serialization;
 
 using NUnit.Framework;
 
@@ -12,6 +13,40 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     [SetUpFixture]
     public sealed class SetupFixture : Rhino.Testing.Fixtures.RhinoSetupFixture
     {
+        static readonly MxTestSettings s_settings;
+
+        static SetupFixture()
+        {
+            string settingsFile = Rhino.Testing.Configs.Current.SettingsFile;
+
+            if (File.Exists(settingsFile))
+            {
+                try
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(MxTestSettings));
+                    s_settings = Rhino.Testing.Configs.Deserialize<MxTestSettings>(serializer, settingsFile);
+
+                    return;
+                }
+                catch (Exception) { }
+            }
+
+            s_settings = new MxTestSettings();
+        }
+
+        public static bool TryGetTestFiles(out string filesDir)
+        {
+            filesDir = default;
+
+            if (Directory.Exists(s_settings.TestFilesDirectory))
+            {
+                filesDir = s_settings.TestFilesDirectory;
+                return true;
+            }
+
+            return false;
+        }
+
         public override void OneTimeSetup()
         {
             base.OneTimeSetup();

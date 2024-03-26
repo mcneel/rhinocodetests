@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
+using Rhino.Runtime.Code.Serialization;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -30,7 +31,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             Rhino.Testing.Configs configs = Rhino.Testing.Configs.Current;
 
-            if (configs.TryGetConfig("TestFilesDirectory", out string fileDir))
+            if (SetupFixture.TryGetTestFiles(out string fileDir))
             {
                 string fullpath = Path.GetFullPath(Path.Combine(configs.SettingsDir, @"..\..\..\", fileDir, subPath));
                 if (Directory.Exists(fullpath))
