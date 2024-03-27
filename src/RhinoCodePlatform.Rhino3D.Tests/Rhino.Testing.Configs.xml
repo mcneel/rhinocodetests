@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Settings>
-  <RhinoSystemDirectory>..\..\..\..\..\..\..\..\bin\Release</RhinoSystemDirectory>
+  <RhinoSystemDirectory>C:\Users\ein\gits\rhino\src4\bin\Debug</RhinoSystemDirectory>
+  <LoadLegacyIronPython>true</LoadLegacyIronPython>
   <LoadGrasshopper>true</LoadGrasshopper>
-  <TestFilesDirectory>..\..\..\..\..\files\</TestFilesDirectory> 
+
+  <TestFilesDirectory>..\..\..\..\..\files\</TestFilesDirectory>
 </Settings>
