@@ -72,6 +72,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         static void LoadLanguages()
         {
             Registrar.StartScripting();
+            Registrar.SendReportsToConsole = true;
             RhinoCode.Languages.WaitStatusComplete(LanguageSpec.Any, new StatusResponder());
             foreach (ILanguage language in RhinoCode.Languages)
             {
