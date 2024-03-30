@@ -47,8 +47,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         [Test, TestCaseSource(nameof(GetTestDefinitions))]
         public void TestGrasshopper1File(ScriptInfo scriptInfo)
         {
-            Assume.That(scriptInfo.IsSkipped == false);
-            
+            TestSkip(scriptInfo);
+
             Code code = GetGrasshopper().CreateCode(scriptInfo.Uri);
 
             var ctx = new RunContext

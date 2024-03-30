@@ -5,7 +5,8 @@ using System.Collections.Generic;
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
-using Rhino.Runtime.Code.Serialization;
+
+using NUnit.Framework;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -69,6 +70,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
 
             return false;
+        }
+    
+        protected static void TestSkip(ScriptInfo scriptInfo)
+        {
+            if (scriptInfo.IsSkipped)
+                Assert.Ignore();
         }
     }
 }
