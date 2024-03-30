@@ -4,12 +4,15 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 
+using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Storage;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     public sealed class ScriptInfo
     {
+        static readonly Regex s_rhinoVersionFinder = new Regex(@"(rc|rh|gh)(?<major>\d)\.(?<minor>\d)");
+
         public Uri Uri { get; }
 
         public string Name { get; }
@@ -32,6 +35,20 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             IsDebug = uriStr.Contains("_debug");
             IsSkipped = uriStr.Contains("_skip");
             ExpectsError = uriStr.Contains("_error");
+
+            Match m = s_rhinoVersionFinder.Match(uriStr);
+            if (m.Success)
+            {
+                int major = int.Parse(m.Groups["major"].Value);
+                int minor = int.Parse(m.Groups["minor"].Value);
+
+                Version apiVersion = typeof(Code).Assembly.GetName().Version;
+                if (apiVersion.Major < major
+                        || apiVersion.Minor < minor)
+                {
+                    IsSkipped = true;
+                }
+            }
         }
 
         public bool MatchesError(string errorMessage)

@@ -16,7 +16,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         [Test, TestCaseSource(nameof(GetTestScripts))]
         public void TestPython2Script(ScriptInfo scriptInfo)
         {
-            Assume.That(scriptInfo.IsSkipped == false);
+            TestSkip(scriptInfo);
 
             Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(scriptInfo.Uri);
 
