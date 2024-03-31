@@ -13,72 +13,72 @@ bool TestNuGetRef(string refSpec, NuGetPackageSpec nugetSpec)
     return refNugetSpec.Equals(nugetSpec);
 }
 
-bool result = true;
+bool res = true;
 
 // with #r ================================================================================================
 // using ,
-result &= TestNuGetRef("#r \"nuget: RestSharp,110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
-result &= TestNuGetRef("# r \"nuget: RestSharp , 110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
+res &= TestNuGetRef("#r \"nuget: RestSharp,110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
+res &= TestNuGetRef("# r \"nuget: RestSharp , 110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
 
 // using ==
-result &= TestNuGetRef("#r \"nuget: RestSharp==110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
-result &= TestNuGetRef("# r \"nuget: RestSharp == 110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
+res &= TestNuGetRef("#r \"nuget: RestSharp==110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
+res &= TestNuGetRef("# r \"nuget: RestSharp == 110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
 
 // using >=
-result &= TestNuGetRef("#r \"nuget: RestSharp>=110.2.0\"", new NuGetPackageSpec("RestSharp>=110.2.0"));
-result &= TestNuGetRef("# r \"nuget: RestSharp >= 110.2.0\"", new NuGetPackageSpec("RestSharp>=110.2.0"));
+res &= TestNuGetRef("#r \"nuget: RestSharp>=110.2.0\"", new NuGetPackageSpec("RestSharp>=110.2.0"));
+res &= TestNuGetRef("# r \"nuget: RestSharp >= 110.2.0\"", new NuGetPackageSpec("RestSharp>=110.2.0"));
 
 // using <=
-result &= TestNuGetRef("#r \"nuget: RestSharp<=110.2.0\"", new NuGetPackageSpec("RestSharp<=110.2.0"));
-result &= TestNuGetRef("# r \"nuget: RestSharp <= 110.2.0\"", new NuGetPackageSpec("RestSharp<=110.2.0"));
+res &= TestNuGetRef("#r \"nuget: RestSharp<=110.2.0\"", new NuGetPackageSpec("RestSharp<=110.2.0"));
+res &= TestNuGetRef("# r \"nuget: RestSharp <= 110.2.0\"", new NuGetPackageSpec("RestSharp<=110.2.0"));
 
 // using >
-result &= TestNuGetRef("#r \"nuget: RestSharp>110.2.0\"", new NuGetPackageSpec("RestSharp>110.2.0"));
-result &= TestNuGetRef("# r \"nuget: RestSharp > 110.2.0\"", new NuGetPackageSpec("RestSharp>110.2.0"));
+res &= TestNuGetRef("#r \"nuget: RestSharp>110.2.0\"", new NuGetPackageSpec("RestSharp>110.2.0"));
+res &= TestNuGetRef("# r \"nuget: RestSharp > 110.2.0\"", new NuGetPackageSpec("RestSharp>110.2.0"));
 
 // using <
-result &= TestNuGetRef("#r \"nuget: RestSharp<110.2.0\"", new NuGetPackageSpec("RestSharp<110.2.0"));
-result &= TestNuGetRef("# r \"nuget: RestSharp < 110.2.0\"", new NuGetPackageSpec("RestSharp<110.2.0"));
+res &= TestNuGetRef("#r \"nuget: RestSharp<110.2.0\"", new NuGetPackageSpec("RestSharp<110.2.0"));
+res &= TestNuGetRef("# r \"nuget: RestSharp < 110.2.0\"", new NuGetPackageSpec("RestSharp<110.2.0"));
 
 // no version
-result &= TestNuGetRef("#r \"nuget: RestSharp\"", new NuGetPackageSpec("RestSharp"));
-result &= TestNuGetRef("# r \"nuget: RestSharp\"", new NuGetPackageSpec("RestSharp"));
+res &= TestNuGetRef("#r \"nuget: RestSharp\"", new NuGetPackageSpec("RestSharp"));
+res &= TestNuGetRef("# r \"nuget: RestSharp\"", new NuGetPackageSpec("RestSharp"));
 
 // with //r ===============================================================================================
 // using ,
-result &= TestNuGetRef("//r \"nuget: RestSharp,110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
-result &= TestNuGetRef("// r \"nuget: RestSharp , 110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
+res &= TestNuGetRef("//r \"nuget: RestSharp,110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
+res &= TestNuGetRef("// r \"nuget: RestSharp , 110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
 
 // using ==
-result &= TestNuGetRef("//r \"nuget: RestSharp==110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
-result &= TestNuGetRef("// r \"nuget: RestSharp == 110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
+res &= TestNuGetRef("//r \"nuget: RestSharp==110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
+res &= TestNuGetRef("// r \"nuget: RestSharp == 110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
 
 // using >=
-result &= TestNuGetRef("//r \"nuget: RestSharp>=110.2.0\"", new NuGetPackageSpec("RestSharp>=110.2.0"));
-result &= TestNuGetRef("// r \"nuget: RestSharp >= 110.2.0\"", new NuGetPackageSpec("RestSharp>=110.2.0"));
+res &= TestNuGetRef("//r \"nuget: RestSharp>=110.2.0\"", new NuGetPackageSpec("RestSharp>=110.2.0"));
+res &= TestNuGetRef("// r \"nuget: RestSharp >= 110.2.0\"", new NuGetPackageSpec("RestSharp>=110.2.0"));
 
 // using <=
-result &= TestNuGetRef("//r \"nuget: RestSharp<=110.2.0\"", new NuGetPackageSpec("RestSharp<=110.2.0"));
-result &= TestNuGetRef("// r \"nuget: RestSharp <= 110.2.0\"", new NuGetPackageSpec("RestSharp<=110.2.0"));
+res &= TestNuGetRef("//r \"nuget: RestSharp<=110.2.0\"", new NuGetPackageSpec("RestSharp<=110.2.0"));
+res &= TestNuGetRef("// r \"nuget: RestSharp <= 110.2.0\"", new NuGetPackageSpec("RestSharp<=110.2.0"));
 
 // using >
-result &= TestNuGetRef("//r \"nuget: RestSharp>110.2.0\"", new NuGetPackageSpec("RestSharp>110.2.0"));
-result &= TestNuGetRef("// r \"nuget: RestSharp > 110.2.0\"", new NuGetPackageSpec("RestSharp>110.2.0"));
+res &= TestNuGetRef("//r \"nuget: RestSharp>110.2.0\"", new NuGetPackageSpec("RestSharp>110.2.0"));
+res &= TestNuGetRef("// r \"nuget: RestSharp > 110.2.0\"", new NuGetPackageSpec("RestSharp>110.2.0"));
 
 // using <
-result &= TestNuGetRef("//r \"nuget: RestSharp<110.2.0\"", new NuGetPackageSpec("RestSharp<110.2.0"));
-result &= TestNuGetRef("// r \"nuget: RestSharp < 110.2.0\"", new NuGetPackageSpec("RestSharp<110.2.0"));
+res &= TestNuGetRef("//r \"nuget: RestSharp<110.2.0\"", new NuGetPackageSpec("RestSharp<110.2.0"));
+res &= TestNuGetRef("// r \"nuget: RestSharp < 110.2.0\"", new NuGetPackageSpec("RestSharp<110.2.0"));
 
 // no version
-result &= TestNuGetRef("//r \"nuget: RestSharp\"", new NuGetPackageSpec("RestSharp"));
-result &= TestNuGetRef("// r \"nuget: RestSharp\"", new NuGetPackageSpec("RestSharp"));
+res &= TestNuGetRef("//r \"nuget: RestSharp\"", new NuGetPackageSpec("RestSharp"));
+res &= TestNuGetRef("// r \"nuget: RestSharp\"", new NuGetPackageSpec("RestSharp"));
 
 
 // legacy format ==========================================================================================
-result &= TestNuGetRef("//r nuget \"RestSharp==110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
-result &= TestNuGetRef("//r nuget \"RestSharp>=110.2.0\"", new NuGetPackageSpec("RestSharp>=110.2.0"));
-result &= TestNuGetRef("//r nuget \"RestSharp<=110.2.0\"", new NuGetPackageSpec("RestSharp<=110.2.0"));
-result &= TestNuGetRef("//r nuget \"RestSharp<110.2.0\"", new NuGetPackageSpec("RestSharp<110.2.0"));
-result &= TestNuGetRef("//r nuget \"RestSharp>110.2.0\"", new NuGetPackageSpec("RestSharp>110.2.0"));
+res &= TestNuGetRef("//r nuget \"RestSharp==110.2.0\"", new NuGetPackageSpec("RestSharp==110.2.0"));
+res &= TestNuGetRef("//r nuget \"RestSharp>=110.2.0\"", new NuGetPackageSpec("RestSharp>=110.2.0"));
+res &= TestNuGetRef("//r nuget \"RestSharp<=110.2.0\"", new NuGetPackageSpec("RestSharp<=110.2.0"));
+res &= TestNuGetRef("//r nuget \"RestSharp<110.2.0\"", new NuGetPackageSpec("RestSharp<110.2.0"));
+res &= TestNuGetRef("//r nuget \"RestSharp>110.2.0\"", new NuGetPackageSpec("RestSharp>110.2.0"));
 
-Console.WriteLine(result);
+result = res;
