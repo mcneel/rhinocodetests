@@ -7,11 +7,28 @@ using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
 
 using NUnit.Framework;
+using System.Text;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     public abstract class ScriptFixture : Rhino.Testing.Fixtures.RhinoTestFixture
     {
+        sealed class NUnitStream : Stream
+        {
+            public override bool CanRead { get; } = false;
+            public override bool CanSeek { get; } = false;
+            public override bool CanWrite { get; } = true;
+            public override long Length { get; } = 0;
+            public override long Position { get; set; } = 0;
+
+            public override void Flush() { }
+            public override int Read(byte[] buffer, int offset, int count) => throw new NotImplementedException();
+            public override long Seek(long offset, SeekOrigin origin) => throw new NotImplementedException();
+            public override void SetLength(long value)=> throw new NotImplementedException();
+
+            public override void Write(byte[] buffer, int offset, int count) => TestContext.Write(Encoding.UTF8.GetString(buffer));
+        }
+
         protected ILanguage m_language = default;
 
         protected static ILanguage GetLanguage(ScriptFixture fixture, LanguageSpec languageSpec)
@@ -44,6 +61,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                     yield break;
             }
         }
+
+        protected static Stream GetOutputStream() => new NUnitStream();
 
         protected static bool TryRunCode(ScriptInfo scriptInfo, Code code, RunContext context, out string errorMessage)
         {
