@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
 
 using NUnit.Framework;
@@ -22,6 +21,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             var ctx = new RunContext
             {
+                OutputStream = GetOutputStream(),
                 OverrideCodeParams = true,
                 Outputs = {
                     ["result"] = default,
