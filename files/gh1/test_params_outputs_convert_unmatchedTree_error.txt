@@ -1,0 +1,1 @@
+Parameter "T" type conversion failed from GH_Structure<Eto\.Drawing\.SolidBrush> to DataTree<Color>
