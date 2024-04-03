@@ -39,6 +39,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 Assert.True(scriptInfo.MatchesError(errorMessage));
         }
 
-        static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "*.cs");
+        static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
     }
 }
