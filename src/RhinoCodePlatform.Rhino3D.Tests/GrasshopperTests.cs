@@ -9,6 +9,7 @@ using Rhino.Runtime.Code.Languages;
 
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
+using Rhino.Runtime.Code.Text;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -73,7 +74,16 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 }
             }
             else
-                Assert.True(scriptInfo.MatchesError(errorMessage));
+            {
+                foreach (var line in errorMessage.ToLinesLazy())
+                {
+                    if (string.IsNullOrEmpty(line))
+                        continue;
+
+                    Assert.True(scriptInfo.MatchesError(line));
+                }
+            }
+
         }
 
         ILanguage GetGrasshopper() => GetLanguage(this, new LanguageSpec("*.*.grasshopper", "1"));
