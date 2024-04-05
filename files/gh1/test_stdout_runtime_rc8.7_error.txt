@@ -1,0 +1,4 @@
+Solution exception:Test
+Data conversion failed from Number to Plane
+Error running script: Test \[
+Error running script \(PythonException\): Test

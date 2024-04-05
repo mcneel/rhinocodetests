@@ -1,1 +1,1 @@
-Error running script\: I am an exceptional script
+Error running script: I am an exceptional script
