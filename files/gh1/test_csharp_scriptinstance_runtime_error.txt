@@ -1,1 +1,1 @@
-Error running script\: Attempted to divide by zero. \[21\:1\]
+Error running script: Attempted to divide by zero. \[21:

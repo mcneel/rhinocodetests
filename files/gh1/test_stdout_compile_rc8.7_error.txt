@@ -1,0 +1,7 @@
+Expression generated an error for \(x\): Invalid expression: Unexpected symbol encountered
+Solution exception:unexpected EOF while parsing
+'Curve' does not contain a constructor that takes 0 arguments \[34:
+The name 'm' does not exist in the current context \[1:
+invalid syntax  \[1:
+expected an indented block
+unexpected token '\<newline\>'

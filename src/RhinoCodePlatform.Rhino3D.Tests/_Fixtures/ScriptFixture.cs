@@ -76,14 +76,14 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             catch (CompileException compileEx)
             {
                 if (scriptInfo.ExpectsError)
-                    errorMessage = compileEx.ToString();
+                    errorMessage = compileEx.Diagnostics.ToString();
                 else
-                    throw new Exception(compileEx.ToString());
+                    throw;
             }
-            catch (Exception runEx)
+            catch (ExecuteException runEx)
             {
                 if (scriptInfo.ExpectsError)
-                    errorMessage = runEx.ToString();
+                    errorMessage = runEx.Message;
                 else
                     throw;
             }

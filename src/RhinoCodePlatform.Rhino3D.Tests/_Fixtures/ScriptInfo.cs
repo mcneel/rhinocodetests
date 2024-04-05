@@ -53,7 +53,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         public bool MatchesError(string errorMessage)
         {
-            string errorsFile = Path.ChangeExtension(Uri.ToString(), ".txt");
+            string errorsFile = Path.ChangeExtension(Uri.ToPath(), ".txt");
 
             if (File.Exists(errorsFile))
             {
@@ -62,11 +62,9 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                     if (new Regex(line).IsMatch(errorMessage))
                         return true;
                 }
-
-                return false;
             }
 
-            return true;
+            return false;
         }
 
         public override string ToString() => Name;
