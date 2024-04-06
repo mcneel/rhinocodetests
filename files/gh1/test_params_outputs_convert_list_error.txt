@@ -1,0 +1,2 @@
+Parameter "a" type conversion failed from GH_Curve to Point3d
+Parameter "a" type conversion failed from Guid to Point3d
