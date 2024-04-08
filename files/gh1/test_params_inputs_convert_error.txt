@@ -1,0 +1,3 @@
+Parameter \"x\" type conversion failed from GH_String to float
+Parameter \"x\" type conversion failed from GH_String to double
+Type conversion failed from Text to float

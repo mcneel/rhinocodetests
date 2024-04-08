@@ -1,0 +1,4 @@
+Error running script \(ExecuteException\)\: \"inputSrf\" input value is not valid\.
+Objects\: Surface
+Error running script \(ExecuteException\)\: \"inputSurface\" input value is not valid\.
+Target Type\: Surface
