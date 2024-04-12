@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Collections.Generic;
 
 using Rhino.Runtime.Code;
@@ -7,7 +8,6 @@ using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
 
 using NUnit.Framework;
-using System.Text;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
