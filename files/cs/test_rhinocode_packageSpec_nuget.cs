@@ -81,4 +81,5 @@ res &= TestNuGetRef("//r nuget \"RestSharp<=110.2.0\"", new NuGetPackageSpec("Re
 res &= TestNuGetRef("//r nuget \"RestSharp<110.2.0\"", new NuGetPackageSpec("RestSharp<110.2.0"));
 res &= TestNuGetRef("//r nuget \"RestSharp>110.2.0\"", new NuGetPackageSpec("RestSharp>110.2.0"));
 
+// Console.WriteLine(res);
 result = res;
