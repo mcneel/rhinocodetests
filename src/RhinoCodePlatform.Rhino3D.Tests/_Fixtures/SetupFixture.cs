@@ -57,6 +57,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
 
             LoadLanguages();
+            SetupGrasshopperSearchPaths();
         }
 
         sealed class StatusResponder : ProgressStatusResponder
@@ -80,6 +81,17 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 {
                     throw new Exception($"Language init error | {RhinoCode.Logger.Text}");
                 }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+        static void SetupGrasshopperSearchPaths()
+        {
+            string testPluginsPath = Path.Combine(s_settings.TestFilesDirectory, "gh1Plugins");
+
+            if (Directory.Exists(testPluginsPath))
+            {
+                Grasshopper.Folders.CustomAssemblyFolders.Add(testPluginsPath);
             }
         }
     }
