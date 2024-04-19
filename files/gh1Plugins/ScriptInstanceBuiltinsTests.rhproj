@@ -1,0 +1,79 @@
+{
+  "id": "e0a2c616-dd85-4dab-9a8b-54cd58bb9de1",
+  "identity": {
+    "name": "ScriptInstanceBuiltinsTests",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "appName": "Rhino3D",
+      "appVersion": {
+        "major": 8
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "type": "components",
+      "id": "e165b0cd-4aa8-4a22-aab9-c8de375bf382",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "test_plugins_scriptInstance_builtins.ghx",
+      "uri": "test_plugins_scriptInstance_builtins.ghx",
+      "scripts": [
+        {
+          "id": "8a74182d-7c16-4312-9710-b3ceb59c4999",
+          "name": "CSharp_SDK",
+          "nickname": "CSSDK",
+          "subcat": "Default"
+        },
+        {
+          "id": "cafee8f0-1381-4d14-b415-c75bc3b93241",
+          "name": "CSharp_Script",
+          "nickname": "CSSCR",
+          "subcat": "Default"
+        },
+        {
+          "id": "8a95ff81-ddc0-41fc-9907-45021215a983",
+          "name": "IPy_SDK",
+          "nickname": "IPySDK",
+          "subcat": "Default"
+        },
+        {
+          "id": "b995396a-1c91-4c92-bea8-134cafc0df01",
+          "name": "IPy_Script",
+          "nickname": "IPySCR",
+          "subcat": "Default"
+        },
+        {
+          "id": "9befb90f-5c18-4141-87f1-ee2d8017d931",
+          "name": "Py3_SDK",
+          "nickname": "Py3SDK",
+          "subcat": "Default"
+        },
+        {
+          "id": "574ccef8-516a-4d5f-8347-4792d0c97bf5",
+          "name": "Py3_Script",
+          "nickname": "Py3SCR",
+          "subcat": "Default"
+        }
+      ]
+    }
+  ]
+}

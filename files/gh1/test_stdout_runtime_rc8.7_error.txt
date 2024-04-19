@@ -1,4 +1,8 @@
 Solution exception:Test
 Data conversion failed from Number to Plane
-Error running script: Test \[
-Error running script \(PythonException\): Test
+Error running script: Test \[40\:
+Error running script: Test \[3\:
+Error running script: Test \[10\:
+Error running script: Test \[2\:
+Error running script \(ExecuteException\): Test
+Error running script: Test \[2\:
