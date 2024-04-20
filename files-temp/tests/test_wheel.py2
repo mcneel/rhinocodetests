@@ -1,0 +1,5 @@
+#! python2
+# wheel: natsort-3.5.5-py2.py3-none-any.whl
+import natsort
+
+print(natsort)

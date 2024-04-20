@@ -1,0 +1,26 @@
+#! python 2
+
+import rhinoscriptsyntax as rs
+import scriptcontext as sc
+
+import System
+import System.Collections.Generic
+import Rhino
+
+p = rs.CreatePoint(0, 0, 10)
+print(p)
+print(type(p))
+print(hasattr(p, '__iter__'))
+p[0] = 12
+print(p[0])
+
+v = rs.CreateVector(0, 10, 10)
+print(v)
+print(type(v))
+print(hasattr(v, '__iter__'))
+v[0] = 12
+print(v[0])
+
+p = rs.CreatePoint(0, 0, 10) + rs.CreateVector(0, 10, 10)
+print(p)
+print(type(p))

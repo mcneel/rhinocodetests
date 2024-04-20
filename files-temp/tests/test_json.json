@@ -1,0 +1,51 @@
+{
+  "zuis": [
+    {
+      "type": "c9b2d725-6f87-4b07-af90-bd9aefef68eb",
+      "id": "7b86f305-26eb-4759-9d46-0502255020f6",
+      "title": "CPython",
+      "inputs": [
+        {
+          "name": "x"
+        },
+        {
+          "name": "y"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "a"
+        }
+      ],
+      "position": {
+        "x": 545,
+        "y": 128
+      },
+      "UseCodeInputParam": false,
+      "UseLibraryInputParam": false,
+      "UseStandardOutputParam": false
+    }
+  ],
+  "wires": [
+    {
+      "fromId": "52748c6d-a78e-4ec9-bc46-3d027201c260",
+      "fromOutput": {
+        "name": "integer"
+      },
+      "toId": "7b86f305-26eb-4759-9d46-0502255020f6",
+      "toInput": {
+        "name": "x"
+      }
+    },
+    {
+      "fromId": "52748c6d-a78e-4ec9-bc46-3d027201c260",
+      "fromOutput": {
+        "name": "float"
+      },
+      "toId": "7b86f305-26eb-4759-9d46-0502255020f6",
+      "toInput": {
+        "name": "y"
+      }
+    }
+  ]
+}

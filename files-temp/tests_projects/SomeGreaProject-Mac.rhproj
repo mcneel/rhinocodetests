@@ -1,0 +1,167 @@
+{
+  "id": "70eaa3ae-e51e-43fa-8f51-4792dce194e0",
+  "identity": {
+    "name": "SomeGreatProjectMac",
+    "version": "0.1-beta",
+    "publisher": {
+      "email": "bob@example.com",
+      "name": "Bob"
+    },
+    "copyright": "Copyright \u00A9 2023 Bob",
+    "license": "MIT",
+    "image": {
+      "light": {
+        "type": "svg",
+        "data": "PHN2ZyB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwhLS1SaGlubyBnZW5lcmF0ZWQgU1ZHLS0\u002BPHBvbHlsaW5lICBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZT0iI0VEMUMyNCIgc3Ryb2tlLW9wYWNpdHk9IjEiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJidXR0IiBwb2ludHM9IjIzLDE2IDE2LDExIDEzLDEyIDEwLDE5IDEwLDI2IDE4LDM4IDI2LDQ1IDI5LDQ2Ii8\u002BCjxwb2x5bGluZSAgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2U9IiNFRDFDMjQiIHN0cm9rZS1vcGFjaXR5PSIxIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0iYnV0dCIgcG9pbnRzPSIyMywxNSAyNywxMSAzMCw4IDM0LDkgMzcsMTUgMzcsMjkgMzUsNDAgMzIsNDYgMzEsNDYgMzAsNDYgMjksNDggMjksNDYiLz4KPC9zdmc\u002B"
+      }
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "appName": "Rhino3D",
+      "appVersion": {
+        "major": 8
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "4cc62334-512a-47ab-8818-f4bf0052d903",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "AddNumbers",
+      "uri": "gh_command.ghx"
+    },
+    {
+      "id": "ca39bb7b-10fb-4a6d-8571-fe1037b47ab4",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "AddMoreNumbers",
+      "uri": "gh_command_bin.gh"
+    },
+    {
+      "id": "537e9fbf-d3f7-46a7-918e-57dba57e8e95",
+      "language": {
+        "id": "*.*.python",
+        "version": "3.*.*"
+      },
+      "title": "TestCPython",
+      "uri": "file:///Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests/test_cpython.py"
+    },
+    {
+      "id": "dbb5013c-5656-4547-a823-59f83aa704f8",
+      "language": {
+        "id": "*.*.csharp",
+        "version": "9.*.*"
+      },
+      "title": "TestConsole",
+      "uri": "file:///Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests/test_console.csx"
+    },
+    {
+      "id": "b7c210c7-a8eb-4b85-b584-889072f3e578",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "gh_command_bin",
+      "uri": "gh_command_bin.gh",
+      "canRun": false
+    },
+    {
+      "id": "c3390caa-21b2-4cb2-a57b-085e85da5562",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "gh_command",
+      "uri": "gh_command.ghx",
+      "canRun": false
+    },
+    {
+      "type": "components",
+      "id": "a4b93247-56a6-4785-9aa4-72ccab94ebaa",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "uri": "gh_ctx_components.ghx",
+      "canPublish": false,
+      "scripts": [
+        {
+          "id": "a4b93247-56a6-4785-9aa4-72ccab94ebaa",
+          "name": "Test",
+          "subcat": "Default"
+        }
+      ]
+    },
+    {
+      "id": "98aa3a2c-61dd-41f4-9067-decd8a720b7d",
+      "language": {
+        "id": "*.*.csharp",
+        "version": "*.*.*"
+      },
+      "title": "TestCLibrary",
+      "uri": "libraries/TestC#Library.cs"
+    },
+    {
+      "id": "13407363-0f92-4f66-8b97-02ac652dadcf",
+      "language": {
+        "id": "*.*.python",
+        "version": "3.*.*"
+      },
+      "title": "TestPython3Library",
+      "uri": "libraries/TestPython3Library.py"
+    },
+    {
+      "id": "cec2269f-f0f7-4963-9952-63e442abbaf1",
+      "language": {
+        "id": "*.*.python",
+        "version": "2.*.*"
+      },
+      "title": "TestPython2Library",
+      "uri": "libraries/TestPython2Library.py"
+    }
+  ],
+  "libraries": [
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests_projects/libraries/testmodule/",
+        "language": {
+          "id": "*.*.python",
+          "version": "3.*.*"
+        }
+      }
+    },
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests_projects/libraries/TestAssembly/",
+        "language": {
+          "id": "*.*.csharp",
+          "version": "*.*.*"
+        }
+      }
+    },
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests_projects/libraries/testipymodule/",
+        "language": {
+          "id": "*.*.python",
+          "version": "2.*.*"
+        }
+      }
+    }
+  ]
+}

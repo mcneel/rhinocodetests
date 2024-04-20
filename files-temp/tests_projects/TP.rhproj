@@ -1,0 +1,84 @@
+{
+  "id": "23d70b49-e025-4093-abe5-d8ceb225166e",
+  "identity": {
+    "name": "TP",
+    "version": "0.1",
+    "publisher": {
+      "email": "bob@example.com",
+      "name": "Bob"
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "appName": "Rhino3D",
+      "appVersion": {
+        "major": 8,
+        "minor": 0
+      },
+      "title": "Rhino3D (8.0)",
+      "slug": "rh8_0"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "type": "components",
+      "id": "47ba0c6a-d7ee-4553-bad0-ff5521eeaeb7",
+      "language": {
+        "id": "*.*.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "gh_ctx_components.gh",
+      "uri": "file:///Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests_projects/gh_ctx_components.gh",
+      "scripts": []
+    },
+    {
+      "id": "cc615482-19a5-4eda-9e8a-31c0f1788434",
+      "language": {
+        "id": "*.*.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "gh_command_bin",
+      "uri": "file:///Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests_projects/gh_command_bin.gh"
+    },
+    {
+      "id": "f4e5220a-3cd6-485f-b09d-cb40d2dfa5c6",
+      "language": {
+        "id": "*.*.csharp",
+        "version": "*.*.*"
+      },
+      "title": "Command",
+      "uri": "file:///Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests_projects/tests/Command.cs"
+    },
+    {
+      "id": "96982606-cfd1-4ff2-abf5-181b66f1e796",
+      "language": {
+        "id": "*.*.python",
+        "version": "*.*.*"
+      },
+      "title": "test_get_shared",
+      "uri": "file:///Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests_projects/tests/test_get_shared.py"
+    }
+  ],
+  "resources": [
+    {
+      "id": "d208bdff-449b-4844-8add-96bba1557cdc",
+      "uri": "file:///Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests_projects/files/data.txt"
+    }
+  ],
+  "libraries": [
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests_projects/libraries/testmodule/",
+        "language": {
+          "id": "*.*.python",
+          "version": "3.*.*"
+        }
+      }
+    }
+  ]
+}

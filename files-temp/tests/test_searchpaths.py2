@@ -1,0 +1,9 @@
+#! python 2
+
+import sys
+import testipymodule as t
+
+print(sys.version)
+print('\n'.join(sys.path))
+
+print(t)

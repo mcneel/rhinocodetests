@@ -1,0 +1,3 @@
+; https://docs.mcneel.com/rhino/5/help/en-us/information/rhinoscripting.htm
+; https://wiki.mcneel.com/rhino/basicmacros
+-_RunPythonScript _ResetEngine "C:\Users\ein\gits\rhino\src4\rhino4\Plug-ins\RhinoCodePlugins\tests_rhino\runpythoncmd\test_resetengine.py"
