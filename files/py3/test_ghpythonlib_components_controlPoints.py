@@ -10,8 +10,6 @@ x = [
     ])
 ]
 
-print(x)
-
 a = ghc.ControlPoints(x)
 
 result = len(a.points) > 0
