@@ -62,6 +62,18 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
         }
 
+        protected static RunContext GetRunContext()
+        {
+            return new RunContext
+            {
+                OutputStream = GetOutputStream(),
+                OverrideCodeParams = true,
+                Outputs = {
+                    ["result"] = default,
+                },
+            };
+        }
+
         protected static Stream GetOutputStream() => new NUnitStream();
 
         protected static bool TryRunCode(ScriptInfo scriptInfo, Code code, RunContext context, out string errorMessage)

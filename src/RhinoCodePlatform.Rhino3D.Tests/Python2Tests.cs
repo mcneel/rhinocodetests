@@ -19,14 +19,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(scriptInfo.Uri);
 
-            var ctx = new RunContext
-            {
-                OutputStream = GetOutputStream(),
-                OverrideCodeParams = true,
-                Outputs = {
-                    ["result"] = false,
-                },
-            };
+            RunContext ctx = GetRunContext();
 
             if (TryRunCode(scriptInfo, code, ctx, out string errorMessage))
             {
@@ -35,6 +28,28 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
             else
                 Assert.True(scriptInfo.MatchesError(errorMessage));
+        }
+
+        [Test]
+        public void TestRuntimeErrorLine_InScript()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+@"import os
+
+print(12 / 0)
+");
+
+            RunContext ctx = GetRunContext();
+
+            try
+            {
+                code.Run(ctx);
+            }
+            catch (ExecuteException ex)
+            {
+                if (ex.Position.LineNumber != 3)
+                    throw;
+            }
         }
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py2\", "test_*.py");
