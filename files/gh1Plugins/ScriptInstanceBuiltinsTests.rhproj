@@ -34,8 +34,8 @@
         "id": "*.gh1.grasshopper",
         "version": "1.*.*"
       },
-      "title": "test_plugins_scriptInstance_builtins.ghx",
-      "uri": "test_plugins_scriptInstance_builtins.ghx",
+      "title": "ScriptInstanceBuiltinsTests.ghx",
+      "uri": "ScriptInstanceBuiltinsTests.ghx",
       "scripts": [
         {
           "id": "8a74182d-7c16-4312-9710-b3ceb59c4999",
