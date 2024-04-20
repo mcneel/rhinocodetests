@@ -1,0 +1,17 @@
+#! python 2
+
+import Rhino
+from System import Action, Func
+
+def func():
+    print("hi there")
+
+
+def func2(arg):
+    print(arg)
+
+
+Rhino.RhinoApp.InvokeOnUiThread(Action(func))
+Rhino.RhinoApp.InvokeOnUiThread(Func[object, object](func2), 12)
+
+print("done")

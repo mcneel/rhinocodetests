@@ -1,0 +1,17 @@
+- drop component. check message
+- create script
+- add script and editor should go away
+- dclick again and script should come back with same language
+- add/remove inputs
+- add/remove outputs
+- add/remove library/out params
+- convert to runscript
+- add methods
+- remove manually and re-add methods
+- modify runscript signature (add, remove params)
+- modify runscript signature (change param types)
+- modify runscript signature (change param access)
+- test debug
+- test debug (multiple)
+- test publisehd script_components
+- test publisehd context_components

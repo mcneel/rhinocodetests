@@ -1,6 +1,8 @@
 *.vsidx
+*.pyc
+*.3dmbak
 **/.vs/*
-src/**/bin/*
-src/**/obj/*
+**/bin/*
+**/obj/*
 
 .DS_Store

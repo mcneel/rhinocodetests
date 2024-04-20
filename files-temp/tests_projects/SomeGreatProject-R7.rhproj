@@ -1,0 +1,125 @@
+{
+  "id": "9c753e93-60cb-46c9-8d1d-170c6386b07b",
+  "identity": {
+    "name": "SomeGreatProject",
+    "version": "0.1",
+    "publisher": {
+      "email": "bob@mcneel.com",
+      "name": "Bob (Robert)",
+      "company": "McNeel"
+    },
+    "copyright": "Copyright SomeGreatProject 2024",
+    "image": {
+      "light": {
+        "type": "svg",
+        "data": "PHN2ZyB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwhLS1SaGlubyBnZW5lcmF0ZWQgU1ZHLS0\u002BPGxpbmUgIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlPSIjRUQxQzI0IiBzdHJva2Utb3BhY2l0eT0iMSIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHgxPSIxMC41IiB5MT0iMTAuNSIgeDI9IjM4LjUiIHkyPSI3LjUiLz4KPGxpbmUgIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlPSIjRUQxQzI0IiBzdHJva2Utb3BhY2l0eT0iMSIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHgxPSIzOC41IiB5MT0iNy41IiB4Mj0iMTguNSIgeTI9IjQ2LjUiLz4KPGxpbmUgIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlPSIjRUQxQzI0IiBzdHJva2Utb3BhY2l0eT0iMSIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHgxPSIyNC41IiB5MT0iMjMuNSIgeDI9IjMyLjUiIHkyPSIyMS41Ii8\u002BCjwvc3ZnPg=="
+      }
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "appName": "Rhino3D",
+      "appVersion": {
+        "major": 7,
+        "minor": 32
+      },
+      "title": "Rhino3D (7.32)",
+      "slug": "rh7_32"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "ea3eb40a-ab29-41ce-afb0-33b49bbb408d",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "AddNumbers",
+      "uri": "gh_command_bin_r7.gh",
+      "image": {
+        "light": {
+          "type": "svg",
+          "data": "PHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiIGNsYXNzPSJpY29uIiAgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik01MTIgMTAyNEMyMjkuNyAxMDI0IDAgNzk0LjMgMCA1MTJTMjI5LjcgMCA1MTIgMHM1MTIgMjI5LjcgNTEyIDUxMi0yMjkuNyA1MTItNTEyIDUxMnogbTAtOTM4LjdDMjc2LjcgODUuMyA4NS4zIDI3Ni43IDg1LjMgNTEyUzI3Ni43IDkzOC43IDUxMiA5MzguNyA5MzguNyA3NDcuMyA5MzguNyA1MTIgNzQ3LjMgODUuMyA1MTIgODUuM3oiIGZpbGw9IiMzNjg4RkYiIC8\u002BPHBhdGggZD0iTTY4Mi43IDU1NC43SDM0MS4zYy0yMy42IDAtNDIuNy0xOS4xLTQyLjctNDIuN3MxOS4xLTQyLjcgNDIuNy00Mi43aDM0MS4zYzIzLjYgMCA0Mi43IDE5LjEgNDIuNyA0Mi43cy0xOS4xIDQyLjctNDIuNiA0Mi43eiIgZmlsbD0iIzVGNjM3OSIgLz48cGF0aCBkPSJNNTEyIDcyNS4zYy0yMy42IDAtNDIuNy0xOS4xLTQyLjctNDIuN1YzNDEuM2MwLTIzLjYgMTkuMS00Mi43IDQyLjctNDIuN3M0Mi43IDE5LjEgNDIuNyA0Mi43djM0MS4zYzAgMjMuNi0xOS4xIDQyLjctNDIuNyA0Mi43eiIgZmlsbD0iIzVGNjM3OSIgLz48L3N2Zz4="
+        }
+      }
+    },
+    {
+      "id": "5fe7f887-08c0-4f58-95bf-6550c2431dbc",
+      "language": {
+        "id": "*.*.python",
+        "version": "2.*.*"
+      },
+      "title": "TestPython2",
+      "uri": "file:///C:/Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests/test_python2.py",
+      "image": {
+        "light": {
+          "type": "svg",
+          "data": "PHN2ZyBoZWlnaHQ9IjgwMHB4IiB3aWR0aD0iODAwcHgiIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIA0KCSB2aWV3Qm94PSIwIDAgNTEyIDUxMiIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI\u002BDQo8Zz4NCgk8Y2lyY2xlIHN0eWxlPSJmaWxsOiNGRkE4NTg7IiBjeD0iMjU2IiBjeT0iMjU2IiByPSIyNDUuODAxIi8\u002BDQoJPHBhdGggc3R5bGU9ImZpbGw6I0ZGQTg1ODsiIGQ9Ik0xMS4yMTksMjU2YzAtMzcuMTc3LDEwOS41OTItNjcuMzE1LDI0NC43ODEtNjcuMzE1UzUwMC43ODEsMjE4LjgyMyw1MDAuNzgxLDI1NiIvPg0KCTxwYXRoIHN0eWxlPSJmaWxsOiNGRkE4NTg7IiBkPSJNNTAwLjc4MSwyNTZjMCwzNy4xNzctMTA5LjU5Miw2Ny4zMTUtMjQ0Ljc4MSw2Ny4zMTVTMTEuMjE5LDI5My4xNzcsMTEuMjE5LDI1NiIvPg0KPC9nPg0KPGc\u002BDQoJPHBhdGggc3R5bGU9ImZpbGw6IzAwNTM3QjsiIGQ9Ik00MzcuMDE5LDc0Ljk4QzM4OC42NjcsMjYuNjI4LDMyNC4zODEsMCwyNTYsMEMxODcuNjIsMCwxMjMuMzMzLDI2LjYyOCw3NC45OCw3NC45OFMwLDE4Ny42MiwwLDI1Ng0KCQlzMjYuNjI4LDEzMi42NjcsNzQuOTgsMTgxLjAyUzE4Ny42Miw1MTIsMjU2LDUxMmM2OC4zODEsMCwxMzIuNjY3LTI2LjYyOCwxODEuMDE5LTc0Ljk4QzQ4NS4zNzIsMzg4LjY2Nyw1MTIsMzI0LjM4LDUxMiwyNTYNCgkJUzQ4NS4zNzIsMTIzLjMzMyw0MzcuMDE5LDc0Ljk4eiBNMjU2LDIwLjM5OGMxMjEuMTE2LDAsMjIxLjE2Miw5MS44NjcsMjM0LjE1NiwyMDkuNTc2Yy0xLjI3MywwLjQzOC0yLjQ3OSwxLjEzNC0zLjUzOCwyLjA5Nw0KCQljLTQuMTY3LDMuNzg5LTQuNDc0LDEwLjI0LTAuNjg0LDE0LjQwN2MzLjA4NCwzLjM5MSw0LjY0OCw2LjU5NSw0LjY0OCw5LjUyMWMwLDkuMjc3LTE2LjgxMywyNC43MzMtNjQuMTk5LDM3Ljc2NQ0KCQlDMzgxLjAwNCwzMDYuMjQzLDMyMC40OTYsMzEzLjExNiwyNTYsMzEzLjExNnMtMTI1LjAwNS02Ljg3Mi0xNzAuMzgyLTE5LjM1MWMtNDcuMzg3LTEzLjAzMi02NC4yLTI4LjQ4Ny02NC4yLTM3Ljc2NQ0KCQljMC0yLjkyNiwxLjU2NC02LjEzLDQuNjQ4LTkuNTIyYzMuNzg5LTQuMTY3LDMuNDgzLTEwLjYxOC0wLjY4NS0xNC40MDdjLTEuMDU5LTAuOTYzLTIuMjY1LTEuNjU4LTMuNTM3LTIuMDk2DQoJCUMzNC44MzgsMTEyLjI2NiwxMzQuODg0LDIwLjM5OCwyNTYsMjAuMzk4eiBNMjU2LDQ5MS42MDJjLTExOC42MzgsMC0yMTcuMDU4LTg4LjE0OS0yMzMuMjUtMjAyLjM4OA0KCQljMTMuMjg5LDkuMjEyLDMyLjU0LDE3LjM2Niw1Ny40NTksMjQuMjE5YzQ3LjA4OSwxMi45NSwxMDkuNTE5LDIwLjA4MSwxNzUuNzksMjAuMDgxczEyOC43MDItNy4xMzEsMTc1Ljc5LTIwLjA4MQ0KCQljMjQuOTItNi44NTMsNDQuMTctMTUuMDA4LDU3LjQ1OC0yNC4yMTlDNDczLjA1OCw0MDMuNDUzLDM3NC42MzgsNDkxLjYwMiwyNTYsNDkxLjYwMnoiLz4NCgk8cGF0aCBzdHlsZT0iZmlsbDojMDA1MzdCOyIgZD0iTTI3NC44MDQsMTk5LjA4MmMxMi42MzgsMC4yNjcsMjUuMjYxLDAuODEsMzcuNTE5LDEuNjE1YzAuMjI4LDAuMDE1LDAuNDUzLDAuMDIyLDAuNjc4LDAuMDIyDQoJCWM1LjMyOCwwLDkuODE0LTQuMTM5LDEwLjE2OC05LjUzMmMwLjM2OC01LjYyMS0zLjg4OS0xMC40NzYtOS41MDktMTAuODQ1Yy0xMi41NTgtMC44MjQtMjUuNDg3LTEuMzgxLTM4LjQyNi0xLjY1NA0KCQljLTAuMDczLTAuMDAyLTAuMTQ3LTAuMDAyLTAuMjE5LTAuMDAyYy01LjUzMywwLTEwLjA3Niw0LjQyNS0xMC4xOTMsOS45ODRDMjY0LjcwMywxOTQuMzAyLDI2OS4xNzIsMTk4Ljk2MywyNzQuODA0LDE5OS4wODJ6Ii8\u002BDQoJPHBhdGggc3R5bGU9ImZpbGw6IzAwNTM3QjsiIGQ9Ik0zNDkuNjczLDIwNC4wNTZjMTIuODM1LDEuNDg1LDI1LjI4NCwzLjI5MSwzNy4wMDQsNS4zNjljMC42MDIsMC4xMDYsMS4yLDAuMTU4LDEuNzkyLDAuMTU4DQoJCWM0Ljg1MywwLDkuMTU1LTMuNDc2LDEwLjAzMS04LjQyYzAuOTgzLTUuNTQ2LTIuNzE2LTEwLjg0LTguMjYzLTExLjgyM2MtMTIuMTIxLTIuMTQ4LTI0Ljk4LTQuMDE0LTM4LjIxOS01LjU0Ng0KCQljLTUuNTk0LTAuNjUtMTAuNjU1LDMuMzY0LTExLjMwNCw4Ljk1OUMzNDAuMDY2LDE5OC4zNDgsMzQ0LjA3NiwyMDMuNDA5LDM0OS42NzMsMjA0LjA1NnoiLz4NCgk8cGF0aCBzdHlsZT0iZmlsbDojMDA1MzdCOyIgZD0iTTQyMi45ODUsMjE3LjMyYzEzLjE3NSwzLjQ4MiwyNC44MzQsNy4zNjIsMzQuNjUyLDExLjUzMmMxLjMsMC41NTMsMi42NTMsMC44MTQsMy45ODIsMC44MTQNCgkJYzMuOTcsMCw3Ljc0My0yLjMzMiw5LjM5Mi02LjIxNGMyLjIwMi01LjE4NC0wLjIxNi0xMS4xNzItNS40MDEtMTMuMzc0Yy0xMC43MTItNC41NS0yMy4zLTguNzQ4LTM3LjQxMy0xMi40NzgNCgkJYy01LjQ0Mi0xLjQ0LTExLjAyOCwxLjgwOC0xMi40NjcsNy4yNTVDNDE0LjI5MiwyMTAuMjk4LDQxNy41NCwyMTUuODgsNDIyLjk4NSwyMTcuMzJ6Ii8\u002BDQoJPHBhdGggc3R5bGU9ImZpbGw6IzAwNTM3QjsiIGQ9Ik01MC40MTksMjI5LjY1YzEuMzI5LDAsMi42OC0wLjI2MSwzLjk4MS0wLjgxM2M5LjgyLTQuMTY4LDIxLjQ4LTguMDQ2LDM0LjY1My0xMS41MjYNCgkJYzUuNDQ2LTEuNDM5LDguNjk1LTcuMDIsNy4yNTYtMTIuNDY2Yy0xLjQzOS01LjQ0NS03LjAxOC04LjY5NS0xMi40NjYtNy4yNTZjLTE0LjExMiwzLjcyOC0yNi42OTgsNy45MjQtMzcuNDEzLDEyLjQ3Mg0KCQljLTUuMTg1LDIuMjAxLTcuNjA1LDguMTg4LTUuNDA0LDEzLjM3M0M0Mi42NzQsMjI3LjMxOCw0Ni40NDgsMjI5LjY1LDUwLjQxOSwyMjkuNjV6Ii8\u002BDQoJPHBhdGggc3R5bGU9ImZpbGw6IzAwNTM3QjsiIGQ9Ik0xOTkuMDMyLDIwMC43MTZjMC4yMjQsMCwwLjQ1LTAuMDA3LDAuNjc3LTAuMDIyYzEyLjI1OC0wLjgwNCwyNC44ODItMS4zNDYsMzcuNTE5LTEuNjE0DQoJCWM1LjYzMi0wLjExOCwxMC4xLTQuNzgsOS45ODItMTAuNDEyYy0wLjExOC01LjYzMi00Ljc5NS0xMC4xMzctMTAuNDExLTkuOTgxYy0xMi45MzksMC4yNzMtMjUuODY1LDAuODI5LTM4LjQyMywxLjY1Mg0KCQljLTUuNjIxLDAuMzY4LTkuODc5LDUuMjI0LTkuNTEsMTAuODQ1QzE4OS4yMTgsMTk2LjU3OCwxOTMuNzAyLDIwMC43MTYsMTk5LjAzMiwyMDAuNzE2eiIvPg0KCTxwYXRoIHN0eWxlPSJmaWxsOiMwMDUzN0I7IiBkPSJNMTIzLjU2NiwyMDkuNTc3YzAuNTkxLDAsMS4xOS0wLjA1MSwxLjc5Mi0wLjE1OGMxMS43MTUtMi4wNzcsMjQuMTY0LTMuODgyLDM3LjAwMi01LjM2Nw0KCQljNS41OTUtMC42NDcsOS42MDctNS43MDcsOC45Ni0xMS4zMDRjLTAuNjQ3LTUuNTk1LTUuNzA1LTkuNjE1LTExLjMwNC04Ljk2Yy0xMy4yNDMsMS41MzEtMjYuMTAxLDMuMzk2LTM4LjIxOCw1LjU0NA0KCQljLTUuNTQ2LDAuOTgzLTkuMjQ2LDYuMjc3LTguMjYzLDExLjgyM0MxMTQuNDEyLDIwNi4xMDEsMTE4LjcxNCwyMDkuNTc3LDEyMy41NjYsMjA5LjU3N3oiLz4NCjwvZz4NCjwvc3ZnPg=="
+        }
+      }
+    },
+    {
+      "id": "3638217b-5dc1-4f2c-844b-9141c4c7a060",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "gh_components_r7",
+      "uri": "gh_components_r7.ghx",
+      "canRun": false
+    },
+    {
+      "id": "f7dba06a-8908-4892-8c30-634b260a4288",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "AddMoreNumbers",
+      "uri": "gh_command_r7.ghx"
+    },
+    {
+      "type": "components",
+      "id": "c17ce4a9-ad1b-4cd9-9ef9-dea68052af4f",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "gh_command_bin_r7.gh",
+      "uri": "gh_command_bin_r7.gh",
+      "scripts": []
+    },
+    {
+      "type": "components",
+      "id": "b637fead-7913-48f4-8e72-aa11f69e781e",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "gh_components_r7.ghx",
+      "uri": "gh_components_r7.ghx",
+      "scripts": []
+    }
+  ],
+  "resources": [
+    {
+      "id": "b4dea1c5-4dcd-4833-a3c5-0fca284d617b",
+      "uri": "files/Rock.3dm"
+    }
+  ],
+  "libraries": [
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///C:/Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests_projects/libraries/testipymodule/",
+        "language": {
+          "id": "*.*.python",
+          "version": "2.*.*"
+        }
+      }
+    }
+  ]
+}

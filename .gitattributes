@@ -1,3 +1,9 @@
-src/Reference/*.dll filter=lfs diff=lfs merge=lfs -text
 *.gh filter=lfs diff=lfs merge=lfs -text
+*.ghuser filter=lfs diff=lfs merge=lfs -text
+*.ghz filter=lfs diff=lfs merge=lfs -text
 *.gha filter=lfs diff=lfs merge=lfs -text
+*.dll filter=lfs diff=lfs merge=lfs -text
+*.whl filter=lfs diff=lfs merge=lfs -text
+*.3dm filter=lfs diff=lfs merge=lfs -text
+*.ico filter=lfs diff=lfs merge=lfs -text
+*.pt filter=lfs diff=lfs merge=lfs -text

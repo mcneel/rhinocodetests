@@ -1,0 +1,8 @@
+_-ScriptEditor _Run "%USERPROFILE%\gits\rhino\src4\rhino4\Plug-ins\RhinoCodePlugins\tests\test_cpython.py"
+_-ScriptEditor _Run ("%USERPROFILE%\gits\rhino\src4\rhino4\Plug-ins\RhinoCodePlugins\tests\test_cpython.py")
+
+# the folder containing this file should be on rhino search paths
+_-ScriptEditor _Run "LimitedPolyline.py"
+
+-_RunPythonScript "%USERPROFILE%\gits\rhino\src4\rhino4\Plug-ins\RhinoCodePlugins\tests\test_cpython.py"
+-_RunPythonScript "LimitedPolyline.py"

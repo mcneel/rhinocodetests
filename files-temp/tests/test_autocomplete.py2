@@ -1,0 +1,46 @@
+import os
+import sys
+import rhinoscriptsyntax as rs
+import scriptcontext as sc
+import ghpythonlib as gh
+import math
+
+import System
+import System.Collections.Generic
+import Rhino
+import Rhino.Geometry as RG
+import Grasshopper as GH
+
+
+# python builtin
+os.removedirs()                             # pass
+a = os.removedirs()                         # pass
+os.path.dirname()                           # pass
+m = os.path.dirname()                       # pass
+math.asinh()                                # needs docstring
+m = math.asinh()                            # needs docstring
+
+# rhino libraries
+rs.AddEllipse()                             # pass
+e = rs.AddEllipse()                         # pass
+gh.components.AlignPlanes()                 # pass
+g = gh.components.AlignPlanes()             # pass
+
+# rhino dotnet libraries
+RG.Point3d.Add()                            # pass
+m = RG.Point3d.Add()                        # pass
+p = RG.Point3d()                            # pass
+p.Add()
+GH.DataTree()                               # needs docstring
+g = GH.DataTree()                           # needs docstring
+
+# other dotnet libs
+System.Guid()                               # needs docstring
+g = System.Guid()                           # needs docstring
+
+# misc
+a = [str()];
+a[0]                                        # !
+
+Rhino.Render.ProxyTypes                     # needs docstring
+GH                                          # pass

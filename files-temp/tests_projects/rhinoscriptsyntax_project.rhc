@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-16"?>
+<RhinoScriptCompilerProject>
+  <Plugin>
+    <PluginName>AwesomeProject</PluginName>
+    <Description>no description</Description>
+    <PluginId>f807c879-9fe5-11fe-c38a-98bc41c446e8</PluginId>
+    <OutputPath>bin\</OutputPath>
+    <AuthorName>Ehsan Iran-Nejad</AuthorName>
+    <AuthorEmail>eirannejad@gmail.com</AuthorEmail>
+    <AuthorPhone>2818442217</AuthorPhone>
+    <AuthorAddress>2350</AuthorAddress>
+    <AuthorCountry>USA</AuthorCountry>
+    <AuthorWebsite>ein.sh</AuthorWebsite>
+    <URL>ein.sh/plugin</URL>
+    <CopyrightMessage>Please be careful with this plugin</CopyrightMessage>
+    <SemanticVersion>0.1.2</SemanticVersion>
+    <Platform>Windows</Platform>
+    <MinimumRhinoVersion>7.2</MinimumRhinoVersion>
+  </Plugin>
+  <Commands>
+    <!--Compiled
+    Script: TestConsole-->
+    <Command>
+      <Name>TestConsole</Name>
+      <Path>..\tests\test_console.py</Path>
+      <Type>Normal</Type>
+    </Command>
+    <!--Compiled
+    Script: TestCPython-->
+    <Command>
+      <Name>TestCPython</Name>
+      <Path>..\tests\test_cpython.py</Path>
+      <Type>Hidden</Type>
+    </Command>
+    <!--Compiled
+    Script: TDebug-->
+    <Command>
+      <Name>TDebug</Name>
+      <Path>..\tests\test_debug_exception.py</Path>
+      <Type>Transparent</Type>
+    </Command>
+    <!--Compiled
+    Script: test_debug_threading-->
+    <Command>
+      <Name>test_debug_threading</Name>
+      <Path>..\tests\test_debug_threading.py</Path>
+      <Type>TransparentAndHidden</Type>
+    </Command>
+    <!--Compiled
+    Script: test_accessors-->
+    <Command>
+      <Name>test_accessors</Name>
+      <Path>..\tests_rhinogh\test_accessors.ghx</Path>
+      <Type>Normal</Type>
+    </Command>
+    <Command>
+      <Path>
+        C:\Users\ein\gits\rhino\src4\rhino4\Plug-ins\RhinoCodePlugins\tests\libtest\utils\math.py</Path>
+      <Type>Library</Type>
+    </Command>
+  </Commands>
+</RhinoScriptCompilerProject>

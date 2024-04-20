@@ -1,0 +1,11 @@
+#! python 2
+
+import System
+
+import clr
+clr.AddReference("System.IO.FileSystem.DriveInfo")
+
+System.IO.D
+drives = System.IO.DriveInfo.GetDrives()
+for drive in drives:
+    print(drive)

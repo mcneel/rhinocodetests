@@ -1,0 +1,4 @@
+import rhinoscriptsyntax as rs
+
+pnt = rs.GetPoint("FirstPoint")
+print(pnt == 0)

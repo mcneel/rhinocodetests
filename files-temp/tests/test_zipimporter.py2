@@ -1,0 +1,9 @@
+import sys
+from zipimport import zipimporter
+
+z = zipimporter(r"C:\Users\ein\Downloads\TEST\libs\testipymodule.zip")
+z.load_module("testipymodule")
+
+import testipymodule as t
+
+print(t)
