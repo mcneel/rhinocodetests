@@ -37,7 +37,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         public void TestCompileErrorLine_ReturnOutsideFunction()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
-@"a = ""Hello Python 3 in Grasshopper!""
+@"
+a = ""Hello Python 3 in Grasshopper!""
 print(a)
 
 Some_Func()
@@ -52,7 +53,7 @@ return
             }
             catch (CompileException ex)
             {
-                if (ex.Diagnostics.First().Reference.Position.LineNumber != 5)
+                if (ex.Diagnostics.First().Reference.Position.LineNumber != 6)
                     throw;
             }
         }
@@ -61,7 +62,8 @@ return
         public void TestRuntimeErrorLine_InScript()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
-@"import os
+@"
+import os
 
 print(12 / 0)
 ");
@@ -74,7 +76,7 @@ print(12 / 0)
             }
             catch (ExecuteException ex)
             {
-                if (ex.Position.LineNumber != 3)
+                if (ex.Position.LineNumber != 4)
                     throw;
             }
         }
@@ -83,7 +85,7 @@ print(12 / 0)
         public void TestRuntimeErrorLine_InFunction()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
-@"#! python 3
+@"
 def foo():
     None[0]
 foo()
@@ -106,7 +108,7 @@ foo()
         public void TestRuntimeErrorLine_InNestedFunctions()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
-@"#! python 3
+@"
 
 import sys
 from System import Uri
@@ -144,7 +146,7 @@ func_call_test(5, 5)
         public void TestDebugErrorLine_InNestedFunctions()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
-@"#! python 3
+@"
 
 import sys
 from System import Uri
@@ -187,6 +189,179 @@ func_call_test(5, 5)
                 Assert.IsTrue(controls.Pass);
             }
 
+        }
+
+        [Test]
+        public void TestComplete_RhinoScriptSyntax()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import rhinoscriptsyntax as rs
+rs.");
+
+            string text = code.Text;
+            IEnumerable<CompletionInfo> completions = 
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
+
+            CompletionInfo cinfo;
+            bool result = true;
+
+            cinfo = completions.First(c => c.Text == "AddAlias");
+            result &= CompletionKind.Function == cinfo.Kind;
+
+            cinfo = completions.First(c => c.Text == "rhapp");
+            result &= CompletionKind.Module == cinfo.Kind;
+
+            cinfo = completions.First(c => c.Text == "rhcommand");
+            result &= CompletionKind.Class == cinfo.Kind;
+
+            cinfo = completions.First(c => c.Text == "Rhino");
+            result &= CompletionKind.Value == cinfo.Kind;
+
+            Assert.True(result);
+        }
+
+        [Test]
+        public void TestComplete_RhinoCommon_Rhino()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+Rhino.");
+
+            string text = code.Text;
+            IEnumerable<CompletionInfo> completions = 
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
+
+            CompletionInfo cinfo;
+            bool result = true;
+
+            cinfo = completions.First(c => c.Text == "RhinoApp");
+            result &= CompletionKind.Class == cinfo.Kind;
+
+            cinfo = completions.First(c => c.Text == "Runtime");
+            result &= CompletionKind.Module == cinfo.Kind;
+
+            Assert.True(result);
+        }
+
+        [Test]
+        public void TestComplete_RhinoCommon_Point3d()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+from Rhino.Geometry import Point3d
+p = Point3d()
+p.");
+
+            string text = code.Text;
+            IEnumerable<CompletionInfo> completions = 
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
+
+            CompletionInfo cinfo;
+            bool result = true;
+
+            cinfo = completions.First(c => c.Text == "Add");
+            // NOTE: this really should be method!
+            result &= CompletionKind.Function == cinfo.Kind;
+
+            cinfo = completions.First(c => c.Text == "X");
+            result &= CompletionKind.Property == cinfo.Kind;
+
+            Assert.True(result);
+        }
+
+        [Test]
+        public void TestComplete_RhinoCommon_ProxyTypes_NONE()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+Rhino.Render.ProxyTypes.");
+
+            string text = code.Text;
+            IEnumerable<CompletionInfo> completions = 
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
+
+            CompletionInfo cinfo;
+            bool result = true;
+
+            cinfo = completions.First(c => c.Text == "NONE");
+            result &= CompletionKind.EnumMember == cinfo.Kind;
+
+            Assert.True(result);
+        }
+
+        [Test]
+        public void TestComplete_StdLib_os()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import os
+os.");
+
+            string text = code.Text;
+            IEnumerable<CompletionInfo> completions = 
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
+
+            CompletionInfo cinfo;
+            bool result = true;
+
+            cinfo = completions.First(c => c.Text == "abc");
+            result &= CompletionKind.Module == cinfo.Kind;
+
+            cinfo = completions.First(c => c.Text == "environ");
+            result &= CompletionKind.Value == cinfo.Kind;
+
+            Assert.True(result);
+        }
+
+        [Test]
+        public void TestComplete_StdLib_os_path()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import os.path as op
+op.");
+
+            string text = code.Text;
+            IEnumerable<CompletionInfo> completions = 
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
+
+            CompletionInfo cinfo;
+            bool result = true;
+
+            cinfo = completions.First(c => c.Text == "dirname");
+            result &= CompletionKind.Function == cinfo.Kind;
+
+            cinfo = completions.First(c => c.Text == "curdir");
+            result &= CompletionKind.Text == cinfo.Kind;
+
+            Assert.True(result);
+        }
+
+        [Test]
+        public void TestComplete_Python_str_array()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+a = [str()];
+a[0].");
+
+            string text = code.Text;
+            IEnumerable<CompletionInfo> completions = 
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
+
+            CompletionInfo cinfo;
+            bool result = true;
+
+            cinfo = completions.First(c => c.Text == "capitalize");
+            result &= CompletionKind.Function == cinfo.Kind;
+
+            cinfo = completions.First(c => c.Text == "split");
+            result &= CompletionKind.Function == cinfo.Kind;
+
+            Assert.True(result);
         }
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py3\", "test_*.py");
