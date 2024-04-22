@@ -44,7 +44,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         public void TestCompileErrorLine_MissingFunction()
         {
             Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
-@"using System;
+@"
+using System;
 
 DoOtherStuff();
 
@@ -68,7 +69,7 @@ void DoStuff(int s)
             }
             catch (CompileException ex)
             {
-                if (ex.Diagnostics.First().Reference.Position.LineNumber != 3)
+                if (ex.Diagnostics.First().Reference.Position.LineNumber != 4)
                     throw;
             }
         }
@@ -77,8 +78,7 @@ void DoStuff(int s)
         public void TestRuntimeErrorLine_InScript()
         {
             Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
-@"// Grasshopper Script Instance
-//#! csharp
+@"
 using System;
 
 int a = 1 + 2;
@@ -94,7 +94,7 @@ a = 5 / zero;
             }
             catch (ExecuteException ex)
             {
-                if (ex.Position.LineNumber != 7)
+                if (ex.Position.LineNumber != 6)
                     throw;
             }
         }
@@ -103,7 +103,8 @@ a = 5 / zero;
         public void TestRuntimeErrorLine_InFunction()
         {
             Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
-@"using System;
+@"
+using System;
 
 DoOtherStuff();
 
@@ -152,10 +153,37 @@ struct Jose { }
             }
             catch (ExecuteException ex)
             {
-                if (ex.Position.LineNumber != 19)
+                if (ex.Position.LineNumber != 20)
                     throw;
             }
         }
+
+        // FIXME: Move csharp autocompletion to language module
+        //        [Test]
+        //        public void TestComplete_System_Console()
+        //        {
+        //            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+        //@"
+        //using System;
+        //using Rhino;
+
+        //Console.");
+
+        //            string text = code.Text;
+        //            IEnumerable<CompletionInfo> completions =
+        //                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
+
+        //            CompletionInfo cinfo;
+        //            bool result = true;
+
+        //            cinfo = completions.First(c => c.Text == "WriteLine");
+        //            result &= CompletionKind.Function == cinfo.Kind;
+
+        //            cinfo = completions.First(c => c.Text == "WindowWidth");
+        //            result &= CompletionKind.Property == cinfo.Kind;
+
+        //            Assert.True(result);
+        //        }
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
     }
