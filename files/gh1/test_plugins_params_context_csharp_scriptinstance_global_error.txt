@@ -1,0 +1,3 @@
+The name 'a' does not exist in the current context
+The name 'x' does not exist in the current context
+The name 'y' does not exist in the current context

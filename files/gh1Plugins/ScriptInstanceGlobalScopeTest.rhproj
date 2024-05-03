@@ -1,0 +1,55 @@
+{
+  "id": "30955311-df27-4e2d-9468-a0affd1a28e1",
+  "identity": {
+    "name": "ScriptInstanceGlobalScopeTest",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "appName": "Rhino3D",
+      "appVersion": {
+        "major": 8
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "type": "components",
+      "id": "be510553-c048-4cb7-8068-a47036064f45",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "ScriptInstanceGlobalScopeTest.ghx",
+      "uri": "ScriptInstanceGlobalScopeTest.ghx",
+      "scripts": [
+        {
+          "id": "77f66f7c-1d24-42be-b446-dc0df1323c8b",
+          "name": "ScriptInstanceGlobalScopeTest",
+          "nickname": "C#",
+          "subcat": "Default"
+        },
+        {
+          "id": "b079b426-5d88-4d5f-ae22-ada62b7c23bc",
+          "name": "ScriptGlobalScopeTest",
+          "nickname": "C#",
+          "subcat": "Default"
+        }
+      ]
+    }
+  ]
+}
