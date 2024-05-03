@@ -28,12 +28,10 @@
     "buildTarget": {
       "appName": "Rhino3D",
       "appVersion": {
-        "major": 8,
-        "minor": 0
+        "major": 8
       },
-      "appOS": "windows",
-      "title": "Rhino3D (8.0 - Windows)",
-      "slug": "rh8_0-win"
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
     },
     "publishTarget": {
       "title": "McNeel Yak Server"
@@ -75,7 +73,7 @@
         "version": "9.*.*"
       },
       "title": "TestConsole",
-      "uri": "file:///C:/Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests/test_console.csx",
+      "uri": "file:///C:/Users/ein/gits/rhinocodetests/files-temp/tests/test_console.csx",
       "kind": "hidden"
     },
     {
@@ -85,7 +83,7 @@
         "version": "3.*.*"
       },
       "title": "TestCPython",
-      "uri": "file:///C:/Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests/test_cpython.py",
+      "uri": "file:///C:/Users/ein/gits/rhinocodetests/files-temp/tests/test_cpython.py",
       "image": {
         "light": {
           "type": "svg",
@@ -249,7 +247,7 @@
         "version": "2.*.*"
       },
       "title": "TestPython2",
-      "uri": "file:///C:/Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests/test_python2.py",
+      "uri": "file:///C:/Users/ein/gits/rhinocodetests/files-temp/tests/test_python2.py",
       "canPublish": false,
       "image": {
         "light": {
@@ -381,7 +379,7 @@
         "version": "1.*.*"
       },
       "title": "code.gh",
-      "uri": "file:///C:/Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests_rhinogh/code.gh",
+      "uri": "file:///C:/Users/ein/gits/rhinocodetests/files-temp/tests_rhinogh/code.gh",
       "scripts": [
         {
           "id": "6983a2f9-3d6d-47c0-bca0-9cfa35a59f1b",
@@ -395,7 +393,7 @@
     {
       "type": "uri",
       "library": {
-        "base": "file:///C:/Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests_projects/libraries/testmodule/",
+        "base": "file:///C:/Users/ein/gits/rhinocodetests/files-temp/tests_projects/libraries/testmodule/",
         "language": {
           "id": "*.*.python",
           "version": "3.*.*"
@@ -405,7 +403,7 @@
     {
       "type": "uri",
       "library": {
-        "base": "file:///C:/Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests_projects/libraries/TestAssembly/",
+        "base": "file:///C:/Users/ein/gits/rhinocodetests/files-temp/tests_projects/libraries/TestAssembly/",
         "language": {
           "id": "*.*.csharp",
           "version": "*.*.*"
@@ -415,7 +413,7 @@
     {
       "type": "uri",
       "library": {
-        "base": "file:///C:/Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests_projects/libraries/testipymodule/",
+        "base": "file:///C:/Users/ein/gits/rhinocodetests/files-temp/tests_projects/libraries/testipymodule/",
         "language": {
           "id": "*.*.python",
           "version": "2.*.*"
@@ -438,7 +436,7 @@
     },
     {
       "id": "ac248ea3-0a9e-4db9-895a-94bd6222f79b",
-      "uri": "file:///C:/Users/ein/gits/rhino/src4/rhino4/Plug-ins/RhinoCodePlugins/tests/natsort-3.5.5-py2.py3-none-any.whl"
+      "uri": "file:///C:/Users/ein/gits/rhinocodetests/files-temp/tests/natsort-3.5.5-py2.py3-none-any.whl"
     }
   ]
 }

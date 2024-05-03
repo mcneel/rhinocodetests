@@ -1,12 +1,10 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 
 using NUnit.Framework;
-
-using Rhino.Runtime.Code;
-using Rhino.Runtime.Code.Languages;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -57,7 +55,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
 
             LoadLanguages();
-            SetupGrasshopperSearchPaths();
+            LoadGrasshopperPlugins();
         }
 
         sealed class StatusResponder : ProgressStatusResponder
@@ -85,13 +83,23 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         }
 
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-        static void SetupGrasshopperSearchPaths()
+        static void LoadGrasshopperPlugins()
         {
             string testPluginsPath = Path.Combine(s_settings.TestFilesDirectory, "gh1Plugins");
 
             if (Directory.Exists(testPluginsPath))
             {
-                Grasshopper.Folders.CustomAssemblyFolders.Add(testPluginsPath);
+                System.Reflection.MethodInfo loader =
+                    Grasshopper.Instances.ComponentServer.GetType()
+                                         .GetMethod("LoadGHA", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+                foreach(string gha in Directory.GetFiles(testPluginsPath, "*.gha"))
+                {
+                    loader.Invoke(
+                            Grasshopper.Instances.ComponentServer,
+                            new object[] { new Grasshopper.Kernel.GH_ExternalFile(gha), false }
+                        );
+                }
             }
         }
     }
