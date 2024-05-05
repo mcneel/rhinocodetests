@@ -84,24 +84,13 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         static void LoadGrasshopperPlugins()
         {
             string testPluginsPath = Path.Combine(s_settings.TestFilesDirectory, "gh1Plugins");
 
             if (Directory.Exists(testPluginsPath))
             {
-                System.Reflection.MethodInfo loader =
-                    Grasshopper.Instances.ComponentServer.GetType()
-                                         .GetMethod("LoadGHA", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-                foreach(string gha in Directory.GetFiles(testPluginsPath, "*.gha"))
-                {
-                    loader.Invoke(
-                            Grasshopper.Instances.ComponentServer,
-                            new object[] { new Grasshopper.Kernel.GH_ExternalFile(gha), false }
-                        );
-                }
+                LoadGHA(Directory.GetFiles(testPluginsPath, "*.gha"));
             }
         }
     }
