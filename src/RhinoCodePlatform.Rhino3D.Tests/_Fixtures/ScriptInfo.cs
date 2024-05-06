@@ -48,6 +48,19 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 {
                     IsSkipped = true;
                 }
+
+                m = m.NextMatch();
+                if (m.Success)
+                {
+                    major = int.Parse(m.Groups["major"].Value);
+                    minor = int.Parse(m.Groups["minor"].Value);
+
+                    if (apiVersion.Major > major
+                            || apiVersion.Minor > minor)
+                    {
+                        IsSkipped = true;
+                    }
+                }
             }
         }
 
