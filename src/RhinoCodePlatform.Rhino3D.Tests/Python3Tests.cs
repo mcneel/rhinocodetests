@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 using NUnit.Framework;
 
@@ -362,6 +363,64 @@ a[0].");
             result &= CompletionKind.Function == cinfo.Kind;
 
             Assert.True(result);
+        }
+
+        [Test]
+        public void TestPIP_SitePackage()
+        {
+            // RH-81895
+            string pkgPath = string.Empty;
+
+            ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
+            Code code = py3.CreateCode(
+$@"
+# venv: site-packages
+# r: rx
+import rx
+
+{nameof(pkgPath)} = rx.__file__
+");
+
+            RunContext ctx = GetRunContext();
+            ctx.Outputs.Set(nameof(pkgPath), pkgPath);
+
+            code.Run(ctx);
+
+            pkgPath = ctx.Outputs.Get<string>(nameof(pkgPath));
+            Assert.True(new Regex(@"[Ll]ib[\\/]site-packages[\\/]").IsMatch(pkgPath));
+        }
+
+        [Test]
+        public void TestPIP_SitePackage_Shared()
+        {
+            // RH-81895
+            ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
+            Code code = py3.CreateCode(
+@"
+# venv: site-packages
+# r: fpdf
+import fpdf
+");
+
+            string pkgPath = string.Empty;
+            RunContext ctx = GetRunContext();
+            code.Run(ctx);
+
+            code = py3.CreateCode(
+$@"
+# r: fpdf
+import fpdf
+
+{nameof(pkgPath)} = fpdf.__file__
+");
+
+            ctx = GetRunContext();
+            ctx.Outputs.Set(nameof(pkgPath), pkgPath);
+
+            code.Run(ctx);
+
+            pkgPath = ctx.Outputs.Get<string>(nameof(pkgPath));
+            Assert.True(new Regex(@"[Ll]ib[\\/]site-packages[\\/]").IsMatch(pkgPath));
         }
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py3\", "test_*.py");

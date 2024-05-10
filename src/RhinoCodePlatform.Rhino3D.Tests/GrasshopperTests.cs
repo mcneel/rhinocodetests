@@ -6,16 +6,20 @@ using NUnit.Framework;
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
+using Rhino.Runtime.Code.Text;
 
+using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
-using Rhino.Runtime.Code.Text;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
     public class GrasshopperTests : ScriptFixture
     {
+        const string GHDOC_PARAM = "__ghdoc__";
+        static readonly Guid s_assertTrue = new("0890a32c-4e30-4f06-a98f-ed62b45838cf");
+
         [Test]
         public void TestGrasshopper1Error()
         {
@@ -59,18 +63,35 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 },
 
                 Options = {
-                    ["grasshopper.runAsCommand"] = false
+                    ["grasshopper.runner.asCommand"] = false,
+                    ["grasshopper.runner.extractDoc"] = GHDOC_PARAM,
                 }
             };
 
             if (TryRunCode(scriptInfo, code, ctx, out string errorMessage))
             {
-                Assert.True(ctx.Outputs.TryGet("result", out IGH_Structure data));
-                foreach (GH_Path p in data.Paths)
+                // NOTE:
+                // definition with no errors, either need to have a 'result' collector
+                if (ctx.Outputs.TryGet("result", out IGH_Structure data))
                 {
-                    foreach (var d in data.get_Branch(p))
-                        if (d is GH_Boolean result)
-                            Assert.True(result.Value);
+                    foreach (GH_Path p in data.Paths)
+                    {
+                        foreach (var d in data.get_Branch(p))
+                            if (d is GH_Boolean result)
+                                Assert.True(result.Value);
+                    }
+                }
+                // or have at least one assert component
+                else
+                {
+                    bool hasAssertComponent = false;
+                    GH_Document ghdoc = ctx.Outputs.Get<GH_Document>(GHDOC_PARAM);
+                    foreach (IGH_DocumentObject docObj in ghdoc.Objects)
+                    {
+                        hasAssertComponent |= docObj.ComponentGuid == s_assertTrue;
+                    }
+
+                    Assert.True(hasAssertComponent);
                 }
             }
             else
