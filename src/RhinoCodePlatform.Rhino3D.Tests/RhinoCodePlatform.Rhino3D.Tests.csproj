@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('Windows'))">net48;net7.0-windows</TargetFrameworks>
     <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('OSX'))">net7.0</TargetFrameworks>
+    <LangVersion>10</LangVersion>
     <IsPackable>false</IsPackable>
     <Nullable>disable</Nullable>
   </PropertyGroup>
@@ -17,6 +18,7 @@
     <Reference Include="Rhino.Runtime.Code" HintPath="$(RhinoSystemDirectory)\Rhino.Runtime.Code.dll" Private="True" />
     <Reference Include="RhinoCodePlatform.Rhino3D" HintPath="$(RhinoSystemDirectory)\RhinoCodePlatform.Rhino3D.dll" Private="False" />
     <Reference Include="Grasshopper" HintPath="$(RhinoPluginsDirectory)\Grasshopper\Grasshopper.dll" Private="False" />
+    <Reference Include="GH_IO" HintPath="$(RhinoPluginsDirectory)\Grasshopper\GH_IO.dll" Private="False" />
   </ItemGroup>
 
   <ItemGroup>
