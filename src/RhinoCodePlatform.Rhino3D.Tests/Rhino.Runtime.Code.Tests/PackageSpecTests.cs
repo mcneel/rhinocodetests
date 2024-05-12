@@ -6,6 +6,7 @@ using Rhino.Runtime.Code.Environments;
 
 namespace Rhino.Runtime.Code.Tests
 {
+#if RC8_8
     [TestFixture]
     public class PackageSpecTests : Rhino.Testing.Fixtures.RhinoTestFixture
     {
@@ -29,4 +30,5 @@ namespace Rhino.Runtime.Code.Tests
             Assert.IsTrue(spec.Matches(package));
         }
     }
+#endif
 }
