@@ -14,6 +14,7 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="NUnit" Version="3.14.0" />
     <PackageReference Include="Rhino.Testing" Version="8.0.15-beta" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +22,8 @@
     <Reference Include="RhinoCodePlatform.Rhino3D" HintPath="$(RhinoSystemDirectory)\RhinoCodePlatform.Rhino3D.dll" Private="False" />
     <Reference Include="Grasshopper" HintPath="$(RhinoPluginsDirectory)\Grasshopper\Grasshopper.dll" Private="False" />
     <Reference Include="GH_IO" HintPath="$(RhinoPluginsDirectory)\Grasshopper\GH_IO.dll" Private="False" />
+
+    <Reference Include="RhinoCodePluginGH" HintPath="$(RhinoPluginsDirectory)\Grasshopper\Components\RhinoCodePluginGH.gha" Private="False" />
   </ItemGroup>
 
   <ItemGroup>

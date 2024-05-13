@@ -14,10 +14,10 @@ using Rhino.Runtime.Code.Tests;
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
-    public class Python3Tests : ScriptFixture
+    public class Python3_Tests : ScriptFixture
     {
         [Test, TestCaseSource(nameof(GetTestScripts))]
-        public void TestPython3Script(ScriptInfo scriptInfo)
+        public void TestScript(ScriptInfo scriptInfo)
         {
             TestSkip(scriptInfo);
 

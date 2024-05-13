@@ -10,17 +10,17 @@ using Rhino.Runtime.Code.Languages;
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
-    public class JsonTests : ScriptFixture
+    public class Text_Tests : ScriptFixture
     {
         [Test, TestCaseSource(nameof(GetTestScripts))]
-        public void TestJsonScript(ScriptInfo scriptInfo)
+        public void TestScript(ScriptInfo scriptInfo)
         {
             TestSkip(scriptInfo);
 
-            // no exec for json. just make sure code can be created
-            Code _ = GetLanguage(this, LanguageSpec.JSON).CreateCode(scriptInfo.Uri);
+            // no exec for text. just make sure code can be created
+            Code _ = GetLanguage(this, LanguageSpec.PlainText).CreateCode(scriptInfo.Uri);
         }
 
-        static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"json\", "test_*.json");
+        static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"text\", "test_*.txt");
     }
 }
