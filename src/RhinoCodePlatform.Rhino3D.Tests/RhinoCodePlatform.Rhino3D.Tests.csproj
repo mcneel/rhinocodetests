@@ -5,7 +5,8 @@
     <LangVersion>10</LangVersion>
     <IsPackable>false</IsPackable>
     <Nullable>disable</Nullable>
-    <DefineConstants>$(DefineConstants);RC8_7</DefineConstants>
+
+    <DefineConstants>RC8_8</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
