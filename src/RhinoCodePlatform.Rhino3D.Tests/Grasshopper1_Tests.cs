@@ -15,7 +15,7 @@ using Grasshopper.Kernel.Types;
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
-    public class GrasshopperTests : ScriptFixture
+    public class Grasshopper1_Tests : ScriptFixture
     {
         const string GHDOC_PARAM = "__ghdoc__";
         static readonly Guid s_assertTrue = new("0890a32c-4e30-4f06-a98f-ed62b45838cf");

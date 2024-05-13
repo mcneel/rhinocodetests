@@ -11,10 +11,10 @@ using Rhino.Runtime.Code.Languages;
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
-    public class Python2Tests : ScriptFixture
+    public class Python2_Tests : ScriptFixture
     {
         [Test, TestCaseSource(nameof(GetTestScripts))]
-        public void TestPython2Script(ScriptInfo scriptInfo)
+        public void TestScript(ScriptInfo scriptInfo)
         {
             TestSkip(scriptInfo);
 
