@@ -15,7 +15,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     public class CSharp_Tests : ScriptFixture
     {
         [Test, TestCaseSource(nameof(GetTestScripts))]
-        public void TestScript(ScriptInfo scriptInfo)
+        public void TestCSharp_Script(ScriptInfo scriptInfo)
         {
             TestSkip(scriptInfo);
 
@@ -41,7 +41,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         }
 
         [Test]
-        public void TestCompileErrorLine_MissingFunction()
+        public void TestCSharp_CompileErrorLine_MissingFunction()
         {
             Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
 @"
@@ -75,7 +75,7 @@ void DoStuff(int s)
         }
 
         [Test]
-        public void TestRuntimeErrorLine_InScript()
+        public void TestCSharp_RuntimeErrorLine_InScript()
         {
             Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
 @"
@@ -100,7 +100,7 @@ a = 5 / zero;
         }
 
         [Test]
-        public void TestRuntimeErrorLine_InFunction()
+        public void TestCSharp_RuntimeErrorLine_InFunction()
         {
             Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
 @"

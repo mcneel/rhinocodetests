@@ -16,5 +16,5 @@ bool doTest()
 test &= doTest();
 
 
-Console.WriteLine(test);
-// result = test;
+// Console.WriteLine(test);
+result = test;

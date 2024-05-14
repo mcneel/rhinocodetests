@@ -14,7 +14,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     public class Python2_Tests : ScriptFixture
     {
         [Test, TestCaseSource(nameof(GetTestScripts))]
-        public void TestScript(ScriptInfo scriptInfo)
+        public void TestPython2_Script(ScriptInfo scriptInfo)
         {
             TestSkip(scriptInfo);
 
@@ -32,7 +32,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         }
 
         [Test]
-        public void TestRuntimeErrorLine_InScript()
+        public void TestPython2_RuntimeErrorLine_InScript()
         {
             Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
 @"
@@ -55,7 +55,7 @@ print(12 / 0)
         }
 
         [Test]
-        public void TestComplete_RhinoScriptSyntax()
+        public void TestPython2_Complete_RhinoScriptSyntax()
         {
             Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
 @"
@@ -79,7 +79,7 @@ rs.");
         }
 
         [Test]
-        public void TestComplete_RhinoCommon_Rhino()
+        public void TestPython2_Complete_RhinoCommon_Rhino()
         {
             Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
 @"
@@ -103,7 +103,7 @@ Rhino.");
         }
 
         [Test]
-        public void TestComplete_StdLib_os()
+        public void TestPython2_Complete_StdLib_os()
         {
             Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
 @"
@@ -127,7 +127,7 @@ os.");
         }
 
         [Test]
-        public void TestComplete_StdLib_os_path()
+        public void TestPython2_Complete_StdLib_os_path()
         {
             Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
 @"

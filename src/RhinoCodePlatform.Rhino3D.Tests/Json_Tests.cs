@@ -13,7 +13,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     public class Json_Tests : ScriptFixture
     {
         [Test, TestCaseSource(nameof(GetTestScripts))]
-        public void TestScript(ScriptInfo scriptInfo)
+        public void TestJSON_Script(ScriptInfo scriptInfo)
         {
             TestSkip(scriptInfo);
 
