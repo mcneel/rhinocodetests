@@ -10,25 +10,23 @@ using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Text;
 
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Parameters;
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
 
 using RhinoCodePlatform.Rhino3D.GH;
 
 using GHP = RhinoCodePluginGH;
-using Grasshopper.Kernel.Parameters;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
-#if RC8_8
     [TestFixture]
     public class Grasshopper1_UITests : ScriptFixture
     {
+#if RC8_8
         [Test]
         public void TestComponent_ChangeLanguage()
         {
-            // TODO:
-            // can not change the component language after it is setup
             IScriptObject script = GHP.Components.ScriptComponent.Create("Test", @"
 #! python 3
 import os
@@ -41,7 +39,49 @@ import os
 using System;
 ";
 
+            Assert.True(LanguageSpec.CSharp.Matches(script.LanguageSpec));
+        }
+
+        [Test]
+        public void TestComponent_ChangeLanguage_Specific()
+        {
+            IScriptObject script = GHP.Components.Python3Component.Create("Test", @"
+#! python 3
+import os
+") as IScriptObject;
+
+            Assert.True(LanguageSpec.Python3.Matches(script.LanguageSpec));
+
+            script.Text = @"
+// #! csharp
+using System;
+";
+
             Assert.False(LanguageSpec.CSharp.Matches(script.LanguageSpec));
+        }
+
+        [Test]
+        public void TestComponent_ChangeLanguage_SetLanguageSpec()
+        {
+            IScriptObject script = GHP.Components.ScriptComponent.Create("Test", @"
+#! python 3
+import os
+") as IScriptObject;
+
+            script.LanguageSpec = LanguageSpec.CSharp;
+
+            Assert.AreEqual(script.LanguageSpec, LanguageSpec.CSharp);
+        }
+
+        [Test]
+        public void TestComponent_ChangeLanguage_SetLanguageSpec_Specific()
+        {
+            IScriptObject script = GHP.Components.Python3Component.Create("Test", @"
+#! python 3
+import os
+") as IScriptObject;
+
+            Assert.Throws<GHP.Components.LanguageReadonlyException>(() => script.LanguageSpec = LanguageSpec.CSharp);
         }
 
         [Test]
@@ -79,9 +119,6 @@ using System;
         {
             IScriptObject script = GHP.Components.Python3Component.Create("Test") as IScriptObject;
 
-            // build so component parameters are applied to the script
-            script.ReBuild();
-
             // change the script
             script.Text = @"
 import System
@@ -110,7 +147,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
             // assert param converters
             IScriptVariable u_param = script.Inputs.ElementAt(0);
             IScriptVariable v_param = script.Inputs.ElementAt(1);
-            
+
             Assert.True(u_param.Converter is GH1.Converters.IntConverter);
             Assert.True(v_param.Converter is GH1.Converters.Point3dConverter);
         }
@@ -119,9 +156,6 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         public void TestComponent_ParamsCollect_Python2()
         {
             IScriptObject script = GHP.Components.IronPython2Component.Create("Test") as IScriptObject;
-
-            // build so component parameters are applied to the script
-            script.ReBuild();
 
             // change the script
             script.Text = @"
@@ -150,9 +184,6 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         public void TestComponent_ParamsCollect_CSharp()
         {
             IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
-
-            // build so component parameters are applied to the script
-            script.ReBuild();
 
             // change the script
             script.Text = @"
@@ -204,6 +235,70 @@ public class Script_Instance : GH_ScriptInstance
         }
 
         [Test]
+        public void TestComponent_ParamsCollect_CSharp_OutToRef()
+        {
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
+
+            // change the script
+            script.Text = @"
+using System;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(int x, out double a)
+    {
+        a = default;
+    }
+}
+";
+
+            // collect parameters from RunScript and apply to component
+            script.ParamsCollect();
+
+            string updatedText = script.Text;
+
+            Assert.AreEqual(updatedText, @"
+using System;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(int x, ref object a)
+    {
+        a = default;
+    }
+}
+");
+            // assert inputs
+            ScriptParam[] inputs = script.Inputs.Select(i => i.CreateScriptParam()).ToArray();
+            Assert.True(inputs[0].Name == "x");
+            Assert.True(inputs[0].ValueType.Name == "int");
+
+            // assert outputs
+            ScriptParam[] outputs = script.Outputs.Select(i => i.CreateScriptParam()).ToArray();
+            Assert.True(outputs[0].Name == "a");
+            Assert.True(outputs[0].ValueType.Name == "double");
+
+            // assert param converters
+            IScriptVariable x_param = script.Inputs.ElementAt(0);
+            IScriptVariable a_param = script.Outputs.ElementAt(0);
+
+            Assert.True(x_param.Converter is GH1.Converters.IntConverter);
+            Assert.True(a_param.Converter is GH1.Converters.DoubleConverter);
+        }
+
+        [Test]
         public void TestComponent_ParamsCollect_Python3_Keep_Str_Hint()
         {
             // test python parameter changes does not overwrite 'str' hint
@@ -219,9 +314,6 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def RunScript(self, x, y):
         return x + y
 ") as IScriptObject;
-
-            // build so component parameters are applied to the script
-            script.ReBuild();
 
             // add hint to parameter 'x'
             IScriptVariable x_param = script.Inputs.ElementAt(0);
@@ -278,9 +370,6 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         return x + y
 ") as IScriptObject;
 
-            // build so component parameters are applied to the script
-            script.ReBuild();
-
             // add hint to parameter 'x'
             IScriptVariable x_param = script.Inputs.ElementAt(0);
             x_param.Converter = new GH1.Converters.PythonStringConverter();
@@ -325,9 +414,6 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
             IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
             script.CaptureOutput = false;
 
-            // build so component parameters are applied to the script
-            script.ReBuild();
-
             // wire up the ins and outs
             IGH_Component component = (IGH_Component)script;
             IGH_Param number_in = new Param_Number();
@@ -371,14 +457,11 @@ public class Script_Instance : GH_ScriptInstance
             Assert.True(param_in_k.SourceCount == 0);
             Assert.True(number_out.SourceCount == 0);
         }
-        
+
         [Test]
         public void TestComponent_DirectCast_Converter()
         {
             IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
-
-            // build so component parameters are applied to the script
-            script.ReBuild();
 
             // change the script
             script.Text = @"
@@ -425,6 +508,31 @@ public class Script_Instance : GH_ScriptInstance
             Assert.True(x_param.Converter is GH1.Converters.CastConverter);
             Assert.True(y_param.Converter is GH1.Converters.CastConverter);
         }
-    }
+
+        [Test]
+        public void TestComponent_HasError()
+        {
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test", @"
+using System;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(int u)
+    {
+") as IScriptObject;
+
+            // collect parameters from RunScript and apply to component
+            script.ParamsCollect();
+
+            Assert.True(script.HasErrors);
+        }
+
 #endif
+    }
 }

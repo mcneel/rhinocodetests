@@ -8,4 +8,44 @@
     <RhinoSystemDirectory>C:\Users\ein\gits\rhino\src4\bin\Debug</RhinoSystemDirectory>
     <RhinoPluginsDirectory>C:\Users\ein\gits\rhino\src4\bin\Debug\Plug-ins</RhinoPluginsDirectory>
   </PropertyGroup>
+
+  <UsingTask TaskName="ExtractVersionParts" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <AssemblyVersion Required="true" />
+      <DefinedGuards Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.Collections.Generic" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+          var version = new Version(AssemblyVersion);
+          int major = version.Major;
+          int minor = version.Minor;
+          
+          var guards = new List<string>();
+          for(int i = 0; i<=minor; i++)
+          {
+            guards.Add("RC" + major.ToString() + "_" + i.ToString());
+          }
+          
+          DefinedGuards = string.Join(";", guards);
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="DynamicallyDefineRhinoCommonGuards" BeforeTargets="CoreCompile">
+    <GetAssemblyIdentity AssemblyFiles="$(RhinoSystemDirectory)\RhinoCommon.dll">
+      <Output TaskParameter="Assemblies" ItemName="RhinoCommon"/>
+    </GetAssemblyIdentity>
+
+    <ExtractVersionParts AssemblyVersion="%(RhinoCommon.Version)">
+      <Output TaskParameter="DefinedGuards" PropertyName="RhinoDefinedGuards"/>
+    </ExtractVersionParts>
+
+    <PropertyGroup>
+      <DefineConstants>$(DefineConstants);$(RhinoDefinedGuards)</DefineConstants>
+    </PropertyGroup>
+  </Target>
 </Project>
