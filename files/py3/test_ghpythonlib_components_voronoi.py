@@ -20,5 +20,5 @@ for point in points:
 
 
 curves_count = len(curves)
-print(curves_count)
+# print(curves_count)
 result = curves_count == 3

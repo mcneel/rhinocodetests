@@ -17,7 +17,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     public class Python3_Tests : ScriptFixture
     {
         [Test, TestCaseSource(nameof(GetTestScripts))]
-        public void TestScript(ScriptInfo scriptInfo)
+        public void TestPython3_Script(ScriptInfo scriptInfo)
         {
             TestSkip(scriptInfo);
 
@@ -35,7 +35,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         }
 
         [Test]
-        public void TestCompileErrorLine_ReturnOutsideFunction()
+        public void TestPython3_CompileErrorLine_ReturnOutsideFunction()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
 @"
@@ -60,7 +60,7 @@ return
         }
 
         [Test]
-        public void TestRuntimeErrorLine_InScript()
+        public void TestPython3_RuntimeErrorLine_InScript()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
 @"
@@ -83,7 +83,7 @@ print(12 / 0)
         }
 
         [Test]
-        public void TestRuntimeErrorLine_InFunction()
+        public void TestPython3_RuntimeErrorLine_InFunction()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
 @"
@@ -92,7 +92,10 @@ def foo():
 foo()
 ");
 
-            RunContext ctx = GetRunContext();
+            // No need to capture stdout.
+            // otherwise it reports SyntaxError in console during build
+            // since None[0] is invalid syntax
+            RunContext ctx = GetRunContext(captureStdout: false);
 
             try
             {
@@ -106,7 +109,7 @@ foo()
         }
 
         [Test]
-        public void TestRuntimeErrorLine_InNestedFunctions()
+        public void TestPython3_RuntimeErrorLine_InNestedFunctions()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
 @"
@@ -144,7 +147,7 @@ func_call_test(5, 5)
         }
 
         [Test]
-        public void TestDebugErrorLine_InNestedFunctions()
+        public void TestPython3_DebugErrorLine_InNestedFunctions()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
 @"
@@ -193,7 +196,7 @@ func_call_test(5, 5)
         }
 
         [Test]
-        public void TestComplete_RhinoScriptSyntax()
+        public void TestPython3_Complete_RhinoScriptSyntax()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
 @"
@@ -223,7 +226,7 @@ rs.");
         }
 
         [Test]
-        public void TestComplete_RhinoCommon_Rhino()
+        public void TestPython3_Complete_RhinoCommon_Rhino()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
 @"
@@ -247,7 +250,7 @@ Rhino.");
         }
 
         [Test]
-        public void TestComplete_RhinoCommon_Point3d()
+        public void TestPython3_Complete_RhinoCommon_Point3d()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
 @"
@@ -273,7 +276,7 @@ p.");
         }
 
         [Test]
-        public void TestComplete_RhinoCommon_ProxyTypes_NONE()
+        public void TestPython3_Complete_RhinoCommon_ProxyTypes_NONE()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
 @"
@@ -294,7 +297,7 @@ Rhino.Render.ProxyTypes.");
         }
 
         [Test]
-        public void TestComplete_StdLib_os()
+        public void TestPython3_Complete_StdLib_os()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
 @"
@@ -318,7 +321,7 @@ os.");
         }
 
         [Test]
-        public void TestComplete_StdLib_os_path()
+        public void TestPython3_Complete_StdLib_os_path()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
 @"
@@ -342,7 +345,7 @@ op.");
         }
 
         [Test]
-        public void TestComplete_Python_str_array()
+        public void TestPython3_Complete_str_array()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
 @"
@@ -366,7 +369,7 @@ a[0].");
         }
 
         [Test]
-        public void TestComplete_Python3_Enum_Members()
+        public void TestPython3_Complete_Enum_Members()
         {
             SkipBefore(8, 8);
 
@@ -392,7 +395,7 @@ m = TestEnum.");
         }
 
         [Test]
-        public void TestPIP_SitePackage()
+        public void TestPython3_PIP_SitePackage()
         {
             // RH-81895
             string pkgPath = string.Empty;
@@ -417,7 +420,7 @@ import rx
         }
 
         [Test]
-        public void TestPIP_SitePackage_Shared()
+        public void TestPython3_PIP_SitePackage_Shared()
         {
             // RH-81895
             ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);

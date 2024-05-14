@@ -25,7 +25,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     {
 #if RC8_8
         [Test]
-        public void TestComponent_ChangeLanguage()
+        public void TestGH1_Component_ChangeLanguage()
         {
             IScriptObject script = GHP.Components.ScriptComponent.Create("Test", @"
 #! python 3
@@ -43,7 +43,7 @@ using System;
         }
 
         [Test]
-        public void TestComponent_ChangeLanguage_Specific()
+        public void TestGH1_Component_ChangeLanguage_Specific()
         {
             IScriptObject script = GHP.Components.Python3Component.Create("Test", @"
 #! python 3
@@ -61,7 +61,7 @@ using System;
         }
 
         [Test]
-        public void TestComponent_ChangeLanguage_SetLanguageSpec()
+        public void TestGH1_Component_ChangeLanguage_SetLanguageSpec()
         {
             IScriptObject script = GHP.Components.ScriptComponent.Create("Test", @"
 #! python 3
@@ -74,7 +74,7 @@ import os
         }
 
         [Test]
-        public void TestComponent_ChangeLanguage_SetLanguageSpec_Specific()
+        public void TestGH1_Component_ChangeLanguage_SetLanguageSpec_Specific()
         {
             IScriptObject script = GHP.Components.Python3Component.Create("Test", @"
 #! python 3
@@ -85,7 +85,7 @@ import os
         }
 
         [Test]
-        public void TestComponent_Params_CaptureOutput()
+        public void TestGH1_Component_Params_CaptureOutput()
         {
             IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
             script.CaptureOutput = false;
@@ -95,7 +95,7 @@ import os
         }
 
         [Test]
-        public void TestComponent_Params_ScriptInput()
+        public void TestGH1_Component_Params_ScriptInput()
         {
             IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
             script.HasExternScript = true;
@@ -105,7 +105,7 @@ import os
         }
 
         [Test]
-        public void TestComponent_Params_ScriptOutput()
+        public void TestGH1_Component_Params_ScriptOutput()
         {
             IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
             script.CaptureScript = true;
@@ -115,7 +115,7 @@ import os
         }
 
         [Test]
-        public void TestComponent_ParamsCollect_Python3()
+        public void TestGH1_Component_ParamsCollect_Python3()
         {
             IScriptObject script = GHP.Components.Python3Component.Create("Test") as IScriptObject;
 
@@ -153,7 +153,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         }
 
         [Test]
-        public void TestComponent_ParamsCollect_Python2()
+        public void TestGH1_Component_ParamsCollect_Python2()
         {
             IScriptObject script = GHP.Components.IronPython2Component.Create("Test") as IScriptObject;
 
@@ -181,7 +181,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         }
 
         [Test]
-        public void TestComponent_ParamsCollect_CSharp()
+        public void TestGH1_Component_ParamsCollect_CSharp()
         {
             IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
 
@@ -235,7 +235,7 @@ public class Script_Instance : GH_ScriptInstance
         }
 
         [Test]
-        public void TestComponent_ParamsCollect_CSharp_OutToRef()
+        public void TestGH1_Component_ParamsCollect_CSharp_OutToRef()
         {
             IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
 
@@ -299,7 +299,7 @@ public class Script_Instance : GH_ScriptInstance
         }
 
         [Test]
-        public void TestComponent_ParamsCollect_Python3_Keep_Str_Hint()
+        public void TestGH1_Component_ParamsCollect_Python3_Keep_Str_Hint()
         {
             // test python parameter changes does not overwrite 'str' hint
             IScriptObject script = GHP.Components.Python3Component.Create("Test", @"
@@ -354,7 +354,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         }
 
         [Test]
-        public void TestComponent_ParamsCollect_Python2_Keep_Str_Hint()
+        public void TestGH1_Component_ParamsCollect_Python2_Keep_Str_Hint()
         {
             // test python parameter changes does not overwrite 'str' hint
             IScriptObject script = GHP.Components.IronPython2Component.Create("Test", @"
@@ -404,7 +404,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         }
 
         [Test]
-        public void TestComponent_ParamsCollect_CSharp_Wiring()
+        public void TestGH1_Component_ParamsCollect_CSharp_Wiring()
         {
             // tests input and output wiring updates correctly when
             // script parameters change and we do not end up with
@@ -459,7 +459,7 @@ public class Script_Instance : GH_ScriptInstance
         }
 
         [Test]
-        public void TestComponent_DirectCast_Converter()
+        public void TestGH1_Component_DirectCast_Converter()
         {
             IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
 
@@ -510,7 +510,7 @@ public class Script_Instance : GH_ScriptInstance
         }
 
         [Test]
-        public void TestComponent_HasError()
+        public void TestGH1_Component_HasError()
         {
             IScriptObject script = GHP.Components.CSharpComponent.Create("Test", @"
 using System;

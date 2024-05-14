@@ -62,11 +62,11 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
         }
 
-        protected static RunContext GetRunContext()
+        protected static RunContext GetRunContext(bool captureStdout = true)
         {
             return new RunContext
             {
-                OutputStream = GetOutputStream(),
+                OutputStream = captureStdout ? GetOutputStream() : default,
                 OverrideCodeParams = true,
                 Outputs = {
                     ["result"] = default,
@@ -83,6 +83,13 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             try
             {
                 code.Run(context);
+
+                if (context.OutputStream is NUnitStream stream)
+                {
+                    stream.Flush();
+                    stream.Dispose();
+                }
+
                 return true;
             }
             catch (CompileException compileEx)
