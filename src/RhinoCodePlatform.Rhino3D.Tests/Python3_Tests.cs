@@ -366,6 +366,32 @@ a[0].");
         }
 
         [Test]
+        public void TestComplete_Python3_Enum_Members()
+        {
+            SkipBefore(8, 8);
+
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+from enum import Enum
+
+class TestEnum(Enum):
+    ONE = 1
+    TWO = 2
+
+    @classmethod
+    def test_class_method(cls):
+        return cls(2)
+
+m = TestEnum.");
+
+            string text = code.Text;
+            IEnumerable<CompletionInfo> completions =
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
+
+            Assert.True(completions.Any(c => c.Text == "test_class_method"));
+        }
+
+        [Test]
         public void TestPIP_SitePackage()
         {
             // RH-81895

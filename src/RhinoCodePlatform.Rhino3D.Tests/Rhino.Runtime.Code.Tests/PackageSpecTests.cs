@@ -6,10 +6,10 @@ using Rhino.Runtime.Code.Environments;
 
 namespace Rhino.Runtime.Code.Tests
 {
-#if RC8_8
     [TestFixture]
     public class PackageSpecTests : Rhino.Testing.Fixtures.RhinoTestFixture
     {
+#if RC8_8
         [Test]
         public void TestPythonPackageSpecNormalizedIdMatch()
         {
@@ -29,6 +29,6 @@ namespace Rhino.Runtime.Code.Tests
             package = new PythonPackage("wood.-nano", new PackageVersion(0, 1, 1));
             Assert.IsTrue(spec.Matches(package));
         }
-    }
 #endif
+    }
 }

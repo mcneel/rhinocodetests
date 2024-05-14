@@ -103,6 +103,16 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             return false;
         }
     
+        protected static void SkipBefore(int major, int minor)
+        {
+            Version apiVersion = typeof(Code).Assembly.GetName().Version;
+            if (apiVersion.Major < major
+                    || apiVersion.Minor < minor)
+            {
+                Assert.Ignore();
+            }
+        }
+
         protected static void TestSkip(ScriptInfo scriptInfo)
         {
             if (scriptInfo.IsSkipped)
