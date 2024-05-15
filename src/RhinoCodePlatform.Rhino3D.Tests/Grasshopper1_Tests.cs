@@ -57,11 +57,10 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             var ctx = new RunContext
             {
-                OverrideCodeParams = true,
+                AutoApplyParams = true,
                 Outputs = {
                     ["result"] = default,
                 },
-
                 Options = {
                     ["grasshopper.runner.asCommand"] = false,
                     ["grasshopper.runner.extractDoc"] = GHDOC_PARAM,

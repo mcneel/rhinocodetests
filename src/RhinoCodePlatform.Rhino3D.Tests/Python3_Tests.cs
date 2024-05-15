@@ -8,8 +8,9 @@ using NUnit.Framework;
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Execution.Debugging;
+using Rhino.Runtime.Code.Execution.Profiling;
 using Rhino.Runtime.Code.Languages;
-using Rhino.Runtime.Code.Tests;
+using Rhino.Runtime.Code.Testing;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -57,6 +58,30 @@ return
                 if (ex.Diagnostics.First().Reference.Position.LineNumber != 6)
                     throw;
             }
+        }
+
+        [Test]
+        public void TestPython3_Compile_Script()
+        {
+            // assert throws compile exception on run/debug/profile
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import os
+
+a = None[0
+");
+
+
+            code.DebugControls = new DebugContinueAllControls();
+
+            ExecuteException run = Assert.Throws<ExecuteException>(() => code.Run(new RunContext()));
+            Assert.IsInstanceOf(typeof(CompileException), run.InnerException);
+
+            ExecuteException debug = Assert.Throws<ExecuteException>(() => code.Debug(new DebugContext()));
+            Assert.IsInstanceOf(typeof(CompileException), debug.InnerException);
+
+            ExecuteException profile = Assert.Throws<ExecuteException>(() => code.Profile(new ProfileContext()));
+            Assert.IsInstanceOf(typeof(CompileException), profile.InnerException);
         }
 
         [Test]
@@ -147,6 +172,26 @@ func_call_test(5, 5)
         }
 
         [Test]
+        public void TestPython3_DebugStop()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import sys
+print(sys) # line 3
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 3);
+            var controls = new DebugStopperControls(breakpoint);
+
+            var ctx = new DebugContext();
+
+            code.DebugControls = controls;
+
+
+            Assert.Throws<DebugStopException>(() => code.Debug(ctx));
+        }
+
+        [Test]
         public void TestPython3_DebugErrorLine_InNestedFunctions()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
@@ -158,7 +203,7 @@ from System import Uri
 
 def func_call_test(a, b):
     def nested_func_call_test(c):
-        raise Exception(""I don't like you"")
+        raise Exception(""I don't like you"")  # line 9
 
     nested_func_call_test(a + b)
 
@@ -177,6 +222,7 @@ func_call_test(5, 5)
             var breakpoint = new CodeReferenceBreakpoint(code, 9);
             var controls = new ExceptionCaptureControls(breakpoint);
 
+            bool capturedException = false;
             var ctx = new DebugContext();
 
             code.DebugControls = controls;
@@ -185,14 +231,15 @@ func_call_test(5, 5)
             {
                 code.Debug(ctx);
             }
-            catch (DebugStopException) { }
-            catch (ExecuteException) { }
+            catch (ExecuteException)
+            {
+                capturedException = true;
+            }
             catch (Exception) { throw; }
             finally
             {
-                Assert.IsTrue(controls.Pass);
+                Assert.IsTrue(controls.Pass && capturedException);
             }
-
         }
 
         [Test]
@@ -204,7 +251,7 @@ import rhinoscriptsyntax as rs
 rs.");
 
             string text = code.Text;
-            IEnumerable<CompletionInfo> completions = 
+            IEnumerable<CompletionInfo> completions =
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
 
             CompletionInfo cinfo;
@@ -234,7 +281,7 @@ import Rhino
 Rhino.");
 
             string text = code.Text;
-            IEnumerable<CompletionInfo> completions = 
+            IEnumerable<CompletionInfo> completions =
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
 
             CompletionInfo cinfo;
@@ -259,7 +306,7 @@ p = Point3d()
 p.");
 
             string text = code.Text;
-            IEnumerable<CompletionInfo> completions = 
+            IEnumerable<CompletionInfo> completions =
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
 
             CompletionInfo cinfo;
@@ -284,7 +331,7 @@ import Rhino
 Rhino.Render.ProxyTypes.");
 
             string text = code.Text;
-            IEnumerable<CompletionInfo> completions = 
+            IEnumerable<CompletionInfo> completions =
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
 
             CompletionInfo cinfo;
@@ -305,7 +352,7 @@ import os
 os.");
 
             string text = code.Text;
-            IEnumerable<CompletionInfo> completions = 
+            IEnumerable<CompletionInfo> completions =
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
 
             CompletionInfo cinfo;
@@ -329,7 +376,7 @@ import os.path as op
 op.");
 
             string text = code.Text;
-            IEnumerable<CompletionInfo> completions = 
+            IEnumerable<CompletionInfo> completions =
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
 
             CompletionInfo cinfo;
@@ -353,7 +400,7 @@ a = [str()];
 a[0].");
 
             string text = code.Text;
-            IEnumerable<CompletionInfo> completions = 
+            IEnumerable<CompletionInfo> completions =
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
 
             CompletionInfo cinfo;

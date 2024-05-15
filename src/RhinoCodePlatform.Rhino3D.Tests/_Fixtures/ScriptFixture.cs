@@ -66,8 +66,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             return new RunContext
             {
+                AutoApplyParams = true,
                 OutputStream = captureStdout ? GetOutputStream() : default,
-                OverrideCodeParams = true,
                 Outputs = {
                     ["result"] = default,
                 },

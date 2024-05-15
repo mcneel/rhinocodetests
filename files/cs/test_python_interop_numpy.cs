@@ -31,7 +31,7 @@ randoms = list(numpy.random.rand(10))
 // this hold inputs and output values
 var ctx = new RunContext
 {
-    OverrideCodeParams = true,
+    AutoApplyParams = true,
     
     // initialize output value
     Outputs = {

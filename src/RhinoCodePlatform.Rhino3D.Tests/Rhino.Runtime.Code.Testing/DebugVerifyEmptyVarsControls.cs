@@ -1,20 +1,21 @@
 using System;
+using System.Linq;
 
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Execution.Debugging;
 
-namespace Rhino.Runtime.Code.Tests
+namespace Rhino.Runtime.Code.Testing
 {
-    class ExceptionCaptureControls : DebugControls
+    sealed class DebugVerifyEmptyVarsControls : DebugControls
     {
         readonly CodeReferenceBreakpoint _bp;
 
         public bool Pass { get; set; } = false;
 
-        public ExceptionCaptureControls(CodeReferenceBreakpoint breakpoint)
+        public DebugVerifyEmptyVarsControls(CodeReferenceBreakpoint breakpoint)
         {
             _bp = breakpoint;
-            
+
             Breakpoints.Add(breakpoint);
         }
 
@@ -25,14 +26,12 @@ namespace Rhino.Runtime.Code.Tests
                 if (ExecEvent.Line == frame.Event
                         && _bp.Matches(frame))
                 {
-                    return DebugAction.StepOver;
-                }
+                    string[] vars = frame.Evaluate()
+                                         .OfType<DebugExpressionVariableResult>()
+                                         .Select(devr => devr.Value.Id)
+                                         .ToArray();
 
-                if (ExecEvent.Exception == frame.Event
-                        && _bp.Matches(frame))
-                {
-                    Pass = true;
-                    return DebugAction.Stop;
+                    Pass = vars.Length == 0;
                 }
             }
 
