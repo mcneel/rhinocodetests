@@ -7,6 +7,9 @@ using NUnit.Framework;
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
+using Rhino.Runtime.Code.Execution.Debugging;
+using Rhino.Runtime.Code.Execution.Profiling;
+using Rhino.Runtime.Code.Testing;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -32,6 +35,30 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         }
 
         [Test]
+        public void TestPython2_Compile_Script()
+        {
+            // assert throws compile exception on run/debug/profile
+            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+@"
+import os
+
+a = None[0
+");
+
+
+            code.DebugControls = new DebugContinueAllControls();
+
+            ExecuteException run = Assert.Throws<ExecuteException>(() => code.Run(new RunContext()));
+            Assert.IsInstanceOf(typeof(CompileException), run.InnerException);
+
+            ExecuteException debug = Assert.Throws<ExecuteException>(() => code.Debug(new DebugContext()));
+            Assert.IsInstanceOf(typeof(CompileException), debug.InnerException);
+
+            ExecuteException profile = Assert.Throws<ExecuteException>(() => code.Profile(new ProfileContext()));
+            Assert.IsInstanceOf(typeof(CompileException), profile.InnerException);
+        }
+
+        [Test]
         public void TestPython2_RuntimeErrorLine_InScript()
         {
             Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
@@ -52,6 +79,26 @@ print(12 / 0)
                 if (ex.Position.LineNumber != 4)
                     throw;
             }
+        }
+
+        [Test]
+        public void TestPython2_DebugStop()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+@"
+import sys
+print(sys)  # line 3
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 3);
+            var controls = new DebugStopperControls(breakpoint);
+
+            var ctx = new DebugContext();
+
+            code.DebugControls = controls;
+
+
+            Assert.Throws<DebugStopException>(() => code.Debug(ctx));
         }
 
         [Test]

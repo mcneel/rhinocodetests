@@ -12,7 +12,7 @@ using Rhino.Runtime.Code.Execution;
 
 var run = new RunContext
 {
-    OverrideCodeParams = true,
+    AutoApplyParams = true,
     Outputs = {
         ["randoms"] = null,
     }
