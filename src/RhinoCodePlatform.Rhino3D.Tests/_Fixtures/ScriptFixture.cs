@@ -118,6 +118,9 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         protected static void ProfileCode(ScriptInfo scriptInfo, Code code, RunContext context)
         {
+#if !RC8_9
+            throw new NotImplementedException("Performance testing is not implemented for Rhino < 8.9");
+#else
             // throw the first measurement out
             // that usually takes longer since the script has to build and cache
             code.Run(context);
@@ -155,6 +158,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             {
                 throw new Exception($"\"{scriptInfo.Name}\" is running slower than expected slowest of {scriptInfo.ExpectedSlowest} (slowest: {slowest})");
             }
+#endif
         }
 
         protected static void SkipBefore(int major, int minor)
