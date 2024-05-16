@@ -1,0 +1,4 @@
+; expected \[4\:6\]
+The name 'just' does not exist in the current context \[4\:6\]
+Only assignment, call, increment, decrement, await, and new object expressions can be used as a statement \[4\:6\]
+Input parameter name "9just" is invalid identifier

@@ -12,6 +12,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     public sealed class ScriptInfo
     {
         static readonly Regex s_rhinoVersionFinder = new Regex(@"(rc|rh|gh)(?<major>\d)\.(?<minor>\d)");
+        static readonly Regex s_performanceSpecFinder = new Regex(@"perf\((?<rounds>\d),\s*(?<mean>\d+)ms,\s*(?<dev>\d+)ms\)");
 
         public Uri Uri { get; }
 
@@ -22,6 +23,22 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         public bool IsSkipped { get; } = false;
 
         public bool ExpectsError { get; } = false;
+
+        public bool ExpectsWarning { get; } = false;
+
+        #region Profiling
+        public bool IsProfileTest { get; } = false;
+
+        public int ProfileRounds { get; } = 1;
+
+        public TimeSpan ExpectedMean { get; } = TimeSpan.Zero;
+
+        public TimeSpan ExpectedDeviation { get; } = TimeSpan.Zero;
+
+        public TimeSpan ExpectedSlowest => ExpectedMean + ExpectedDeviation;
+
+        public TimeSpan ExpectedFastest => ExpectedMean - ExpectedDeviation;
+        #endregion
 
         public ScriptInfo(Uri scriptPath)
         {
@@ -35,6 +52,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             IsDebug = uriStr.Contains("_debug");
             IsSkipped = uriStr.Contains("_skip");
             ExpectsError = uriStr.Contains("_error");
+            ExpectsWarning = uriStr.Contains("_warning");
 
             Match m = s_rhinoVersionFinder.Match(uriStr);
             if (m.Success)
@@ -61,6 +79,15 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                         IsSkipped = true;
                     }
                 }
+            }
+
+            m = s_performanceSpecFinder.Match(uriStr);
+            if (m.Success)
+            {
+                IsProfileTest = true;
+                ProfileRounds = int.Parse(m.Groups["rounds"].Value);
+                ExpectedMean = TimeSpan.FromMilliseconds(int.Parse(m.Groups["mean"].Value));
+                ExpectedDeviation = TimeSpan.FromMilliseconds(int.Parse(m.Groups["dev"].Value));
             }
         }
 
