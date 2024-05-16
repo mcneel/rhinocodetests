@@ -1,0 +1,2 @@
+Input parameter "ImageData \(dir\)" is using reserved keyword "dir" as variable name.
+ Script either fails to run or might override a builtin function.
