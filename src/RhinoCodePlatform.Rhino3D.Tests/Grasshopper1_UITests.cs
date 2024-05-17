@@ -533,6 +533,64 @@ public class Script_Instance : GH_ScriptInstance
             Assert.True(script.HasErrors);
         }
 
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "gh1ui", "test_notkeepingvalue_rc8.8.ghx" })]
+        public void TestGH1_Component_NotKeepingValue(string ghfile)
+        {
+            GH_Document ghdoc = Grasshopper.Instances.DocumentServer.AddDocument(ghfile, makeActive: true);
+
+            ghdoc.Enabled = true;
+            ghdoc.NewSolution(expireAllObjects: true);
+
+            IGH_Param input = ((IGH_Param)ghdoc.Objects.FirstOrDefault(c => c.NickName == "Input"));
+            ghdoc.RemoveObject(input, true);
+
+            ghdoc.NewSolution(expireAllObjects: true);
+
+            IGH_Param assert = ((IGH_Param)ghdoc.Objects.FirstOrDefault(c => c.NickName == "Assert"));
+            Assert.IsFalse(assert.RuntimeMessages(GH_RuntimeMessageLevel.Error).Any());
+        }
+
+        [Test]
+        public void TestGH1_Component_Python_DoesNotReset_Converter_Goo()
+        {
+            TestGH1_Component_Python_DoesNotReset_Converter(new GH1.Converters.GooConverter());
+        }
+
+        [Test]
+        public void TestGH1_Component_Python_DoesNotReset_Converter_Float()
+        {
+            TestGH1_Component_Python_DoesNotReset_Converter(new GH1.Converters.PythonFloatConverter());
+        }
+
+        [Test]
+        public void TestGH1_Component_Python_DoesNotReset_Converter_Point3d()
+        {
+            TestGH1_Component_Python_DoesNotReset_Converter(new GH1.Converters.Point3dConverter());
+        }
+
+        
+        static void TestGH1_Component_Python_DoesNotReset_Converter(IParamValueConverter converter)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-82051
+
+            IScriptObject script = GHP.Components.Python3Component.Create("Test", @"
+a = str(type(x))
+") as IScriptObject;
+
+            IScriptVariable x_param = script.Inputs.ElementAt(0);
+            x_param.Converter = converter;
+
+            // build so there is a code to apply params to
+            script.ReBuild();
+
+            IGH_Component component = (IGH_Component)script;
+            component.Params.RegisterOutputParam(new GHP.Parameters.ScriptVariableParam("z"));
+            // zui calls this automatically when parameter is added
+            ((IGH_VariableParameterComponent)component).VariableParameterMaintenance();
+
+            x_param = script.Inputs.ElementAt(0);
+            Assert.IsInstanceOf(converter.GetType(), x_param.Converter);
+        }
 #endif
     }
 }

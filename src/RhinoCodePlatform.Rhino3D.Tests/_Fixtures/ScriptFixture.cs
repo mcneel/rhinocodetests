@@ -45,6 +45,16 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             return fixture.m_language;
         }
 
+        protected static IEnumerable<string> GetTestScript(string subPath, string filename)
+        {
+            Rhino.Testing.Configs configs = Rhino.Testing.Configs.Current;
+
+            if (SetupFixture.TryGetTestFiles(out string fileDir))
+            {
+                yield return Path.GetFullPath(Path.Combine(configs.SettingsDir, fileDir, subPath, filename));
+            }
+        }
+
         protected static IEnumerable<object[]> GetTestScripts(string subPath, string fileFilter)
         {
             Rhino.Testing.Configs configs = Rhino.Testing.Configs.Current;
