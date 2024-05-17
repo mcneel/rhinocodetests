@@ -8,8 +8,6 @@ using NUnit.Framework;
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
-using System.Diagnostics;
-using System.Linq;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {

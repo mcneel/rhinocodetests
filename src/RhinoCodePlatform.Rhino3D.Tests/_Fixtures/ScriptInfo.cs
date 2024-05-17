@@ -26,6 +26,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         public bool ExpectsWarning { get; } = false;
 
+        public bool ExpectsRhinoDocument { get; } = false;
+
         #region Profiling
         public bool IsProfileTest { get; } = false;
 
@@ -89,11 +91,17 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 ExpectedMean = TimeSpan.FromMilliseconds(int.Parse(m.Groups["mean"].Value));
                 ExpectedDeviation = TimeSpan.FromMilliseconds(int.Parse(m.Groups["dev"].Value));
             }
+
+            ExpectsRhinoDocument = File.Exists(GetRhinoFile());
         }
+
+        public string GetRhinoFile() => Path.ChangeExtension(Uri.ToPath(), ".3dm");
+
+        public string GetErrorsFile() => Path.ChangeExtension(Uri.ToPath(), ".txt");
 
         public bool MatchesError(string errorMessage)
         {
-            string errorsFile = Path.ChangeExtension(Uri.ToPath(), ".txt");
+            string errorsFile = GetErrorsFile();
 
             if (File.Exists(errorsFile))
             {
