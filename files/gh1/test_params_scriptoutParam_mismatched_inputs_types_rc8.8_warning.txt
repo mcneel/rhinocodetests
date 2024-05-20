@@ -1,0 +1,3 @@
+Input parameter "x" \("object"\) is not compatible with input "x" \("int"\) of script "Python 3 Script"
+Input parameter "y" \("Arc"\) is not compatible with input "y" \("Curve"\) of script "Python 3 Script"
+Input parameter "x" \("Line"\) is not compatible with input "x" \("Curve"\) of script "Python 3 Script"
