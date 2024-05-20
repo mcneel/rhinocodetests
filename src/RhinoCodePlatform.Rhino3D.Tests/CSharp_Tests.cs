@@ -187,6 +187,24 @@ struct Jose { }
         }
 
         [Test]
+        public void TestCSharp_Runtime_NULL_Input()
+        {
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+@"
+a = x is null;
+");
+
+            RunContext ctx = GetRunContext();
+            ctx.Inputs.Set("x", null);
+            ctx.Outputs.Set("a", false);
+
+            code.Run(ctx);
+
+            bool isnull = ctx.Outputs.Get<bool>("a");
+            Assert.IsTrue(isnull);
+        }
+
+        [Test]
         public void TestCSharp_DebugStop()
         {
             Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
