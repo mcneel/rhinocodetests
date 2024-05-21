@@ -235,6 +235,95 @@ public class Script_Instance : GH_ScriptInstance
         }
 
         [Test]
+        public void TestGH1_Component_ParamsCollect_Python3_Empty()
+        {
+            IScriptObject script = GHP.Components.Python3Component.Create("Test") as IScriptObject;
+
+            // change the script
+            script.Text = @"
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+import math
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        return 0
+";
+
+            Assert.IsNotEmpty(script.Inputs);
+
+            // collect parameters from RunScript and apply to component
+            script.ParamsCollect();
+
+            Assert.IsFalse(script.HasErrors);
+            Assert.IsEmpty(script.Inputs);
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsCollect_Python2_Empty()
+        {
+            IScriptObject script = GHP.Components.IronPython2Component.Create("Test") as IScriptObject;
+
+            // change the script
+            script.Text = @"
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+import math
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        return 0
+";
+
+            Assert.IsNotEmpty(script.Inputs);
+
+            // collect parameters from RunScript and apply to component
+            script.ParamsCollect();
+
+            Assert.IsFalse(script.HasErrors);
+            Assert.IsEmpty(script.Inputs);
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsCollect_CSharp_Empty()
+        {
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
+
+            // change the script
+            script.Text = @"
+using System;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript()
+    {
+    }
+}
+";
+            Assert.IsNotEmpty(script.Inputs);
+            Assert.IsNotEmpty(script.Outputs);
+
+            // collect parameters from RunScript and apply to component
+            script.ParamsCollect();
+
+            Assert.IsFalse(script.HasErrors);
+            Assert.IsEmpty(script.Inputs);
+            Assert.IsEmpty(script.Outputs);
+        }
+
+        [Test]
         public void TestGH1_Component_ParamsCollect_CSharp_OutToRef()
         {
             IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
@@ -296,6 +385,57 @@ public class Script_Instance : GH_ScriptInstance
 
             Assert.True(x_param.Converter is GH1.Converters.IntConverter);
             Assert.True(a_param.Converter is GH1.Converters.DoubleConverter);
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsCollect_Python3_CorrectSelf()
+        {
+            IScriptObject script = GHP.Components.Python3Component.Create("Test") as IScriptObject;
+
+            // change the script
+            script.Text = @"
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+import math
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript():
+        return 0
+";
+
+            // collect parameters from RunScript and apply to component
+            script.ParamsCollect();
+
+            Assert.IsTrue(script.Text.Contains("def RunScript(self)"));
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsCollect_Python2_CorrectSelf()
+        {
+            IScriptObject script = GHP.Components.IronPython2Component.Create("Test") as IScriptObject;
+
+            // change the script
+            script.Text = @"
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+import math
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript():
+        return 0
+";
+
+            // collect parameters from RunScript and apply to component
+            script.ParamsCollect();
+
+            Assert.IsTrue(script.Text.Contains("def RunScript(self)"));
+
         }
 
         [Test]
