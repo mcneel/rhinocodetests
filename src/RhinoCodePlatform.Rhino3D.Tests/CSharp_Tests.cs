@@ -446,6 +446,36 @@ public class Script_Instance
 
 #if RC8_9
         [Test]
+        public void TestCSharp_DebugReturn_Script()
+        {
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+void Pass() {}
+int Second()
+{
+    Pass(); // line 6
+    return 12; // line 7
+}
+void First()
+{
+    Second();
+}
+
+First();
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOver);
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 7));
+
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
         public void TestCSharp_DebugNested_Script()
         {
             Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
@@ -507,6 +537,7 @@ First();
             Assert.True(controls.Pass);
         }
 #endif
+
         // FIXME: Move csharp autocompletion to language module
         //        [Test]
         //        public void TestComplete_System_Console()
