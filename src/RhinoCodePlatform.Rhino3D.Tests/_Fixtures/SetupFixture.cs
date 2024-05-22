@@ -23,7 +23,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             {
                 try
                 {
-                    XmlSerializer serializer = new XmlSerializer(typeof(MxTestSettings));
+                    XmlSerializer serializer = new(typeof(MxTestSettings));
                     s_settings = Rhino.Testing.Configs.Deserialize<MxTestSettings>(serializer, settingsFile);
 
                     return;
