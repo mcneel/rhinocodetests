@@ -101,6 +101,36 @@ print(sys)  # line 3
             Assert.Throws<DebugStopException>(() => code.Debug(ctx));
         }
 
+#if RC8_9
+        [Test]
+        public void TestPython2_DebugPauses_Script_StepOut()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+@"
+def First():
+    pass # line 3
+    pass # line 4
+
+First()
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 3), DebugAction.StepOver);
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 4));
+
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOver);
+
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+#endif
+
         [Test]
         public void TestPython2_Complete_RhinoScriptSyntax()
         {

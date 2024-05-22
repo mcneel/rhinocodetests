@@ -242,6 +242,41 @@ func_call_test(5, 5)
             }
         }
 
+#if RC8_9
+        [Test]
+        public void TestPython3_DebugPauses_Script_StepOut()
+        {
+            // python 3 debugger does not stop on 'pass' statements
+            // so using Test() instead
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+def Test():
+    pass
+
+def First():
+    Test() # line 6
+    Test() # line 7
+
+First()
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOver);
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 7));
+
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOver);
+
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+#endif
+
         [Test]
         public void TestPython3_Complete_RhinoScriptSyntax()
         {
