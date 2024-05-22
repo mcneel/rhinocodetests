@@ -308,8 +308,70 @@ public class Script_Instance
             Assert.True(controls.Pass);
         }
 
+#if RC8_9
         [Test]
-        public void TestCSharp_Debug_Script()
+        public void TestCSharp_DebugPauses_Script_StepOut()
+        {
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+void Pass() {}
+void First()
+{
+    Pass(); // line 6
+    Pass(); // line 7
+}
+
+First();
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOver);
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 7));
+
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOver);
+
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestCSharp_DebugPauses_Script_DoNotStepIn()
+        {
+            // detect auto-declare code params are in global scope.
+            // this could happen if roslyn trace-injector does not produce valid code
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+void Pass() {}
+void First()
+{
+    Pass(); // line 6
+    Pass();
+}
+
+First();
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepIn);
+            controls.DoNotExpectPause(new CodeReferenceBreakpoint(code, 3));
+
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+#endif
+
+        [Test]
+        public void TestCSharp_DebugVars_Script()
         {
             // detect auto-declare code params are in global scope.
             // this could happen if roslyn trace-injector does not produce valid code
@@ -349,7 +411,7 @@ a = x + y; // line 5
         }
 
         [Test]
-        public void TestCSharp_DebugBuild_ScriptInstance()
+        public void TestCSharp_DebugVars_ScriptInstance()
         {
             // detect missing variables in global scope does not break debugging.
             // this could happen if roslyn trace-injector does not produce valid code
@@ -382,6 +444,69 @@ public class Script_Instance
             Assert.True(controls.Pass);
         }
 
+#if RC8_9
+        [Test]
+        public void TestCSharp_DebugNested_Script()
+        {
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+void Pass() {}
+void Second() {}
+void First()
+{
+    Pass(); // line 7
+    Second(); // line 8
+    Pass();
+}
+
+First();
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 7), DebugAction.StepOver);
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 8), DebugAction.Continue);
+
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestCSharp_DebugNestedNested_Script()
+        {
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+void Pass() {}
+int Second()
+{
+    Pass(); // line 6
+    Pass();
+    Pass();
+    return 12;
+}
+void First()
+{
+    Pass();
+    Second(); // line 14
+    Pass();
+}
+
+First();
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 14), DebugAction.StepIn);
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.Continue);
+
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+#endif
         // FIXME: Move csharp autocompletion to language module
         //        [Test]
         //        public void TestComplete_System_Console()
