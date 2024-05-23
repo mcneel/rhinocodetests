@@ -12,6 +12,8 @@ using Rhino.Runtime.Code.Execution.Profiling;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Testing;
 
+using RhinoCodePlatform.Rhino3D.Languages;
+
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
@@ -533,6 +535,318 @@ import fpdf
             pkgPath = ctx.Outputs.Get<string>(nameof(pkgPath));
             Assert.True(new Regex(@"[Ll]ib[\\/]site-packages[\\/]").IsMatch(pkgPath));
         }
+
+#if RC8_9
+        [Test]
+        public void TestPython3_ScriptInstance_Convert()
+        {
+            var script = new Grasshopper1Script(@"
+#! python 3
+""""""Grasshopper Script""""""
+a = ""Hello Python 3 in Grasshopper!""
+print(a)
+
+");
+
+            script.ConvertToScriptInstance(addSolve: false, addPreview: false);
+
+            // NOTE:
+            // no params are defined so RunScript() is empty
+            Assert.AreEqual(@"#! python 3
+""""""Grasshopper Script""""""
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        a = ""Hello Python 3 in Grasshopper!""
+        print(a)
+        
+        
+        return
+", script.Text);
+        }
+
+        [Test]
+        public void TestPython3_ScriptInstance_Convert_LastEmptyLine()
+        {
+            var script = new Grasshopper1Script(@"
+#! python 3
+print(a)");
+
+            script.ConvertToScriptInstance(addSolve: false, addPreview: false);
+
+            // NOTE:
+            // no params are defined so RunScript() is empty
+            Assert.AreEqual(@"#! python 3
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        print(a)
+        return
+", script.Text);
+        }
+
+        [Test]
+        public void TestPython3_ScriptInstance_Convert_CommentBlock()
+        {
+            var script = new Grasshopper1Script(@"
+#! python 3
+""""""Grasshopper Script
+
+Hello Python 3 in Grasshopper!
+Hello Python 3 in Grasshopper!
+
+Hello Python 3 in Grasshopper!
+
+""""""
+a = ""Hello Python 3 in Grasshopper!""
+print(a)
+
+");
+
+            script.ConvertToScriptInstance(addSolve: false, addPreview: false);
+
+            // NOTE:
+            // no params are defined so RunScript() is empty
+            Assert.AreEqual(@"#! python 3
+""""""Grasshopper Script
+
+Hello Python 3 in Grasshopper!
+Hello Python 3 in Grasshopper!
+
+Hello Python 3 in Grasshopper!
+
+""""""
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        a = ""Hello Python 3 in Grasshopper!""
+        print(a)
+        
+        
+        return
+", script.Text);
+        }
+
+        [Test]
+        public void TestPython3_ScriptInstance_Convert_WithFunction()
+        {
+            var script = new Grasshopper1Script(@"
+#! python 3
+""""""Grasshopper Script""""""
+
+a = 42
+print(""test"")
+
+def Test():
+    pass
+
+
+a = 12
+");
+
+            script.ConvertToScriptInstance(addSolve: false, addPreview: false);
+
+            // NOTE:
+            // no params are defined so RunScript() is empty
+            Assert.AreEqual(@"#! python 3
+""""""Grasshopper Script""""""
+
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        a = 42
+        print(""test"")
+        
+        return
+
+
+def Test():
+    pass
+
+
+a = 12
+", script.Text);
+        }
+
+        [Test]
+        public void TestPython3_ScriptInstance_Convert_AddSolveOverrides()
+        {
+            var script = new Grasshopper1Script(@"#! python 3
+import System
+import Rhino
+import Grasshopper
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        return
+");
+
+            script.ConvertToScriptInstance(addSolve: true, addPreview: false);
+
+            Assert.AreEqual(@"#! python 3
+import System
+import Rhino
+import Grasshopper
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        return
+
+    # Solve overrides 
+    def BeforeRunScript(self):
+        pass
+
+    def AfterRunScript(self):
+        pass
+", script.Text);
+        }
+
+        [Test]
+        public void TestPython3_ScriptInstance_Convert_AddPreviewOverrides()
+        {
+            var script = new Grasshopper1Script(@"#! python 3
+import System
+import Rhino
+import Grasshopper
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        return
+");
+
+            script.ConvertToScriptInstance(addSolve: false, addPreview: true);
+            
+            Assert.AreEqual(@"#! python 3
+import System
+import Rhino
+import Grasshopper
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        return
+
+    # Preview overrides 
+    @property
+    def ClippingBox(self):
+        return Rhino.Geometry.BoundingBox.Empty
+
+    def DrawViewportWires(self, args):
+        pass
+
+    def DrawViewportMeshes(self, args):
+        pass
+", script.Text);
+        }
+
+        [Test]
+        public void TestPython3_ScriptInstance_Convert_AddBothOverrides()
+        {
+            var script = new Grasshopper1Script(@"#! python 3
+import System
+import Rhino
+import Grasshopper
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        return
+");
+
+            script.ConvertToScriptInstance(addSolve: true, addPreview: true);
+            
+            Assert.AreEqual(@"#! python 3
+import System
+import Rhino
+import Grasshopper
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        return
+
+    # Solve overrides 
+    def BeforeRunScript(self):
+        pass
+
+    def AfterRunScript(self):
+        pass
+
+    # Preview overrides 
+    @property
+    def ClippingBox(self):
+        return Rhino.Geometry.BoundingBox.Empty
+
+    def DrawViewportWires(self, args):
+        pass
+
+    def DrawViewportMeshes(self, args):
+        pass
+", script.Text);
+        }
+
+        [Test]
+        public void TestPython3_ScriptInstance_Convert_AddBothOverrides_Steps()
+        {
+            var script = new Grasshopper1Script(@"#! python 3
+import System
+import Rhino
+import Grasshopper
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        return
+");
+
+            script.ConvertToScriptInstance(addSolve: true, addPreview: false);
+            script.ConvertToScriptInstance(addSolve: false, addPreview: true);
+            
+            Assert.AreEqual(@"#! python 3
+import System
+import Rhino
+import Grasshopper
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        return
+
+    # Solve overrides 
+    def BeforeRunScript(self):
+        pass
+
+    def AfterRunScript(self):
+        pass
+
+    # Preview overrides 
+    @property
+    def ClippingBox(self):
+        return Rhino.Geometry.BoundingBox.Empty
+
+    def DrawViewportWires(self, args):
+        pass
+
+    def DrawViewportMeshes(self, args):
+        pass
+", script.Text);
+        }
+#endif
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py3\", "test_*.py");
     }

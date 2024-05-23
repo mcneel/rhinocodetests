@@ -70,7 +70,7 @@ import os
 
             script.LanguageSpec = LanguageSpec.CSharp;
 
-            Assert.AreEqual(script.LanguageSpec, LanguageSpec.CSharp);
+            Assert.AreEqual(LanguageSpec.CSharp, script.LanguageSpec);
         }
 
         [Test]
@@ -352,7 +352,7 @@ public class Script_Instance : GH_ScriptInstance
 
             string updatedText = script.Text;
 
-            Assert.AreEqual(updatedText, @"
+            Assert.AreEqual(@"
 using System;
 
 using Rhino;
@@ -368,7 +368,7 @@ public class Script_Instance : GH_ScriptInstance
         a = default;
     }
 }
-");
+", updatedText);
             // assert inputs
             ScriptParam[] inputs = script.Inputs.Select(i => i.CreateScriptParam()).ToArray();
             Assert.True(inputs[0].Name == "x");
