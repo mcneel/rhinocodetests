@@ -11,6 +11,8 @@ using Rhino.Runtime.Code.Execution.Profiling;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Testing;
 
+using RhinoCodePlatform.Rhino3D.Languages;
+
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
@@ -407,7 +409,7 @@ a = x + y; // line 5
             code.Debug(ctx);
 
             Assert.True(controls.Pass);
-            Assert.AreEqual(ctx.Outputs.Get<int>("a"), 42);
+            Assert.AreEqual(42, ctx.Outputs.Get<int>("a"));
         }
 
         [Test]
@@ -564,6 +566,371 @@ First();
 
         //            Assert.True(result);
         //        }
+
+#if RC8_9
+        [Test]
+        public void TestCSharp_ScriptInstance_Convert()
+        {
+            var script = new Grasshopper1Script(@"
+// #! csharp
+// Grasshopper Script
+using System;
+a = ""Hello Python 3 in Grasshopper!"";
+Console.WriteLine(a);
+");
+
+            script.ConvertToScriptInstance(addSolve: false, addPreview: false);
+
+            // NOTE:
+            // no params are defined so RunScript() is empty
+            // FIXME:
+            // comments are removed in C# conversion
+            Assert.AreEqual(@"
+// #! csharp
+// Grasshopper Script
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+  /* 
+    Members:
+      RhinoDoc RhinoDocument
+      GH_Document GrasshopperDocument
+      IGH_Component Component
+      int Iteration
+
+    Methods (Virtual & overridable):
+      Print(string text)
+      Print(string format, params object[] args)
+      Reflect(object obj)
+      Reflect(object obj, string method_name)
+  */
+
+  private void RunScript()
+  {
+    a = ""Hello Python 3 in Grasshopper!"";
+    Console.WriteLine(a);
+  }
+}
+
+", script.Text);
+        }
+
+        [Test]
+        public void TestCSharp_ScriptInstance_Convert_LastEmptyLine()
+        {
+            var script = new Grasshopper1Script(@"
+// #! csharp
+// Grasshopper Script
+using System;
+a = ""Hello Python 3 in Grasshopper!"";
+Console.WriteLine(a);");
+
+            script.ConvertToScriptInstance(addSolve: false, addPreview: false);
+
+            // NOTE:
+            // no params are defined so RunScript() is empty
+            Assert.AreEqual(@"
+// #! csharp
+// Grasshopper Script
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+  /* 
+    Members:
+      RhinoDoc RhinoDocument
+      GH_Document GrasshopperDocument
+      IGH_Component Component
+      int Iteration
+
+    Methods (Virtual & overridable):
+      Print(string text)
+      Print(string format, params object[] args)
+      Reflect(object obj)
+      Reflect(object obj, string method_name)
+  */
+
+  private void RunScript()
+  {
+    a = ""Hello Python 3 in Grasshopper!"";
+    Console.WriteLine(a);  }
+}
+
+", script.Text);
+        }
+
+        [Test]
+        public void TestCSharp_ScriptInstance_Convert_WithFunction()
+        {
+            var script = new Grasshopper1Script(@"
+// #! csharp
+// Grasshopper Script
+using System;
+a = ""Hello Python 3 in Grasshopper!"";
+Console.WriteLine(a);
+
+int Test()
+{
+    return 42;
+}
+");
+
+            script.ConvertToScriptInstance(addSolve: false, addPreview: false);
+
+            // NOTE:
+            // no params are defined so RunScript() is empty
+            Assert.AreEqual(@"
+// #! csharp
+// Grasshopper Script
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+  /* 
+    Members:
+      RhinoDoc RhinoDocument
+      GH_Document GrasshopperDocument
+      IGH_Component Component
+      int Iteration
+
+    Methods (Virtual & overridable):
+      Print(string text)
+      Print(string format, params object[] args)
+      Reflect(object obj)
+      Reflect(object obj, string method_name)
+  */
+
+  private void RunScript()
+  {
+    a = ""Hello Python 3 in Grasshopper!"";
+    Console.WriteLine(a);
+    int Test()
+{
+    return 42;
+}
+  }
+}
+
+", script.Text);
+        }
+
+        [Test]
+        public void TestCSharp_ScriptInstance_Convert_AddSolveOverrides()
+        {
+            var script = new Grasshopper1Script(@"// #! csharp
+using System;
+using Rhino;
+using Grasshopper;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript()
+    {
+    }
+}
+");
+
+            script.ConvertToScriptInstance(addSolve: true, addPreview: false);
+
+            Assert.AreEqual(@"// #! csharp
+using System;
+using Rhino;
+using Grasshopper;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript()
+    {
+    }
+
+    public override void BeforeRunScript()
+    {
+    }
+
+    public override void AfterRunScript()
+    {
+    }
+}
+", script.Text);
+        }
+
+        [Test]
+        public void TestCSharp_ScriptInstance_Convert_AddPreviewOverrides()
+        {
+            var script = new Grasshopper1Script(@"// #! csharp
+using System;
+using Rhino;
+using Grasshopper;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript()
+    {
+    }
+}
+");
+
+            script.ConvertToScriptInstance(addSolve: false, addPreview: true);
+
+            Assert.AreEqual(@"// #! csharp
+using System;
+using Rhino;
+using Grasshopper;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript()
+    {
+    }
+
+    public override BoundingBox ClippingBox => BoundingBox.Empty;
+
+    public override void DrawViewportMeshes(IGH_PreviewArgs args)
+    {
+    }
+
+    public override void DrawViewportWires(IGH_PreviewArgs args)
+    {
+    }
+}
+", script.Text);
+        }
+
+        [Test]
+        public void TestCSharp_ScriptInstance_Convert_AddBothOverrides()
+        {
+            var script = new Grasshopper1Script(@"// #! csharp
+using System;
+using Rhino;
+using Grasshopper;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript()
+    {
+    }
+}
+");
+
+            script.ConvertToScriptInstance(addSolve: true, addPreview: true);
+
+            Assert.AreEqual(@"// #! csharp
+using System;
+using Rhino;
+using Grasshopper;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript()
+    {
+    }
+
+    public override void BeforeRunScript()
+    {
+    }
+
+    public override void AfterRunScript()
+    {
+    }
+
+    public override BoundingBox ClippingBox => BoundingBox.Empty;
+
+    public override void DrawViewportMeshes(IGH_PreviewArgs args)
+    {
+    }
+
+    public override void DrawViewportWires(IGH_PreviewArgs args)
+    {
+    }
+}
+", script.Text);
+        }
+
+        [Test]
+        public void TestCSharp_ScriptInstance_Convert_AddBothOverrides_Steps()
+        {
+            var script = new Grasshopper1Script(@"// #! csharp
+using System;
+using Rhino;
+using Grasshopper;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript()
+    {
+    }
+}
+");
+
+            script.ConvertToScriptInstance(addSolve: true, addPreview: false);
+            script.ConvertToScriptInstance(addSolve: false, addPreview: true);
+
+            Assert.AreEqual(@"// #! csharp
+using System;
+using Rhino;
+using Grasshopper;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript()
+    {
+    }
+
+    public override void BeforeRunScript()
+    {
+    }
+
+    public override void AfterRunScript()
+    {
+    }
+
+    public override BoundingBox ClippingBox => BoundingBox.Empty;
+
+    public override void DrawViewportMeshes(IGH_PreviewArgs args)
+    {
+    }
+
+    public override void DrawViewportWires(IGH_PreviewArgs args)
+    {
+    }
+}
+", script.Text);
+        }
+#endif
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
     }
