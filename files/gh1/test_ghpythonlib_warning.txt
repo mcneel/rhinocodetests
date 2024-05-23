@@ -1,0 +1,2 @@
+Divide Curve: input 1 curve. error: Data conversion failed from Guid to Curve
+Divide Curve: solver component. error: Data conversion failed from Guid to Curve

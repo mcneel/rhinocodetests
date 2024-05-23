@@ -540,8 +540,9 @@ import fpdf
         [Test]
         public void TestPython3_ScriptInstance_Convert()
         {
-            var script = new Grasshopper1Script(@"
-#! python 3
+            const string P = "#";
+            var script = new Grasshopper1Script($@"
+{P}! python 3
 """"""Grasshopper Script""""""
 a = ""Hello Python 3 in Grasshopper!""
 print(a)
@@ -573,8 +574,9 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         [Test]
         public void TestPython3_ScriptInstance_Convert_LastEmptyLine()
         {
-            var script = new Grasshopper1Script(@"
-#! python 3
+            const string P = "#";
+            var script = new Grasshopper1Script($@"
+{P}! python 3
 print(a)");
 
             script.ConvertToScriptInstance(addSolve: false, addPreview: false);
@@ -598,8 +600,9 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         [Test]
         public void TestPython3_ScriptInstance_Convert_CommentBlock()
         {
-            var script = new Grasshopper1Script(@"
-#! python 3
+            const string P = "#";
+            var script = new Grasshopper1Script($@"
+{P}! python 3
 """"""Grasshopper Script
 
 Hello Python 3 in Grasshopper!
@@ -645,8 +648,9 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         [Test]
         public void TestPython3_ScriptInstance_Convert_WithFunction()
         {
-            var script = new Grasshopper1Script(@"
-#! python 3
+            const string P = "#";
+            var script = new Grasshopper1Script($@"
+{P}! python 3
 """"""Grasshopper Script""""""
 
 a = 42
@@ -691,6 +695,7 @@ a = 12
         [Test]
         public void TestPython3_ScriptInstance_Convert_AddSolveOverrides()
         {
+            const string P = "#";
             var script = new Grasshopper1Script(@"#! python 3
 import System
 import Rhino
@@ -703,7 +708,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 
             script.ConvertToScriptInstance(addSolve: true, addPreview: false);
 
-            Assert.AreEqual(@"#! python 3
+            Assert.AreEqual($@"#! python 3
 import System
 import Rhino
 import Grasshopper
@@ -712,7 +717,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def RunScript(self):
         return
 
-    # Solve overrides 
+    {P} Solve overrides 
     def BeforeRunScript(self):
         pass
 
@@ -724,6 +729,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         [Test]
         public void TestPython3_ScriptInstance_Convert_AddPreviewOverrides()
         {
+            const string P = "#";
             var script = new Grasshopper1Script(@"#! python 3
 import System
 import Rhino
@@ -736,7 +742,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 
             script.ConvertToScriptInstance(addSolve: false, addPreview: true);
             
-            Assert.AreEqual(@"#! python 3
+            Assert.AreEqual($@"#! python 3
 import System
 import Rhino
 import Grasshopper
@@ -745,7 +751,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def RunScript(self):
         return
 
-    # Preview overrides 
+    {P} Preview overrides 
     @property
     def ClippingBox(self):
         return Rhino.Geometry.BoundingBox.Empty
@@ -761,7 +767,8 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         [Test]
         public void TestPython3_ScriptInstance_Convert_AddBothOverrides()
         {
-            var script = new Grasshopper1Script(@"#! python 3
+            const string P = "#";
+            var script = new Grasshopper1Script($@"#! python 3
 import System
 import Rhino
 import Grasshopper
@@ -773,7 +780,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 
             script.ConvertToScriptInstance(addSolve: true, addPreview: true);
             
-            Assert.AreEqual(@"#! python 3
+            Assert.AreEqual($@"#! python 3
 import System
 import Rhino
 import Grasshopper
@@ -782,14 +789,14 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def RunScript(self):
         return
 
-    # Solve overrides 
+    {P} Solve overrides 
     def BeforeRunScript(self):
         pass
 
     def AfterRunScript(self):
         pass
 
-    # Preview overrides 
+    {P} Preview overrides 
     @property
     def ClippingBox(self):
         return Rhino.Geometry.BoundingBox.Empty
@@ -805,6 +812,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         [Test]
         public void TestPython3_ScriptInstance_Convert_AddBothOverrides_Steps()
         {
+            const string P = "#";
             var script = new Grasshopper1Script(@"#! python 3
 import System
 import Rhino
@@ -818,7 +826,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
             script.ConvertToScriptInstance(addSolve: true, addPreview: false);
             script.ConvertToScriptInstance(addSolve: false, addPreview: true);
             
-            Assert.AreEqual(@"#! python 3
+            Assert.AreEqual($@"#! python 3
 import System
 import Rhino
 import Grasshopper
@@ -827,14 +835,14 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def RunScript(self):
         return
 
-    # Solve overrides 
+    {P} Solve overrides 
     def BeforeRunScript(self):
         pass
 
     def AfterRunScript(self):
         pass
 
-    # Preview overrides 
+    {P} Preview overrides 
     @property
     def ClippingBox(self):
         return Rhino.Geometry.BoundingBox.Empty
