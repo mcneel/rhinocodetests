@@ -231,6 +231,66 @@ op.");
 
 #if RC8_9
         [Test]
+        public void TestPython2_CompleteSignature()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+@"
+import Rhino
+Rhino.Input.RhinoGet.GetOneObject(");
+
+            string text = code.Text;
+            IEnumerable<SignatureInfo> signatures =
+                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length);
+
+            Assert.AreEqual(2, signatures.Count());
+
+            SignatureInfo sig;
+
+            sig = signatures.ElementAt(0);
+            Assert.AreEqual(0, sig.ParameterIndex);
+            Assert.AreEqual(
+                @"GetOneObject(prompt: str, acceptNothing: bool, filter: ObjectType) -> (Result, ObjRef)",
+                sig.Text
+                );
+            Assert.AreEqual("prompt: str", sig.Parameters[0].Name);
+            Assert.AreEqual("acceptNothing: bool", sig.Parameters[1].Name);
+            Assert.AreEqual("filter: ObjectType", sig.Parameters[2].Name);
+
+            sig = signatures.ElementAt(1);
+            Assert.AreEqual(0, sig.ParameterIndex);
+            Assert.AreEqual(
+                @"GetOneObject(prompt: str, acceptNothing: bool, filter: GetObjectGeometryFilter) -> (Result, ObjRef)",
+                sig.Text
+                );
+            Assert.AreEqual("prompt: str", sig.Parameters[0].Name);
+            Assert.AreEqual("acceptNothing: bool", sig.Parameters[1].Name);
+            Assert.AreEqual("filter: GetObjectGeometryFilter", sig.Parameters[2].Name);
+        }
+
+        [Test]
+        public void TestPython2_CompleteSignature_ParameterIndex()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+@"
+import Rhino
+Rhino.Input.RhinoGet.GetOneObject(prompt, ");
+
+            string text = code.Text;
+            IEnumerable<SignatureInfo> signatures =
+                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length);
+
+            Assert.AreEqual(2, signatures.Count());
+
+            SignatureInfo first = signatures.ElementAt(0);
+            Assert.AreEqual(1, first.ParameterIndex);
+
+            SignatureInfo second = signatures.ElementAt(1);
+            Assert.AreEqual(1, second.ParameterIndex);
+        }
+#endif
+
+#if RC8_9
+        [Test]
         public void TestPython2_ScriptInstance_Convert()
         {
             const string P = "#";
