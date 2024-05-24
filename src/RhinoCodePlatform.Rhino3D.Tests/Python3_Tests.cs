@@ -478,6 +478,68 @@ m = TestEnum.");
             Assert.True(completions.Any(c => c.Text == "test_class_method"));
         }
 
+#if RC8_9
+        [Test]
+        public void TestPython3_CompleteSignature()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+Rhino.Input.RhinoGet.GetOneObject(");
+
+            string text = code.Text;
+            IEnumerable<SignatureInfo> signatures =
+                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length);
+
+            Assert.AreEqual(2, signatures.Count());
+
+            SignatureInfo sig;
+
+            sig = signatures.ElementAt(0);
+            Assert.AreEqual(0, sig.ParameterIndex);
+            Assert.AreEqual(
+                @"GetOneObject(prompt: str, acceptNothing: bool, filter_: DocObjects.ObjectType) -> (Commands.Result, DocObjects.ObjRef)",
+                sig.Text
+                );
+            Assert.AreEqual("prompt: str", sig.Parameters[0].Name);
+            Assert.AreEqual("acceptNothing: bool", sig.Parameters[1].Name);
+            Assert.AreEqual("filter_: DocObjects.ObjectType", sig.Parameters[2].Name);
+
+            sig = signatures.ElementAt(1);
+            Assert.AreEqual(0, sig.ParameterIndex);
+            Assert.AreEqual(
+                @"GetOneObject(prompt: str, acceptNothing: bool, filter_: Custom.GetObjectGeometryFilter) -> (Commands.Result, DocObjects.ObjRef)",
+                sig.Text
+                );
+            Assert.AreEqual("prompt: str", sig.Parameters[0].Name);
+            Assert.AreEqual("acceptNothing: bool", sig.Parameters[1].Name);
+            Assert.AreEqual("filter_: Custom.GetObjectGeometryFilter", sig.Parameters[2].Name);
+        }
+
+        [Test]
+        public void TestPython3_CompleteSignature_ParameterIndex()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+Rhino.Input.RhinoGet.GetOneObject(prompt, ");
+
+            string text = code.Text;
+            IEnumerable<SignatureInfo> signatures =
+                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length);
+
+            Assert.AreEqual(2, signatures.Count());
+
+            SignatureInfo sig;
+
+            sig = signatures.ElementAt(0);
+            Assert.AreEqual(1, sig.ParameterIndex);
+
+            sig = signatures.ElementAt(1);
+            Assert.AreEqual(1, sig.ParameterIndex);
+        }
+#endif
+
         [Test]
         public void TestPython3_PIP_SitePackage()
         {
