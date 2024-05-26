@@ -9,6 +9,7 @@ using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Execution.Debugging;
 using Rhino.Runtime.Code.Execution.Profiling;
+using Rhino.Runtime.Code.Environments;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Testing;
 
@@ -597,6 +598,31 @@ import fpdf
             pkgPath = ctx.Outputs.Get<string>(nameof(pkgPath));
             Assert.True(new Regex(@"[Ll]ib[\\/]site-packages[\\/]").IsMatch(pkgPath));
         }
+
+#if RC8_9
+        [Test]
+        public void TestPython3_PIP_AccessDeniedError()
+        {
+            // https://github.com/mcneel/rhino/pull/72450
+            ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
+            Code code = py3.CreateCode(
+@"
+# r: openexr
+import OpenEXR
+");
+
+            code.Run(GetRunContext());
+
+            code = py3.CreateCode(
+$@"
+# r: openexr-tools
+import OpenEXR
+");
+
+            EnvironException restore = Assert.Throws<EnvironException>(() => code.Run(GetRunContext()));
+            Assert.AreEqual("Access Denied: OpenEXR is already loaded", restore.Message);
+        }
+#endif
 
 #if RC8_9
         [Test]
