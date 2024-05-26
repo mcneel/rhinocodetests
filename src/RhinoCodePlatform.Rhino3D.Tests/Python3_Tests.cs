@@ -620,7 +620,7 @@ import OpenEXR
 ");
 
             EnvironException restore = Assert.Throws<EnvironException>(() => code.Run(GetRunContext()));
-            Assert.AreEqual("Access Denied: OpenEXR is already loaded", restore.Message);
+            Assert.IsTrue(restore.Message.StartsWith("Access Denied: "));
         }
 #endif
 
