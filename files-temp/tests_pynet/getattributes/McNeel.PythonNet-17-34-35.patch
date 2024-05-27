@@ -1,0 +1,253 @@
+diff --git forkSrcPrefix/src/runtime/TypeManager.cs forkDstPrefix/src/runtime/TypeManager.cs
+index 22908f97c191f3e839fe1ade3d6ea3930e0242fc..45133b3a764f841fdbb49e99e4bcc43618540c36 100644
+--- forkSrcPrefix/src/runtime/TypeManager.cs
++++ forkDstPrefix/src/runtime/TypeManager.cs
+@@ -165,7 +165,6 @@ namespace Python.Runtime
+             return type;
+         }
+ 
+-
+         internal static void InitializeClassCore(Type clrType, PyType pyType, ClassBase impl)
+         {
+             if (pyType.BaseReference != null)
+@@ -881,6 +880,11 @@ namespace Python.Runtime
+                 // PyType_GenericNew
+                 return Util.ReadIntPtr(Runtime.PySuper_Type, TypeOffset.tp_new);
+             }
++            else if (offset == TypeOffset.tp_getattr)
++            {
++                // PyObject_GetAttr
++                return Util.ReadIntPtr(Runtime.PyBaseObjectType, TypeOffset.tp_getattr);
++            }
+             else if (offset == TypeOffset.tp_getattro)
+             {
+                 // PyObject_GenericGetAttr
+diff --git forkSrcPrefix/src/runtime/Native/ITypeOffsets.cs forkDstPrefix/src/runtime/Native/ITypeOffsets.cs
+index 7d71b4b915c486205aaa9f79f310cbe4b7df92de..285b112a12067fc2b41a746d6071abdcb22c0d43 100644
+--- forkSrcPrefix/src/runtime/Native/ITypeOffsets.cs
++++ forkDstPrefix/src/runtime/Native/ITypeOffsets.cs
+@@ -54,6 +54,7 @@ namespace Python.Runtime.Native
+         int tp_dictoffset { get; }
+         int tp_flags { get; }
+         int tp_free { get; }
++        int tp_getattr { get; }
+         int tp_getattro { get; }
+         int tp_hash { get; }
+         int tp_is_gc { get; }
+diff --git forkSrcPrefix/src/runtime/Native/TypeOffset.cs forkDstPrefix/src/runtime/Native/TypeOffset.cs
+index 319d94f856ae3a29d5719172a0860a39ffa43330..e2b036c4ee342224ec8fc3e96f7b60584c4c2d84 100644
+--- forkSrcPrefix/src/runtime/Native/TypeOffset.cs
++++ forkDstPrefix/src/runtime/Native/TypeOffset.cs
+@@ -61,6 +61,7 @@ namespace Python.Runtime
+         internal static int tp_dictoffset { get; private set; }
+         internal static int tp_flags { get; private set; }
+         internal static int tp_free { get; private set; }
++        internal static int tp_getattr { get; private set; }
+         internal static int tp_getattro { get; private set; }
+         internal static int tp_hash { get; private set; }
+         internal static int tp_is_gc { get; private set; }
+diff --git forkSrcPrefix/src/runtime/Types/ClassDerived.cs forkDstPrefix/src/runtime/Types/ClassDerived.cs
+index 83324945a78acb1d234b544095e26bcb542cd104..aee5035314c4477d70017f73fc6f6675a0e1b34c 100644
+--- forkSrcPrefix/src/runtime/Types/ClassDerived.cs
++++ forkDstPrefix/src/runtime/Types/ClassDerived.cs
+@@ -941,7 +941,8 @@ namespace Python.Runtime
+                         pyMethodName = methodName;
+ 
+                     using var pyself = new PyObject(self.CheckRun());
+-                    using PyObject method = pyself.GetAttr(pyMethodName, Runtime.None);
++                    using var methodNameObj = new PyString(pyMethodName);
++                    using PyObject method = pyself.GetAttr(methodNameObj);
+                     BorrowedReference dt = Runtime.PyObject_TYPE(method);
+                     if (method.Reference != Runtime.PyNone && dt != Runtime.PyMethodWrapperType)
+                     {
+diff --git forkSrcPrefix/src/runtime/Types/MetaType.cs forkDstPrefix/src/runtime/Types/MetaType.cs
+index 3b5e76cf0fa5a9308ba21392968d47355f3f5963..00ae146f13acfc5d024105f9aa974711a4b7ec52 100644
+--- forkSrcPrefix/src/runtime/Types/MetaType.cs
++++ forkDstPrefix/src/runtime/Types/MetaType.cs
+@@ -176,6 +176,7 @@ namespace Python.Runtime
+                         clsDict["__namespace__"] =
+                             (clsDict["__module__"].ToString()).ToPython();
+                     }
++
+                     return TypeManager.CreateSubType(name, cb, interfaces, clsDict);
+                 }
+             }
+diff --git forkSrcPrefix/src/runtime/Types/ReflectedClrType.cs forkDstPrefix/src/runtime/Types/ReflectedClrType.cs
+index ceca1d592489be5ce7ee4d39141e78c763223d63..8b2389e05db0f5ac90b870ed00368ee7bb3bbffa 100644
+--- forkSrcPrefix/src/runtime/Types/ReflectedClrType.cs
++++ forkDstPrefix/src/runtime/Types/ReflectedClrType.cs
+@@ -1,6 +1,7 @@
+ using System;
+ using System.Collections.Generic;
+ using System.Diagnostics;
++using System.Reflection;
+ using System.Runtime.Serialization;
+ 
+ using static Python.Runtime.PythonException;
+@@ -93,6 +94,45 @@ internal sealed class ReflectedClrType : PyType
+                 ThrowIfIsNotZero(Runtime.PyDict_DelItemString(cls_dict, "__classcell__"));
+             }
+ 
++            const BindingFlags tbFlags = BindingFlags.Public | BindingFlags.Static;
++            using var clsDict = new PyDict(dict);
++            using var keys = clsDict.Keys();
++            foreach (PyObject pyKey in keys)
++            {
++                string? keyStr = Runtime.GetManagedString(pyKey);
++                if (keyStr is null)
++                {
++                    continue;
++                }
++
++                if (keyStr.StartsWith("__str__"))
++                {
++                    var tp_str = typeof(ReflectedClrType).GetMethod(nameof(ReflectedClrType.tp_str), tbFlags);
++                    Util.WriteIntPtr(pyTypeObj, TypeOffset.tp_str, Interop.GetThunk(tp_str).Address);
++                }
++
++                if (keyStr.StartsWith("__repr__"))
++                {
++                    var tp_repr = typeof(ReflectedClrType).GetMethod(nameof(ReflectedClrType.tp_repr), tbFlags);
++                    Util.WriteIntPtr(pyTypeObj, TypeOffset.tp_repr, Interop.GetThunk(tp_repr).Address);
++                }
++
++                if (keyStr.StartsWith("__getattribute__"))
++                {
++                    var tp_getattro = typeof(ReflectedClrType).GetMethod(nameof(ReflectedClrType.tp_getattro), tbFlags);
++                    Util.WriteIntPtr(pyTypeObj, TypeOffset.tp_getattro, Interop.GetThunk(tp_getattro).Address);
++                }
++
++                if (keyStr.StartsWith("__getattr__"))
++                {
++                    var tp_getattr = typeof(ReflectedClrType).GetMethod(nameof(ReflectedClrType.tp_getattr), tbFlags);
++                    //Util.WriteIntPtr(pyTypeObj, TypeOffset.tp_getattr, Interop.GetThunk(tp_getattr).Address);
++                    Util.WriteIntPtr(pyTypeObj, TypeOffset.tp_getattro, Interop.GetThunk(tp_getattr).Address);
++                }
++
++                pyKey.Dispose();
++            }
++
+             return new NewReference(pyTypeObj);
+         }
+         catch (Exception e)
+@@ -101,6 +141,120 @@ internal sealed class ReflectedClrType : PyType
+         }
+     }
+ 
++    public static NewReference tp_str(BorrowedReference ob)
++    {
++        CLRObject? clrObj = ManagedType.GetManagedObject(ob) as CLRObject;
++        if (clrObj is null)
++        {
++            return Exceptions.RaiseTypeError("invalid object");
++        }
++
++        if (TryGetBoundMethod0(ob, "__str__", out NewReference result))
++        {
++            return result;
++        }
++
++        return ClassObject.tp_str(ob);
++    }
++
++    public static NewReference tp_repr(BorrowedReference ob)
++    {
++        CLRObject? clrObj = ManagedType.GetManagedObject(ob) as CLRObject;
++        if (clrObj is null)
++        {
++            return Exceptions.RaiseTypeError("invalid object");
++        }
++
++        if (TryGetBoundMethod0(ob, "__repr__", out NewReference result))
++        {
++            return result;
++        }
++
++        return ClassObject.tp_repr(ob);
++    }
++
++    public static NewReference tp_getattro(BorrowedReference ob, BorrowedReference key)
++    {
++        CLRObject? clrObj = ManagedType.GetManagedObject(ob) as CLRObject;
++        if (clrObj is null)
++        {
++            return Exceptions.RaiseTypeError("invalid object");
++        }
++
++        if (TryGetBoundMethod1(ob, key, "__getattribute__", out NewReference result))
++        {
++            if (Exceptions.ErrorOccurred())
++            {
++                Exceptions.Clear();
++                return tp_getattr(ob, key);
++            }
++            return result;
++        }
++
++        return Runtime.PyObject_GenericGetAttr(ob, key);
++    }
++
++    public static NewReference tp_getattr(BorrowedReference ob, BorrowedReference key)
++    {
++        CLRObject? clrObj = ManagedType.GetManagedObject(ob) as CLRObject;
++        if (clrObj is null)
++        {
++            return Exceptions.RaiseTypeError("invalid object");
++        }
++
++        if (TryGetBoundMethod1(ob, key, "__getattr__", out NewReference result))
++        {
++            return result;
++        }
++
++        using var objRepr = Runtime.PyObject_Repr(ob);
++        using var keyRepr = Runtime.PyObject_Repr(key);
++        Exceptions.SetError(
++                Exceptions.AttributeError,
++                $"object '{Runtime.GetManagedString(objRepr.BorrowOrThrow())}' has no attribute '{Runtime.GetManagedString(keyRepr.BorrowOrThrow())}'"
++            );
++        return default;
++    }
++
++    private static bool TryGetBoundMethod0(BorrowedReference ob, string keyName, out NewReference result)
++    {
++        result = default;
++
++        using var getAttrKey = new PyString(keyName);
++        using var method = Runtime.PyObject_GenericGetAttr(ob, getAttrKey);
++        bool foundMethod = !Exceptions.ErrorOccurred();
++        if (foundMethod && Runtime.PyObject_TypeCheckExact(method.Borrow(), Runtime.PyBoundMethodType))
++        {
++            using var args = Runtime.PyTuple_New(0);
++            result = Runtime.PyObject_Call(method.Borrow(), args.Borrow(), null);
++            return true;
++        }
++        else
++            Exceptions.Clear();
++
++        return false;
++    }
++
++    private static bool TryGetBoundMethod1(BorrowedReference ob, BorrowedReference key, string keyName, out NewReference result)
++    {
++        result = default;
++
++        using var getAttrKey = new PyString(keyName);
++        using var method = Runtime.PyObject_GenericGetAttr(ob, getAttrKey);
++        bool foundMethod = !Exceptions.ErrorOccurred();
++        if (foundMethod && Runtime.PyObject_TypeCheckExact(method.Borrow(), Runtime.PyBoundMethodType))
++        {
++            using var args = Runtime.PyTuple_New(1);
++            Runtime.PyTuple_SetItem(args.Borrow(), 0, key);
++            result = Runtime.PyObject_Call(method.Borrow(), args.Borrow(), null);
++            return true;
++        }
++        else
++            Exceptions.Clear();
++
++        return false;
++    }
++
+     static ReflectedClrType AllocateClass(Type clrType)
+     {
+         string name = TypeManager.GetPythonTypeName(clrType);
