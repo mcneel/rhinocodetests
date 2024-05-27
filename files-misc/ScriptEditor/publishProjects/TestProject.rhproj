@@ -1,0 +1,86 @@
+{
+  "id": "63b11bce-3ee3-4941-8869-ee183a3b4cc3",
+  "identity": {
+    "name": "TestProject",
+    "version": "0.1.4-beta",
+    "publisher": {
+      "email": "bob@mcneel.com",
+      "name": "Bob (Robert)",
+      "company": "McNeel"
+    },
+    "copyright": "Copyright \u00A9 2023",
+    "license": "MIT",
+    "image": {
+      "light": {
+        "type": "svg",
+        "data": "PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgODAwIDgwMCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWw6c3BhY2U9InByZXNlcnZlIiB4bWxuczpzZXJpZj0iaHR0cDovL3d3dy5zZXJpZi5jb20vIiBzdHlsZT0iZmlsbC1ydWxlOmV2ZW5vZGQ7Y2xpcC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kOyI\u002BDQogICAgPHBhdGggZD0iTTQwMC43NDUsMTMzLjI1QzQzOS45OTUsOTcgNDkyLjI0NSw3NSA1NDkuOTk1LDc1QzY3NC4yNDUsNzUgNzc0Ljk5NSwxNzUuNzUgNzc0Ljk5NSwzMDBDNzc0Ljk5NSw1MDAgNTI0Ljk5NSw3MjUgMzk5Ljk5NSw3NzVDMjc0Ljk5NSw3MjUgMjQuOTk1LDUwMCAyNC45OTUsMzAwQzI0Ljk5NSwxNzUuNzUgMTI1Ljc0NSw3NSAyNDkuOTk2LDc1QzMwNy43NDUsNzUgMzYwLjI0NSw5NyAzOTkuOTk1LDEzMi41TDQwMC43NDUsMTMzLjI1WiIgc3R5bGU9ImZpbGw6cmdiKDI1NSw0OSwyNCk7ZmlsbC1ydWxlOm5vbnplcm87Ii8\u002BDQogICAgPHBhdGggZD0iTTQwMCwxMzIuNjEzQzM2MC4xNzUsOTYuODg4IDMwNy43MjUsNzQuOTg4IDI1MCw3NC45ODhDMTI1LjcyNSw3NC45ODggMjUsMTc1LjczOCAyNSwyOTkuOTg4QzI1LDQ5OS45ODggMjc1LDcyNC45ODggNDAwLDc3NC45ODhDNTI1LDcyNC45ODggNzc1LDQ5OS45ODggNzc1LDI5OS45ODhDNzc1LDE3NS43MzggNjc0LjI3NSw3NC45ODggNTUwLDc0Ljk4OEM0NjEuOTI1LDc0Ljk4OCAzODYuOTc1LDEyNi4yNjMgMzUwLDE5OS45ODhNNjc1LDI5OS45OTVDNjc1LDIzMC45NDUgNjE5LjA1LDE3NC45OTUgNTUwLDE3NC45OTUiIHN0eWxlPSJmaWxsOm5vbmU7ZmlsbC1ydWxlOm5vbnplcm87c3Ryb2tlOmJsYWNrO3N0cm9rZS13aWR0aDo1MHB4OyIvPg0KPC9zdmc\u002BDQo="
+      }
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "appName": "Rhino3D",
+      "appVersion": {
+        "major": 8,
+        "minor": 0
+      },
+      "title": "Rhino3D (8.0)",
+      "slug": "rh8_0"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "6fa93e41-8431-4e70-93df-bffcba9d420e",
+      "language": {
+        "id": "*.*.csharp",
+        "version": "*.*.*"
+      },
+      "title": "MyCSharpCommand",
+      "uri": "MyCSharpCommand.cs"
+    },
+    {
+      "id": "ba554128-fedf-4f94-a3fd-d87c96064e8d",
+      "language": {
+        "id": "*.*.python",
+        "version": "3.*.*"
+      },
+      "title": "MyPythonCommand",
+      "uri": "file:///C:/Users/ein/LEO-WX/Downloads/ScriptEditor/MyPythonCommand.py"
+    },
+    {
+      "id": "a639cb0b-a661-4062-8bbe-478f64cf5771",
+      "language": {
+        "id": "*.*.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "AddNumbers",
+      "uri": "AddNumbers.ghx"
+    },
+    {
+      "type": "components",
+      "id": "24c8f986-f4ed-4245-964c-58ed96377c12",
+      "language": {
+        "id": "*.*.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "MakeSphere.gh",
+      "uri": "MakeSphere.gh",
+      "scripts": []
+    },
+    {
+      "type": "components",
+      "id": "08c42dfc-16b4-4c91-bc18-4a47051cbf2f",
+      "language": {
+        "id": "*.*.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "AllContextParams.gh",
+      "uri": "AllContextParams.gh",
+      "scripts": []
+    }
+  ]
+}
