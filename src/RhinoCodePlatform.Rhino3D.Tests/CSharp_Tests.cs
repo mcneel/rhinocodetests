@@ -685,6 +685,7 @@ public class Script_Instance : GH_ScriptInstance
         [Test]
         public void TestCSharp_ScriptInstance_Convert_WithFunction()
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-82125
             var script = new Grasshopper1Script(@"
 // #! csharp
 // Grasshopper Script
@@ -738,10 +739,11 @@ public class Script_Instance : GH_ScriptInstance
   {
     a = ""Hello Python 3 in Grasshopper!"";
     Console.WriteLine(a);
-    int Test()
-{
+  }
+
+  private int Test()
+  {
     return 42;
-}
   }
 }
 
