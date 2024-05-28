@@ -751,6 +751,74 @@ public class Script_Instance : GH_ScriptInstance
         }
 
         [Test]
+        public void TestCSharp_ScriptInstance_Convert_WithFunctionWithParams()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-82125
+            var script = new Grasshopper1Script(@"
+// #! csharp
+// Grasshopper Script
+using System;
+a = ""Hello Python 3 in Grasshopper!"";
+Console.WriteLine(a);
+
+int Test(int x, int y)
+{
+    return 42;
+}
+");
+
+            script.ConvertToScriptInstance(addSolve: false, addPreview: false);
+
+            // NOTE:
+            // no params are defined so RunScript() is empty
+            Assert.AreEqual(@"
+// #! csharp
+// Grasshopper Script
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+  /* 
+    Members:
+      RhinoDoc RhinoDocument
+      GH_Document GrasshopperDocument
+      IGH_Component Component
+      int Iteration
+
+    Methods (Virtual & overridable):
+      Print(string text)
+      Print(string format, params object[] args)
+      Reflect(object obj)
+      Reflect(object obj, string method_name)
+  */
+
+  private void RunScript()
+  {
+    a = ""Hello Python 3 in Grasshopper!"";
+    Console.WriteLine(a);
+  }
+
+  private int Test(int x, int y)
+  {
+    return 42;
+  }
+}
+
+", script.Text);
+        }
+
+        [Test]
         public void TestCSharp_ScriptInstance_Convert_AddSolveOverrides()
         {
             var script = new Grasshopper1Script(@"// #! csharp
