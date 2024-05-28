@@ -10,6 +10,7 @@ using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Execution.Debugging;
 using Rhino.Runtime.Code.Execution.Profiling;
 using Rhino.Runtime.Code.Environments;
+using Rhino.Runtime.Code.Diagnostics;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Testing;
 
@@ -277,6 +278,99 @@ First()
             code.Debug(new DebugContext());
 
             Assert.True(controls.Pass);
+        }
+#endif
+
+#if RC8_9
+        [Test]
+        public void TestPython3_Diagnose_SuperInit_PythonClass()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+class Base:
+    def __init__(self):
+        pass
+
+class Derived(Base):
+    def __init__(self):
+        super().__init__()
+
+class MissingSuper(Base):
+    def __init__(self):
+        pass
+");
+
+            IEnumerable<Diagnostic> diagnostics =
+                code.Language.Support.Diagnose(SupportRequest.Empty, code, s_errorsOnly);
+
+            Assert.IsEmpty(diagnostics);
+        }
+
+        [Test]
+        public void TestPython3_Diagnose_SuperInit_RhinoCommon()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+from Rhino.Geometry import Point3d
+
+# Point3d is a struct
+class NewPoint(Point3d): # line 5
+    def __init__(self):
+        pass
+");
+
+            IEnumerable<Diagnostic> diagnostics =
+                code.Language.Support.Diagnose(SupportRequest.Empty, code, s_errorsOnly);
+
+            Assert.AreEqual(1, diagnostics.Count());
+            Diagnostic first = diagnostics.First();
+            Assert.AreEqual("E:superchecker", first.Id);
+            Assert.AreEqual(5, first.Reference.Position.LineNumber);
+            Assert.AreEqual("\"NewPoint\" class is missing super().__init__() in its initializer for base class \"Point3d\"", first.Message);
+        }
+
+        [Test]
+        public void TestPython3_Diagnose_SuperInit_RhinoCommon_ImportAs()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino.Input.Custom as ric
+
+class InheritedGetPoint(ric.GetPoint): # line 4
+    def __init__(self):
+        pass
+");
+
+            IEnumerable<Diagnostic> diagnostics =
+                code.Language.Support.Diagnose(SupportRequest.Empty, code, s_errorsOnly);
+
+            Assert.AreEqual(1, diagnostics.Count());
+            Diagnostic first = diagnostics.First();
+            Assert.AreEqual("E:superchecker", first.Id);
+            Assert.AreEqual(4, first.Reference.Position.LineNumber);
+            Assert.AreEqual("\"InheritedGetPoint\" class is missing super().__init__() in its initializer for base class \"ric.GetPoint\"", first.Message);
+        }
+
+        [Test]
+        public void TestPython3_Diagnose_SuperInit_EtoForms()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+from Eto.Forms import Form
+
+class NewForm(Form):
+    def __init__(self):
+        pass
+");
+
+            IEnumerable<Diagnostic> diagnostics =
+                code.Language.Support.Diagnose(SupportRequest.Empty, code, s_errorsOnly);
+
+            Assert.AreEqual(1, diagnostics.Count());
+            Diagnostic first = diagnostics.First();
+            Assert.AreEqual("E:superchecker", first.Id);
+            Assert.AreEqual(4, first.Reference.Position.LineNumber);
+            Assert.AreEqual("\"NewForm\" class is missing super().__init__() in its initializer for base class \"Form\"", first.Message);
         }
 #endif
 
@@ -944,6 +1038,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         }
 #endif
 
+        static DiagnoseOptions s_errorsOnly = new DiagnoseOptions { Errors = true, Hints = false, Infos = false, Warnings = false };
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py3\", "test_*.py");
     }
 }

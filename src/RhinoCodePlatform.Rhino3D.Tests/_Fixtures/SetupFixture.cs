@@ -60,12 +60,17 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             LoadGrasshopperPlugins();
         }
 
-        sealed class StatusResponder : ProgressStatusResponder
+        sealed class TextContextStatusResponder : ProgressStatusResponder
         {
             public override void StatusChanged(ILanguage language, ProgressChangedEventArgs args)
             {
+                // e.g.
+                // Initializing Python 3.9.10: 6% - Deploying runtime
                 int progress = Convert.ToInt32(language.Status.Progress.Value * 100);
-                Console.WriteLine($"Initializing languages {progress}%");
+                if (progress < 100)
+                    TestContext.Progress.WriteLine($"Initializing {language.Id.Name} {language.Id.Version}: {progress,3}% - {language.Status.Progress.Message}");
+                else
+                    TestContext.Progress.WriteLine($"Initializing {language.Id.Name} {language.Id.Version}: Complete");
             }
         }
 
@@ -74,7 +79,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             Registrar.StartScripting();
             Registrar.SendReportsToConsole = true;
-            RhinoCode.Languages.WaitStatusComplete(LanguageSpec.Any, new StatusResponder());
+            RhinoCode.Languages.WaitStatusComplete(LanguageSpec.Any, new TextContextStatusResponder());
             foreach (ILanguage language in RhinoCode.Languages)
             {
                 if (language.Status.IsErrored)
