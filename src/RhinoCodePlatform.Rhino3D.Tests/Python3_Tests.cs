@@ -248,7 +248,7 @@ func_call_test(5, 5)
 
 #if RC8_8
         [Test]
-        public void TestPython3_Debug_Variables_Enum_CheckValue ()
+        public void TestPython3_Debug_Variables_Enum_CheckValue()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
 @"
