@@ -246,6 +246,138 @@ func_call_test(5, 5)
             }
         }
 
+#if RC8_8
+        [Test]
+        public void TestPython3_Debug_Variables_Enum_CheckValue ()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+from Rhino.DocObjects import ObjectType
+m = ObjectType.AnyObject
+stop = m # line 4
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 4);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("m", Rhino.DocObjects.ObjectType.AnyObject),
+            })
+            {
+            };
+
+            code.DebugControls = controls;
+            var ctx = new DebugContext();
+            code.Debug(ctx);
+
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestPython3_Debug_Variables_Enum_ShouldNotExpand()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+from Rhino.DocObjects import ObjectType
+m = ObjectType.Brep
+stop = m # line 4
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 4);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("m", Rhino.DocObjects.ObjectType.Brep),
+            })
+            {
+                OnReceivedExpected = (v) =>
+                {
+                    // enum value of "m" must not be expandable in debugger
+                    if (v.Id == "m")
+                        return !v.CanExpand;
+                    return true;
+                }
+            };
+
+            code.DebugControls = controls;
+            var ctx = new DebugContext();
+            code.Debug(ctx);
+
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestPython3_Debug_Variables_RhinoObject()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+from Rhino.Geometry import Sphere, Point3d
+doc: Rhino.RhinoDoc = Rhino.RhinoDoc.ActiveDoc
+brep = Sphere(Point3d.Origin, 10).ToBrep()
+brep_id = doc.Objects.AddBrep(brep)
+brep_obj = doc.Objects.Find(brep_id)
+stop = brep_obj # line 8
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 8);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("brep_obj"),
+            })
+            {
+                OnReceivedExpected = (v) =>
+                {
+                    if (v.Id == "brep_obj")
+                    {
+                        ExecVariable[] members = v.Expand().ToArray();
+
+                        Assert.IsTrue(members.Any(m => m.Id == "Geometry"));
+
+                        // Guid is not exapandable
+                        ExecVariable id = members.First(m => m.Id == "Id");
+                        Assert.IsFalse(id.CanExpand);
+
+                        // bool is not exapandable
+                        ExecVariable isHidden = members.First(m => m.Id == "IsHidden");
+                        Assert.IsFalse(isHidden.CanExpand);
+
+                        // None is not exapandable
+                        ExecVariable renderMaterial = members.First(m => m.Id == "RenderMaterial");
+                        Assert.IsFalse(isHidden.CanExpand);
+
+                        ExecVariable[] expanded;
+
+                        // assert enumerable with one item has [0] and Count
+                        ExecVariable geom = members.First(m => m.Id == "Geometry");
+                        ExecVariable edges = geom.Expand().First(m => m.Id == "Edges");
+                        expanded = edges.Expand().ToArray();
+                        Assert.Greater(expanded.Length, 2);
+                        Assert.Contains("[0]", expanded.Select(e => e.Id).ToList());
+                        Assert.Contains("Count", expanded.Select(e => e.Id).ToList());
+
+                        // assert array only has one Length member
+                        ExecVariable subobjMat = members.First(m => m.Id == "SubobjectMaterialComponents");
+                        expanded = subobjMat.Expand().ToArray();
+                        Assert.AreEqual(1, expanded.Length);
+                        Assert.AreEqual("Length", expanded[0].Id);
+                        
+                        // assert color is expandable
+                        ExecVariable attribs = members.First(m => m.Id == "Attributes");
+                        ExecVariable objColor = attribs.Expand().First(m => m.Id == "ObjectColor");
+                        Assert.IsTrue(objColor.CanExpand);
+                    }
+
+                    return true;
+                }
+            };
+
+            code.DebugControls = controls;
+            var ctx = new DebugContext();
+            code.Debug(ctx);
+
+            Assert.True(controls.Pass);
+        }
+#endif
+
 #if RC8_9
         [Test]
         public void TestPython3_DebugPauses_Script_StepOut()
@@ -313,8 +445,7 @@ class MissingSuper(Base):
 @"
 from Rhino.Geometry import Point3d
 
-# Point3d is a struct
-class NewPoint(Point3d): # line 5
+class NewPoint(Point3d): # line 5, Point3d is a struct
     def __init__(self):
         pass
 ");

@@ -386,7 +386,7 @@ a = x + y; // line 5
 ");
 
             var breakpoint = new CodeReferenceBreakpoint(code, 5);
-            var controls = new DebugVerifyVarsControls(breakpoint, new ExecVariable[]
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
             {
                 new("x", 21),
                 new("y", 21),
