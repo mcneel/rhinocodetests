@@ -41,25 +41,17 @@ var ctx = new RunContext
 
 bool test = true;
 
-try
-{
-    // run the code
-    py3Code.Run(ctx);
+// run the code
+py3Code.Run(ctx);
 
-    // grab the result
-    // python is not typed to lets cast it to a generic List of objects
-    if (ctx.Outputs.TryGet("randoms", out List<object> data))
-    {
-        test = true;
-    }
-    else
-        test = false;
-}
-catch (Exception ex)
+// grab the result
+// python is not typed to lets cast it to a generic List of objects
+if (ctx.Outputs.TryGet("randoms", out List<object> data))
 {
+    test = true;
+}
+else
     test = false;
-}
-
 
 // Console.WriteLine(test);
 result = test;

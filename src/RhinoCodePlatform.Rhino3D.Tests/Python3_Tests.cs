@@ -359,7 +359,7 @@ stop = brep_obj # line 8
                         expanded = subobjMat.Expand().ToArray();
                         Assert.AreEqual(1, expanded.Length);
                         Assert.AreEqual("Length", expanded[0].Id);
-                        
+
                         // assert color is expandable
                         ExecVariable attribs = members.First(m => m.Id == "Attributes");
                         ExecVariable objColor = attribs.Expand().First(m => m.Id == "ObjectColor");
@@ -445,7 +445,7 @@ class MissingSuper(Base):
 @"
 from Rhino.Geometry import Point3d
 
-class NewPoint(Point3d): # line 5, Point3d is a struct
+class NewPoint(Point3d): # line 4, Point3d is a struct
     def __init__(self):
         pass
 ");
@@ -456,7 +456,7 @@ class NewPoint(Point3d): # line 5, Point3d is a struct
             Assert.AreEqual(1, diagnostics.Count());
             Diagnostic first = diagnostics.First();
             Assert.AreEqual("E:superchecker", first.Id);
-            Assert.AreEqual(5, first.Reference.Position.LineNumber);
+            Assert.AreEqual(4, first.Reference.Position.LineNumber);
             Assert.AreEqual("\"NewPoint\" class is missing super().__init__() in its initializer for base class \"Point3d\"", first.Message);
         }
 
@@ -830,22 +830,32 @@ import fpdf
         {
             // https://github.com/mcneel/rhino/pull/72450
             ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
-            Code code = py3.CreateCode(
+            
+            if (py3.Environs.OfIdentity("test_access_denied") is IEnviron testEnviron)
+            {
+                py3.Environs.DeleteEnviron(testEnviron);
+            }
+
+            py3.CreateCode(
 @"
+# venv: test_access_denied
 # r: openexr
 import OpenEXR
-");
+").Run(GetRunContext());
 
-            code.Run(GetRunContext());
 
-            code = py3.CreateCode(
+            Code code = py3.CreateCode(
 $@"
+# venv: test_access_denied
 # r: openexr-tools
 import OpenEXR
 ");
 
             EnvironException restore = Assert.Throws<EnvironException>(() => code.Run(GetRunContext()));
             Assert.IsTrue(restore.Message.StartsWith("Access Denied: "));
+
+            CorruptEnvironException badRun = Assert.Throws<CorruptEnvironException>(() => code.Run(GetRunContext()));
+            Assert.IsTrue(badRun.Message.Contains("is corrupted"));
         }
 #endif
 
@@ -1054,7 +1064,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 ");
 
             script.ConvertToScriptInstance(addSolve: false, addPreview: true);
-            
+
             Assert.AreEqual($@"#! python 3
 import System
 import Rhino
@@ -1092,7 +1102,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 ");
 
             script.ConvertToScriptInstance(addSolve: true, addPreview: true);
-            
+
             Assert.AreEqual($@"#! python 3
 import System
 import Rhino
@@ -1138,7 +1148,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 
             script.ConvertToScriptInstance(addSolve: true, addPreview: false);
             script.ConvertToScriptInstance(addSolve: false, addPreview: true);
-            
+
             Assert.AreEqual($@"#! python 3
 import System
 import Rhino
