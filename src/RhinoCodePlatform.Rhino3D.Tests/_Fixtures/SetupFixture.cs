@@ -7,12 +7,15 @@ using NUnit.Framework;
 
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Languages;
+using Rhino.Runtime.Code.Logging;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [SetUpFixture]
     public sealed class SetupFixture : Rhino.Testing.Fixtures.RhinoSetupFixture
     {
+        public const string RHINOCODE_LOG_LEVEL_ENVVAR = "RHINOCODE_LOG_LEVEL";
+
         static readonly MxTestSettings s_settings;
 
         static SetupFixture()
@@ -58,6 +61,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             LoadLanguages();
             LoadGrasshopperPlugins();
+            LoadRhinoCode();
         }
 
         sealed class TextContextStatusResponder : ProgressStatusResponder
@@ -96,6 +100,50 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             if (Directory.Exists(testPluginsPath))
             {
                 LoadGHA(Directory.GetFiles(testPluginsPath, "*.gha"));
+            }
+        }
+
+        static void LoadRhinoCode()
+        {
+            if (Environment.GetEnvironmentVariable(RHINOCODE_LOG_LEVEL_ENVVAR) is string level)
+            {
+                LogLevel logLevel = (LogLevel)0xFF;
+
+                switch (level)
+                {
+                    case "trace":
+                        logLevel = LogLevel.Trace;
+                        break;
+
+                    case "debug":
+                        logLevel = LogLevel.Debug;
+                        break;
+
+                    case "info":
+                        logLevel = LogLevel.Info;
+                        break;
+
+                    case "warn":
+                    case "warning":
+                        logLevel = LogLevel.Warn;
+                        break;
+
+                    case "error":
+                        logLevel = LogLevel.Error;
+                        break;
+
+                    case "exception":
+                    case "critical":
+                        logLevel = LogLevel.Critical;
+                        break;
+                }
+
+                TestContext.Progress.WriteLine($"RhinoCode Log Level: {logLevel}");
+                RhinoCode.Logger.MessageLogged += (_, a) =>
+                {
+                    if (a.Level >= logLevel)
+                        TestContext.Progress.WriteLine(a.Message);
+                };
             }
         }
     }
