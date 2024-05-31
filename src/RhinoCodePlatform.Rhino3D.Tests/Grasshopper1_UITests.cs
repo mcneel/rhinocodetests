@@ -16,6 +16,7 @@ using Grasshopper.Kernel.Types;
 
 using RhinoCodePlatform.Rhino3D.GH;
 
+using RGH = RhinoCodePlatform.Rhino3D.GH;
 using GHP = RhinoCodePluginGH;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
@@ -693,26 +694,54 @@ public class Script_Instance : GH_ScriptInstance
         [Test]
         public void TestGH1_Component_Python_DoesNotReset_Converter_Goo()
         {
-            TestGH1_Component_Python_DoesNotReset_Converter(new GH1.Converters.GooConverter());
+            var converter = new GH1.Converters.GooConverter();
+            TestGH1_Component_Python_ResetConverter(converter, converter);
+        }
+
+        [Test]
+        public void TestGH1_Component_Python_DoesNotReset_Converter_Dynamic()
+        {
+            var converter = new GH1.Converters.PythonDynamicConverter();
+            TestGH1_Component_Python_ResetConverter(converter, converter);
+        }
+
+        [Test]
+        public void TestGH1_Component_Python_DoReset_Converter_Goo()
+        {
+            TestGH1_Component_Python_ResetConverter(new GH1.Converters.GooConverter(),
+                                                    new GH1.Converters.PythonDynamicConverter(),
+                                                    DefaultOverrideKind.OverrideToExpected);
         }
 
         [Test]
         public void TestGH1_Component_Python_DoesNotReset_Converter_Float()
         {
-            TestGH1_Component_Python_DoesNotReset_Converter(new GH1.Converters.PythonFloatConverter());
+            var converter = new GH1.Converters.PythonFloatConverter();
+            TestGH1_Component_Python_ResetConverter(converter, converter, DefaultOverrideKind.NoOverride);
         }
 
         [Test]
         public void TestGH1_Component_Python_DoesNotReset_Converter_Point3d()
         {
-            TestGH1_Component_Python_DoesNotReset_Converter(new GH1.Converters.Point3dConverter());
+            var converter = new GH1.Converters.Point3dConverter();
+            TestGH1_Component_Python_ResetConverter(converter, converter, DefaultOverrideKind.NoOverride);
         }
 
-        
-        static void TestGH1_Component_Python_DoesNotReset_Converter(IParamValueConverter converter)
-        {
-            // https://mcneel.myjetbrains.com/youtrack/issue/RH-82051
+        enum DefaultOverrideKind { NoOverride, Override, OverrideToExpected, }
 
+        static void TestGH1_Component_Python_ResetConverter(IParamValueConverter converter,
+                                                            IParamValueConverter expected,
+                                                            DefaultOverrideKind overrideKind = DefaultOverrideKind.Override)
+        {
+            IParamValueConverter defaultConverter = default;
+            if (overrideKind > DefaultOverrideKind.NoOverride)
+            {
+                defaultConverter = RGH.ComponentConfigs.Current.GetDefaultPythonHint();
+                RGH.ComponentConfigs.Current.DefaultPythonHint = 
+                    overrideKind == DefaultOverrideKind.OverrideToExpected ? expected.Id.Id : converter.Id.Id;
+            }
+
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-82051
             IScriptObject script = GHP.Components.Python3Component.Create("Test", @"
 a = str(type(x))
 ") as IScriptObject;
@@ -729,7 +758,12 @@ a = str(type(x))
             ((IGH_VariableParameterComponent)component).VariableParameterMaintenance();
 
             x_param = script.Inputs.ElementAt(0);
-            Assert.IsInstanceOf(converter.GetType(), x_param.Converter);
+            Assert.IsInstanceOf(expected.GetType(), x_param.Converter);
+
+            if (overrideKind > DefaultOverrideKind.NoOverride)
+            {
+                RGH.ComponentConfigs.Current.DefaultPythonHint = defaultConverter.Id.Id;
+            }
         }
 #endif
     }
