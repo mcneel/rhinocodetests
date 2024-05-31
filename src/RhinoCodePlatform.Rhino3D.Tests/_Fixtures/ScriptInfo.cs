@@ -12,6 +12,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     public sealed class ScriptInfo
     {
         static readonly Regex s_rhinoVersionFinder = new Regex(@"(rc|rh|gh)(?<major>\d)\.(?<minor>\d)");
+        static readonly Regex s_rhinoDebugOnlyFinder = new Regex(@"_debugOnly");
         static readonly Regex s_performanceSpecFinder = new Regex(@"perf\((?<rounds>\d),\s*(?<mean>\d+)ms,\s*(?<dev>\d+)ms\)");
 
         public Uri Uri { get; }
@@ -56,13 +57,14 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             ExpectsError = uriStr.Contains("_error");
             ExpectsWarning = uriStr.Contains("_warning");
 
+            Version apiVersion = typeof(Code).Assembly.GetName().Version;
+
             Match m = s_rhinoVersionFinder.Match(uriStr);
             if (m.Success)
             {
                 int major = int.Parse(m.Groups["major"].Value);
                 int minor = int.Parse(m.Groups["minor"].Value);
 
-                Version apiVersion = typeof(Code).Assembly.GetName().Version;
                 if (apiVersion.Major < major
                         || apiVersion.Minor < minor)
                 {
@@ -81,6 +83,14 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                         IsSkipped = true;
                     }
                 }
+            }
+
+            m = s_rhinoDebugOnlyFinder.Match(uriStr);
+            if (m.Success
+                    // DEBUG Rhino has a revision number of 1000
+                    && apiVersion.Revision != 1000)
+            {
+                IsSkipped = true;
             }
 
             m = s_performanceSpecFinder.Match(uriStr);
