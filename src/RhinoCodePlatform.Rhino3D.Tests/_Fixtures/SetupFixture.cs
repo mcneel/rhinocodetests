@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Logging;
+using Rhino.Runtime.Code.Environments;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -89,6 +90,22 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 if (language.Status.IsErrored)
                 {
                     throw new Exception($"Language init error | {RhinoCode.Logger.Text}");
+                }
+
+                // cleanup all python 3 environments before running tests
+                else if (LanguageSpec.Python3.Matches(language.Id))
+                {
+                    IEnvirons environs = language.Environs;
+                    foreach (IEnviron environ in environs.QueryEnvirons())
+                    {
+                        if (environ.Id.StartsWith("default")
+                                || environ.Id.StartsWith("site-"))
+                        {
+                            continue;
+                        }
+
+                        environs.DeleteEnviron(environ);
+                    }
                 }
             }
         }
