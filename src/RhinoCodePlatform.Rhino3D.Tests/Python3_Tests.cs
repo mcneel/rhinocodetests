@@ -830,7 +830,7 @@ import fpdf
         {
             // https://github.com/mcneel/rhino/pull/72450
             ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
-            
+
             if (py3.Environs.OfIdentity("test_access_denied") is IEnviron testEnviron)
             {
                 py3.Environs.DeleteEnviron(testEnviron);
@@ -856,6 +856,27 @@ import OpenEXR
 
             CorruptEnvironException badRun = Assert.Throws<CorruptEnvironException>(() => code.Run(GetRunContext()));
             Assert.IsTrue(badRun.Message.Contains("is corrupted"));
+        }
+
+        [Test]
+        public void TestPython3_PIP_Install()
+        {
+            // https://github.com/mcneel/rhino/pull/72450
+            ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
+
+            Assert.NotNull(py3.Environs.Shared);
+
+            if (py3.Environs.OfIdentity("test_pip_install_requests") is IEnviron testEnviron)
+            {
+                py3.Environs.DeleteEnviron(testEnviron);
+            }
+
+            IEnviron environ = py3.Environs.CreateEnviron("test_pip_install_requests");
+
+            IPackage pkg = environ.AddPackage(new PackageSpec("requests", "2.31.0"));
+            Assert.AreEqual("requests==2.31.0 (Any)", pkg.ToString());
+            Assert.AreEqual("requests", pkg.Id);
+            Assert.AreEqual("2.31.0", pkg.Version.ToString());
         }
 #endif
 
