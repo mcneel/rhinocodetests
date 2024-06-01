@@ -12,7 +12,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     public sealed class ScriptInfo
     {
         static readonly Regex s_rhinoVersionFinder = new Regex(@"(rc|rh|gh)(?<major>\d)\.(?<minor>\d)");
-        static readonly Regex s_rhinoDebugOnlyFinder = new Regex(@"_debugOnly");
+        static readonly Regex s_rhinoLocalOnlyFinder = new Regex(@"_onlyLocal");
         static readonly Regex s_performanceSpecFinder = new Regex(@"perf\((?<rounds>\d),\s*(?<mean>\d+)ms,\s*(?<dev>\d+)ms\)");
 
         public Uri Uri { get; }
@@ -85,13 +85,9 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 }
             }
 
-            m = s_rhinoDebugOnlyFinder.Match(uriStr);
-            if (m.Success
-                    // DEBUG Rhino has a revision number of 1000
-                    && apiVersion.Revision != 1000)
-            {
-                IsSkipped = true;
-            }
+#if RELEASE
+            IsSkipped |= s_rhinoLocalOnlyFinder.IsMatch(uriStr);
+#endif
 
             m = s_performanceSpecFinder.Match(uriStr);
             if (m.Success)
