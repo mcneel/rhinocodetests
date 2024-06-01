@@ -85,7 +85,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 }
             }
 
-#if DEBUG
+#if RELEASE
             IsSkipped |= s_rhinoLocalOnlyFinder.IsMatch(uriStr);
 #endif
 
