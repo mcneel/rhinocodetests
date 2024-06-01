@@ -12,7 +12,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     public sealed class ScriptInfo
     {
         static readonly Regex s_rhinoVersionFinder = new Regex(@"(rc|rh|gh)(?<major>\d)\.(?<minor>\d)");
-        static readonly Regex s_rhinoLocalOnlyFinder = new Regex(@"_onlyLocal");
+        static readonly Regex s_rhinoLocalOnlyFinder = new Regex(@"_onlylocal");
         static readonly Regex s_performanceSpecFinder = new Regex(@"perf\((?<rounds>\d),\s*(?<mean>\d+)ms,\s*(?<dev>\d+)ms\)");
 
         public Uri Uri { get; }
