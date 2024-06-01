@@ -85,13 +85,9 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 }
             }
 
-            m = s_rhinoDebugOnlyFinder.Match(uriStr);
-            if (m.Success
-                    // DEBUG Rhino has a revision number of 1000
-                    && apiVersion.Revision != 1000)
-            {
-                IsSkipped = true;
-            }
+#if DEBUG
+            IsSkipped |= s_rhinoLocalOnlyFinder.IsMatch(uriStr);
+#endif
 
             m = s_performanceSpecFinder.Match(uriStr);
             if (m.Success)
