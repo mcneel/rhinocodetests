@@ -690,7 +690,9 @@ public class Script_Instance : GH_ScriptInstance
             IGH_Param assert = ((IGH_Param)ghdoc.Objects.FirstOrDefault(c => c.NickName == "Assert"));
             Assert.IsFalse(assert.RuntimeMessages(GH_RuntimeMessageLevel.Error).Any());
         }
+#endif
 
+#if RC8_9
         [Test]
         public void TestGH1_Component_Python_DoesNotReset_Converter_Goo()
         {

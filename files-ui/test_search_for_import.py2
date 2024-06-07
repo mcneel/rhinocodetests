@@ -1,0 +1,31 @@
+"""
+NOTE:
+
+- Reference to RhinoCommmon.dll is added by default
+
+- Python 2 is out of support and 'pip' package manager
+  does not work for python 2. You can specify your script requirements like:
+    
+    # wheel: <wheel-file-name.whl>
+
+    For example this line will ask the runtime to install
+    the listed packages before running the script:
+
+    # wheel: natsort-3.5.5-py2.py3-none-any.whl
+
+    You can download wheel files from PyPI.org for required packages.
+    Make sure to choose a version that supports python >=2.7
+
+- Use env directive to add an environment path to sys.path automatically
+    # env: /path/to/your/site-packages/
+"""
+#! python 2
+
+import rhinoscriptsyntax as rs
+import scriptcontext as sc
+import math
+
+import System
+import System.Collections.Generic
+import Rhino
+
