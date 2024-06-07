@@ -828,6 +828,8 @@ import fpdf
         [Test]
         public void TestPython3_PIP_AccessDeniedError()
         {
+            const string P = "#";
+
             // https://github.com/mcneel/rhino/pull/72450
             ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
 
@@ -837,17 +839,17 @@ import fpdf
             }
 
             py3.CreateCode(
-@"
-# venv: test_access_denied
-# r: openexr
+$@"
+{P} venv: test_access_denied
+{P} r: openexr
 import OpenEXR
 ").Run(GetRunContext());
 
 
             Code code = py3.CreateCode(
 $@"
-# venv: test_access_denied
-# r: openexr-tools
+{P} venv: test_access_denied
+{P} r: openexr-tools
 import OpenEXR
 ");
 
