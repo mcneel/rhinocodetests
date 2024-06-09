@@ -143,7 +143,11 @@ rs.");
 
             string text = code.Text;
             IEnumerable<CompletionInfo> completions =
+#if RC8_9
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+#else
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
+#endif
 
             CompletionInfo cinfo;
             bool result = true;
@@ -167,7 +171,11 @@ Rhino.");
 
             string text = code.Text;
             IEnumerable<CompletionInfo> completions =
+#if RC8_9
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+#else
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
+#endif
 
             CompletionInfo cinfo;
             bool result = true;
@@ -191,7 +199,11 @@ os.");
 
             string text = code.Text;
             IEnumerable<CompletionInfo> completions =
+#if RC8_9
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+#else
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
+#endif
 
             CompletionInfo cinfo;
             bool result = true;
@@ -215,7 +227,11 @@ op.");
 
             string text = code.Text;
             IEnumerable<CompletionInfo> completions =
+#if RC8_9
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+#else
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
+#endif
 
             CompletionInfo cinfo;
             bool result = true;
@@ -240,7 +256,7 @@ Rhino.Input.RhinoGet.GetOneObject(");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
-                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length);
+                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
 
             Assert.AreEqual(2, signatures.Count());
 
@@ -277,7 +293,7 @@ Rhino.Input.RhinoGet.GetOneObject(prompt, ");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
-                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length);
+                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
 
             Assert.AreEqual(2, signatures.Count());
 
