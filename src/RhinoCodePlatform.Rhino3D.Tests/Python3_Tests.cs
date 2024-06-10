@@ -736,6 +736,235 @@ m = TestEnum.");
             Assert.True(completions.Any(c => c.Text == "test_class_method"));
         }
 
+#if RC8_9 // RH-81189
+        [Test]
+        public void TestPython3_CompleteNot_InCommentBlock()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+Rhino.
+""""""
+This is a comment block
+Rhino.
+""""""
+Rhino.
+");
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            completions = support.Complete(SupportRequest.Empty, code, 22, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 52, CompleteOptions.Empty);
+            Assert.IsEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 73, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+        }
+
+        [Test]
+        public void TestPython3_CompleteNot_InCommentBlock_Nested()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+Rhino.
+""""""
+Do not show ""complete Rhino.
+Do not show ""complete"" Rhino.
+Do not show \""complete Rhino.
+Do not show \""complete\"" Rhino.
+
+Do not show 'complete Rhino.
+Do not show 'complete' Rhino.
+Do not show \'complete Rhino.
+Do not show \'complete\' Rhino.
+""""""
+Rhino.
+");
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            completions = support.Complete(SupportRequest.Empty, code, 22, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 57, CompleteOptions.Empty);
+            Assert.IsEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 88, CompleteOptions.Empty);
+            Assert.IsEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 119, CompleteOptions.Empty);
+            Assert.IsEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 152, CompleteOptions.Empty);
+            Assert.IsEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 184, CompleteOptions.Empty);
+            Assert.IsEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 215, CompleteOptions.Empty);
+            Assert.IsEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 246, CompleteOptions.Empty);
+            Assert.IsEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 279, CompleteOptions.Empty);
+            Assert.IsEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 284, CompleteOptions.Empty);
+            Assert.IsEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 292, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+        }
+
+        [Test]
+        public void TestPython3_CompleteNot_InCommentBlock_Start()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"""""""
+");
+
+            IEnumerable<CompletionInfo> completions = 
+                code.Language.Support.Complete(SupportRequest.Empty, code, 3, CompleteOptions.Empty);
+
+            Assert.IsEmpty(completions);
+        }
+
+        [Test]
+        public void TestPython3_CompleteNot_InFunctionDocstring()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+Rhino.
+def Foo() -> None: # Rhino.
+    """"""Some Foo Function
+
+    Args:
+        Rhino.
+
+    """"""
+Rhino.
+");
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            completions = support.Complete(SupportRequest.Empty, code, 22, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 106, CompleteOptions.Empty);
+            Assert.IsEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 117, CompleteOptions.Empty);
+            Assert.IsEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 125, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+        }
+
+        [Test]
+        public void TestPython3_CompleteNot_InLiteralString_Double()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+Rhino.
+m = ""Rhino.""
+Rhino.
+");
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            completions = support.Complete(SupportRequest.Empty, code, 22, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 35, CompleteOptions.Empty);
+            Assert.IsEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 44, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+        }
+
+        [Test]
+        public void TestPython3_CompleteNot_InLiteralString_Single()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+Rhino.
+m = 'Rhino.'
+Rhino.
+");
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            completions = support.Complete(SupportRequest.Empty, code, 22, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 35, CompleteOptions.Empty);
+            Assert.IsEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 44, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+        }
+
+        [Test]
+        public void TestPython3_CompleteNot_InLiteralString_DoubleEscaped()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+Rhino.
+m = ""\""Rhino.""
+Rhino.
+");
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            completions = support.Complete(SupportRequest.Empty, code, 22, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 37, CompleteOptions.Empty);
+            Assert.IsEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 46, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+        }
+
+        [Test]
+        public void TestPython3_CompleteNot_InLiteralString_SingleEscaped()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+Rhino.
+m = '\'Rhino.'
+Rhino.
+");
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            completions = support.Complete(SupportRequest.Empty, code, 22, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 37, CompleteOptions.Empty);
+            Assert.IsEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 46, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+        }
+#endif
+
 #if RC8_9
         [Test]
         public void TestPython3_CompleteSignature()
