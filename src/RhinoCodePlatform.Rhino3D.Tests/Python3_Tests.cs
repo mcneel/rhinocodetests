@@ -1059,6 +1059,28 @@ Rhino.Input.RhinoGet.GetOneObject(prompt, ");
         }
 #endif
 
+#if RC8_9
+        [Test]
+        public void TestPython3_Format_Simple()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+class Test:
+
+    def __init__(self):
+        pass
+");
+
+            string result = code.Language.Support.Format(SupportRequest.Empty, code, FormatOptions.Empty);
+
+            Assert.AreEqual(
+@"class Test:
+    def __init__(self):
+        pass
+", result);
+        }
+#endif
+
         [Test]
         public void TestPython3_PIP_SitePackage()
         {
