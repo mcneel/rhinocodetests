@@ -505,6 +505,22 @@ class NewForm(Form):
         }
 #endif
 
+#if RC8_9
+        [Test]
+        public void TestPython3_Complete_Import()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import ");
+
+            string text = code.Text;
+            IEnumerable<CompletionInfo> completions =
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+
+            Assert.IsNotEmpty(completions);
+        }
+#endif
+
         [Test]
         public void TestPython3_Complete_RhinoScriptSyntax()
         {
@@ -738,6 +754,22 @@ m = TestEnum.");
 
 #if RC8_9 // RH-81189
         [Test]
+        public void TestPython3_Complete_LastIndex()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+Rhino.");
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            string text = code.Text;
+            completions = support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+        }
+
+        [Test]
         public void TestPython3_CompleteNot_InCommentBlock()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
@@ -829,7 +861,7 @@ Rhino.
 @"""""""
 ");
 
-            IEnumerable<CompletionInfo> completions = 
+            IEnumerable<CompletionInfo> completions =
                 code.Language.Support.Complete(SupportRequest.Empty, code, 3, CompleteOptions.Empty);
 
             Assert.IsEmpty(completions);
@@ -893,30 +925,6 @@ Rhino.
         }
 
         [Test]
-        public void TestPython3_CompleteNot_InLiteralString_Single()
-        {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
-@"
-import Rhino
-Rhino.
-m = 'Rhino.'
-Rhino.
-");
-
-            IEnumerable<CompletionInfo> completions;
-            ISupport support = code.Language.Support;
-
-            completions = support.Complete(SupportRequest.Empty, code, 22, CompleteOptions.Empty);
-            Assert.IsNotEmpty(completions);
-
-            completions = support.Complete(SupportRequest.Empty, code, 35, CompleteOptions.Empty);
-            Assert.IsEmpty(completions);
-
-            completions = support.Complete(SupportRequest.Empty, code, 44, CompleteOptions.Empty);
-            Assert.IsNotEmpty(completions);
-        }
-
-        [Test]
         public void TestPython3_CompleteNot_InLiteralString_DoubleEscaped()
         {
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
@@ -937,6 +945,30 @@ Rhino.
             Assert.IsEmpty(completions);
 
             completions = support.Complete(SupportRequest.Empty, code, 46, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+        }
+
+        [Test]
+        public void TestPython3_CompleteNot_InLiteralString_Single()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+Rhino.
+m = 'Rhino.'
+Rhino.
+");
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            completions = support.Complete(SupportRequest.Empty, code, 22, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 35, CompleteOptions.Empty);
+            Assert.IsEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 44, CompleteOptions.Empty);
             Assert.IsNotEmpty(completions);
         }
 
@@ -1461,6 +1493,98 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         pass
 ", script.Text);
         }
+#endif
+
+#if RC8_9
+        [Test]
+        public void TestPython3_ScriptInstance_Complete_Self()
+        {
+            const string P = "#";
+            var script = new Grasshopper1Script($@"
+{P}! python 3
+""""""Grasshopper Script""""""
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self, x, y):
+        self.
+        return
+
+");
+
+            Code code = script.CreateCode();
+
+            IEnumerable<CompletionInfo> completions =
+                code.Language.Support.Complete(SupportRequest.Empty, code, 229, CompleteOptions.Empty);
+
+            CompletionInfo cinfo;
+            bool result = true;
+
+            cinfo = completions.First(c => c.Text == "Iteration");
+            result &= CompletionKind.Property == cinfo.Kind;
+
+            cinfo = completions.First(c => c.Text == "RhinoDocument");
+            result &= CompletionKind.Property == cinfo.Kind;
+
+            cinfo = completions.First(c => c.Text == "GrasshopperDocument");
+            result &= CompletionKind.Property == cinfo.Kind;
+
+            cinfo = completions.First(c => c.Text == "Component");
+            result &= CompletionKind.Property == cinfo.Kind;
+
+            cinfo = completions.First(c => c.Text == "Print");
+            result &= CompletionKind.Function == cinfo.Kind;
+
+            cinfo = completions.First(c => c.Text == "Reflect");
+            result &= CompletionKind.Function == cinfo.Kind;
+
+            cinfo = completions.First(c => c.Text == "AddRuntimeMessage");
+            result &= CompletionKind.Function == cinfo.Kind;
+
+            Assert.True(result);
+        }
+
+        [Test]
+        public void TestPython3_ScriptInstance_Complete_SelfRhinoDoc()
+        {
+            const string P = "#";
+            var script = new Grasshopper1Script($@"
+{P}! python 3
+""""""Grasshopper Script""""""
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self, x, y):
+        self.RhinoDocument.
+        return
+
+");
+
+            Code code = script.CreateCode();
+
+            IEnumerable<CompletionInfo> completions =
+                code.Language.Support.Complete(SupportRequest.Empty, code, 243, CompleteOptions.Empty);
+
+            CompletionInfo cinfo;
+            bool result = true;
+
+            cinfo = completions.First(c => c.Text == "ActiveCommandId");
+            result &= CompletionKind.Property == cinfo.Kind;
+
+            cinfo = completions.First(c => c.Text == "OpenDocuments");
+            result &= CompletionKind.Function == cinfo.Kind;
+
+            Assert.True(result);
+        }
+
 #endif
 
         static DiagnoseOptions s_errorsOnly = new() { Errors = true, Hints = false, Infos = false, Warnings = false };
