@@ -245,7 +245,39 @@ op.");
             Assert.True(result);
         }
 
+#if RC8_9
+        [Test]
+        public void TestPython2_Complete_Import()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+@"
+import ");
+
+            string text = code.Text;
+            IEnumerable<CompletionInfo> completions =
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+
+            Assert.IsNotEmpty(completions);
+        }
+#endif
+
 #if RC8_9 // RH-81189
+        [Test]
+        public void TestPython2_Complete_LastIndex()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+@"
+import Rhino
+Rhino.");
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            string text = code.Text;
+            completions = support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+        }
+
         [Test]
         public void TestPython2_CompleteNot_InCommentBlock()
         {

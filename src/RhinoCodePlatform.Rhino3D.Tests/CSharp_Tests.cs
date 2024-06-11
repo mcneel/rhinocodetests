@@ -1002,6 +1002,90 @@ public class Script_Instance : GH_ScriptInstance
         }
 #endif
 
+        // FIXME: Move csharp autocompletion to language module
+//        [Test]
+//        public void TestCSharp_ScriptInstance_Complete_Self()
+//        {
+//            var script = new Grasshopper1Script(@"// #! csharp
+//using System;
+//using Rhino;
+//using Grasshopper;
+
+//public class Script_Instance : GH_ScriptInstance
+//{
+//    private void RunScript()
+//    {
+//        this.
+//    }
+//}
+//");
+
+//            Code code = script.CreateCode();
+
+//            IEnumerable<CompletionInfo> completions =
+//                code.Language.Support.Complete(SupportRequest.Empty, code, 168, CompleteOptions.Empty);
+
+//            CompletionInfo cinfo;
+//            bool result = true;
+
+//            cinfo = completions.First(c => c.Text == "Iteration");
+//            result &= CompletionKind.Property == cinfo.Kind;
+
+//            cinfo = completions.First(c => c.Text == "RhinoDocument");
+//            result &= CompletionKind.Property == cinfo.Kind;
+
+//            cinfo = completions.First(c => c.Text == "GrasshopperDocument");
+//            result &= CompletionKind.Property == cinfo.Kind;
+
+//            cinfo = completions.First(c => c.Text == "Component");
+//            result &= CompletionKind.Property == cinfo.Kind;
+
+//            cinfo = completions.First(c => c.Text == "Print");
+//            result &= CompletionKind.Function == cinfo.Kind;
+
+//            cinfo = completions.First(c => c.Text == "Reflect");
+//            result &= CompletionKind.Function == cinfo.Kind;
+
+//            cinfo = completions.First(c => c.Text == "AddRuntimeMessage");
+//            result &= CompletionKind.Function == cinfo.Kind;
+
+//            Assert.True(result);
+//        }
+
+//        [Test]
+//        public void TestCSharp_ScriptInstance_Complete_SelfRhinoDoc()
+//        {
+//            var script = new Grasshopper1Script(@"// #! csharp
+//using System;
+//using Rhino;
+//using Grasshopper;
+
+//public class Script_Instance : GH_ScriptInstance
+//{
+//    private void RunScript()
+//    {
+//        this.RhinoDocument.
+//    }
+//}
+//");
+
+//            Code code = script.CreateCode();
+
+//            IEnumerable<CompletionInfo> completions =
+//                code.Language.Support.Complete(SupportRequest.Empty, code, 182, CompleteOptions.Empty);
+
+//            CompletionInfo cinfo;
+//            bool result = true;
+
+//            cinfo = completions.First(c => c.Text == "ActiveCommandId");
+//            result &= CompletionKind.Property == cinfo.Kind;
+
+//            cinfo = completions.First(c => c.Text == "OpenDocuments");
+//            result &= CompletionKind.Function == cinfo.Kind;
+
+//            Assert.True(result);
+//        }
+
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
     }
 }
