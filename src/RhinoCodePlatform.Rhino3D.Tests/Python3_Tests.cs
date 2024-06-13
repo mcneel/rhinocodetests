@@ -505,6 +505,35 @@ class NewForm(Form):
         }
 #endif
 
+#if RC8_10
+        [Test]
+        public void TestPython3_Diagnose_SuperInit_RhinoCommon_GetObject()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-82559
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+import scriptcontext as sc
+import rhinoscriptsyntax as rs
+import math
+
+class GO_FilterPrevious(Rhino.Input.Custom.GetObject):
+    def __init__(self, ids):
+        self.m_ids = ids
+        self.SubObjectSelect = False
+");
+
+            IEnumerable<Diagnostic> diagnostics =
+                code.Language.Support.Diagnose(SupportRequest.Empty, code, s_errorsOnly);
+
+            Assert.AreEqual(1, diagnostics.Count());
+            Diagnostic first = diagnostics.First();
+            Assert.AreEqual("E:superchecker", first.Id);
+            Assert.AreEqual(7, first.Reference.Position.LineNumber);
+            Assert.AreEqual("\"GO_FilterPrevious\" class is missing super().__init__() in its initializer for base class \"Rhino.Input.Custom.GetObject\"", first.Message);
+        }
+#endif
+
 #if RC8_9
         [Test]
         public void TestPython3_Complete_Import()
@@ -752,7 +781,7 @@ m = TestEnum.");
             Assert.True(completions.Any(c => c.Text == "test_class_method"));
         }
 
-#if RC8_9 // RH-81189
+#if RC8_9 // https://mcneel.myjetbrains.com/youtrack/issue/RH-81189
         [Test]
         public void TestPython3_Complete_LastIndex()
         {
@@ -1084,14 +1113,14 @@ class Test:
         [Test]
         public void TestPython3_PIP_SitePackage()
         {
-            // RH-81895
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81895
             string pkgPath = string.Empty;
 
             ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
             Code code = py3.CreateCode(
 $@"
 # venv: site-packages
-# r: rx
+#r: rx
 import rx
 
 {nameof(pkgPath)} = rx.__file__
@@ -1109,12 +1138,12 @@ import rx
         [Test]
         public void TestPython3_PIP_SitePackage_Shared()
         {
-            // RH-81895
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81895
             ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
             Code code = py3.CreateCode(
 @"
 # venv: site-packages
-# r: fpdf
+#r: fpdf
 import fpdf
 ");
 
@@ -1124,7 +1153,7 @@ import fpdf
 
             code = py3.CreateCode(
 $@"
-# r: fpdf
+#r: fpdf
 import fpdf
 
 {nameof(pkgPath)} = fpdf.__file__
