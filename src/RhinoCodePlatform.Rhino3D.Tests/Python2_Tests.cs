@@ -261,7 +261,7 @@ import ");
         }
 #endif
 
-#if RC8_9 // RH-81189
+#if RC8_9 // https://mcneel.myjetbrains.com/youtrack/issue/RH-81189
         [Test]
         public void TestPython2_Complete_LastIndex()
         {
