@@ -131,7 +131,6 @@ First()
 
             Assert.True(controls.Pass);
         }
-#endif
 
         [Test]
         public void TestPython2_Complete_RhinoScriptSyntax()
@@ -245,7 +244,6 @@ op.");
             Assert.True(result);
         }
 
-#if RC8_9
         [Test]
         public void TestPython2_Complete_Import()
         {
@@ -259,9 +257,8 @@ import ");
 
             Assert.IsNotEmpty(completions);
         }
-#endif
 
-#if RC8_9 // https://mcneel.myjetbrains.com/youtrack/issue/RH-81189
+        // https://mcneel.myjetbrains.com/youtrack/issue/RH-81189
         [Test]
         public void TestPython2_Complete_LastIndex()
         {
@@ -504,91 +501,7 @@ Rhino.
             completions = support.Complete(SupportRequest.Empty, code, 46, CompleteOptions.Empty);
             Assert.IsNotEmpty(completions);
         }
-#endif
 
-#if RC8_10
-        [Test]
-        public void TestPython2_Complete_SkipBlockComments()
-        {
-            const string P = "#";
-
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
-$@"
-import os
-import os as aa
-import os as bb
-import os as cc
-import os as dd
-import rhinoscriptsyntax as RS
-
-{P} os is correct
-os.
-
-{P} aa:
-{P} should complete as if it is 'os'
-""""""
-import rhinoscriptsyntax as aa
-""""""
-aa.
-
-{P} bb:
-{P} should complete as if it is 'os'
-s = 42 # import rhinoscriptsyntax as bb
-bb.
-
-{P} cc:
-{P} should complete as if it is 'os'
-s = 'import rhinoscriptsyntax as cc'
-cc.
-
-
-{P} dd:
-{P} should complete as if it is 'os'
-'''
-import rhinoscriptsyntax as dd
-'''
-dd.
-
-
-RS.
-");
-
-            IEnumerable<CompletionInfo> completions;
-            ISupport support = code.Language.Support;
-
-            // os.
-            completions = support.Complete(SupportRequest.Empty, code, 135, CompleteOptions.Empty);
-            Assert.IsNotEmpty(completions);
-            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
-
-            // aa.
-            completions = support.Complete(SupportRequest.Empty, code, 227, CompleteOptions.Empty);
-            Assert.IsNotEmpty(completions);
-            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
-
-            // bb.
-            completions = support.Complete(SupportRequest.Empty, code, 318, CompleteOptions.Empty);
-            Assert.IsNotEmpty(completions);
-            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
-
-            // cc.
-            completions = support.Complete(SupportRequest.Empty, code, 406, CompleteOptions.Empty);
-            Assert.IsNotEmpty(completions);
-            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
-
-            // dd.
-            completions = support.Complete(SupportRequest.Empty, code, 500, CompleteOptions.Empty);
-            Assert.IsNotEmpty(completions);
-            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
-
-            // RS.
-            completions = support.Complete(SupportRequest.Empty, code, 509, CompleteOptions.Empty);
-            Assert.IsNotEmpty(completions);
-            Assert.IsTrue(completions.Any(c => c.Text == "AddAlias"));
-        }
-#endif
-
-#if RC8_9
         [Test]
         public void TestPython2_CompleteSignature()
         {
@@ -646,9 +559,7 @@ Rhino.Input.RhinoGet.GetOneObject(prompt, ");
             SignatureInfo second = signatures.ElementAt(1);
             Assert.AreEqual(1, second.ParameterIndex);
         }
-#endif
 
-#if RC8_9
         [Test]
         public void TestPython2_ScriptInstance_Convert()
         {
@@ -965,6 +876,112 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def DrawViewportMeshes(self, args):
         pass
 ", script.Text);
+        }
+#endif
+
+#if RC8_10
+        [Test]
+        public void TestPython2_Complete_SkipBlockComments()
+        {
+            const string P = "#";
+
+            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+$@"
+import os
+import os as aa
+import os as bb
+import os as cc
+import os as dd
+import rhinoscriptsyntax as RS
+
+{P} os is correct
+os.
+
+{P} aa:
+{P} should complete as if it is 'os'
+""""""
+import rhinoscriptsyntax as aa
+""""""
+aa.
+
+{P} bb:
+{P} should complete as if it is 'os'
+s = 42 # import rhinoscriptsyntax as bb
+bb.
+
+{P} cc:
+{P} should complete as if it is 'os'
+s = 'import rhinoscriptsyntax as cc'
+cc.
+
+
+{P} dd:
+{P} should complete as if it is 'os'
+'''
+import rhinoscriptsyntax as dd
+'''
+dd.
+
+
+RS.
+");
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            // os.
+            completions = support.Complete(SupportRequest.Empty, code, 135, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
+
+            // aa.
+            completions = support.Complete(SupportRequest.Empty, code, 227, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
+
+            // bb.
+            completions = support.Complete(SupportRequest.Empty, code, 318, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
+
+            // cc.
+            completions = support.Complete(SupportRequest.Empty, code, 406, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
+
+            // dd.
+            completions = support.Complete(SupportRequest.Empty, code, 500, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
+
+            // RS.
+            completions = support.Complete(SupportRequest.Empty, code, 509, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+            Assert.IsTrue(completions.Any(c => c.Text == "AddAlias"));
+        }
+
+        [Test]
+        public void TestPython2_CompleteSignature_ParameterIndex_Nested()
+        {
+            //RH-82584 Signature has wrong param index
+            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+@"
+import Rhino
+Rhino.Input.RhinoGet.GetOneObject( (1,2,3), ");
+
+            string text = code.Text;
+            IEnumerable<SignatureInfo> signatures =
+                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+
+            Assert.AreEqual(2, signatures.Count());
+
+            SignatureInfo sig;
+
+            sig = signatures.ElementAt(0);
+            Assert.AreEqual(1, sig.ParameterIndex);
+
+            sig = signatures.ElementAt(1);
+            Assert.AreEqual(1, sig.ParameterIndex);
         }
 #endif
 
