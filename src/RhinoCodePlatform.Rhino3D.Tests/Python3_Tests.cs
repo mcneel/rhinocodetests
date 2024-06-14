@@ -246,310 +246,6 @@ func_call_test(5, 5)
             }
         }
 
-#if RC8_8
-        [Test]
-        public void TestPython3_Debug_Variables_Enum_CheckValue()
-        {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
-@"
-from Rhino.DocObjects import ObjectType
-m = ObjectType.AnyObject
-stop = m # line 4
-");
-
-            var breakpoint = new CodeReferenceBreakpoint(code, 4);
-            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
-            {
-                new("m", Rhino.DocObjects.ObjectType.AnyObject),
-            })
-            {
-            };
-
-            code.DebugControls = controls;
-            var ctx = new DebugContext();
-            code.Debug(ctx);
-
-            Assert.True(controls.Pass);
-        }
-
-        [Test]
-        public void TestPython3_Debug_Variables_Enum_ShouldNotExpand()
-        {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
-@"
-from Rhino.DocObjects import ObjectType
-m = ObjectType.Brep
-stop = m # line 4
-");
-
-            var breakpoint = new CodeReferenceBreakpoint(code, 4);
-            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
-            {
-                new("m", Rhino.DocObjects.ObjectType.Brep),
-            })
-            {
-                OnReceivedExpected = (v) =>
-                {
-                    // enum value of "m" must not be expandable in debugger
-                    if (v.Id == "m")
-                        return !v.CanExpand;
-                    return true;
-                }
-            };
-
-            code.DebugControls = controls;
-            var ctx = new DebugContext();
-            code.Debug(ctx);
-
-            Assert.True(controls.Pass);
-        }
-
-        [Test]
-        public void TestPython3_Debug_Variables_RhinoObject()
-        {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
-@"
-import Rhino
-from Rhino.Geometry import Sphere, Point3d
-doc: Rhino.RhinoDoc = Rhino.RhinoDoc.ActiveDoc
-brep = Sphere(Point3d.Origin, 10).ToBrep()
-brep_id = doc.Objects.AddBrep(brep)
-brep_obj = doc.Objects.Find(brep_id)
-stop = brep_obj # line 8
-");
-
-            var breakpoint = new CodeReferenceBreakpoint(code, 8);
-            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
-            {
-                new("brep_obj"),
-            })
-            {
-                OnReceivedExpected = (v) =>
-                {
-                    if (v.Id == "brep_obj")
-                    {
-                        ExecVariable[] members = v.Expand().ToArray();
-
-                        Assert.IsTrue(members.Any(m => m.Id == "Geometry"));
-
-                        // Guid is not exapandable
-                        ExecVariable id = members.First(m => m.Id == "Id");
-                        Assert.IsFalse(id.CanExpand);
-
-                        // bool is not exapandable
-                        ExecVariable isHidden = members.First(m => m.Id == "IsHidden");
-                        Assert.IsFalse(isHidden.CanExpand);
-
-                        // None is not exapandable
-                        ExecVariable renderMaterial = members.First(m => m.Id == "RenderMaterial");
-                        Assert.IsFalse(isHidden.CanExpand);
-
-                        ExecVariable[] expanded;
-
-                        // assert enumerable with one item has [0] and Count
-                        ExecVariable geom = members.First(m => m.Id == "Geometry");
-                        ExecVariable edges = geom.Expand().First(m => m.Id == "Edges");
-                        expanded = edges.Expand().ToArray();
-                        Assert.Greater(expanded.Length, 2);
-                        Assert.Contains("[0]", expanded.Select(e => e.Id).ToList());
-                        Assert.Contains("Count", expanded.Select(e => e.Id).ToList());
-
-                        // assert array only has one Length member
-                        ExecVariable subobjMat = members.First(m => m.Id == "SubobjectMaterialComponents");
-                        expanded = subobjMat.Expand().ToArray();
-                        Assert.AreEqual(1, expanded.Length);
-                        Assert.AreEqual("Length", expanded[0].Id);
-
-                        // assert color is expandable
-                        ExecVariable attribs = members.First(m => m.Id == "Attributes");
-                        ExecVariable objColor = attribs.Expand().First(m => m.Id == "ObjectColor");
-                        Assert.IsTrue(objColor.CanExpand);
-                    }
-
-                    return true;
-                }
-            };
-
-            code.DebugControls = controls;
-            var ctx = new DebugContext();
-            code.Debug(ctx);
-
-            Assert.True(controls.Pass);
-        }
-#endif
-
-#if RC8_9
-        [Test]
-        public void TestPython3_DebugPauses_Script_StepOut()
-        {
-            // python 3 debugger does not stop on 'pass' statements
-            // so using Test() instead
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
-@"
-def Test():
-    pass
-
-def First():
-    Test() # line 6
-    Test() # line 7
-
-First()
-");
-
-            var controls = new DebugPauseDetectControls();
-            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOver);
-            controls.ExpectPause(new CodeReferenceBreakpoint(code, 7));
-
-            code.DebugControls = controls;
-            code.Debug(new DebugContext());
-
-            Assert.True(controls.Pass);
-
-            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOver);
-
-            code.Debug(new DebugContext());
-
-            Assert.True(controls.Pass);
-        }
-#endif
-
-#if RC8_9
-        [Test]
-        public void TestPython3_Diagnose_SuperInit_PythonClass()
-        {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
-@"
-class Base:
-    def __init__(self):
-        pass
-
-class Derived(Base):
-    def __init__(self):
-        super().__init__()
-
-class MissingSuper(Base):
-    def __init__(self):
-        pass
-");
-
-            IEnumerable<Diagnostic> diagnostics =
-                code.Language.Support.Diagnose(SupportRequest.Empty, code, s_errorsOnly);
-
-            Assert.IsEmpty(diagnostics);
-        }
-
-        [Test]
-        public void TestPython3_Diagnose_SuperInit_RhinoCommon()
-        {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
-@"
-from Rhino.Geometry import Point3d
-
-class NewPoint(Point3d): # line 4, Point3d is a struct
-    def __init__(self):
-        pass
-");
-
-            IEnumerable<Diagnostic> diagnostics =
-                code.Language.Support.Diagnose(SupportRequest.Empty, code, s_errorsOnly);
-
-            Assert.AreEqual(1, diagnostics.Count());
-            Diagnostic first = diagnostics.First();
-            Assert.AreEqual("E:superchecker", first.Id);
-            Assert.AreEqual(4, first.Reference.Position.LineNumber);
-            Assert.AreEqual("\"NewPoint\" class is missing super().__init__() in its initializer for base class \"Point3d\"", first.Message);
-        }
-
-        [Test]
-        public void TestPython3_Diagnose_SuperInit_RhinoCommon_ImportAs()
-        {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
-@"
-import Rhino.Input.Custom as ric
-
-class InheritedGetPoint(ric.GetPoint): # line 4
-    def __init__(self):
-        pass
-");
-
-            IEnumerable<Diagnostic> diagnostics =
-                code.Language.Support.Diagnose(SupportRequest.Empty, code, s_errorsOnly);
-
-            Assert.AreEqual(1, diagnostics.Count());
-            Diagnostic first = diagnostics.First();
-            Assert.AreEqual("E:superchecker", first.Id);
-            Assert.AreEqual(4, first.Reference.Position.LineNumber);
-            Assert.AreEqual("\"InheritedGetPoint\" class is missing super().__init__() in its initializer for base class \"ric.GetPoint\"", first.Message);
-        }
-
-        [Test]
-        public void TestPython3_Diagnose_SuperInit_EtoForms()
-        {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
-@"
-from Eto.Forms import Form
-
-class NewForm(Form):
-    def __init__(self):
-        pass
-");
-
-            IEnumerable<Diagnostic> diagnostics =
-                code.Language.Support.Diagnose(SupportRequest.Empty, code, s_errorsOnly);
-
-            Assert.AreEqual(1, diagnostics.Count());
-            Diagnostic first = diagnostics.First();
-            Assert.AreEqual("E:superchecker", first.Id);
-            Assert.AreEqual(4, first.Reference.Position.LineNumber);
-            Assert.AreEqual("\"NewForm\" class is missing super().__init__() in its initializer for base class \"Form\"", first.Message);
-        }
-#endif
-
-#if RC8_10
-        [Test]
-        public void TestPython3_Diagnose_SuperInit_RhinoCommon_GetObject()
-        {
-            // https://mcneel.myjetbrains.com/youtrack/issue/RH-82559
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
-@"
-import Rhino
-import scriptcontext as sc
-import rhinoscriptsyntax as rs
-import math
-
-class GO_FilterPrevious(Rhino.Input.Custom.GetObject):
-    def __init__(self, ids):
-        self.m_ids = ids
-        self.SubObjectSelect = False
-");
-
-            IEnumerable<Diagnostic> diagnostics =
-                code.Language.Support.Diagnose(SupportRequest.Empty, code, s_errorsOnly);
-
-            Assert.AreEqual(1, diagnostics.Count());
-            Diagnostic first = diagnostics.First();
-            Assert.AreEqual("E:superchecker", first.Id);
-            Assert.AreEqual(7, first.Reference.Position.LineNumber);
-            Assert.AreEqual("\"GO_FilterPrevious\" class is missing super().__init__() in its initializer for base class \"Rhino.Input.Custom.GetObject\"", first.Message);
-        }
-#endif
-
-#if RC8_9
-        [Test]
-        public void TestPython3_Complete_Import()
-        {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
-@"
-import ");
-
-            string text = code.Text;
-            IEnumerable<CompletionInfo> completions =
-                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-
-            Assert.IsNotEmpty(completions);
-        }
-#endif
-
         [Test]
         public void TestPython3_Complete_RhinoScriptSyntax()
         {
@@ -781,7 +477,335 @@ m = TestEnum.");
             Assert.True(completions.Any(c => c.Text == "test_class_method"));
         }
 
-#if RC8_9 // https://mcneel.myjetbrains.com/youtrack/issue/RH-81189
+        [Test]
+        public void TestPython3_PIP_SitePackage()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81895
+            string pkgPath = string.Empty;
+
+            ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
+            Code code = py3.CreateCode(
+$@"
+# venv: site-packages
+#r: rx
+import rx
+
+{nameof(pkgPath)} = rx.__file__
+");
+
+            RunContext ctx = GetRunContext();
+            ctx.Outputs.Set(nameof(pkgPath), pkgPath);
+
+            code.Run(ctx);
+
+            pkgPath = ctx.Outputs.Get<string>(nameof(pkgPath));
+            Assert.True(new Regex(@"[Ll]ib[\\/]site-packages[\\/]").IsMatch(pkgPath));
+        }
+
+        [Test]
+        public void TestPython3_PIP_SitePackage_Shared()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81895
+            ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
+            Code code = py3.CreateCode(
+@"
+# venv: site-packages
+#r: fpdf
+import fpdf
+");
+
+            string pkgPath = string.Empty;
+            RunContext ctx = GetRunContext();
+            code.Run(ctx);
+
+            code = py3.CreateCode(
+$@"
+#r: fpdf
+import fpdf
+
+{nameof(pkgPath)} = fpdf.__file__
+");
+
+            ctx = GetRunContext();
+            ctx.Outputs.Set(nameof(pkgPath), pkgPath);
+
+            code.Run(ctx);
+
+            pkgPath = ctx.Outputs.Get<string>(nameof(pkgPath));
+            Assert.True(new Regex(@"[Ll]ib[\\/]site-packages[\\/]").IsMatch(pkgPath));
+        }
+
+#if RC8_8
+        [Test]
+        public void TestPython3_Debug_Variables_Enum_CheckValue()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+from Rhino.DocObjects import ObjectType
+m = ObjectType.AnyObject
+stop = m # line 4
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 4);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("m", Rhino.DocObjects.ObjectType.AnyObject),
+            })
+            {
+            };
+
+            code.DebugControls = controls;
+            var ctx = new DebugContext();
+            code.Debug(ctx);
+
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestPython3_Debug_Variables_Enum_ShouldNotExpand()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+from Rhino.DocObjects import ObjectType
+m = ObjectType.Brep
+stop = m # line 4
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 4);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("m", Rhino.DocObjects.ObjectType.Brep),
+            })
+            {
+                OnReceivedExpected = (v) =>
+                {
+                    // enum value of "m" must not be expandable in debugger
+                    if (v.Id == "m")
+                        return !v.CanExpand;
+                    return true;
+                }
+            };
+
+            code.DebugControls = controls;
+            var ctx = new DebugContext();
+            code.Debug(ctx);
+
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestPython3_Debug_Variables_RhinoObject()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+from Rhino.Geometry import Sphere, Point3d
+doc: Rhino.RhinoDoc = Rhino.RhinoDoc.ActiveDoc
+brep = Sphere(Point3d.Origin, 10).ToBrep()
+brep_id = doc.Objects.AddBrep(brep)
+brep_obj = doc.Objects.Find(brep_id)
+stop = brep_obj # line 8
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 8);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("brep_obj"),
+            })
+            {
+                OnReceivedExpected = (v) =>
+                {
+                    if (v.Id == "brep_obj")
+                    {
+                        ExecVariable[] members = v.Expand().ToArray();
+
+                        Assert.IsTrue(members.Any(m => m.Id == "Geometry"));
+
+                        // Guid is not exapandable
+                        ExecVariable id = members.First(m => m.Id == "Id");
+                        Assert.IsFalse(id.CanExpand);
+
+                        // bool is not exapandable
+                        ExecVariable isHidden = members.First(m => m.Id == "IsHidden");
+                        Assert.IsFalse(isHidden.CanExpand);
+
+                        // None is not exapandable
+                        ExecVariable renderMaterial = members.First(m => m.Id == "RenderMaterial");
+                        Assert.IsFalse(isHidden.CanExpand);
+
+                        ExecVariable[] expanded;
+
+                        // assert enumerable with one item has [0] and Count
+                        ExecVariable geom = members.First(m => m.Id == "Geometry");
+                        ExecVariable edges = geom.Expand().First(m => m.Id == "Edges");
+                        expanded = edges.Expand().ToArray();
+                        Assert.Greater(expanded.Length, 2);
+                        Assert.Contains("[0]", expanded.Select(e => e.Id).ToList());
+                        Assert.Contains("Count", expanded.Select(e => e.Id).ToList());
+
+                        // assert array only has one Length member
+                        ExecVariable subobjMat = members.First(m => m.Id == "SubobjectMaterialComponents");
+                        expanded = subobjMat.Expand().ToArray();
+                        Assert.AreEqual(1, expanded.Length);
+                        Assert.AreEqual("Length", expanded[0].Id);
+
+                        // assert color is expandable
+                        ExecVariable attribs = members.First(m => m.Id == "Attributes");
+                        ExecVariable objColor = attribs.Expand().First(m => m.Id == "ObjectColor");
+                        Assert.IsTrue(objColor.CanExpand);
+                    }
+
+                    return true;
+                }
+            };
+
+            code.DebugControls = controls;
+            var ctx = new DebugContext();
+            code.Debug(ctx);
+
+            Assert.True(controls.Pass);
+        }
+#endif
+
+#if RC8_9
+        [Test]
+        public void TestPython3_DebugPauses_Script_StepOut()
+        {
+            // python 3 debugger does not stop on 'pass' statements
+            // so using Test() instead
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+def Test():
+    pass
+
+def First():
+    Test() # line 6
+    Test() # line 7
+
+First()
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOver);
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 7));
+
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOver);
+
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestPython3_Diagnose_SuperInit_PythonClass()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+class Base:
+    def __init__(self):
+        pass
+
+class Derived(Base):
+    def __init__(self):
+        super().__init__()
+
+class MissingSuper(Base):
+    def __init__(self):
+        pass
+");
+
+            IEnumerable<Diagnostic> diagnostics =
+                code.Language.Support.Diagnose(SupportRequest.Empty, code, s_errorsOnly);
+
+            Assert.IsEmpty(diagnostics);
+        }
+
+        [Test]
+        public void TestPython3_Diagnose_SuperInit_RhinoCommon()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+from Rhino.Geometry import Point3d
+
+class NewPoint(Point3d): # line 4, Point3d is a struct
+    def __init__(self):
+        pass
+");
+
+            IEnumerable<Diagnostic> diagnostics =
+                code.Language.Support.Diagnose(SupportRequest.Empty, code, s_errorsOnly);
+
+            Assert.AreEqual(1, diagnostics.Count());
+            Diagnostic first = diagnostics.First();
+            Assert.AreEqual("E:superchecker", first.Id);
+            Assert.AreEqual(4, first.Reference.Position.LineNumber);
+            Assert.AreEqual("\"NewPoint\" class is missing super().__init__() in its initializer for base class \"Point3d\"", first.Message);
+        }
+
+        [Test]
+        public void TestPython3_Diagnose_SuperInit_RhinoCommon_ImportAs()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino.Input.Custom as ric
+
+class InheritedGetPoint(ric.GetPoint): # line 4
+    def __init__(self):
+        pass
+");
+
+            IEnumerable<Diagnostic> diagnostics =
+                code.Language.Support.Diagnose(SupportRequest.Empty, code, s_errorsOnly);
+
+            Assert.AreEqual(1, diagnostics.Count());
+            Diagnostic first = diagnostics.First();
+            Assert.AreEqual("E:superchecker", first.Id);
+            Assert.AreEqual(4, first.Reference.Position.LineNumber);
+            Assert.AreEqual("\"InheritedGetPoint\" class is missing super().__init__() in its initializer for base class \"ric.GetPoint\"", first.Message);
+        }
+
+        [Test]
+        public void TestPython3_Diagnose_SuperInit_EtoForms()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+from Eto.Forms import Form
+
+class NewForm(Form):
+    def __init__(self):
+        pass
+");
+
+            IEnumerable<Diagnostic> diagnostics =
+                code.Language.Support.Diagnose(SupportRequest.Empty, code, s_errorsOnly);
+
+            Assert.AreEqual(1, diagnostics.Count());
+            Diagnostic first = diagnostics.First();
+            Assert.AreEqual("E:superchecker", first.Id);
+            Assert.AreEqual(4, first.Reference.Position.LineNumber);
+            Assert.AreEqual("\"NewForm\" class is missing super().__init__() in its initializer for base class \"Form\"", first.Message);
+        }
+
+        [Test]
+        public void TestPython3_Complete_Import()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import ");
+
+            string text = code.Text;
+            IEnumerable<CompletionInfo> completions =
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+
+            Assert.IsNotEmpty(completions);
+        }
+
+        // https://mcneel.myjetbrains.com/youtrack/issue/RH-81189
         [Test]
         public void TestPython3_Complete_LastIndex()
         {
@@ -1024,91 +1048,7 @@ Rhino.
             completions = support.Complete(SupportRequest.Empty, code, 46, CompleteOptions.Empty);
             Assert.IsNotEmpty(completions);
         }
-#endif
 
-#if RC8_10
-        [Test]
-        public void TestPython3_Complete_SkipBlockComments()
-        {
-            const string P = "#";
-
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
-$@"
-import os
-import os as aa
-import os as bb
-import os as cc
-import os as dd
-import rhinoscriptsyntax as RS
-
-{P} os is correct
-os.
-
-{P} aa:
-{P} should complete as if it is 'os'
-""""""
-import rhinoscriptsyntax as aa
-""""""
-aa.
-
-{P} bb:
-{P} should complete as if it is 'os'
-s = 42 # import rhinoscriptsyntax as bb
-bb.
-
-{P} cc:
-{P} should complete as if it is 'os'
-s = 'import rhinoscriptsyntax as cc'
-cc.
-
-
-{P} dd:
-{P} should complete as if it is 'os'
-'''
-import rhinoscriptsyntax as dd
-'''
-dd.
-
-
-RS.
-");
-
-            IEnumerable<CompletionInfo> completions;
-            ISupport support = code.Language.Support;
-
-            // os.
-            completions = support.Complete(SupportRequest.Empty, code, 135, CompleteOptions.Empty);
-            Assert.IsNotEmpty(completions);
-            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
-
-            // aa.
-            completions = support.Complete(SupportRequest.Empty, code, 227, CompleteOptions.Empty);
-            Assert.IsNotEmpty(completions);
-            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
-
-            // bb.
-            completions = support.Complete(SupportRequest.Empty, code, 318, CompleteOptions.Empty);
-            Assert.IsNotEmpty(completions);
-            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
-
-            // cc.
-            completions = support.Complete(SupportRequest.Empty, code, 406, CompleteOptions.Empty);
-            Assert.IsNotEmpty(completions);
-            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
-
-            // dd.
-            completions = support.Complete(SupportRequest.Empty, code, 500, CompleteOptions.Empty);
-            Assert.IsNotEmpty(completions);
-            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
-
-            // RS.
-            completions = support.Complete(SupportRequest.Empty, code, 509, CompleteOptions.Empty);
-            Assert.IsNotEmpty(completions);
-            Assert.IsTrue(completions.Any(c => c.Text == "AddAlias"));
-        }
-#endif
-
-#if RC8_9
         [Test]
         public void TestPython3_CompleteSignature()
         {
@@ -1168,9 +1108,7 @@ Rhino.Input.RhinoGet.GetOneObject(prompt, ");
             sig = signatures.ElementAt(1);
             Assert.AreEqual(1, sig.ParameterIndex);
         }
-#endif
 
-#if RC8_9
         [Test]
         public void TestPython3_Format_Simple()
         {
@@ -1190,67 +1128,7 @@ class Test:
         pass
 ", result);
         }
-#endif
 
-        [Test]
-        public void TestPython3_PIP_SitePackage()
-        {
-            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81895
-            string pkgPath = string.Empty;
-
-            ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
-            Code code = py3.CreateCode(
-$@"
-# venv: site-packages
-#r: rx
-import rx
-
-{nameof(pkgPath)} = rx.__file__
-");
-
-            RunContext ctx = GetRunContext();
-            ctx.Outputs.Set(nameof(pkgPath), pkgPath);
-
-            code.Run(ctx);
-
-            pkgPath = ctx.Outputs.Get<string>(nameof(pkgPath));
-            Assert.True(new Regex(@"[Ll]ib[\\/]site-packages[\\/]").IsMatch(pkgPath));
-        }
-
-        [Test]
-        public void TestPython3_PIP_SitePackage_Shared()
-        {
-            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81895
-            ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
-            Code code = py3.CreateCode(
-@"
-# venv: site-packages
-#r: fpdf
-import fpdf
-");
-
-            string pkgPath = string.Empty;
-            RunContext ctx = GetRunContext();
-            code.Run(ctx);
-
-            code = py3.CreateCode(
-$@"
-#r: fpdf
-import fpdf
-
-{nameof(pkgPath)} = fpdf.__file__
-");
-
-            ctx = GetRunContext();
-            ctx.Outputs.Set(nameof(pkgPath), pkgPath);
-
-            code.Run(ctx);
-
-            pkgPath = ctx.Outputs.Get<string>(nameof(pkgPath));
-            Assert.True(new Regex(@"[Ll]ib[\\/]site-packages[\\/]").IsMatch(pkgPath));
-        }
-
-#if RC8_9
         [Test]
         public void TestPython3_PIP_AccessDeniedError()
         {
@@ -1306,9 +1184,7 @@ import OpenEXR
             Assert.AreEqual("requests", pkg.Id);
             Assert.AreEqual("2.31.0", pkg.Version.ToString());
         }
-#endif
 
-#if RC8_9
         [Test]
         public void TestPython3_ScriptInstance_Convert()
         {
@@ -1626,9 +1502,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         pass
 ", script.Text);
         }
-#endif
 
-#if RC8_9
         [Test]
         public void TestPython3_ScriptInstance_Complete_Self()
         {
@@ -1718,6 +1592,140 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
             Assert.True(result);
         }
 
+#endif
+
+#if RC8_10
+
+        [Test]
+        public void TestPython3_Diagnose_SuperInit_RhinoCommon_GetObject()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-82559
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+import scriptcontext as sc
+import rhinoscriptsyntax as rs
+import math
+
+class GO_FilterPrevious(Rhino.Input.Custom.GetObject):
+    def __init__(self, ids):
+        self.m_ids = ids
+        self.SubObjectSelect = False
+");
+
+            IEnumerable<Diagnostic> diagnostics =
+                code.Language.Support.Diagnose(SupportRequest.Empty, code, s_errorsOnly);
+
+            Assert.AreEqual(1, diagnostics.Count());
+            Diagnostic first = diagnostics.First();
+            Assert.AreEqual("E:superchecker", first.Id);
+            Assert.AreEqual(7, first.Reference.Position.LineNumber);
+            Assert.AreEqual("\"GO_FilterPrevious\" class is missing super().__init__() in its initializer for base class \"Rhino.Input.Custom.GetObject\"", first.Message);
+        }
+
+        [Test]
+        public void TestPython3_Complete_SkipBlockComments()
+        {
+            const string P = "#";
+
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+$@"
+import os
+import os as aa
+import os as bb
+import os as cc
+import os as dd
+import rhinoscriptsyntax as RS
+
+{P} os is correct
+os.
+
+{P} aa:
+{P} should complete as if it is 'os'
+""""""
+import rhinoscriptsyntax as aa
+""""""
+aa.
+
+{P} bb:
+{P} should complete as if it is 'os'
+s = 42 # import rhinoscriptsyntax as bb
+bb.
+
+{P} cc:
+{P} should complete as if it is 'os'
+s = 'import rhinoscriptsyntax as cc'
+cc.
+
+
+{P} dd:
+{P} should complete as if it is 'os'
+'''
+import rhinoscriptsyntax as dd
+'''
+dd.
+
+
+RS.
+");
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            // os.
+            completions = support.Complete(SupportRequest.Empty, code, 135, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
+
+            // aa.
+            completions = support.Complete(SupportRequest.Empty, code, 227, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
+
+            // bb.
+            completions = support.Complete(SupportRequest.Empty, code, 318, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
+
+            // cc.
+            completions = support.Complete(SupportRequest.Empty, code, 406, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
+
+            // dd.
+            completions = support.Complete(SupportRequest.Empty, code, 500, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+            Assert.IsTrue(completions.Any(c => c.Text == "environ"));
+
+            // RS.
+            completions = support.Complete(SupportRequest.Empty, code, 509, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+            Assert.IsTrue(completions.Any(c => c.Text == "AddAlias"));
+        }
+
+        [Test]
+        public void TestPython3_CompleteSignature_ParameterIndex_Nested()
+        {
+            //RH-82584 Signature has wrong param index
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+Rhino.Input.RhinoGet.GetOneObject( (1,2,3), ");
+
+            string text = code.Text;
+            IEnumerable<SignatureInfo> signatures =
+                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+
+            Assert.AreEqual(2, signatures.Count());
+
+            SignatureInfo sig;
+
+            sig = signatures.ElementAt(0);
+            Assert.AreEqual(1, sig.ParameterIndex);
+
+            sig = signatures.ElementAt(1);
+            Assert.AreEqual(1, sig.ParameterIndex);
+        }
 #endif
 
         static DiagnoseOptions s_errorsOnly = new() { Errors = true, Hints = false, Infos = false, Warnings = false };

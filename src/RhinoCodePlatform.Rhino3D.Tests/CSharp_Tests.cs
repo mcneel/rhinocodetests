@@ -310,68 +310,6 @@ public class Script_Instance
             Assert.True(controls.Pass);
         }
 
-#if RC8_9
-        [Test]
-        public void TestCSharp_DebugPauses_Script_StepOut()
-        {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
-@"
-using System;
-void Pass() {}
-void First()
-{
-    Pass(); // line 6
-    Pass(); // line 7
-}
-
-First();
-");
-
-            var controls = new DebugPauseDetectControls();
-            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOver);
-            controls.ExpectPause(new CodeReferenceBreakpoint(code, 7));
-
-            code.DebugControls = controls;
-            code.Debug(new DebugContext());
-
-            Assert.True(controls.Pass);
-
-            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOver);
-
-            code.Debug(new DebugContext());
-
-            Assert.True(controls.Pass);
-        }
-
-        [Test]
-        public void TestCSharp_DebugPauses_Script_DoNotStepIn()
-        {
-            // detect auto-declare code params are in global scope.
-            // this could happen if roslyn trace-injector does not produce valid code
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
-@"
-using System;
-void Pass() {}
-void First()
-{
-    Pass(); // line 6
-    Pass();
-}
-
-First();
-");
-
-            var controls = new DebugPauseDetectControls();
-            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepIn);
-            controls.DoNotExpectPause(new CodeReferenceBreakpoint(code, 3));
-
-            code.DebugControls = controls;
-            code.Debug(new DebugContext());
-
-            Assert.True(controls.Pass);
-        }
-#endif
-
         [Test]
         public void TestCSharp_DebugVars_Script()
         {
@@ -447,6 +385,66 @@ public class Script_Instance
         }
 
 #if RC8_9
+        [Test]
+        public void TestCSharp_DebugPauses_Script_StepOut()
+        {
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+void Pass() {}
+void First()
+{
+    Pass(); // line 6
+    Pass(); // line 7
+}
+
+First();
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOver);
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 7));
+
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOver);
+
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestCSharp_DebugPauses_Script_DoNotStepIn()
+        {
+            // detect auto-declare code params are in global scope.
+            // this could happen if roslyn trace-injector does not produce valid code
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+void Pass() {}
+void First()
+{
+    Pass(); // line 6
+    Pass();
+}
+
+First();
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepIn);
+            controls.DoNotExpectPause(new CodeReferenceBreakpoint(code, 3));
+
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+
         [Test]
         public void TestCSharp_DebugReturn_Script()
         {
@@ -538,36 +536,7 @@ First();
 
             Assert.True(controls.Pass);
         }
-#endif
 
-        // FIXME: Move csharp autocompletion to language module
-        //        [Test]
-        //        public void TestComplete_System_Console()
-        //        {
-        //            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
-        //@"
-        //using System;
-        //using Rhino;
-
-        //Console.");
-
-        //            string text = code.Text;
-        //            IEnumerable<CompletionInfo> completions =
-        //                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
-
-        //            CompletionInfo cinfo;
-        //            bool result = true;
-
-        //            cinfo = completions.First(c => c.Text == "WriteLine");
-        //            result &= CompletionKind.Function == cinfo.Kind;
-
-        //            cinfo = completions.First(c => c.Text == "WindowWidth");
-        //            result &= CompletionKind.Property == cinfo.Kind;
-
-        //            Assert.True(result);
-        //        }
-
-#if RC8_9
         [Test]
         public void TestCSharp_ScriptInstance_Convert()
         {
