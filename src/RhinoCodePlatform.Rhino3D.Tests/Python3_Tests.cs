@@ -669,6 +669,29 @@ stop = brep_obj # line 8
 
 #if RC8_9
         [Test]
+        public void TestPython3_StdErr()
+        {
+            // python 3 debugger does not stop on 'pass' statements
+            // so using Test() instead
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import sys
+
+result = sys.stderr is not None
+");
+
+            var ctx = new RunContext(defaultStderr: true)
+            {
+                AutoApplyParams = true,
+                Outputs = { ["result"] = false }
+            };
+            
+            code.Run(ctx);
+
+            Assert.IsTrue(ctx.Outputs.Get<bool>("result"));
+        }
+
+        [Test]
         public void TestPython3_DebugPauses_Script_StepOut()
         {
             // python 3 debugger does not stop on 'pass' statements
@@ -1591,7 +1614,6 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 
             Assert.True(result);
         }
-
 #endif
 
 #if RC8_10
@@ -1711,6 +1733,32 @@ RS.
 @"
 import Rhino
 Rhino.Input.RhinoGet.GetOneObject( (1,2,3), ");
+
+            string text = code.Text;
+            IEnumerable<SignatureInfo> signatures =
+                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+
+            Assert.AreEqual(2, signatures.Count());
+
+            SignatureInfo sig;
+
+            sig = signatures.ElementAt(0);
+            Assert.AreEqual(1, sig.ParameterIndex);
+
+            sig = signatures.ElementAt(1);
+            Assert.AreEqual(1, sig.ParameterIndex);
+        }
+
+        [Test]
+        public void TestPython3_CompleteSignature_ParameterIndex_NestedFunction()
+        {
+            //RH-82584 Signature has wrong param index
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import os.path as op
+import Rhino
+
+Rhino.Input.RhinoGet.GetOneObject(op.dirname(""test""),");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
