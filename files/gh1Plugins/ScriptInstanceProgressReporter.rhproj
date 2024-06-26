@@ -1,7 +1,7 @@
 {
   "id": "8790337a-810c-49ad-88ff-1c6918388a9c",
   "identity": {
-    "name": "ScriptInstanceProgressReporter_Single",
+    "name": "ScriptInstanceProgressReporter",
     "version": "0.1",
     "publisher": {
       "email": "ehsan@mcneel.com",
@@ -41,6 +41,23 @@
           "id": "f8eace3b-1f9a-40d6-8331-928855b19df5",
           "name": "ProgressTest_Single",
           "nickname": "PTS",
+          "subcat": "Default"
+        }
+      ]
+    },
+    {
+      "type": "components",
+      "id": "c07a7009-ef45-455f-94ab-34cd831b5ae4",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "ScriptInstanceProgressReporter_Context.ghx",
+      "uri": "ScriptInstanceProgressReporter_Context.ghx",
+      "scripts": [
+        {
+          "id": "c07a7009-ef45-455f-94ab-34cd831b5ae4",
+          "name": "ProgressTest_Context",
           "subcat": "Default"
         }
       ]

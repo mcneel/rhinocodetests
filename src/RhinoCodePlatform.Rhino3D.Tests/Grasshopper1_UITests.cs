@@ -767,14 +767,21 @@ a = str(type(x))
 #endif
 
 #if RC8_10
-        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "gh1ui", "test_plugins_package_install_progress_single_rc8.10.ghx" })]
-        public void TestGH1_PublishedComponent_RestoreProgress_Single(string ghfile)
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "gh1ui", "test_plugins_package_install_progress_single_rc8.10.ghx" }),
+               TestCaseSource(nameof(GetTestScript), new object[] { "gh1ui", "test_plugins_package_install_progress_context_rc8.10.ghx" })]
+        public void TestGH1_PublishedComponent_RestoreProgress(string ghfile)
         {
             GH_Document ghdoc = Grasshopper.Instances.DocumentServer.AddDocument(ghfile, makeActive: true);
 
-            IGH_Component component = ((IGH_Component)ghdoc.Objects.FirstOrDefault(c => c.NickName == "PTS"));
-            ProgressReporterAttribs attribs = new(component, new Regex(@"Installing ""scipy"".+Collecting scipy.+Collecting numpy.+Installing collected packages: numpy, scipy.+Successfully installed numpy.+scipy.+", RegexOptions.Singleline));
-            component.Attributes = attribs;
+            IGH_Component component = (IGH_Component)ghdoc.Objects.First(c => c.NickName == "PTS");
+            IScriptAttribute cattribs = (IScriptAttribute)component.Attributes;
+            ProgressReporterAttribs attribs = 
+                new(cattribs,
+                    new Regex(@"Installing ""scipy"".+" +
+                              @"Collecting scipy.+" +
+                              @"Collecting numpy.+" + 
+                              @"Installing collected packages: numpy, scipy.+" + 
+                              @"Successfully installed numpy.+scipy.+", RegexOptions.Singleline));
 
             ghdoc.Enabled = true;
 
