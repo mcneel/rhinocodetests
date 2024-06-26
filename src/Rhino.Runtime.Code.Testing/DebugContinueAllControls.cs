@@ -4,7 +4,7 @@ using Rhino.Runtime.Code.Execution.Debugging;
 
 namespace Rhino.Runtime.Code.Testing
 {
-    sealed class DebugContinueAllControls : DebugControls
+    public sealed class DebugContinueAllControls : DebugControls
     {
         public override DebugAction Pause() => DebugAction.Continue;
 

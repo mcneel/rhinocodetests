@@ -8,9 +8,9 @@ using Rhino.Runtime.Code.Execution.Debugging;
 
 namespace Rhino.Runtime.Code.Testing
 {
-    delegate bool VerifyExpectedDelegate(ExecVariable expected);
+    public delegate bool VerifyExpectedDelegate(ExecVariable expected);
 
-    sealed class ExpectedVariable : ExecVariable
+    public sealed class ExpectedVariable : ExecVariable
     {
         public bool ExpectsValue { get; }
 
@@ -27,7 +27,7 @@ namespace Rhino.Runtime.Code.Testing
         }
     }
 
-    sealed class DebugVerifyVarsControls : DebugControls
+    public sealed class DebugVerifyVarsControls : DebugControls
     {
         readonly CodeReferenceBreakpoint _bp;
         readonly ExpectedVariable[] _expected;

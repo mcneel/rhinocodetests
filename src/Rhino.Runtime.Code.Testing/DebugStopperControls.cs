@@ -4,7 +4,7 @@ using Rhino.Runtime.Code.Execution.Debugging;
 
 namespace Rhino.Runtime.Code.Testing
 {
-    sealed class DebugStopperControls : DebugControls
+    public sealed class DebugStopperControls : DebugControls
     {
         readonly CodeReferenceBreakpoint _bp;
 

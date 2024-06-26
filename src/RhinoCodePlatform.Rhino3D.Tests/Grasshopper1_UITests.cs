@@ -1,22 +1,18 @@
 using System;
 using System.Linq;
-using System.Collections.Generic;
 
 using NUnit.Framework;
 
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
-using Rhino.Runtime.Code.Text;
 
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
-using Grasshopper.Kernel.Data;
-using Grasshopper.Kernel.Types;
 
 using RhinoCodePlatform.Rhino3D.GH;
+using RhinoCodePlatform.Rhino3D.Testing;
 
-using RGH = RhinoCodePlatform.Rhino3D.GH;
 using GHP = RhinoCodePluginGH;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
@@ -738,8 +734,8 @@ public class Script_Instance : GH_ScriptInstance
             IParamValueConverter defaultConverter = default;
             if (overrideKind > DefaultOverrideKind.NoOverride)
             {
-                defaultConverter = RGH.ComponentConfigs.Current.GetDefaultPythonHint();
-                RGH.ComponentConfigs.Current.DefaultPythonHint = 
+                defaultConverter = ComponentConfigs.Current.GetDefaultPythonHint();
+                ComponentConfigs.Current.DefaultPythonHint =
                     overrideKind == DefaultOverrideKind.OverrideToExpected ? expected.Id.Id : converter.Id.Id;
             }
 
@@ -764,8 +760,30 @@ a = str(type(x))
 
             if (overrideKind > DefaultOverrideKind.NoOverride)
             {
-                RGH.ComponentConfigs.Current.DefaultPythonHint = defaultConverter.Id.Id;
+                ComponentConfigs.Current.DefaultPythonHint = defaultConverter.Id.Id;
             }
+        }
+#endif
+
+#if RC8_10
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "gh1ui", "test_plugins_package_install_progress_single_rc8.10.ghx" })]
+        public void TestGH1_PublishedComponent_RestoreProgress_Single(string ghfile)
+        {
+            GH_Document ghdoc = Grasshopper.Instances.DocumentServer.AddDocument(ghfile, makeActive: true);
+
+            IGH_Component component = ((IGH_Component)ghdoc.Objects.FirstOrDefault(c => c.NickName == "PTS"));
+            ProgressReporterAttribs attribs = new(component);
+            component.Attributes = attribs;
+
+            // setup expected messages
+
+            ghdoc.Enabled = true;
+
+            Registrar.SendReportsToConsole = false;
+            ghdoc.NewSolution(expireAllObjects: true);
+            Registrar.SendReportsToConsole = true;
+
+            Assert.IsTrue(attribs.Pass);
         }
 #endif
     }

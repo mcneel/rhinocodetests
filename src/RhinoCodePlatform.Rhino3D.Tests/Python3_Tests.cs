@@ -685,7 +685,7 @@ result = sys.stderr is not None
                 AutoApplyParams = true,
                 Outputs = { ["result"] = false }
             };
-            
+
             code.Run(ctx);
 
             Assert.IsTrue(ctx.Outputs.Get<bool>("result"));
@@ -1160,14 +1160,9 @@ class Test:
             // https://github.com/mcneel/rhino/pull/72450
             ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
 
-            if (py3.Environs.OfIdentity("test_access_denied") is IEnviron testEnviron)
-            {
-                py3.Environs.DeleteEnviron(testEnviron);
-            }
-
             py3.CreateCode(
 $@"
-{P} venv: test_access_denied
+{P} venv: {SetupFixture.RHINOCODE_PYTHON_VENV_PREFIX}access_denied
 {P} r: openexr
 import OpenEXR
 ").Run(GetRunContext());
@@ -1195,12 +1190,7 @@ import OpenEXR
 
             Assert.NotNull(py3.Environs.Shared);
 
-            if (py3.Environs.OfIdentity("test_pip_install_requests") is IEnviron testEnviron)
-            {
-                py3.Environs.DeleteEnviron(testEnviron);
-            }
-
-            IEnviron environ = py3.Environs.CreateEnviron("test_pip_install_requests");
+            IEnviron environ = py3.Environs.CreateEnviron($"{SetupFixture.RHINOCODE_PYTHON_VENV_PREFIX}install_requests");
 
             IPackage pkg = environ.AddPackage(new PackageSpec("requests", "2.31.0"));
             Assert.AreEqual("requests==2.31.0 (Any)", pkg.ToString());
@@ -1617,7 +1607,6 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 #endif
 
 #if RC8_10
-
         [Test]
         public void TestPython3_Diagnose_SuperInit_RhinoCommon_GetObject()
         {
@@ -1773,6 +1762,19 @@ Rhino.Input.RhinoGet.GetOneObject(op.dirname(""test""),");
 
             sig = signatures.ElementAt(1);
             Assert.AreEqual(1, sig.ParameterIndex);
+        }
+
+        [Test]
+        public void TestPython3_PIP_InstallWithDependencies()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-82730
+            ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
+
+            IEnviron environ = py3.Environs.CreateEnviron($"{SetupFixture.RHINOCODE_PYTHON_VENV_PREFIX}install_jaxcpu");
+
+            IPackage pkg = environ.AddPackage(new PackageSpec("jax[cpu]"));
+            Assert.AreEqual("jax", pkg.Id);
+            Assert.IsTrue(environ.Contains(new PackageSpec("jax")));
         }
 #endif
 

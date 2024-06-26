@@ -4,9 +4,6 @@
     <!--<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('Windows'))">net48;net7.0-windows</TargetFrameworks>-->
     <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('Windows'))">net7.0-windows</TargetFrameworks>
     <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('OSX'))">net7.0</TargetFrameworks>
-    <LangVersion>10</LangVersion>
-    <IsPackable>false</IsPackable>
-    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,13 +17,18 @@
 
   <ItemGroup>
     <Reference Include="Rhino.Runtime.Code" HintPath="$(RhinoSystemDirectory)\Rhino.Runtime.Code.dll" Private="True" />
-    <Reference Include="RhinoCodePlatform.Rhino3D" HintPath="$(RhinoSystemDirectory)\RhinoCodePlatform.Rhino3D.dll" Private="False" />
+
     <Reference Include="RhinoCommon" HintPath="$(RhinoSystemDirectory)\RhinoCommon.dll" Private="False" />
     <Reference Include="RhinoCodePlatform.Rhino3D" HintPath="$(RhinoSystemDirectory)\RhinoCodePlatform.Rhino3D.dll" Private="False" />
     <Reference Include="Grasshopper" HintPath="$(RhinoPluginsDirectory)\Grasshopper\Grasshopper.dll" Private="False" />
     <Reference Include="GH_IO" HintPath="$(RhinoPluginsDirectory)\Grasshopper\GH_IO.dll" Private="False" />
 
     <Reference Include="RhinoCodePluginGH" HintPath="$(RhinoPluginsDirectory)\Grasshopper\Components\RhinoCodePluginGH.gha" Private="False" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Rhino.Runtime.Code.Testing\Rhino.Runtime.Code.Testing.csproj" />
+    <ProjectReference Include="..\RhinoCodePlatform.Rhino3D.Testing\RhinoCodePlatform.Rhino3D.Testing.csproj" />
   </ItemGroup>
 
   <ItemGroup>
