@@ -14,6 +14,7 @@ using RhinoCodePlatform.Rhino3D.GH;
 using RhinoCodePlatform.Rhino3D.Testing;
 
 using GHP = RhinoCodePluginGH;
+using System.Text.RegularExpressions;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -772,10 +773,8 @@ a = str(type(x))
             GH_Document ghdoc = Grasshopper.Instances.DocumentServer.AddDocument(ghfile, makeActive: true);
 
             IGH_Component component = ((IGH_Component)ghdoc.Objects.FirstOrDefault(c => c.NickName == "PTS"));
-            ProgressReporterAttribs attribs = new(component);
+            ProgressReporterAttribs attribs = new(component, new Regex(@"Installing ""scipy"".+Collecting scipy.+Collecting numpy.+Installing collected packages: numpy, scipy.+Successfully installed numpy.+scipy.+", RegexOptions.Singleline));
             component.Attributes = attribs;
-
-            // setup expected messages
 
             ghdoc.Enabled = true;
 
