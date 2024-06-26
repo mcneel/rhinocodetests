@@ -1,6 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
 
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Attributes;
@@ -11,13 +11,19 @@ namespace RhinoCodePlatform.Rhino3D.Testing
 {
     public sealed class ProgressReporterAttribs : GH_ComponentAttributes, IScriptAttribute
     {
-        public bool Pass { get; private set; } = false;
+        readonly StringBuilder _messages = new();
+        readonly Regex _match;
 
-        public ProgressReporterAttribs(IGH_Component component) : base(component) { }
+        public bool Pass => _match.IsMatch(_messages.ToString());
+
+        public ProgressReporterAttribs(IGH_Component component, Regex match) : base(component)
+        {
+            _match = match;
+        }
 
         public void ShowProgress(float progress, string message)
         {
-            Pass |= progress > 0f;
+            _messages.AppendLine(message);
         }
     }
 }
