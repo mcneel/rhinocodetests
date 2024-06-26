@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+
 using NUnit.Framework;
 
 using Rhino.Runtime.Code.Languages;
@@ -8,7 +9,7 @@ using Rhino.Runtime.Code.Languages;
 namespace Rhino.Runtime.Code.Tests
 {
     [TestFixture]
-    public class LanguageSpecTests : Rhino.Testing.Fixtures.RhinoTestFixture
+    public class LanguageSpecTests
     {
         [Test]
         public void TestLanguageSpecCtorSingleLetterFamily()

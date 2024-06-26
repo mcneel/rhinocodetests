@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- Disabled since Rhino.Inside in net48 has problem loading GHPython (System.__ComObject issue) -->
+    <!--<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('Windows'))">net48;net7.0-windows</TargetFrameworks>-->
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('Windows'))">net7.0-windows</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('OSX'))">net7.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Rhino.Runtime.Code" HintPath="$(RhinoSystemDirectory)\Rhino.Runtime.Code.dll" Private="True" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Rhino.Runtime.Code.Testing\Rhino.Runtime.Code.Testing.csproj" />
+  </ItemGroup>
+</Project>

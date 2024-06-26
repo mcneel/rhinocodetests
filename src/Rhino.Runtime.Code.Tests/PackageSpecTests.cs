@@ -7,7 +7,7 @@ using Rhino.Runtime.Code.Environments;
 namespace Rhino.Runtime.Code.Tests
 {
     [TestFixture]
-    public class PackageSpecTests : Rhino.Testing.Fixtures.RhinoTestFixture
+    public class PackageSpecTests
     {
 #if RC8_8
         [Test]

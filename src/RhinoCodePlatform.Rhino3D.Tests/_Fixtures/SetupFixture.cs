@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 
@@ -16,6 +17,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     public sealed class SetupFixture : Rhino.Testing.Fixtures.RhinoSetupFixture
     {
         public const string RHINOCODE_LOG_LEVEL_ENVVAR = "RHINOCODE_LOG_LEVEL";
+        public const string RHINOCODE_PYTHON_VENV_PREFIX = "test_";
 
         static readonly MxTestSettings s_settings;
 
@@ -93,17 +95,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 }
 
                 // cleanup all python 3 environments before running tests
-                else if (LanguageSpec.Python3.Matches(language.Id))
+                if (LanguageSpec.Python3.Matches(language.Id))
                 {
                     IEnvirons environs = language.Environs;
-                    foreach (IEnviron environ in environs.QueryEnvirons())
+                    foreach (IEnviron environ in environs.QueryEnvirons()
+                                                         .Where(e => e.Id.StartsWith(RHINOCODE_PYTHON_VENV_PREFIX)))
                     {
-                        if (environ.Id.StartsWith("default")
-                                || environ.Id.StartsWith("site-"))
-                        {
-                            continue;
-                        }
-
                         environs.DeleteEnviron(environ);
                     }
                 }

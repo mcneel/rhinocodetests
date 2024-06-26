@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Rhino.Runtime.Code.Testing
 {
-    sealed class SwallowOutputsStream : Stream
+    public sealed class SwallowOutputsStream : Stream
     {
         public override bool CanRead { get; } = false;
         public override bool CanSeek { get; } = false;

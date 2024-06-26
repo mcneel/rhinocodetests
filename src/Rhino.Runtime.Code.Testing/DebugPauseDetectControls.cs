@@ -6,7 +6,7 @@ using Rhino.Runtime.Code.Execution.Debugging;
 
 namespace Rhino.Runtime.Code.Testing
 {
-    sealed class DebugPauseDetectControls : DebugControls
+    public sealed class DebugPauseDetectControls : DebugControls
     {
         #region Fields
         sealed class DebugPause
