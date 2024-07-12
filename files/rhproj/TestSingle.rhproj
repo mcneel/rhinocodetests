@@ -1,0 +1,52 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.10.24191\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "2ffb5fe3-05c2-43aa-b907-63af5571dd73",
+  "identity": {
+    "name": "TestSingle",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    },
+    "description": "Test a single command in a project",
+    "copyright": "Copyright \u00A9 2024 Ehsan Iran-Nejad",
+    "license": "MIT",
+    "url": "https://ein.sh/"
+  },
+  "settings": {
+    "buildPath": "testSingle/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": {
+          "major": 8
+        }
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "a55c3fa8-6202-45c1-8d79-e3641411fc18",
+      "language": {
+        "id": "*.*.python",
+        "version": "*.*.*"
+      },
+      "title": "command",
+      "uri": "command.py"
+    }
+  ]
+}

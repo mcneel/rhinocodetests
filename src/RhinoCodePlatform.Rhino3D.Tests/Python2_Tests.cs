@@ -11,7 +11,11 @@ using Rhino.Runtime.Code.Execution.Debugging;
 using Rhino.Runtime.Code.Execution.Profiling;
 using Rhino.Runtime.Code.Testing;
 
+#if RC8_10
+using RhinoCodePlatform.Rhino3D.Languages.GH1;
+#else
 using RhinoCodePlatform.Rhino3D.Languages;
+#endif
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {

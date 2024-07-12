@@ -10,7 +10,16 @@ using Rhino.Runtime.Code.Languages;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
 
+#if RC8_10
+using RhinoCodePlatform.GH;
+using RhinoCodePlatform.GH.Context;
+using LGH1 = RhinoCodePlatform.Rhino3D.Languages.GH1;
+using ComponentConfigs = RhinoCodePlatform.GH.ScriptConfigs;
+#else
 using RhinoCodePlatform.Rhino3D.GH;
+using IScriptParameter = RhinoCodePlatform.Rhino3D.GH.IScriptVariable;
+#endif
+
 using RhinoCodePlatform.Rhino3D.Testing;
 
 using GHP = RhinoCodePluginGH;
@@ -143,11 +152,11 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
             Assert.True(inputs[1].ValueType.Name == "Point3d");
 
             // assert param converters
-            IScriptVariable u_param = script.Inputs.ElementAt(0);
-            IScriptVariable v_param = script.Inputs.ElementAt(1);
+            IScriptParameter u_param = script.Inputs.ElementAt(0);
+            IScriptParameter v_param = script.Inputs.ElementAt(1);
 
-            Assert.True(u_param.Converter is GH1.Converters.IntConverter);
-            Assert.True(v_param.Converter is GH1.Converters.Point3dConverter);
+            Assert.True(u_param.Converter is LGH1.Converters.IntConverter);
+            Assert.True(v_param.Converter is LGH1.Converters.Point3dConverter);
         }
 
         [Test]
@@ -221,15 +230,15 @@ public class Script_Instance : GH_ScriptInstance
             Assert.True(outputs[1].ValueType.Name == "Surface");
 
             // assert param converters
-            IScriptVariable u_param = script.Inputs.ElementAt(0);
-            IScriptVariable v_param = script.Inputs.ElementAt(1);
-            IScriptVariable w_param = script.Outputs.ElementAt(0);
-            IScriptVariable z_param = script.Outputs.ElementAt(1);
+            IScriptParameter u_param = script.Inputs.ElementAt(0);
+            IScriptParameter v_param = script.Inputs.ElementAt(1);
+            IScriptParameter w_param = script.Outputs.ElementAt(0);
+            IScriptParameter z_param = script.Outputs.ElementAt(1);
 
-            Assert.True(u_param.Converter is GH1.Converters.IntConverter);
-            Assert.True(v_param.Converter is GH1.Converters.DoubleConverter);
-            Assert.True(w_param.Converter is GH1.Converters.Point3dConverter);
-            Assert.True(z_param.Converter is GH1.Converters.SurfaceConverter);
+            Assert.True(u_param.Converter is LGH1.Converters.IntConverter);
+            Assert.True(v_param.Converter is LGH1.Converters.DoubleConverter);
+            Assert.True(w_param.Converter is LGH1.Converters.Point3dConverter);
+            Assert.True(z_param.Converter is LGH1.Converters.SurfaceConverter);
         }
 
         [Test]
@@ -378,11 +387,11 @@ public class Script_Instance : GH_ScriptInstance
             Assert.True(outputs[0].ValueType.Name == "double");
 
             // assert param converters
-            IScriptVariable x_param = script.Inputs.ElementAt(0);
-            IScriptVariable a_param = script.Outputs.ElementAt(0);
+            IScriptParameter x_param = script.Inputs.ElementAt(0);
+            IScriptParameter a_param = script.Outputs.ElementAt(0);
 
-            Assert.True(x_param.Converter is GH1.Converters.IntConverter);
-            Assert.True(a_param.Converter is GH1.Converters.DoubleConverter);
+            Assert.True(x_param.Converter is LGH1.Converters.IntConverter);
+            Assert.True(a_param.Converter is LGH1.Converters.DoubleConverter);
         }
 
         [Test]
@@ -454,9 +463,9 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 ") as IScriptObject;
 
             // add hint to parameter 'x'
-            IScriptVariable x_param = script.Inputs.ElementAt(0);
-            IScriptVariable y_param = script.Inputs.ElementAt(1);
-            x_param.Converter = new GH1.Converters.PythonStringConverter();
+            IScriptParameter x_param = script.Inputs.ElementAt(0);
+            IScriptParameter y_param = script.Inputs.ElementAt(1);
+            x_param.Converter = new LGH1.Converters.PythonStringConverter();
 
             // update script with parameter changes
             script.ParamsApply();
@@ -487,8 +496,8 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
             Assert.True(inputs[1].ValueType.Name == "Point3d");
 
             // verify parameter converters
-            Assert.True(x_param.Converter is GH1.Converters.PythonStringConverter);
-            Assert.True(y_param.Converter is GH1.Converters.Point3dConverter);
+            Assert.True(x_param.Converter is LGH1.Converters.PythonStringConverter);
+            Assert.True(y_param.Converter is LGH1.Converters.Point3dConverter);
         }
 
         [Test]
@@ -509,8 +518,8 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 ") as IScriptObject;
 
             // add hint to parameter 'x'
-            IScriptVariable x_param = script.Inputs.ElementAt(0);
-            x_param.Converter = new GH1.Converters.PythonStringConverter();
+            IScriptParameter x_param = script.Inputs.ElementAt(0);
+            x_param.Converter = new LGH1.Converters.PythonStringConverter();
 
             // update script with parameter changes
             script.ParamsApply();
@@ -538,7 +547,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
             Assert.True(inputs[0].ValueType.Name == "string");
 
             // verify parameter converters
-            Assert.True(x_param.Converter is GH1.Converters.PythonStringConverter);
+            Assert.True(x_param.Converter is LGH1.Converters.PythonStringConverter);
         }
 
         [Test]
@@ -640,11 +649,11 @@ public class Script_Instance : GH_ScriptInstance
             Assert.True(inputs[1].ValueType.Name == "Decoder");
 
             // assert param converters
-            IScriptVariable x_param = script.Inputs.ElementAt(0);
-            IScriptVariable y_param = script.Inputs.ElementAt(1);
+            IScriptParameter x_param = script.Inputs.ElementAt(0);
+            IScriptParameter y_param = script.Inputs.ElementAt(1);
 
-            Assert.True(x_param.Converter is GH1.Converters.CastConverter);
-            Assert.True(y_param.Converter is GH1.Converters.CastConverter);
+            Assert.True(x_param.Converter is LGH1.Converters.CastConverter);
+            Assert.True(y_param.Converter is LGH1.Converters.CastConverter);
         }
 
         [Test]
@@ -693,36 +702,36 @@ public class Script_Instance : GH_ScriptInstance
         [Test]
         public void TestGH1_Component_Python_DoesNotReset_Converter_Goo()
         {
-            var converter = new GH1.Converters.GooConverter();
+            var converter = new LGH1.Converters.GooConverter();
             TestGH1_Component_Python_ResetConverter(converter, converter);
         }
 
         [Test]
         public void TestGH1_Component_Python_DoesNotReset_Converter_Dynamic()
         {
-            var converter = new GH1.Converters.PythonDynamicConverter();
+            var converter = new LGH1.Converters.PythonDynamicConverter();
             TestGH1_Component_Python_ResetConverter(converter, converter);
         }
 
         [Test]
         public void TestGH1_Component_Python_DoReset_Converter_Goo()
         {
-            TestGH1_Component_Python_ResetConverter(new GH1.Converters.GooConverter(),
-                                                    new GH1.Converters.PythonDynamicConverter(),
+            TestGH1_Component_Python_ResetConverter(new LGH1.Converters.GooConverter(),
+                                                    new LGH1.Converters.PythonDynamicConverter(),
                                                     DefaultOverrideKind.OverrideToExpected);
         }
 
         [Test]
         public void TestGH1_Component_Python_DoesNotReset_Converter_Float()
         {
-            var converter = new GH1.Converters.PythonFloatConverter();
+            var converter = new LGH1.Converters.PythonFloatConverter();
             TestGH1_Component_Python_ResetConverter(converter, converter, DefaultOverrideKind.NoOverride);
         }
 
         [Test]
         public void TestGH1_Component_Python_DoesNotReset_Converter_Point3d()
         {
-            var converter = new GH1.Converters.Point3dConverter();
+            var converter = new LGH1.Converters.Point3dConverter();
             TestGH1_Component_Python_ResetConverter(converter, converter, DefaultOverrideKind.NoOverride);
         }
 
@@ -735,7 +744,11 @@ public class Script_Instance : GH_ScriptInstance
             IParamValueConverter defaultConverter = default;
             if (overrideKind > DefaultOverrideKind.NoOverride)
             {
+#if RC8_10
+                defaultConverter = LGH1.Grasshopper1.GetConfiguredPythonConverter();
+#else
                 defaultConverter = ComponentConfigs.Current.GetDefaultPythonHint();
+#endif
                 ComponentConfigs.Current.DefaultPythonHint =
                     overrideKind == DefaultOverrideKind.OverrideToExpected ? expected.Id.Id : converter.Id.Id;
             }
@@ -745,7 +758,7 @@ public class Script_Instance : GH_ScriptInstance
 a = str(type(x))
 ") as IScriptObject;
 
-            IScriptVariable x_param = script.Inputs.ElementAt(0);
+            IScriptParameter x_param = script.Inputs.ElementAt(0);
             x_param.Converter = converter;
 
             // build so there is a code to apply params to
@@ -767,7 +780,7 @@ a = str(type(x))
 #endif
 
 #if RC8_10
-        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "gh1ui", "test_plugins_package_install_progress_single_rc8.10.ghx" }),
+                [Test, TestCaseSource(nameof(GetTestScript), new object[] { "gh1ui", "test_plugins_package_install_progress_single_rc8.10.ghx" }),
                TestCaseSource(nameof(GetTestScript), new object[] { "gh1ui", "test_plugins_package_install_progress_context_rc8.10.ghx" })]
         public void TestGH1_PublishedComponent_RestoreProgress(string ghfile)
         {
@@ -775,19 +788,19 @@ a = str(type(x))
 
             IGH_Component component = (IGH_Component)ghdoc.Objects.First(c => c.NickName == "PTS");
             IScriptAttribute cattribs = (IScriptAttribute)component.Attributes;
-            ProgressReporterAttribs attribs = 
+            ProgressReporterAttribs attribs =
                 new(cattribs,
                     new Regex(@"Installing ""scipy"".+" +
                               @"Collecting scipy.+" +
-                              @"Collecting numpy.+" + 
-                              @"Installing collected packages: numpy, scipy.+" + 
+                              @"Collecting numpy.+" +
+                              @"Installing collected packages: numpy, scipy.+" +
                               @"Successfully installed numpy.+scipy.+", RegexOptions.Singleline));
 
             ghdoc.Enabled = true;
 
-            Registrar.SendReportsToConsole = false;
+            RhinoCode.ReportProgressToConsole = false;
             ghdoc.NewSolution(expireAllObjects: true);
-            Registrar.SendReportsToConsole = true;
+            RhinoCode.ReportProgressToConsole = true;
 
             Assert.IsTrue(attribs.Pass);
         }

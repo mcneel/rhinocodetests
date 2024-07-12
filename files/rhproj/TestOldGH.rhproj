@@ -1,0 +1,49 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.10.24193\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "247463d0-e8e7-447d-82a6-8be6d4461af9",
+  "identity": {
+    "name": "TestOldGH",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "testOldGH/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": {
+          "major": 8
+        }
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "type": "components",
+      "id": "153a71e2-fa7b-4eff-bb26-90a498218951",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "oldGHFormat.ghx",
+      "uri": "oldGHFormat.ghx"
+    }
+  ]
+}
