@@ -1,0 +1,53 @@
+{
+  "id": "51885091-077e-44c7-9db9-4f2af9d56ba9",
+  "identity": {
+    "name": "ScriptInstancePreviews",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "appName": "Rhino3D",
+      "appVersion": {
+        "major": 8
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "type": "components",
+      "id": "2d048048-350b-4ab8-a324-35a34307fc9f",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "ScriptInstancePreviews_Single.ghx",
+      "uri": "ScriptInstancePreviews_Single.ghx",
+      "scripts": []
+    },
+    {
+      "type": "components",
+      "id": "8a1b7fc0-a66d-4aa4-a412-3c1b01e462a3",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "ScriptInstancePreviews_Context.ghx",
+      "uri": "ScriptInstancePreviews_Context.ghx",
+      "scripts": []
+    }
+  ]
+}

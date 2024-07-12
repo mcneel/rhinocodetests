@@ -1,0 +1,38 @@
+{
+  "host": {
+    "name": "Rhino3D_TESTs",
+    "version": "0.1",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "56bae66b-b5f1-4c6d-bac3-17b18ada9f71",
+  "identity": {
+    "name": "TestLegacyGroupParams",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "file:///C:/Users/ein/gits/rhinocodetests/files/rhproj/build/rh8",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": {
+          "major": 8
+        }
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": []
+}

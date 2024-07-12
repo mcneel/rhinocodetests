@@ -13,7 +13,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 {
     public abstract class ScriptFixture : Rhino.Testing.Fixtures.RhinoTestFixture
     {
-        sealed class NUnitStream : Stream
+        protected sealed class NUnitStream : Stream
         {
             public override bool CanRead { get; } = false;
             public override bool CanSeek { get; } = false;
@@ -27,6 +27,11 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             public override void SetLength(long value) => throw new NotImplementedException();
 
             public override void Write(byte[] buffer, int offset, int count) => TestContext.Write(Encoding.UTF8.GetString(buffer));
+        }
+
+        protected sealed class NUnitProgressReporter : ProgressReporter
+        {
+            protected override void WriteLine(string text) => TestContext.WriteLine(text);
         }
 
         protected ILanguage m_language = default;

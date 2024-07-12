@@ -2,8 +2,13 @@ using System;
 using System.Text;
 using System.Text.RegularExpressions;
 
+#if RC8_10
+using RhinoCodePlatform.GH.Context;
+using RhinoCodePlatform.Rhino3D.Languages.GH1.Attributes;
+#else
 using RhinoCodePlatform.Rhino3D.GH;
 using RhinoCodePlatform.Rhino3D.GH1;
+#endif
 
 namespace RhinoCodePlatform.Rhino3D.Testing
 {
