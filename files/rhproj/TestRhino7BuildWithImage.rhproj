@@ -1,0 +1,139 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.10.24194\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "91e208a4-5b82-4725-90e2-741b7352df75",
+  "identity": {
+    "name": "TestRhino7BuildWithImage",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    },
+    "image": {
+      "light": {
+        "type": "svg",
+        "data": "PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgNDggNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0ibm9uZSIgZGFyay1maWxsPSJub25lIiBkYXJrLXN0cm9rZT0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgc3Ryb2tlLXdpZHRoPSIwIj4NCiAgPHBvbHlsaW5lIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgZGFyay1maWxsPSJub25lIiBkYXJrLXN0cm9rZT0iI0ZGRiIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgc3Ryb2tlLXdpZHRoPSIxIiBwb2ludHM9IjExLjUwLDkuNTAgNDAuNTAsMy41MCA4LjUwLDI2LjUwIDM1LjUwLDE1LjUwIDEyLjUwLDM4LjUwIDM5LjUwLDIxLjUwIDM1LjUwLDM5LjUwIDQyLjUwLDIwLjUwIDQzLjUwLDI3LjUwIiAvPg0KPC9zdmc\u002B"
+      },
+      "projectIcon": {
+        "light": {
+          "type": "bitmap",
+          "data": {
+            "bytes": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAAXFJREFUSEvt1NsrBGEYx/EJ5ZQoF\u002BQQbihKUUJckLMLSVEUSimkHHI\u002BlBty\u002BBdcuHHhv/T9ztiath1mlwvKrz41787uM\u002B8\u002B7/tO8FdSh16so88PvpNadGMaG7jCFi5wizKkTjU6MY41nGEXCxhAMyrgg0aROmM4wj6WMIw2lCKeLpzDB\u002BWVJlRGl4mZw2J0\u002BbNxQQ/RE45\u002BOEPYRlU4itKCWdSEowJTDBd5IhwFQRH6sYMHrKDgdOAaLnID7L3jGcxjBAXHv74MD9HmB6\u002BNhbOL\u002B33b6Hb\u002BNB4mD84enK2zdvaZZBd3u17iCR66RyRmEq/wHNhn\u002Bx1PvHg57L/b1d3lb45xCu/ljDNwZ\u002BRKvPggTtAejqLXh61xgrayEXklU7weTmIK8dj/e3jfFvsKSZ1McYta3CLZybQm71h4FbbDtuRKCV6QdD8xvkVv4EImLhppxRvyaouzfoZb8Kt4Vu6iy3TxveJuSJsDeMD\u002B8\u002BsSBO/kNivZle5UTAAAAABJRU5ErkJggg==",
+            "width": 24,
+            "height": 24
+          }
+        },
+        "dark": {
+          "type": "bitmap",
+          "data": {
+            "bytes": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABhJREFUSEvtwQEBAAAAgiD/r64hQAAAXA0JGAAB0AJbXgAAAABJRU5ErkJggg==",
+            "width": 24,
+            "height": 24
+          }
+        },
+        "icoData": "AAABAAEAGBgAAAEAIAAUAgAAFgAAAIlQTkcNChoKAAAADUlIRFIAAAAYAAAAGAgGAAAA4Hc9\u002BAAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAG2SURBVEhL7dQ9KEVxGMfx4yWSvMSgvKQMDIrkpSRSZDCIgUgyCSOD7EpGsRiMMltlIAaDt2wMMsjLQF7iIi/5/s69p86991znL5TBrz6dl27P8z/n/9xj/XYSQsfvJgclaEESzmAnLnT8SrKRh1yXS2QhFRN4gh2/BhmILHYPrVBOcYVuHGMVYYnVoAkVeIW7mI7PcFKKNizgRDdMkw897mdR4c7g6c9GGzoKPeGPpw7DSLOvgilEKzLtq4iYTpHGuRfnWEE8qlEJNdjHIqJi0kDz3QVtpDa4CuXYRjJusAbP\u002BDXQo2tUD6HVKjvYRaN9FV5cv79FPaZ0I1YD/ZkG8YB06BVoxRpTJbK4xrUd2ocjFGEMng30d\u002B/HHjawhXc4cRdPQQdesI4\u002BqKb2aAaPiMoQtHFeUXGnQS20ymL7yrLKMA4tcAD6AhhtshOn8AH0OvRpWNaNUPT\u002BGzANPZFWH9CjmMQprqlR8SW4iyvah2tcQN\u002BnAOx35RcVL0AN7jAHFXEnEWqgfQiLX4NmqMEbZrEJr\u002BjbpQ3XtBlHEzEPrcwvPZgMnppF86xpMM0I9J36z5\u002BLZX0AMEZQKiQt\u002BcwAAAAASUVORK5CYII="
+      },
+      "categoryIcon": {
+        "light": {
+          "type": "bitmap",
+          "data": {
+            "bytes": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAAO9JREFUOE\u002B10s\u002BLAWEAh/FZ2thQFLb24LJbqE05USJEm9hadhW1jhxc3Fwc1Z780Z7vvDOZycyG8tSneWead36\u002B1o1Fne1FPeEdn5jiD00E9ogiBtDJMkIZGUzwgtAKqCBh7516wxBXPbpbH1UzvO4CWegV0njGF7a4qDq6qEEXaWEOtzjyZugvhgXW\u002BIa\u002ByQN\u002BoPQhV9hA5/nSI\u002BsX6Z11B\u002BWd3EYPHSyhJ/Olu3tzJ\u002Bu36eQc1C8\u002B8GrvhaTJM2g9NHTA0wEpMwxOk3cYI6kDnrQq92YYnj5QyQzP0vtrZf5bxNkGpfVw02q8V5Z1BOqFE1XbwcdeAAAAAElFTkSuQmCC",
+            "width": 16,
+            "height": 16
+          }
+        },
+        "dark": {
+          "type": "bitmap",
+          "data": {
+            "bytes": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABNJREFUOE9jGAWjYBSMAjBgYAAABBAAAadEfGMAAAAASUVORK5CYII=",
+            "width": 16,
+            "height": 16
+          }
+        }
+      },
+      "toolbarIcons": {
+        "light": {
+          "guidMap": [
+            {
+              "guid": "91e208a4-5b82-4725-90e2-741b7352df75",
+              "index": 0
+            }
+          ],
+          "small": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAD0SURBVDhPxdKxa8JAFMfxqw6hgzo4FFQQJwcHkdhBuhQEBwdxcnHo2HZ18C/yD3AVl0JHq9LNTk5WNxcdBBG/L8kFxAQvkz/4cHch7yXkRd09D94aJWlkkRG3GqTg3\u002BzZ4d\u002BzCmtQRwVH\u002BDd76wE6pbAGOWyxd07BacFyt9HyhB7kDSPnBZ9IOCdiOoU4ulhjjBieYZs0KKKDAeQDVlHGD6xbDZqQUf7Blgtkihle5RDWQH6Wd8gUkviFPFHGKHGKyVdQgwbeMMc3JjhBxy/Go7u9zAfy7vYqUqwb1NA3nYJEFy7QxhIj0wa6WP68AobYKKXUGf6UKC/hJdyNAAAAAElFTkSuQmCC",
+          "normal": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAG2SURBVEhL7dQ9KEVxGMfx4yWSvMSgvKQMDIrkpSRSZDCIgUgyCSOD7EpGsRiMMltlIAaDt2wMMsjLQF7iIi/5/s69p86991znL5TBrz6dl27P8z/n/9xj/XYSQsfvJgclaEESzmAnLnT8SrKRh1yXS2QhFRN4gh2/BhmILHYPrVBOcYVuHGMVYYnVoAkVeIW7mI7PcFKKNizgRDdMkw897mdR4c7g6c9GGzoKPeGPpw7DSLOvgilEKzLtq4iYTpHGuRfnWEE8qlEJNdjHIqJi0kDz3QVtpDa4CuXYRjJusAbP\u002BDXQo2tUD6HVKjvYRaN9FV5cv79FPaZ0I1YD/ZkG8YB06BVoxRpTJbK4xrUd2ocjFGEMng30d\u002B/HHjawhXc4cRdPQQdesI4\u002BqKb2aAaPiMoQtHFeUXGnQS20ymL7yrLKMA4tcAD6AhhtshOn8AH0OvRpWNaNUPT\u002BGzANPZFWH9CjmMQprqlR8SW4iyvah2tcQN\u002BnAOx35RcVL0AN7jAHFXEnEWqgfQiLX4NmqMEbZrEJr\u002BjbpQ3XtBlHEzEPrcwvPZgMnppF86xpMM0I9J36z5\u002BLZX0AMEZQKiQt\u002BcwAAAAASUVORK5CYII=",
+          "large": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHzSURBVFhH7dU/SBdhHMfx6w9FSBk1CGUEDjUERmSBhBEkDg5Sg1FENIk11iDugjSGLQ6O0dwm0VDU0FAqbTZERPRnSKzIMtLo/b7f7\u002BT8cec9Z2DLfeDF/e548Ps8j9/nLvrf2VK//mtacBg92IYPCMqm\u002BrVM9mI/9qV8xh40YQSLCElz0QSa0VjsO1yh3mMOF/EGjxCSsziGpbwJrAxAupjXX0hyBH24i3c\u002BCEwr5rEQ32XEAW7nWrFwf\u002B3nxsaGuwl3aMNzCtexM76r5SB6sTu\u002BK5nQU\u002BBxvYyPeIjNOIHjcAIvcQ\u002BlEzIBz/cF2Gg2YAeO4gW24wseYz3pLZqAW\u002BtRfAVXa6YwjTPx3erijv\u002BKLtzyQU58lwxiIW8CKwOwC26xK/YYmsbiHsdzsA9eow1DyIpvy6uYwdOsCawagOf4gyTp4jtwHr/xBFfg37RHxvATjbmGSbyN7zLiABsrKxZPJtAJV3kovouidgzDBQzAN2hhQpowSVJ4Fm63r94HPqjH//9p3IY74up/YM24VSFJitv1Fr\u002BPdHFjH/h6/QS/D4XFTcgELH4AJ/EN47BIOlvhBOyDMukumkA3nMAy7uAZsuK3w4b0tITGhvUrmhsHTMCVFeUSRms/g\u002BJxtVlzUzigITfgd6JKlSpVqlQpmSj6CwSWWug1dH4IAAAAAElFTkSuQmCC"
+        }
+      }
+    }
+  },
+  "settings": {
+    "buildPath": "testRhino7BuildWithImage/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "7"
+      },
+      "title": "Rhino3D (7.*)",
+      "slug": "rh7"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "b8e2866b-203f-4fa6-8702-098731dc29a1",
+      "language": {
+        "id": "*.*.python",
+        "version": "2.*.*"
+      },
+      "title": "command_r7",
+      "uri": "command_r7.py2"
+    },
+    {
+      "type": "components",
+      "id": "eaddc170-fe12-407e-ade4-5fabcec0e287",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "components_r7.ghx",
+      "uri": "components_r7.ghx",
+      "scripts": [
+        {
+          "id": "aab362a8-c143-4375-8a78-2690a6d96d06",
+          "name": "Second",
+          "nickname": "Second",
+          "subcat": "Default",
+          "image": {
+            "light": {
+              "type": "svg",
+              "data": "PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgNDggNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0ibm9uZSIgZGFyay1maWxsPSJub25lIiBkYXJrLXN0cm9rZT0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgc3Ryb2tlLXdpZHRoPSIwIj4NCiAgPGNpcmNsZSBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIGRhcmstZmlsbD0ibm9uZSIgZGFyay1zdHJva2U9IiNGRkYiIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIiBzdHJva2Utd2lkdGg9IjEiIHI9IjguNTQ0MDAzNDg2NjMzMyIgY3g9IjI1LjUiIGN5PSIxMS41IiAvPg0KICA8Y2lyY2xlIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgZGFyay1maWxsPSJub25lIiBkYXJrLXN0cm9rZT0iI0ZGRiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiIHN0cm9rZS13aWR0aD0iMSIgcj0iMTIuMjA2NTU1MzY2NTE2MTEzIiBjeD0iMjkuNSIgY3k9IjI4LjUiIC8\u002BDQogIDxjaXJjbGUgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBkYXJrLWZpbGw9Im5vbmUiIGRhcmstc3Ryb2tlPSIjRkZGIiBzdHJva2UtbGluZWNhcD0iYnV0dCIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgc3Ryb2tlLXdpZHRoPSIxIiByPSI3LjYxNTc3MzIwMDk4ODc2OTUiIGN4PSI4LjUiIGN5PSIyNS41IiAvPg0KPC9zdmc\u002B"
+            }
+          }
+        },
+        {
+          "id": "f071defa-a515-4e87-96fd-9e1a37970d10",
+          "name": "First",
+          "nickname": "First",
+          "description": "IronPython 2 scripting component",
+          "subcat": "Default",
+          "image": {
+            "light": {
+              "type": "svg",
+              "data": "PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgNDggNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0ibm9uZSIgZGFyay1maWxsPSJub25lIiBkYXJrLXN0cm9rZT0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgc3Ryb2tlLXdpZHRoPSIwIj4NCiAgPGNpcmNsZSBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIGRhcmstZmlsbD0ibm9uZSIgZGFyay1zdHJva2U9IiNGRkYiIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIiBzdHJva2Utd2lkdGg9IjEiIHI9IjEwIiBjeD0iMzAuNSIgY3k9IjE0LjUiIC8\u002BDQogIDxjaXJjbGUgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBkYXJrLWZpbGw9Im5vbmUiIGRhcmstc3Ryb2tlPSIjRkZGIiBzdHJva2UtbGluZWNhcD0iYnV0dCIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgc3Ryb2tlLXdpZHRoPSIxIiByPSIxMS43MDQ2OTk1MTYyOTYzODciIGN4PSIyMi41IiBjeT0iMzEuNSIgLz4NCiAgPGNpcmNsZSBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIGRhcmstZmlsbD0ibm9uZSIgZGFyay1zdHJva2U9IiNGRkYiIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIiBzdHJva2Utd2lkdGg9IjEiIHI9IjEwLjI5NTYzMDQ1NTAxNzA5IiBjeD0iMjEuNSIgY3k9IjIzLjUiIC8\u002BDQo8L3N2Zz4="
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

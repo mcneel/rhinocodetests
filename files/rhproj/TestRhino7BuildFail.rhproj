@@ -1,13 +1,13 @@
 {
   "host": {
-    "name": "Rhino3D_TESTs",
-    "version": "0.1",
+    "name": "Rhino3D",
+    "version": "8.10.24194\u002B1000",
     "os": "windows",
     "arch": "x64"
   },
-  "id": "56bae66b-b5f1-4c6d-bac3-17b18ada9f71",
+  "id": "d1579232-6a0b-4f3a-9ba8-b50022f25d43",
   "identity": {
-    "name": "TestLegacyGroupParams",
+    "name": "TestRhino7Build",
     "version": "0.1",
     "publisher": {
       "email": "ehsan@mcneel.com",
@@ -19,20 +19,28 @@
     }
   },
   "settings": {
-    "buildPath": "file:///C:/Users/ein/gits/rhinocodetests/files/rhproj/build/rh8",
+    "buildPath": "testRhino7Build/",
     "buildTarget": {
       "host": {
         "name": "Rhino3D",
-        "version": {
-          "major": 8
-        }
+        "version": "7"
       },
-      "title": "Rhino3D (8.*)",
-      "slug": "rh8"
+      "title": "Rhino3D (7.*)",
+      "slug": "rh7"
     },
     "publishTarget": {
       "title": "McNeel Yak Server"
     }
   },
-  "codes": []
+  "codes": [
+    {
+      "id": "b8e2866b-203f-4fa6-8702-098731dc29a1",
+      "language": {
+        "id": "*.*.python",
+        "version": "3.*.*"
+      },
+      "title": "command",
+      "uri": "command.py"
+    }
+  ]
 }
