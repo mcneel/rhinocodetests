@@ -84,6 +84,55 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
 
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestRhino7Build.rhproj" })]
+        public void TestRhProj_Build_RhinoGH7(string rhprojfile)
+        {
+            IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+
+            project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
+            project.Build(s_host, new NUnitProgressReporter());
+
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "TestRhino7Build.rhp")));
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "TestRhino7Build.gha")));
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "testrhino7build-0.1.1234.8888-rh7-any.yak")));
+
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+        }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestRhino7BuildWithImage.rhproj" })]
+        public void TestRhProj_Build_RhinoGH7_WithImages(string rhprojfile)
+        {
+            IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+
+            project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
+            project.Build(s_host, new NUnitProgressReporter());
+
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "TestRhino7BuildWithImage.rhp")));
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "TestRhino7BuildWithImage.gha")));
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "testrhino7buildwithimage-0.1.1234.8888-rh7-any.yak")));
+
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+        }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestRhino7BuildFail.rhproj" })]
+        public void TestRhProj_Build_RhinoGH7_Fail(string rhprojfile)
+        {
+            IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+
+            ProjectBuildException ex = Assert.Throws<ProjectBuildException>(() =>
+            {
+                project.Build(s_host, new SilentProgressReporter());
+            });
+
+            Assert.IsTrue(ex.Message.Contains("Rhino 7 projects can only contain Python 2 or Grasshopper commands"));
+        }
+
         [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestOld.rhproj" })]
         public void TestRhProj_BuildError_OldProjectFormat(string rhprojfile)
         {
