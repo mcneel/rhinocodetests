@@ -13,6 +13,14 @@
     <RhinoPluginsDirectory>$(MSBuildThisFileDirectory)..\..\..\..\bin\$(Configuration)\Plug-ins</RhinoPluginsDirectory>
   </PropertyGroup>
 
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <GrasshopperPluginDirectory>$(RhinoPluginsDirectory)\Grasshopper</GrasshopperPluginDirectory>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <GrasshopperPluginDirectory>$(RhinoPluginsDirectory)\GrasshopperPlugin.rhp</GrasshopperPluginDirectory>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
   </PropertyGroup>
