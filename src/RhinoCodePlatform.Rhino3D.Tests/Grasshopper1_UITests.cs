@@ -10,7 +10,7 @@ using Rhino.Runtime.Code.Languages;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
 
-#if RC8_10
+#if RC8_11
 using RhinoCodePlatform.GH;
 using RhinoCodePlatform.GH.Context;
 using LGH1 = RhinoCodePlatform.Rhino3D.Languages.GH1;
@@ -744,7 +744,7 @@ public class Script_Instance : GH_ScriptInstance
             IParamValueConverter defaultConverter = default;
             if (overrideKind > DefaultOverrideKind.NoOverride)
             {
-#if RC8_10
+#if RC8_11
                 defaultConverter = LGH1.Grasshopper1.GetConfiguredPythonConverter();
 #else
                 defaultConverter = ComponentConfigs.Current.GetDefaultPythonHint();
@@ -780,7 +780,7 @@ a = str(type(x))
 #endif
 
 #if RC8_10
-                [Test, TestCaseSource(nameof(GetTestScript), new object[] { "gh1ui", "test_plugins_package_install_progress_single_rc8.10.ghx" }),
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "gh1ui", "test_plugins_package_install_progress_single_rc8.10.ghx" }),
                TestCaseSource(nameof(GetTestScript), new object[] { "gh1ui", "test_plugins_package_install_progress_context_rc8.10.ghx" })]
         public void TestGH1_PublishedComponent_RestoreProgress(string ghfile)
         {

@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using System.Text.RegularExpressions;
 
-#if RC8_10
+#if RC8_11
 using RhinoCodePlatform.GH.Context;
 using RhinoCodePlatform.Rhino3D.Languages.GH1.Attributes;
 #else

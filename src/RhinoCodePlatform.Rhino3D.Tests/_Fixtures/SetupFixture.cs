@@ -85,7 +85,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         static void LoadLanguages()
         {
             Registrar.StartScripting();
-#if RC8_10
+#if RC8_11
             RhinoCode.ReportProgressToConsole = true;
 #else
             Registrar.SendReportsToConsole = true;

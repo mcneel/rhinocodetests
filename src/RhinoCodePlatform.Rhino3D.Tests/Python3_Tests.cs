@@ -14,7 +14,7 @@ using Rhino.Runtime.Code.Diagnostics;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Testing;
 
-#if RC8_10
+#if RC8_11
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
 #else
 using RhinoCodePlatform.Rhino3D.Languages;
