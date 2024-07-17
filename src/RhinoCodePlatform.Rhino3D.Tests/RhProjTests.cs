@@ -11,7 +11,7 @@ using Rhino.Runtime.Code.Storage;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
-#if RC8_10
+#if RC8_11
     [TestFixture]
     public class RhProjTests : ScriptFixture
     {

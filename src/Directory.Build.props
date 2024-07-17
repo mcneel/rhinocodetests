@@ -8,6 +8,7 @@
     <LangVersion>10</LangVersion>
     <IsPackable>false</IsPackable>
     <Nullable>disable</Nullable>
+    <NoWarn>NU1701;MSB3277</NoWarn>
 
     <RhinoSystemDirectory>$(MSBuildThisFileDirectory)..\..\..\..\bin\$(Configuration)</RhinoSystemDirectory>
     <RhinoPluginsDirectory>$(MSBuildThisFileDirectory)..\..\..\..\bin\$(Configuration)\Plug-ins</RhinoPluginsDirectory>
@@ -29,8 +30,7 @@
     <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
   </PropertyGroup>
 
-  <UsingTask TaskName="ExtractVersionParts" TaskFactory="RoslynCodeTaskFactory"
-    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+  <UsingTask TaskName="ExtractVersionParts" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
     <ParameterGroup>
       <AssemblyVersion Required="true" />
       <DefinedGuards Output="true" />
@@ -43,11 +43,14 @@
           var version = new Version(AssemblyVersion);
           int major = version.Major;
           int minor = version.Minor;
+          int maxMinor = 5 * 12; // 5 years of service releases
           
           var guards = new List<string>();
-          for(int i = 0; i<=minor; i++)
+          for(int ma = 8; ma<=major; ma++)
+          for(int mi = 0; mi<=maxMinor; mi++)
           {
-            guards.Add("RC" + major.ToString() + "_" + i.ToString());
+            if (ma == major && mi > minor) break;
+            guards.Add("RC" + ma.ToString() + "_" + mi.ToString());
           }
           
           DefinedGuards = string.Join(";", guards);
@@ -68,5 +71,9 @@
     <PropertyGroup>
       <DefineConstants>$(DefineConstants);$(RhinoDefinedGuards)</DefineConstants>
     </PropertyGroup>
+  </Target>
+
+  <Target Name="PrintInRhino" AfterTargets="DynamicallyDefineRhinoCommonGuards">
+    <Message Text="DefineConstants: $(RhinoDefinedGuards)" Importance="high" />
   </Target>
 </Project>
