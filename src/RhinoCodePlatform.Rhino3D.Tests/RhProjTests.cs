@@ -78,7 +78,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
             project.Build(s_host, new NUnitProgressReporter());
 
-            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "TestSingleComponent.gha")));
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "TestSingleComponent.Components.gha")));
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testsinglecomponent-0.1.1234.8888-rh8-any.yak")));
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
@@ -96,7 +96,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             project.Build(s_host, new NUnitProgressReporter());
 
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "TestRhino7Build.rhp")));
-            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "TestRhino7Build.gha")));
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "TestRhino7Build.Components.gha")));
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "testrhino7build-0.1.1234.8888-rh7-any.yak")));
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
@@ -114,7 +114,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             project.Build(s_host, new NUnitProgressReporter());
 
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "TestRhino7BuildWithImage.rhp")));
-            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "TestRhino7BuildWithImage.gha")));
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "TestRhino7BuildWithImage.Components.gha")));
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "testrhino7buildwithimage-0.1.1234.8888-rh7-any.yak")));
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
