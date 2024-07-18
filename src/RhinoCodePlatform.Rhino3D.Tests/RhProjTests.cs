@@ -156,7 +156,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 projectNoHost.Build(s_host, new SilentProgressReporter());
             });
 
-            Assert.IsTrue(ex.Message.Contains("Project file is saved on Rhino 8.9 or earlier. Please re-save the project in Rhino 8.10 or above"));
+            Assert.IsTrue(ex.Message.Contains("Project file is saved on Rhino 8.9 or earlier. Please re-save the project in Rhino 8.11 or above"));
         }
 
         [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestOldGH.rhproj" })]
@@ -169,7 +169,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 project.Build(s_host, new SilentProgressReporter());
             });
 
-            Assert.IsTrue(ex.Message.Contains("Grasshopper file is saved on Rhino 8.9 or earlier. Please re-save the file in Rhino 8.10 or above"));
+            Assert.IsTrue(ex.Message.Contains("Grasshopper file is saved on Rhino 8.9 or earlier. Please re-save the file in Rhino 8.11 or above"));
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
@@ -185,7 +185,10 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 project.Build(s_host, new SilentProgressReporter());
             });
 
-            Assert.IsTrue(ex.Message.Contains("Grasshopper legacy RH_IN/RH_OUT params are only supported on Rhino 8.10 or above"));
+            Assert.IsTrue(ex.Message.Contains("Grasshopper legacy RH_IN/RH_OUT params are only supported on Rhino 8.11 or above"));
+
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
 
         static readonly Host s_host = new("Rhino3D_TESTs", new Version(0, 1));
