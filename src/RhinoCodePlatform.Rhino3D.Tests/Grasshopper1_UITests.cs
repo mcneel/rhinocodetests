@@ -805,5 +805,60 @@ a = str(type(x))
             Assert.IsTrue(attribs.Pass);
         }
 #endif
+
+#if RC8_11
+        [Test]
+        public void TestGH1_Component_ParamsCollect_CSharp_InputNamedOutLine()
+        {
+            // RH-83087
+            // input parameter with name starting with 'out' or 'ref' should be recognized
+            // as input and not an output!
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
+
+            // change the script
+            script.Text = @"
+using System;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(int outline, int reference, ref Point3d w)
+    {
+    }
+}
+";
+
+            // collect parameters from RunScript and apply to component
+            script.ParamsCollect();
+
+            // assert inputs
+            ScriptParam[] inputs = script.Inputs.Select(i => i.CreateScriptParam()).ToArray();
+            Assert.True(inputs[0].Name == "outline");
+            Assert.True(inputs[0].ValueType.Name == "int");
+
+            Assert.True(inputs[1].Name == "reference");
+            Assert.True(inputs[1].ValueType.Name == "int");
+
+            // assert outputs
+            ScriptParam[] outputs = script.Outputs.Select(i => i.CreateScriptParam()).ToArray();
+            Assert.True(outputs[0].Name == "w");
+            Assert.True(outputs[0].ValueType.Name == "Point3d");
+
+            // assert param converters
+            IScriptParameter outline_param = script.Inputs.ElementAt(0);
+            IScriptParameter reference_param = script.Inputs.ElementAt(1);
+            IScriptParameter w_param = script.Outputs.ElementAt(0);
+
+            Assert.True(outline_param.Converter is LGH1.Converters.IntConverter);
+            Assert.True(reference_param.Converter is LGH1.Converters.IntConverter);
+            Assert.True(w_param.Converter is LGH1.Converters.Point3dConverter);
+        }
+
+#endif
     }
 }
