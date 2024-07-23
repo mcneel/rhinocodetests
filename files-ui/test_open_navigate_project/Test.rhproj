@@ -1,7 +1,7 @@
 {
   "host": {
     "name": "Rhino3D",
-    "version": "8.10.24190\u002B1000",
+    "version": "8.11.24205\u002B1000",
     "os": "windows",
     "arch": "x64"
   },
@@ -195,6 +195,15 @@
           "subcat": "Default"
         }
       ]
+    },
+    {
+      "id": "b30ad43a-4f58-4dc4-b23b-046c2d1c489a",
+      "language": {
+        "id": "*.*.python",
+        "version": "3.*.*"
+      },
+      "title": "TestAsync",
+      "uri": "TestAsync.py"
     }
   ]
 }
