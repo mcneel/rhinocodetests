@@ -1,0 +1,56 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.10.24194\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "264884e7-ce04-44fc-a897-7a3a8019c9b0",
+  "identity": {
+    "name": "TestRhino7BuildWithExcludedComponent",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "testRhino7BuildWithExcludedComponent/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "7"
+      },
+      "title": "Rhino3D (7.*)",
+      "slug": "rh7"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "type": "components",
+      "id": "eaddc170-fe12-407e-ade4-5fabcec0e287",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "components_r7.ghx",
+      "uri": "components_r7.ghx",
+      "scripts": [
+        {
+          "id": "f071defa-a515-4e87-96fd-9e1a37970d10",
+          "name": "First",
+          "nickname": "First",
+          "subcat": "Default",
+          "exposure": "excluded"
+        }
+      ]
+    }
+  ]
+}
