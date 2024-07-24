@@ -1,0 +1,56 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.11.24206\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "6732f10a-99dc-4ec3-8912-6252b4a85d85",
+  "identity": {
+    "name": "TestRhino7BuildWithExcluded",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "testRhino7BuildWithExcluded/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "7"
+      },
+      "title": "Rhino3D (7.*)",
+      "slug": "rh7"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "98265848-73a6-46a4-8f88-dd3d36569be0",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "command_r7",
+      "uri": "command_r7.ghx"
+    },
+    {
+      "id": "e1321408-19bc-4648-9f76-7a9d4a01ed3c",
+      "language": {
+        "id": "*.*.python",
+        "version": "2.*.*"
+      },
+      "title": "command_r7",
+      "uri": "command_r7.py2",
+      "exposure": "exclude"
+    }
+  ]
+}
