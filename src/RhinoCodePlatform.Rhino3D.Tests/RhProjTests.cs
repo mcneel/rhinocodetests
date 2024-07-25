@@ -9,11 +9,11 @@ using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Platform;
 using Rhino.Runtime.Code.Projects;
+using Rhino.Runtime.Code.Diagnostics;
 using Rhino.Runtime.Code.Storage;
 
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using RhinoCodePlatform.Projects;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -24,36 +24,153 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestSingle.rhproj" })]
         public void TestRhProj_Read_Identity(string rhprojfile)
         {
-            IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+            IProject project;
 
-            Assert.AreEqual("TestSingle", project.Identity.Name);
-            Assert.AreEqual(new ProjectVersion(0, 1), project.Identity.Version);
-            Assert.AreEqual("ehsan@mcneel.com", project.Identity.Publisher.Email);
-            Assert.AreEqual("MIT", project.Identity.License);
+            void assert()
+            {
+                Assert.AreEqual("TestSingle", project.Identity.Name);
+                Assert.AreEqual(new ProjectVersion(0, 1), project.Identity.Version);
+                Assert.AreEqual("ehsan@mcneel.com", project.Identity.Publisher.Email);
+                Assert.AreEqual("MIT", project.Identity.License);
+            }
+
+            project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+            assert();
+
+            IStorage storage = RhinoCode.StorageSites.CreateStorage(new Uri(rhprojfile));
+            project = new Testing.ProjectReaderServer().CreateProject(storage);
+            assert();
         }
 
         [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestSingle.rhproj" })]
         public void TestRhProj_Read_Settings(string rhprojfile)
         {
-            IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+            IProject project;
 
-            Assert.AreEqual("testSingle/", project.Settings.BuildPath.ToString());
-            Assert.AreEqual("Rhino3D (8.*)", project.Settings.BuildTarget.Title);
-            Assert.AreEqual("McNeel Yak Server", project.Settings.PublishTarget.Title);
+            void assert()
+            {
+                Assert.AreEqual("testSingle/", project.Settings.BuildPath.ToString());
+                Assert.AreEqual("Rhino3D (8.*)", project.Settings.BuildTarget.Title);
+                Assert.AreEqual("McNeel Yak Server", project.Settings.PublishTarget.Title);
+            }
+
+            project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+            assert();
+
+            IStorage storage = RhinoCode.StorageSites.CreateStorage(new Uri(rhprojfile));
+            project = new Testing.ProjectReaderServer().CreateProject(storage);
+            assert();
         }
 
         [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestSingle.rhproj" })]
         public void TestRhProj_Read_Codes(string rhprojfile)
         {
+            IProject project;
+
+            void assert()
+            {
+                Assert.IsNotEmpty(project.Codes);
+
+                ProjectCode code = project.Codes.First();
+                Assert.AreEqual(new Guid("a55c3fa8-6202-45c1-8d79-e3641411fc18"), code.Id);
+                Assert.AreEqual(LanguageSpec.Python, code.LanguageSpec);
+                Assert.AreEqual("command", code.Title);
+                Assert.IsTrue(code.Uri.IsAbsoluteUri);
+            }
+
+            project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+            assert();
+
+            IStorage storage = RhinoCode.StorageSites.CreateStorage(new Uri(rhprojfile));
+            project = new Testing.ProjectReaderServer().CreateProject(storage);
+            assert();
+        }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestMissing.rhproj" })]
+        public void TestRhProj_Read_Missing(string rhprojfile)
+        {
+            IProject project;
+
+            void assert()
+            {
+                foreach (ProjectPath path in project.Paths)
+                    foreach (ProjectCode code in project[path])
+                    {
+                        code.TryGetErrors(out DiagnosticSet diags);
+                        Assert.IsNotEmpty(diags);
+                        Assert.AreEqual("Script file is missing", diags.First().Message);
+                    }
+            }
+
+            project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+            assert();
+
+            IStorage storage = RhinoCode.StorageSites.CreateStorage(new Uri(rhprojfile));
+            project = new Testing.ProjectReaderServer().CreateProject(storage);
+            assert();
+        }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestMissing.rhproj" })]
+        public void TestRhProj_Read_MissingUI(string rhprojfile)
+        {
+            // NOTE:
+            // not using ProjectReaderServer here since projects read using
+            // ProjectReaderServer do not report Commands/ and Components/ paths
             IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
 
-            Assert.IsNotEmpty(project.Codes);
+            var ghPathId = new Guid("9A92B0F4-AC5E-4116-A5AF-17C3BA99B5A8");
+            foreach (ProjectPath path in project.Paths)
+            {
+                bool testedGHPath = false;
+                IProjectShelf shelf = project.Traverse(path);
+                foreach (ProjectPath shelfPath in shelf.Paths)
+                {
+                    if (shelfPath.Id == ghPathId)
+                    {
+                        IProjectShelf ghShelf = project.Traverse(shelfPath);
+                        foreach (ProjectPath ghSource in ghShelf.Paths)
+                        {
+                            ghSource.TryGetErrors(out DiagnosticSet diags);
+                            Assert.IsNotEmpty(diags);
+                            Assert.AreEqual("Grasshopper file is missing", diags.First().Message);
+                        }
+                        testedGHPath = true;
+                    }
+                }
 
-            ProjectCode code = project.Codes.First();
+                Assert.IsTrue(testedGHPath);
+
+                foreach (ProjectCode code in shelf.Codes)
+                {
+                    code.TryGetErrors(out DiagnosticSet diags);
+                    Assert.IsNotEmpty(diags);
+                    Assert.AreEqual("Script file is missing", diags.First().Message);
+                }
+            }
+        }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestUnsupported.rhproj" })]
+        public void TestRhProj_Read_Unsupported(string rhprojfile)
+        {
+            // NOTE:
+            // not using ProjectReaderServer here since the exposure updates
+            // on editable projects for ui only. projects read using ProjectReaderServer
+            // will throw a build exception instead
+            IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+
+            ProjectCode code;
+
+            code = project.Codes.First();
             Assert.AreEqual(new Guid("a55c3fa8-6202-45c1-8d79-e3641411fc18"), code.Id);
             Assert.AreEqual(LanguageSpec.Python, code.LanguageSpec);
-            Assert.AreEqual("command", code.Title);
-            Assert.IsTrue(code.Uri.IsAbsoluteUri);
+            Assert.AreEqual(ProjectCodeExposure.Expose, code.Exposure);
+
+            project.Settings.BuildTarget = new ProjectBuildTarget("Rhino3D_TESTs", new HostVersionSpec("7.*"));
+
+            // under current implementation, after changing build target,
+            // project updates code exposure when codes are queried again
+            ProjectCode _ = project.Codes.First();
+            Assert.AreEqual(ProjectCodeExposure.ExcludeUnsupported, code.Exposure);
         }
 
         [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestSingle.rhproj" })]
@@ -467,7 +584,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 if (inst.OpCode == OpCodes.Stsfld && ((FieldReference)inst.Operand).Name == "s_projectData")
                 {
                     string encrypted = (string)inst.Previous.Operand;
-                    project = Rhino3DProject.DecryptProject<Rhino3DProject>(encrypted);
+                    project = RhinoCodePlatform.Projects.Rhino3DProject.DecryptProject<RhinoCodePlatform.Projects.Rhino3DProject>(encrypted);
                     return true;
                 }
                 inst = inst.Next;
