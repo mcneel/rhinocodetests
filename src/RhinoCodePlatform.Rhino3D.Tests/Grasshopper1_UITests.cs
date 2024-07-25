@@ -376,7 +376,7 @@ public class Script_Instance : GH_ScriptInstance
         a = default;
     }
 }
-", updatedText);
+", EnsureCRLF(updatedText));
             // assert inputs
             ScriptParam[] inputs = script.Inputs.Select(i => i.CreateScriptParam()).ToArray();
             Assert.True(inputs[0].Name == "x");
@@ -906,7 +906,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
             u: Grasshopper.DataTree[object],
             v: System.Collections.Generic.List[object]):
         return
-", script.Text);
+", EnsureCRLF(script.Text));
 
             component.Params.RegisterInputParam(new GHP.Parameters.ScriptVariableParam("w"));
             ((IGH_VariableParameterComponent)component).VariableParameterMaintenance();
@@ -927,7 +927,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
             v: System.Collections.Generic.List[object],
             w):
         return
-", script.Text);
+", EnsureCRLF(script.Text));
         }
 
         [Test]
@@ -981,8 +981,10 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
             u: Grasshopper.DataTree[object],
             v: System.Collections.Generic.List[object]):
         return
-", script.Text);
+", EnsureCRLF(script.Text));
         }
 #endif
+
+        static string EnsureCRLF(string input) => input.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
     }
 }
