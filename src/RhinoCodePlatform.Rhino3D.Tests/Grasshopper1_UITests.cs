@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using NUnit.Framework;
 
@@ -21,9 +22,9 @@ using IScriptParameter = RhinoCodePlatform.Rhino3D.GH.IScriptVariable;
 #endif
 
 using RhinoCodePlatform.Rhino3D.Testing;
+using RhinoCodePlatform.Rhino3D.Languages.GH1;
 
 using GHP = RhinoCodePluginGH;
-using System.Text.RegularExpressions;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -859,6 +860,129 @@ public class Script_Instance : GH_ScriptInstance
             Assert.True(w_param.Converter is LGH1.Converters.Point3dConverter);
         }
 
+        [Test]
+        public void TestGH1_Component_ParamsCollect_Python3_Multiline()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83124
+            IScriptObject script = GHP.Components.Python3Component.Create("Test", @"
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self, x, y):
+        return
+") as IScriptObject;
+
+            // build so there is a code to apply params to
+            script.ReBuild();
+
+            IGH_Component component = (IGH_Component)script;
+            // create a few long parameters to push RunScript signature to become multiline
+            // zui calls .VariableParameterMaintenance this automatically when parameter is added
+            component.Params.RegisterInputParam(new GHP.Parameters.ScriptVariableParam("z") { Access = GH_ParamAccess.list });
+            ((IGH_VariableParameterComponent)component).VariableParameterMaintenance();
+
+            component.Params.RegisterInputParam(new GHP.Parameters.ScriptVariableParam("u") { Access = GH_ParamAccess.tree });
+            ((IGH_VariableParameterComponent)component).VariableParameterMaintenance();
+
+            component.Params.RegisterInputParam(new GHP.Parameters.ScriptVariableParam("v") { Access = GH_ParamAccess.list });
+            ((IGH_VariableParameterComponent)component).VariableParameterMaintenance();
+
+            Assert.AreEqual(@"
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self,
+            x,
+            y,
+            z: System.Collections.Generic.List[object],
+            u: Grasshopper.DataTree[object],
+            v: System.Collections.Generic.List[object]):
+        return
+", script.Text);
+
+            component.Params.RegisterInputParam(new GHP.Parameters.ScriptVariableParam("w"));
+            ((IGH_VariableParameterComponent)component).VariableParameterMaintenance();
+
+            Assert.AreEqual(@"
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self,
+            x,
+            y,
+            z: System.Collections.Generic.List[object],
+            u: Grasshopper.DataTree[object],
+            v: System.Collections.Generic.List[object],
+            w):
+        return
+", script.Text);
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsCollect_Python3_Multiline_ConvertToScriptInstance()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83124
+            IScriptObject script = GHP.Components.Python3Component.Create("Test", @"
+
+") as IScriptObject;
+
+            // build so there is a code to apply params to
+            script.ReBuild();
+
+            IGH_Component component = (IGH_Component)script;
+            // create a few long parameters to push RunScript signature to become multiline
+            component.Params.RegisterInputParam(new GHP.Parameters.ScriptVariableParam("z") { Access = GH_ParamAccess.list });
+            component.Params.RegisterInputParam(new GHP.Parameters.ScriptVariableParam("u") { Access = GH_ParamAccess.tree });
+            component.Params.RegisterInputParam(new GHP.Parameters.ScriptVariableParam("v") { Access = GH_ParamAccess.list });
+
+            // zui calls this automatically when parameter is added
+            ((IGH_VariableParameterComponent)component).VariableParameterMaintenance();
+
+            script.Text = @"
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self, x, y):
+        return
+";
+
+            // build so there is a code to apply params to
+            script.ReBuild();
+            script.ParamsApply();
+
+            Assert.AreEqual(@"
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self,
+            x,
+            y,
+            z: System.Collections.Generic.List[object],
+            u: Grasshopper.DataTree[object],
+            v: System.Collections.Generic.List[object]):
+        return
+", script.Text);
+        }
 #endif
     }
 }
