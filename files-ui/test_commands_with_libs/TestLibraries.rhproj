@@ -1,0 +1,96 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.11.24206\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "d1c24497-5cd8-4b7e-a219-3e84c2deaea3",
+  "identity": {
+    "name": "TestLibraries",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "testLibraries/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "8"
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "8593d933-f831-49ca-a575-70e26f81fd91",
+      "language": {
+        "id": "*.*.csharp",
+        "version": "*.*.*"
+      },
+      "title": "TestCLibrary",
+      "uri": "TestC#Library.cs"
+    },
+    {
+      "id": "6ba4d493-b96a-405f-9c0a-59126cc06777",
+      "language": {
+        "id": "*.*.python",
+        "version": "3.*.*"
+      },
+      "title": "TestPython3Library",
+      "uri": "TestPython3Library.py"
+    },
+    {
+      "id": "abd279e8-7672-429c-9033-10dc87f4af2f",
+      "language": {
+        "id": "*.*.python",
+        "version": "2.*.*"
+      },
+      "title": "TestPython2Library",
+      "uri": "TestPython2Library.py"
+    }
+  ],
+  "libraries": [
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///C:/Users/ein/gits/rhinocodetests/files/rhproj/libraries/TestAssembly/",
+        "language": {
+          "id": "*.*.csharp",
+          "version": "*.*.*"
+        }
+      }
+    },
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///C:/Users/ein/gits/rhinocodetests/files/rhproj/libraries/testmodule/",
+        "language": {
+          "id": "*.*.python",
+          "version": "3.*.*"
+        }
+      }
+    },
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///C:/Users/ein/gits/rhinocodetests/files/rhproj/libraries/testipymodule/",
+        "language": {
+          "id": "*.*.python",
+          "version": "2.*.*"
+        }
+      }
+    }
+  ]
+}

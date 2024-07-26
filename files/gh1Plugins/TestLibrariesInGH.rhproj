@@ -1,0 +1,79 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.11.24206\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "d1c24497-5cd8-4b7e-a219-3e84c2deaea3",
+  "identity": {
+    "name": "TestLibrariesInGH",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "testLibrariesInGH/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "8"
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "type": "components",
+      "id": "e9d2b530-f6fc-45c1-8817-476a87163622",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "ComponentsWithLibraries.ghx",
+      "uri": "ComponentsWithLibraries.ghx"
+    }
+  ],
+  "libraries": [
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///C:/Users/ein/gits/rhinocodetests/files/rhproj/libraries/TestAssembly/",
+        "language": {
+          "id": "*.*.csharp",
+          "version": "*.*.*"
+        }
+      }
+    },
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///C:/Users/ein/gits/rhinocodetests/files/rhproj/libraries/testmodule/",
+        "language": {
+          "id": "*.*.python",
+          "version": "3.*.*"
+        }
+      }
+    },
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///C:/Users/ein/gits/rhinocodetests/files/rhproj/libraries/testipymodule/",
+        "language": {
+          "id": "*.*.python",
+          "version": "2.*.*"
+        }
+      }
+    }
+  ]
+}
