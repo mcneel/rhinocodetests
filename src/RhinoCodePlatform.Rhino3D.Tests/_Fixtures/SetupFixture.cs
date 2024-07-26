@@ -109,6 +109,13 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                     }
                 }
             }
+
+            string libsCache = RhinoCode.Stage.LanguageLibraries.Directory;
+            if (Directory.Exists(libsCache))
+            {
+                Directory.Delete(libsCache, true);
+                Directory.CreateDirectory(libsCache);
+            }
         }
 
         static void LoadGrasshopperPlugins()
