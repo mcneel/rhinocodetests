@@ -77,7 +77,11 @@ void DoStuff(int s)
             }
             catch (CompileException ex)
             {
+#if RC8_11
+                if (ex.Diagnosis.First().Reference.Position.LineNumber != 4)
+#else
                 if (ex.Diagnostics.First().Reference.Position.LineNumber != 4)
+#endif
                     throw;
             }
         }

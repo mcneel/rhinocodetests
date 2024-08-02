@@ -96,7 +96,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 foreach (ProjectPath path in project.Paths)
                     foreach (ProjectCode code in project[path])
                     {
-                        code.TryGetErrors(out DiagnosticSet diags);
+                        code.TryDiagnose(out Diagnosis diags);
                         Assert.IsNotEmpty(diags);
                         Assert.AreEqual("Script file is missing", diags.First().Message);
                     }
@@ -130,7 +130,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                         IProjectShelf ghShelf = project.Traverse(shelfPath);
                         foreach (ProjectPath ghSource in ghShelf.Paths)
                         {
-                            ghSource.TryGetErrors(out DiagnosticSet diags);
+                            ghSource.TryDiagnose(out Diagnosis diags);
                             Assert.IsNotEmpty(diags);
                             Assert.AreEqual("Grasshopper file is missing", diags.First().Message);
                         }
@@ -142,7 +142,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
                 foreach (ProjectCode code in shelf.Codes)
                 {
-                    code.TryGetErrors(out DiagnosticSet diags);
+                    code.TryDiagnose(out Diagnosis diags);
                     Assert.IsNotEmpty(diags);
                     Assert.AreEqual("Script file is missing", diags.First().Message);
                 }
