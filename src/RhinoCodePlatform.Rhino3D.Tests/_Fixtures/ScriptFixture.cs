@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
+using Rhino.Runtime.Code.Diagnostics;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -118,7 +119,11 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 if (scriptInfo.ExpectsError || scriptInfo.ExpectsWarning)
                 {
                     if (runEx.InnerException is CompileException compileEx)
+#if RC8_11
+                        errorMessage = compileEx.Diagnosis.ToString();
+#else
                         errorMessage = compileEx.Diagnostics.ToString();
+#endif
                     else
                         errorMessage = runEx.Message;
                 }

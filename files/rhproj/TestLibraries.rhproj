@@ -65,7 +65,7 @@
     {
       "type": "uri",
       "library": {
-        "base": "file:///C:/Users/ein/gits/rhinocodetests/files/rhproj/libraries/TestAssembly/",
+        "base": "libraries/TestAssembly/",
         "language": {
           "id": "*.*.csharp",
           "version": "*.*.*"
@@ -75,7 +75,7 @@
     {
       "type": "uri",
       "library": {
-        "base": "file:///C:/Users/ein/gits/rhinocodetests/files/rhproj/libraries/testmodule/",
+        "base": "libraries/testmodule/",
         "language": {
           "id": "*.*.python",
           "version": "3.*.*"
@@ -85,7 +85,7 @@
     {
       "type": "uri",
       "library": {
-        "base": "file:///C:/Users/ein/gits/rhinocodetests/files/rhproj/libraries/testipymodule/",
+        "base": "libraries/testipymodule/",
         "language": {
           "id": "*.*.python",
           "version": "2.*.*"

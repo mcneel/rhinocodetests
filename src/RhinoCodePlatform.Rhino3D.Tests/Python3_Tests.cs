@@ -63,7 +63,11 @@ return
             }
             catch (CompileException ex)
             {
+#if RC8_11
+                if (ex.Diagnosis.First().Reference.Position.LineNumber != 6)
+#else
                 if (ex.Diagnostics.First().Reference.Position.LineNumber != 6)
+#endif
                     throw;
             }
         }
