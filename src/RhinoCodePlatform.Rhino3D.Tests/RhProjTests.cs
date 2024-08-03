@@ -69,9 +69,9 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             void assert()
             {
-                Assert.IsNotEmpty(project.Codes);
+                Assert.IsNotEmpty(project.GetCodes());
 
-                ProjectCode code = project.Codes.First();
+                ProjectCode code = project.GetCodes().First();
                 Assert.AreEqual(new Guid("a55c3fa8-6202-45c1-8d79-e3641411fc18"), code.Id);
                 Assert.AreEqual(LanguageSpec.Python, code.LanguageSpec);
                 Assert.AreEqual("command", code.Title);
@@ -93,8 +93,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             void assert()
             {
-                foreach (ProjectPath path in project.Paths)
-                    foreach (ProjectCode code in project[path])
+                foreach (ProjectPath path in project.GetPaths())
+                    foreach (ProjectCode code in project.GetCodes(path))
                     {
                         code.TryDiagnose(out Diagnosis diags);
                         Assert.IsNotEmpty(diags);
@@ -119,16 +119,17 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
 
             var ghPathId = new Guid("9A92B0F4-AC5E-4116-A5AF-17C3BA99B5A8");
-            foreach (ProjectPath path in project.Paths)
+            foreach (ProjectPath path in project.GetPaths())
             {
                 bool testedGHPath = false;
                 IProjectShelf shelf = project.Traverse(path);
-                foreach (ProjectPath shelfPath in shelf.Paths)
+                foreach (ProjectPath shelfPath in shelf.GetPaths())
                 {
                     if (shelfPath.Id == ghPathId)
                     {
                         IProjectShelf ghShelf = project.Traverse(shelfPath);
-                        foreach (ProjectPath ghSource in ghShelf.Paths)
+                        Assert.IsNotEmpty(ghShelf.GetPaths());
+                        foreach (ProjectPath ghSource in ghShelf.GetPaths())
                         {
                             ghSource.TryDiagnose(out Diagnosis diags);
                             Assert.IsNotEmpty(diags);
@@ -140,7 +141,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
                 Assert.IsTrue(testedGHPath);
 
-                foreach (ProjectCode code in shelf.Codes)
+                foreach (ProjectCode code in shelf.GetCodes())
                 {
                     code.TryDiagnose(out Diagnosis diags);
                     Assert.IsNotEmpty(diags);
@@ -160,7 +161,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             ProjectCode code;
 
-            code = project.Codes.First();
+            code = project.GetCodes().First();
             Assert.AreEqual(new Guid("a55c3fa8-6202-45c1-8d79-e3641411fc18"), code.Id);
             Assert.AreEqual(LanguageSpec.Python, code.LanguageSpec);
             Assert.AreEqual(ProjectCodeExposure.Expose, code.Exposure);
@@ -169,7 +170,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             // under current implementation, after changing build target,
             // project updates code exposure when codes are queried again
-            ProjectCode _ = project.Codes.First();
+            ProjectCode _ = project.GetCodes().First();
             Assert.AreEqual(ProjectCodeExposure.ExcludeUnsupported, code.Exposure);
         }
 
@@ -306,15 +307,15 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             ILanguageLibrary csm = rhpProj.Libraries.First(l => l.Name == "TestAssembly" && LanguageSpec.CSharp.Matches(l.LanguageSpec));
             Assert.IsNotNull(csm);
-            Assert.IsNotNull(csm.Codes.First(c => c.Title == "Math.cs"));
+            Assert.IsNotNull(csm.GetCodes().First(c => c.Title == "Math.cs"));
 
             ILanguageLibrary py3m = rhpProj.Libraries.First(l => l.Name == "testmodule" && LanguageSpec.Python3.Matches(l.LanguageSpec));
             Assert.IsNotNull(py3m);
-            Assert.IsNotNull(py3m.Codes.First(c => c.Title == "riazi.py"));
+            Assert.IsNotNull(py3m.GetCodes().First(c => c.Title == "riazi.py"));
 
             ILanguageLibrary py2m = rhpProj.Libraries.First(l => l.Name == "testipymodule" && LanguageSpec.Python2.Matches(l.LanguageSpec));
             Assert.IsNotNull(py2m);
-            Assert.IsNotNull(py2m.Codes.First(c => c.Title == "someData.json"));
+            Assert.IsNotNull(py2m.GetCodes().First(c => c.Title == "someData.json"));
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }

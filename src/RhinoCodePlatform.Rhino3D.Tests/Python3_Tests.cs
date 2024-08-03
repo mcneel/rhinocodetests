@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -13,6 +14,7 @@ using Rhino.Runtime.Code.Environments;
 using Rhino.Runtime.Code.Diagnostics;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Testing;
+
 
 #if RC8_11
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
@@ -1786,6 +1788,30 @@ Rhino.Input.RhinoGet.GetOneObject(op.dirname(""test""),");
         }
 #endif
 
+#if RC8_11
+        [Test]
+        public void TestPython3_Library()
+        {
+            ILanguage python3 = GetLanguage(this, LanguageSpec.Python3);
+
+            TryGetTestFilesPath(out string fileDir);
+            LanguageLibrary library = python3.CreateLibrary(new Uri(Path.Combine(fileDir, "py3", "test_library")));
+
+            ICode code;
+
+            var utils = new LibraryPath(new Uri("utils/", UriKind.Relative));
+            Assert.IsNotEmpty(library.GetCodes(utils));
+
+            code = library.GetCodes().First(c => c.Title == "__init__.py");
+            Assert.IsTrue(LanguageSpec.Python3.Matches(code.LanguageSpec));
+
+            code = library.GetCodes().First(c => c.Title == "riazi.py");
+            Assert.IsTrue(LanguageSpec.Python3.Matches(code.LanguageSpec));
+
+            code = library.GetCodes().First(c => c.Title == "someData.json");
+            Assert.IsTrue(LanguageSpec.JSON.Matches(code.LanguageSpec));
+        }
+#endif
         static DiagnoseOptions s_errorsOnly = new() { Errors = true, Hints = false, Infos = false, Warnings = false };
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py3\", "test_*.py");
     }
