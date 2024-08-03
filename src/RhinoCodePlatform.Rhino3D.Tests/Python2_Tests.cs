@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -986,6 +987,28 @@ Rhino.Input.RhinoGet.GetOneObject( (1,2,3), ");
 
             sig = signatures.ElementAt(1);
             Assert.AreEqual(1, sig.ParameterIndex);
+        }
+#endif
+
+#if RC8_11
+        [Test]
+        public void TestPython2_Library()
+        {
+            ILanguage python2 = GetLanguage(this, LanguageSpec.Python2);
+
+            TryGetTestFilesPath(out string fileDir);
+            LanguageLibrary library = python2.CreateLibrary(new Uri(Path.Combine(fileDir, "py2", "test_library")));
+
+            ICode code;
+
+            code = library.GetCodes().First(c => c.Title == "__init__.py");
+            Assert.IsTrue(LanguageSpec.Python2.Matches(code.LanguageSpec));
+
+            code = library.GetCodes().First(c => c.Title == "riazi.py");
+            Assert.IsTrue(LanguageSpec.Python2.Matches(code.LanguageSpec));
+
+            code = library.GetCodes().First(c => c.Title == "someData.json");
+            Assert.IsTrue(LanguageSpec.JSON.Matches(code.LanguageSpec));
         }
 #endif
 
