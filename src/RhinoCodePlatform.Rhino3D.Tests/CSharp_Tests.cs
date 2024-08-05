@@ -395,7 +395,7 @@ public class Script_Instance
 
 #if RC8_9
         [Test]
-        public void TestCSharp_DebugPauses_Script_StepOut()
+        public void TestCSharp_DebugPauses_Script_StepOver()
         {
             Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
 @"
@@ -418,9 +418,29 @@ First();
             code.Debug(new DebugContext());
 
             Assert.True(controls.Pass);
+        }
 
-            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOver);
+        [Test]
+        public void TestCSharp_DebugPauses_Script_StepOut()
+        {
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+void Pass() {}
+void First()
+{
+    Pass(); // line 6
+    Pass(); // line 7
+}
 
+First();
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOut);
+            controls.DoNotExpectPause(new CodeReferenceBreakpoint(code, 7));
+
+            code.DebugControls = controls;
             code.Debug(new DebugContext());
 
             Assert.True(controls.Pass);
@@ -990,6 +1010,38 @@ public class Script_Instance : GH_ScriptInstance
             LanguageLibrary library = csharp.CreateLibrary(new Uri(Path.Combine(fileDir, "cs", "test_library")));
 
             Assert.True(library.GetCodes().All(c => LanguageSpec.CSharp.Matches(c.LanguageSpec)));
+        }
+
+        [Test]
+        public void TestCSharp_DebugDisconnects()
+        {
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+void Test(int v) { value = v; return; }
+void First()
+{
+    Test(0);  // line 6
+    Test(42); // line 7
+}
+
+First();
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.Disconnect);
+            controls.DoNotExpectPause(new CodeReferenceBreakpoint(code, 7));
+
+            var ctx = new DebugContext
+            {
+                AutoApplyParams = true,
+                Outputs = { ["value"] = default }
+            };
+            code.DebugControls = controls;
+            code.Debug(ctx);
+
+            Assert.True(controls.Pass);
+            Assert.IsTrue(ctx.Outputs.Get<int>("value") == 42);
         }
 #endif
 

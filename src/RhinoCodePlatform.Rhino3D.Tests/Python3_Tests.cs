@@ -702,7 +702,7 @@ result = sys.stderr is not None
         }
 
         [Test]
-        public void TestPython3_DebugPauses_Script_StepOut()
+        public void TestPython3_DebugPauses_Script_StepOver()
         {
             // python 3 debugger does not stop on 'pass' statements
             // so using Test() instead
@@ -726,9 +726,30 @@ First()
             code.Debug(new DebugContext());
 
             Assert.True(controls.Pass);
+        }
 
-            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOver);
+        [Test]
+        public void TestPython3_DebugPauses_Script_StepOut()
+        {
+            // python 3 debugger does not stop on 'pass' statements
+            // so using Test() instead
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+def Test():
+    pass
 
+def First():
+    Test() # line 6
+    Test() # line 7
+
+First()
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOut);
+            controls.DoNotExpectPause(new CodeReferenceBreakpoint(code, 7));
+
+            code.DebugControls = controls;
             code.Debug(new DebugContext());
 
             Assert.True(controls.Pass);
@@ -1810,6 +1831,41 @@ Rhino.Input.RhinoGet.GetOneObject(op.dirname(""test""),");
 
             code = library.GetCodes().First(c => c.Title == "someData.json");
             Assert.IsTrue(LanguageSpec.JSON.Matches(code.LanguageSpec));
+        }
+
+        [Test]
+        public void TestPython3_DebugDisconnects()
+        {
+            // python 3 debugger does not stop on 'pass' statements
+            // so using Test() instead
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+value = None
+def Test(v):
+    global value
+    value = v
+
+def First():
+    Test(0) # line 8
+    Test(42) # line 9
+
+First()
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 8), DebugAction.Disconnect);
+            controls.DoNotExpectPause(new CodeReferenceBreakpoint(code, 9));
+
+            var ctx = new DebugContext
+            {
+                AutoApplyParams = true,
+                Outputs = { ["value"] = default }
+            };
+            code.DebugControls = controls;
+            code.Debug(ctx);
+
+            Assert.True(controls.Pass);
+            Assert.IsTrue(ctx.Outputs.Get<int>("value") == 42);
         }
 #endif
         static DiagnoseOptions s_errorsOnly = new() { Errors = true, Hints = false, Infos = false, Warnings = false };
