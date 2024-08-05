@@ -110,7 +110,7 @@ print(sys)  # line 3
 
 #if RC8_9
         [Test]
-        public void TestPython2_DebugPauses_Script_StepOut()
+        public void TestPython2_DebugPauses_Script_StepOver()
         {
             Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
 @"
@@ -129,9 +129,25 @@ First()
             code.Debug(new DebugContext());
 
             Assert.True(controls.Pass);
+        }
 
-            controls.ExpectPause(new CodeReferenceBreakpoint(code, 6), DebugAction.StepOver);
+        [Test]
+        public void TestPython2_DebugPauses_Script_StepOut()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+@"
+def First():
+    pass # line 3
+    pass # line 4
 
+First()
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 3), DebugAction.StepOut);
+            controls.DoNotExpectPause(new CodeReferenceBreakpoint(code, 4));
+
+            code.DebugControls = controls;
             code.Debug(new DebugContext());
 
             Assert.True(controls.Pass);
@@ -1009,6 +1025,39 @@ Rhino.Input.RhinoGet.GetOneObject( (1,2,3), ");
 
             code = library.GetCodes().First(c => c.Title == "someData.json");
             Assert.IsTrue(LanguageSpec.JSON.Matches(code.LanguageSpec));
+        }
+
+        [Test]
+        public void TestPython2_DebugDisconnects()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+@"
+value = None
+def Test(v):
+    global value
+    value = v
+
+def First():
+    Test(0) # line 8
+    Test(42) # line 9
+
+First()
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 8), DebugAction.Disconnect);
+            controls.DoNotExpectPause(new CodeReferenceBreakpoint(code, 9));
+
+            var ctx = new DebugContext
+            {
+                AutoApplyParams = true,
+                Outputs = { ["value"] = default }
+            };
+            code.DebugControls = controls;
+            code.Debug(ctx);
+
+            Assert.True(controls.Pass);
+            Assert.IsTrue(ctx.Outputs.Get<int>("value") == 42);
         }
 #endif
 
