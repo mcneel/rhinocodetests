@@ -1030,6 +1030,7 @@ Rhino.Input.RhinoGet.GetOneObject( (1,2,3), ");
         [Test]
         public void TestPython2_DebugDisconnects()
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83214
             Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
 @"
 value = None

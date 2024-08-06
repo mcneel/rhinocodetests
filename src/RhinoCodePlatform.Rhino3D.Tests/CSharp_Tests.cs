@@ -1015,6 +1015,7 @@ public class Script_Instance : GH_ScriptInstance
         [Test]
         public void TestCSharp_DebugDisconnects()
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83214
             Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
 @"
 using System;
@@ -1042,6 +1043,24 @@ First();
 
             Assert.True(controls.Pass);
             Assert.IsTrue(ctx.Outputs.Get<int>("value") == 42);
+        }
+
+        [Test]
+        public void TestCSharp_DebugTracer_VoidLambda()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83216
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+int value = 0;
+
+void Test(int v) => value = v;
+
+Test(42);
+");
+
+            code.DebugControls = new DebugContinueAllControls();
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
         }
 #endif
 

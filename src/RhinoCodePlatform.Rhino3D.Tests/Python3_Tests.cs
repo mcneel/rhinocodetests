@@ -1836,6 +1836,7 @@ Rhino.Input.RhinoGet.GetOneObject(op.dirname(""test""),");
         [Test]
         public void TestPython3_DebugDisconnects()
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83214
             // python 3 debugger does not stop on 'pass' statements
             // so using Test() instead
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
