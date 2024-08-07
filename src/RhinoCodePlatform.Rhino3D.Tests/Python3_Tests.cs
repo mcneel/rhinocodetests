@@ -1902,6 +1902,167 @@ b = torusB.IsValid
             Assert.IsTrue(ctx.Outputs.Get<bool>("a"));
             Assert.IsTrue(ctx.Outputs.Get<bool>("b"));
         }
+
+        [Test]
+        public void TestPython3_ScriptInstance_Convert_IndentWhiteSpace()
+        {
+            const string P = "#";
+            var script = new Grasshopper1Script($@"
+{P}! python 3
+""""""Grasshopper Script""""""
+a = ""Hello Python 3 in Grasshopper!""
+print(a)
+
+");
+
+            // NOTE:
+            // force whitespace indentation when converting to scriptinstance
+            script.ConvertToScriptInstance(addSolve: false, addPreview: false, new FormatOptions { IndentWithSpaces = true });
+
+            // NOTE:
+            // no params are defined so RunScript() is empty
+            Assert.AreEqual(@"#! python 3
+""""""Grasshopper Script""""""
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        a = ""Hello Python 3 in Grasshopper!""
+        print(a)
+        
+        
+        return
+", script.Text);
+        }
+
+        [Test]
+        public void TestPython3_ScriptInstance_Convert_IndentTabs()
+        {
+            const string P = "#";
+            var script = new Grasshopper1Script($@"
+{P}! python 3
+""""""Grasshopper Script""""""
+a = ""Hello Python 3 in Grasshopper!""
+print(a)
+
+");
+
+            // NOTE:
+            // force tab indentation when converting to scriptinstance
+            script.ConvertToScriptInstance(addSolve: false, addPreview: false, new FormatOptions { IndentWithSpaces = false });
+
+            // NOTE:
+            // no params are defined so RunScript() is empty
+            // !! string literal has tab indents !!
+            Assert.AreEqual(@"#! python 3
+""""""Grasshopper Script""""""
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+	def RunScript(self):
+		a = ""Hello Python 3 in Grasshopper!""
+		print(a)
+		
+		
+		return
+", script.Text);
+        }
+
+        [Test]
+        public void TestPython3_ScriptInstance_Convert_IndentPreferredTab()
+        {
+            const string P = "#";
+            var script = new Grasshopper1Script($@"
+{P}! python 3
+""""""Grasshopper Script""""""
+a = ""Hello Python 3 in Grasshopper!""
+print(a)
+
+def TestIndent():
+	print(""indent is tab"")
+	pass
+");
+
+            // NOTE:
+            // force whitespace when converting to scriptinstance.
+            // the script already has tab indentation and that should prevail
+            script.ConvertToScriptInstance(addSolve: false, addPreview: false, new FormatOptions { IndentWithSpaces = true });
+
+            // NOTE:
+            // no params are defined so RunScript() is empty
+            Assert.AreEqual(@"#! python 3
+""""""Grasshopper Script""""""
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+	def RunScript(self):
+		a = ""Hello Python 3 in Grasshopper!""
+		print(a)
+		
+		return
+
+
+def TestIndent():
+	print(""indent is tab"")
+	pass
+", script.Text);
+        }
+
+        [Test]
+        public void TestPython3_ScriptInstance_Convert_IndentPreferredWhiteSpace()
+        {
+            const string P = "#";
+            var script = new Grasshopper1Script($@"
+{P}! python 3
+""""""Grasshopper Script""""""
+a = ""Hello Python 3 in Grasshopper!""
+print(a)
+
+def TestIndent():
+  print(""indent is 2 spaces"")
+  pass
+");
+
+            // NOTE:
+            // force tab when converting to scriptinstance.
+            // the script already has 2-space indentation and that should prevail
+            script.ConvertToScriptInstance(addSolve: false, addPreview: false, new FormatOptions { IndentWithSpaces = false });
+
+            // NOTE:
+            // no params are defined so RunScript() is empty
+            Assert.AreEqual(@"#! python 3
+""""""Grasshopper Script""""""
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+  def RunScript(self):
+    a = ""Hello Python 3 in Grasshopper!""
+    print(a)
+    
+    return
+
+
+def TestIndent():
+  print(""indent is 2 spaces"")
+  pass
+", script.Text);
+        }
 #endif
         static DiagnoseOptions s_errorsOnly = new() { Errors = true, Hints = false, Infos = false, Warnings = false };
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py3\", "test_*.py");
