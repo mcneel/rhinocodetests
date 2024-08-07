@@ -1868,6 +1868,40 @@ First()
             Assert.True(controls.Pass);
             Assert.IsTrue(ctx.Outputs.Get<int>("value") == 42);
         }
+
+        [Test]
+        public void TestPython3_StructInitAllKwargs()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83233
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+
+torusA = Rhino.Geometry.Torus(
+    basePlane=Rhino.Geometry.Plane.WorldXY,
+    majorRadius=20.0,
+    minorRadius=10.0)
+
+a = torusA.IsValid
+
+torusB = Rhino.Geometry.Torus(
+    Rhino.Geometry.Plane.WorldXY,
+    majorRadius=20.0,
+    minorRadius=10.0)
+
+b = torusB.IsValid
+");
+
+            var ctx = new RunContext
+            {
+                AutoApplyParams = true,
+                Outputs = { ["a"] = false, ["b"] = false }
+            };
+            code.Run(ctx);
+
+            Assert.IsTrue(ctx.Outputs.Get<bool>("a"));
+            Assert.IsTrue(ctx.Outputs.Get<bool>("b"));
+        }
 #endif
         static DiagnoseOptions s_errorsOnly = new() { Errors = true, Hints = false, Infos = false, Warnings = false };
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py3\", "test_*.py");
