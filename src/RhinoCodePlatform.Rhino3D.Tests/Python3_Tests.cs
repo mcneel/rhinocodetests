@@ -2079,9 +2079,12 @@ class Script_Instance:
 {INSTANCE} = Script_Instance()
 ");
 
-            using DebugContext instctx = new() { AutoApplyParams = true,
-                                                 Options = { ["python.keepScope"] = true },
-                                                 Outputs = { [INSTANCE] = default } };
+            using DebugContext instctx = new()
+            {
+                AutoApplyParams = true,
+                Options = { ["python.keepScope"] = true },
+                Outputs = { [INSTANCE] = default }
+            };
             code.Run(instctx);
             dynamic instance = instctx.Outputs.Get(INSTANCE);
 
