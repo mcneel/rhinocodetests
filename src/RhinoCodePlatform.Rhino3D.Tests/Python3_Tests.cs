@@ -15,7 +15,6 @@ using Rhino.Runtime.Code.Diagnostics;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Testing;
 
-
 #if RC8_11
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
 #else
@@ -2063,7 +2062,61 @@ def TestIndent():
   pass
 ", script.Text);
         }
+
+        [Test]
+        public void TestPython3_DebugPauses_ScriptInstance()
+        {
+            const string INSTANCE = "__instance__";
+
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+$@"
+class Script_Instance:
+    def RunScript(self, x, y):
+        __pynet_sys__._getframe(0).f_trace = __pynet_tracefunc__
+        __pynet_sys__.settrace(__pynet_tracefunc__)
+        return x + y # line 6
+
+{INSTANCE} = Script_Instance()
+");
+
+            using DebugContext instctx = new() { AutoApplyParams = true,
+                                                 Options = { ["python.keepScope"] = true },
+                                                 Outputs = { [INSTANCE] = default } };
+            code.Run(instctx);
+            dynamic instance = instctx.Outputs.Get(INSTANCE);
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 6);
+            var controls = new DebugPauseDetectControls(breakpoint);
+            code.DebugControls = controls;
+
+            int result = 0;
+            using DebugContext ctx = new();
+            using DebugGroup g = code.DebugWith(ctx);
+            result = (int)instance.RunScript(21, 21);
+
+            Assert.True(controls.Pass);
+            Assert.AreEqual(42, result);
+        }
+
+        [Test]
+        public void TestPython3_TextFlagLookup()
+        {
+            const string P = "#";
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+$@"
+{P} flag: python.keepScope
+{P} flag: grasshopper.inputs.marshaller.asStructs
+import os
+");
+
+            var ctx = new RunContext();
+            code.Run(ctx);
+
+            Assert.IsTrue(ctx.Options.Get("python.keepScope", false));
+            Assert.IsTrue(ctx.Options.Get("grasshopper.inputs.marshaller.asStructs", false));
+        }
 #endif
+
         static DiagnoseOptions s_errorsOnly = new() { Errors = true, Hints = false, Infos = false, Warnings = false };
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py3\", "test_*.py");
     }

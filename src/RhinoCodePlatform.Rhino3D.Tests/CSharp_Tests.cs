@@ -1066,6 +1066,21 @@ Test(42);
             code.DebugControls = new DebugContinueAllControls();
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
         }
+
+        [Test]
+        public void TestCSharp_TextFlagLookup()
+        {
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+$@"
+// flag: grasshopper.inputs.marshaller.asStructs
+using System;
+");
+
+            var ctx = new RunContext();
+            code.Run(ctx);
+
+            Assert.IsTrue(ctx.Options.Get("grasshopper.inputs.marshaller.asStructs", false));
+        }
 #endif
 
         // FIXME: Move csharp autocompletion to language module
