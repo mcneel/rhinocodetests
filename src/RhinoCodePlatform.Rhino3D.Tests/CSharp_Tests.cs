@@ -311,7 +311,11 @@ public class Script_Instance
 
             using (DebugContext ctx = new())
             {
+#if RC8_11
+                using DebugGroup g = code.DebugWith(ctx);
+#else
                 using DebugGroup g = code.DebugWith(ctx, invokes: true);
+#endif
                 object a = default;
                 instance.RunScript(21, 21, ref a);
             }
