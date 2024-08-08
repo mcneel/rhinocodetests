@@ -1221,6 +1221,60 @@ def TestIndent():
   pass
 ", script.Text);
         }
+
+        [Test]
+        public void TestPython2_DebugPauses_ScriptInstance()
+        {
+            const string INSTANCE = "__instance__";
+
+            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+$@"
+class Script_Instance:
+    def RunScript(self, x, y):
+        return x + y # line 4
+
+{INSTANCE} = Script_Instance()
+");
+
+            using DebugContext instctx = new()
+            {
+                AutoApplyParams = true,
+                Options = { ["python.keepScope"] = true },
+                Outputs = { [INSTANCE] = default }
+            };
+            code.Run(instctx);
+            dynamic instance = instctx.Outputs.Get(INSTANCE);
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 4);
+            var controls = new DebugPauseDetectControls(breakpoint);
+            code.DebugControls = controls;
+
+            int result = 0;
+            using DebugContext ctx = new();
+            using DebugGroup g = code.DebugWith(ctx);
+            result = (int)instance.RunScript(21, 21);
+
+            Assert.True(controls.Pass);
+            Assert.AreEqual(42, result);
+        }
+
+        [Test]
+        public void TestPython2_TextFlagLookup()
+        {
+            const string P = "#";
+            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+$@"
+{P} flag: python.keepScope
+{P} flag: grasshopper.inputs.marshaller.asStructs
+import os
+");
+
+            var ctx = new RunContext();
+            code.Run(ctx);
+
+            Assert.IsTrue(ctx.Options.Get("python.keepScope", false));
+            Assert.IsTrue(ctx.Options.Get("grasshopper.inputs.marshaller.asStructs", false));
+        }
 #endif
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py2\", "test_*.py");
