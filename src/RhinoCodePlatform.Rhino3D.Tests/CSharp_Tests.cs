@@ -9,6 +9,7 @@ using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Execution.Debugging;
 using Rhino.Runtime.Code.Execution.Profiling;
+using Rhino.Runtime.Code.Diagnostics;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Testing;
 
@@ -1080,6 +1081,106 @@ using System;
             code.Run(ctx);
 
             Assert.IsTrue(ctx.Options.Get("grasshopper.inputs.marshaller.asStructs", false));
+        }
+#endif
+
+#if RC8_12
+        [Test]
+        public void TestCSharp_AwaitPass()
+        {
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+@"
+// async: true
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+ 
+async Task<int> Compute()
+{
+    await Task.Delay(TimeSpan.FromMilliseconds(2000));
+    return 42;
+}
+ 
+int result = await Compute();
+");
+
+            Assert.DoesNotThrow(() => code.Build(new BuildContext()));
+        }
+
+        [Test]
+        public void TestCSharp_AwaitPass_IfStatement()
+        {
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+@"
+// async: true
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+ 
+async Task<bool> Compute()
+{
+    await Task.Delay(TimeSpan.FromMilliseconds(2000));
+    return true;
+}
+ 
+if (await Compute()) { }
+");
+
+            Assert.DoesNotThrow(() => code.Build(new BuildContext()));
+        }
+
+        [Test]
+        public void TestCSharp_AwaitFail()
+        {
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+ 
+async Task<int> Compute()
+{
+    await Task.Delay(TimeSpan.FromMilliseconds(2000));
+    return 42;
+}
+ 
+int result = await Compute();
+");
+
+            CompileException ex = Assert.Throws<CompileException>(() => code.Build(new BuildContext()));
+            
+            Assert.AreEqual(1, ex.Diagnosis.Length);
+
+            Diagnostic d = ex.Diagnosis.First();
+            Assert.AreEqual(DiagnosticSeverity.Error, d.Severity);
+            Assert.AreEqual("The 'await' operator can only be used within an async method. Consider marking this method with the 'async' modifier and changing its return type to 'Task'.", d.Message);
+        }
+
+        [Test]
+        public void TestCSharp_AwaitFail_IfStatement()
+        {
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+ 
+async Task<bool> Compute()
+{
+    await Task.Delay(TimeSpan.FromMilliseconds(2000));
+    return true;
+}
+ 
+if (await Compute()) { }
+");
+
+            CompileException ex = Assert.Throws<CompileException>(() => code.Build(new BuildContext()));
+            
+            Assert.AreEqual(1, ex.Diagnosis.Length);
+
+            Diagnostic d = ex.Diagnosis.First();
+            Assert.AreEqual(DiagnosticSeverity.Error, d.Severity);
+            Assert.AreEqual("The 'await' operator can only be used within an async method. Consider marking this method with the 'async' modifier and changing its return type to 'Task'.", d.Message);
         }
 #endif
 

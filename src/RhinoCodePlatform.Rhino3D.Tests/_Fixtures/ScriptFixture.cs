@@ -1,14 +1,16 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 using NUnit.Framework;
 
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
-using Rhino.Runtime.Code.Diagnostics;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -105,19 +107,61 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         protected static Stream GetOutputStream() => new NUnitStream();
 
+        sealed class Dispatcher : SynchronizationContext
+        {
+            readonly ConcurrentQueue<Action> _queue = new();
+            readonly ManualResetEventSlim _added = new(false);
+            readonly Thread _t = new(Execute) { IsBackground = true };
+            bool _dispatching = false;
+
+            public Dispatcher() => _t.Start(this);
+
+            public void Dispatch(Action action)
+            {
+                _dispatching = true;
+                _queue.Enqueue(action);
+                _added.Set();
+                _t.Join();
+            }
+
+            public override void Post(SendOrPostCallback d, object state)
+            {
+                _dispatching = false;
+                _queue.Enqueue(() => d(state));
+                _added.Set();
+            }
+
+            static void Execute(object dispatcher)
+            {
+                Dispatcher disp = (Dispatcher)dispatcher!;
+                SetSynchronizationContext(disp);
+                while (true)
+                {
+                    disp._added.Wait();
+                    disp._added.Reset();
+
+                    if (disp._queue.TryDequeue(out Action a))
+                    {
+                        a();
+                        if (!disp._dispatching) break;
+                    }
+                }
+            }
+        }
+
         protected static bool TryRunCode(ScriptInfo scriptInfo, Code code, RunContext context, out string errorMessage)
         {
             errorMessage = default;
 
-            if (scriptInfo.IsProfileTest)
-            {
-                ProfileCode(scriptInfo, code, context);
-                return true;
-            }
-
             try
             {
-                code.Run(context);
+#if RC8_12
+                if (scriptInfo.IsAsync)
+                    new Dispatcher().Dispatch(async () => await code.RunAsync(context));
+
+                else
+#endif
+                    code.Run(context);
 
                 if (context.OutputStream is NUnitStream stream)
                 {
@@ -145,51 +189,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
 
             return false;
-        }
-
-        protected static void ProfileCode(ScriptInfo scriptInfo, Code code, RunContext context)
-        {
-#if !RC8_9
-            throw new NotImplementedException("Performance testing is not implemented for Rhino < 8.9");
-#else
-            // throw the first measurement out
-            // that usually takes longer since the script has to build and cache
-            code.Run(context);
-
-            int rounds = scriptInfo.ProfileRounds;
-            TimeSpan[] timeSpans = new TimeSpan[rounds];
-            context.CollectPerformanceMetrics = true;
-
-            for (int i = 0; i < rounds; i++)
-            {
-                code.Run(context);
-
-                timeSpans[i] = context.LastExecuteTimeSpan;
-                context.ResetMetrics();
-            }
-
-            if (context.OutputStream is NUnitStream stream)
-            {
-                stream.Flush();
-                stream.Dispose();
-            }
-
-            PerfMonitor.ComputeDeviation(timeSpans, out TimeSpan meanTime, out TimeSpan stdDev);
-
-            TimeSpan fastest = meanTime - stdDev;
-            TimeSpan slowest = meanTime + stdDev;
-
-            TestContext.WriteLine($"\"{scriptInfo.Name}\" ran {rounds} times - fastest: {fastest}, slowest: {slowest}");
-
-            if (fastest <= scriptInfo.ExpectedFastest)
-            {
-                throw new Exception($"\"{scriptInfo.Name}\" is running faster than expected fastest of {scriptInfo.ExpectedFastest} (fastest: {fastest})");
-            }
-            else if (slowest >= scriptInfo.ExpectedSlowest)
-            {
-                throw new Exception($"\"{scriptInfo.Name}\" is running slower than expected slowest of {scriptInfo.ExpectedSlowest} (slowest: {slowest})");
-            }
-#endif
         }
 
         protected static void SkipBefore(int major, int minor)
