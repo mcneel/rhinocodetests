@@ -12,6 +12,8 @@ using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
 
+using RhinoCodePlatform.Rhino3D.Testing;
+
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     public abstract class ScriptFixture : Rhino.Testing.Fixtures.RhinoTestFixture
@@ -107,47 +109,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         protected static Stream GetOutputStream() => new NUnitStream();
 
-        sealed class Dispatcher : SynchronizationContext
-        {
-            readonly ConcurrentQueue<Action> _queue = new();
-            readonly ManualResetEventSlim _added = new(false);
-            readonly Thread _t = new(Execute) { IsBackground = true };
-            bool _dispatching = false;
-
-            public Dispatcher() => _t.Start(this);
-
-            public void Dispatch(Action action)
-            {
-                _dispatching = true;
-                _queue.Enqueue(action);
-                _added.Set();
-                _t.Join();
-            }
-
-            public override void Post(SendOrPostCallback d, object state)
-            {
-                _dispatching = false;
-                _queue.Enqueue(() => d(state));
-                _added.Set();
-            }
-
-            static void Execute(object dispatcher)
-            {
-                Dispatcher disp = (Dispatcher)dispatcher!;
-                SetSynchronizationContext(disp);
-                while (true)
-                {
-                    disp._added.Wait();
-                    disp._added.Reset();
-
-                    if (disp._queue.TryDequeue(out Action a))
-                    {
-                        a();
-                        if (!disp._dispatching) break;
-                    }
-                }
-            }
-        }
+        static readonly Dispatcher s_dispatcher = new();
 
         protected static bool TryRunCode(ScriptInfo scriptInfo, Code code, RunContext context, out string errorMessage)
         {
@@ -157,7 +119,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             {
 #if RC8_12
                 if (scriptInfo.IsAsync)
-                    new Dispatcher().Dispatch(async () => await code.RunAsync(context));
+                    s_dispatcher.InvokeAsync(async () => await code.RunAsync(context)).Wait();
 
                 else
 #endif
