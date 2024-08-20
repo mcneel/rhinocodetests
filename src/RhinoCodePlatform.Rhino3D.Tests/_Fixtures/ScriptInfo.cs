@@ -13,11 +13,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     {
         static readonly Regex s_rhinoVersionFinder = new Regex(@"(rc|rh|gh)(?<major>\d)\.(?<minor>\d)");
         static readonly Regex s_rhinoLocalOnlyFinder = new Regex(@"_onlylocal");
-        static readonly Regex s_performanceSpecFinder = new Regex(@"perf\((?<rounds>\d),\s*(?<mean>\d+)ms,\s*(?<dev>\d+)ms\)");
 
         public Uri Uri { get; }
 
         public string Name { get; }
+
+        public bool IsAsync { get; } = false;
 
         public bool IsDebug { get; } = false;
 
@@ -30,8 +31,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         public bool ExpectsRhinoDocument { get; } = false;
 
         #region Profiling
-        public bool IsProfileTest { get; } = false;
-
         public int ProfileRounds { get; } = 1;
 
         public TimeSpan ExpectedMean { get; } = TimeSpan.Zero;
@@ -52,6 +51,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             Uri = scriptPath;
             Name = Uri.GetEndpointTitle();
+            IsAsync = uriStr.Contains("_async");
             IsDebug = uriStr.Contains("_debug");
             IsSkipped = uriStr.Contains("_skip");
             ExpectsError = uriStr.Contains("_error");
@@ -88,15 +88,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 #if RELEASE
             IsSkipped |= s_rhinoLocalOnlyFinder.IsMatch(uriStr);
 #endif
-
-            m = s_performanceSpecFinder.Match(uriStr);
-            if (m.Success)
-            {
-                IsProfileTest = true;
-                ProfileRounds = int.Parse(m.Groups["rounds"].Value);
-                ExpectedMean = TimeSpan.FromMilliseconds(int.Parse(m.Groups["mean"].Value));
-                ExpectedDeviation = TimeSpan.FromMilliseconds(int.Parse(m.Groups["dev"].Value));
-            }
 
             ExpectsRhinoDocument = File.Exists(GetRhinoFile());
         }

@@ -72,11 +72,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 ctx.Options["grasshopper.runner.warningsAreErrors"] = true;
             }
 
-            if (scriptInfo.IsProfileTest)
-            {
-                ctx.Options["grasshopper.runner.expireAll"] = true;
-            }
-
             if (TryRunCode(scriptInfo, code, ctx, out string errorMessage))
             {
                 // NOTE:
