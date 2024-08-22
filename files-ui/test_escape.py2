@@ -1,0 +1,14 @@
+#! python 2
+import rhinoscriptsyntax as rs
+import scriptcontext as sc
+from Rhino import RhinoApp
+
+MAX = 1000
+rs.StatusBarProgressMeterShow("Progress", 0, MAX)
+
+for i in range(0, MAX):
+    rs.StatusBarProgressMeterUpdate(i)
+    if sc.escape_test(throw_exception=False): break
+    RhinoApp.Wait()
+
+rs.StatusBarProgressMeterHide()
