@@ -1,0 +1,24 @@
+#! python 2
+import Eto.Forms
+import Eto.Drawing
+import Rhino
+import test
+
+Rhino.RhinoApp.ClearCommandHistoryWindow()
+
+test.test_print()
+print("TEST")
+
+counter = 0
+
+def handler(s, e):
+    global counter
+    print("py2 test: {0}".format(counter))
+    counter += 1
+
+form = Eto.Forms.Form()
+form.Owner = Rhino.UI.RhinoEtoApp.MainWindow
+form.Size = Eto.Drawing.Size(400, 400)
+form.Title = "Python 2"
+form.MouseMove += handler 
+form.Show()

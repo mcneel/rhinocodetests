@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 using NUnit.Framework;
 
@@ -1274,6 +1275,25 @@ import os
 
             Assert.IsTrue(ctx.Options.Get("python.keepScope", false));
             Assert.IsTrue(ctx.Options.Get("grasshopper.inputs.marshaller.asStructs", false));
+        }
+#endif
+
+#if RC8_12
+        [Test]
+        public void TestPython2_Threaded_ExclusiveStreams()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode("print(a, b)");
+
+            string[] outputs = RunManyExclusiveStreams(code, 3);
+
+            // NOTE:
+            // legacy ironpython print would print (21 21)
+            // __future__ print however prints like python 3
+            // this is what is expected here since ExclusiveStreams = true
+            // forces __future__ print to be wired up in the scope
+            Assert.AreEqual("21 21\n", outputs[0]);
+            Assert.AreEqual("22 22\n", outputs[1]);
+            Assert.AreEqual("23 23\n", outputs[2]);
         }
 #endif
 
