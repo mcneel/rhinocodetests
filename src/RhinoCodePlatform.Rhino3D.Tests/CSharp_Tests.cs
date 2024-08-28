@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 using NUnit.Framework;
 
@@ -1148,7 +1149,7 @@ int result = await Compute();
 ");
 
             CompileException ex = Assert.Throws<CompileException>(() => code.Build(new BuildContext()));
-            
+
             Assert.AreEqual(1, ex.Diagnosis.Length);
 
             Diagnostic d = ex.Diagnosis.First();
@@ -1175,12 +1176,67 @@ if (await Compute()) { }
 ");
 
             CompileException ex = Assert.Throws<CompileException>(() => code.Build(new BuildContext()));
-            
+
             Assert.AreEqual(1, ex.Diagnosis.Length);
 
             Diagnostic d = ex.Diagnosis.First();
             Assert.AreEqual(DiagnosticSeverity.Error, d.Severity);
             Assert.AreEqual("The 'await' operator can only be used within an async method. Consider marking this method with the 'async' modifier and changing its return type to 'Task'.", d.Message);
+        }
+
+        [Test]
+        public void TestCSharp_Threaded_ExclusiveStreams()
+        {
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode("using System;Console.WriteLine($\"{a} {b}\");");
+
+            string[] outputs = RunManyExclusiveStreams(code, 3);
+
+            Assert.AreEqual($"21 21{Environment.NewLine}", outputs[0]);
+            Assert.AreEqual($"22 22{Environment.NewLine}", outputs[1]);
+            Assert.AreEqual($"23 23{Environment.NewLine}", outputs[2]);
+        }
+
+        [Test]
+        public void TestCSharp_Threaded_ExclusiveStreams_NestedFunction()
+        {
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(@"
+using System;
+
+void testConsole()
+{
+    Console.WriteLine($""{a} {b}"");
+}
+
+testConsole();
+");
+
+            string[] outputs = RunManyExclusiveStreams(code, 3);
+
+            Assert.AreEqual($"21 21{Environment.NewLine}", outputs[0]);
+            Assert.AreEqual($"22 22{Environment.NewLine}", outputs[1]);
+            Assert.AreEqual($"23 23{Environment.NewLine}", outputs[2]);
+        }
+
+        [Test]
+        public void TestCSharp_Threaded_ExclusiveStreams_StaticFunction()
+        {
+            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(@"
+using System;
+
+Test.TestConsole(a, b);
+
+static class Test {
+public static void TestConsole(int a, int b)
+{
+    Console.WriteLine($""{a} {b}"");
+}}
+");
+
+            string[] outputs = RunManyExclusiveStreams(code, 3);
+
+            Assert.AreEqual(string.Empty, outputs[0]);
+            Assert.AreEqual(string.Empty, outputs[1]);
+            Assert.AreEqual(string.Empty, outputs[2]);
         }
 #endif
 

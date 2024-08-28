@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -99,6 +100,9 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             return new RunContext
             {
+#if RC8_12
+                ResetStreamsPolicy = ResetStreamPolicy.ResetToPlatformStream,
+#endif
                 AutoApplyParams = true,
                 OutputStream = captureStdout ? GetOutputStream() : default,
                 Outputs = {
@@ -109,7 +113,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         protected static Stream GetOutputStream() => new NUnitStream();
 
-        static readonly Dispatcher s_dispatcher = new();
+        protected static readonly Dispatcher s_dispatcher = new();
 
         protected static bool TryRunCode(ScriptInfo scriptInfo, Code code, RunContext context, out string errorMessage)
         {
@@ -151,6 +155,44 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
 
             return false;
+        }
+
+        protected static string[] RunManyExclusiveStreams(Code code, int count)
+        {
+            code.Inputs.Add(new Param[]
+            {
+                new ("a", typeof(int)),
+                new ("b", typeof(int)),
+            });
+
+            code.Build(new BuildContext());
+
+            var ts = new List<Task<string>>();
+            for (int i = 0; i < count; i++)
+            {
+                int id = i;
+                ts.Add(Task.Run(() =>
+                {
+                    var inputs = new ContextInputs
+                    {
+                        ["a"] = 21 + id,
+                        ["b"] = 21 + id,
+                    };
+
+                    var outStream = new RunContextStream();
+                    code.Run(new RunContext($"Execute [{i} of {count}]")
+                    {
+                        ExclusiveStreams = true,
+                        OutputStream = outStream,
+                        Inputs = inputs
+                    });
+
+                    return outStream.GetContents();
+                }));
+            }
+
+            Task.WaitAll(ts.ToArray());
+            return ts.Select(t => t.Result).ToArray();
         }
 
         protected static void SkipBefore(int major, int minor)

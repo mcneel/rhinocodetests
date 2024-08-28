@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 using NUnit.Framework;
 
@@ -14,6 +15,8 @@ using Rhino.Runtime.Code.Environments;
 using Rhino.Runtime.Code.Diagnostics;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Testing;
+
+
 
 #if RC8_11
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
@@ -680,8 +683,6 @@ stop = brep_obj # line 8
         [Test]
         public void TestPython3_StdErr()
         {
-            // python 3 debugger does not stop on 'pass' statements
-            // so using Test() instead
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
 @"
 import sys
@@ -689,7 +690,11 @@ import sys
 result = sys.stderr is not None
 ");
 
+#if RC8_12
+            var ctx = new RunContext(defaultErrorStream: true)
+#else
             var ctx = new RunContext(defaultStderr: true)
+#endif
             {
                 AutoApplyParams = true,
                 Outputs = { ["result"] = false }
@@ -2117,6 +2122,20 @@ import os
 
             Assert.IsTrue(ctx.Options.Get("python.keepScope", false));
             Assert.IsTrue(ctx.Options.Get("grasshopper.inputs.marshaller.asStructs", false));
+        }
+#endif
+
+#if RC8_12
+        [Test]
+        public void TestPython3_Threaded_ExclusiveStreams()
+        {
+            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode("print(a, b)");
+
+            string[] outputs = RunManyExclusiveStreams(code, 3);
+
+            Assert.AreEqual("21 21\n", outputs[0]);
+            Assert.AreEqual("22 22\n", outputs[1]);
+            Assert.AreEqual("23 23\n", outputs[2]);
         }
 #endif
 
