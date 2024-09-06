@@ -811,7 +811,7 @@ a = str(type(x))
         [Test]
         public void TestGH1_Component_ParamsCollect_CSharp_InputNamedOutLine()
         {
-            // RH-83087
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83087
             // input parameter with name starting with 'out' or 'ref' should be recognized
             // as input and not an output!
             IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;

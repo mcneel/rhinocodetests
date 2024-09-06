@@ -1752,7 +1752,7 @@ RS.
         [Test]
         public void TestPython3_CompleteSignature_ParameterIndex_Nested()
         {
-            //RH-82584 Signature has wrong param index
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-82584 Signature has wrong param index
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
 @"
 import Rhino
@@ -1776,7 +1776,7 @@ Rhino.Input.RhinoGet.GetOneObject( (1,2,3), ");
         [Test]
         public void TestPython3_CompleteSignature_ParameterIndex_NestedFunction()
         {
-            //RH-82584 Signature has wrong param index
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-82584 Signature has wrong param index
             Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
 @"
 import os.path as op
