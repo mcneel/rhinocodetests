@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.IO.Compression;
+using System.Collections.Generic;
 
 using NUnit.Framework;
 
@@ -14,13 +15,14 @@ using Rhino.Runtime.Code.Storage;
 
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Rhino.Runtime.Code.Execution;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
-#if RC8_11
     [TestFixture]
     public class RhProjTests : ScriptFixture
     {
+#if RC8_11
         [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestSingle.rhproj" })]
         public void TestRhProj_Read_Identity(string rhprojfile)
         {
@@ -600,6 +602,46 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             if (Directory.Exists(buildPath))
                 Directory.Delete(buildPath, true);
         }
-    }
 #endif
+
+#if RC8_12
+        [Test]
+        public void TestRhProj_Create()
+        {
+            IProjectServer rhpServer = RhinoCode.ProjectServers.WherePasses(s_rhProjServerSpec).First();
+            IProject project = rhpServer.CreateProject();
+
+            IProjectShelf shelf = project.Traverse(project.GetPaths().First());
+
+            IEnumerable<ProjectPath> paths = shelf.GetPaths();
+            Assert.NotNull(paths.FirstOrDefault(p => p.Uri.ToString().Contains("Commands/")));
+            Assert.NotNull(paths.FirstOrDefault(p => p.Uri.ToString().Contains("Components/")));
+        }
+
+        [Test]
+        public void TestRhProj_Create_AddSpecificLanguage()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83675
+            IProjectServer rhpServer = RhinoCode.ProjectServers.WherePasses(s_rhProjServerSpec).First();
+            IProject project = rhpServer.CreateProject();
+
+            IProjectShelf shelf = project.Traverse(project.GetPaths().First());
+            ProjectPath path = shelf.GetPaths().First(p => p.Uri.ToString().Contains("Commands/"));
+
+            project.Add(path, new SourceCode(LanguageSpec.Python2, "import sys\nprint sys.version", new Uri(Path.GetTempFileName())));
+            project.Add(path, new SourceCode(LanguageSpec.Python2, "#! python 3\nimport sys\nprint(sys.version)", new Uri(Path.GetTempFileName())));
+
+            ProjectCode command;
+            
+            command = project.GetCodes().ElementAt(0);
+            Assert.AreEqual(LanguageSpec.Python2, command.LanguageSpec);
+
+            command = project.GetCodes().ElementAt(1);
+            Assert.AreEqual(LanguageSpec.Python2, command.LanguageSpec);
+        }
+
+        static readonly ProjectServerSpec s_rhProjServerSpec = new ProjectServerSpec("mcneel.rhino3d.project");
+#endif
+
+    }
 }
