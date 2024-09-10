@@ -34,7 +34,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             TestSkip(scriptInfo);
 
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(scriptInfo.Uri);
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(scriptInfo.Uri);
 
             RunContext ctx = GetRunContext();
 
@@ -50,7 +50,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         [Test]
         public void TestPython3_CompileErrorLine_ReturnOutsideFunction()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 a = ""Hello Python 3 in Grasshopper!""
 print(a)
@@ -80,7 +80,7 @@ return
         public void TestPython3_Compile_Script()
         {
             // assert throws compile exception on run/debug/profile
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import os
 
@@ -103,7 +103,7 @@ a = None[0
         [Test]
         public void TestPython3_RuntimeErrorLine_InScript()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import os
 
@@ -126,7 +126,7 @@ print(12 / 0)
         [Test]
         public void TestPython3_RuntimeErrorLine_InFunction()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 def foo():
     None[0]
@@ -152,7 +152,7 @@ foo()
         [Test]
         public void TestPython3_RuntimeErrorLine_InNestedFunctions()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 
 import sys
@@ -190,7 +190,7 @@ func_call_test(5, 5)
         [Test]
         public void TestPython3_DebugStop()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import sys
 print(sys) # line 3
@@ -210,7 +210,7 @@ print(sys) # line 3
         [Test]
         public void TestPython3_DebugErrorLine_InNestedFunctions()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 
 import sys
@@ -261,7 +261,7 @@ func_call_test(5, 5)
         [Test]
         public void TestPython3_Complete_RhinoScriptSyntax()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import rhinoscriptsyntax as rs
 rs.");
@@ -295,7 +295,7 @@ rs.");
         [Test]
         public void TestPython3_Complete_RhinoCommon_Rhino()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import Rhino
 Rhino.");
@@ -323,7 +323,7 @@ Rhino.");
         [Test]
         public void TestPython3_Complete_RhinoCommon_Point3d()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 from Rhino.Geometry import Point3d
 p = Point3d()
@@ -353,7 +353,7 @@ p.");
         [Test]
         public void TestPython3_Complete_RhinoCommon_ProxyTypes_NONE()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import Rhino
 Rhino.Render.ProxyTypes.");
@@ -378,7 +378,7 @@ Rhino.Render.ProxyTypes.");
         [Test]
         public void TestPython3_Complete_StdLib_os()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import os
 os.");
@@ -406,7 +406,7 @@ os.");
         [Test]
         public void TestPython3_Complete_StdLib_os_path()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import os.path as op
 op.");
@@ -434,7 +434,7 @@ op.");
         [Test]
         public void TestPython3_Complete_str_array()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 a = [str()];
 a[0].");
@@ -464,7 +464,7 @@ a[0].");
         {
             SkipBefore(8, 8);
 
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 from enum import Enum
 
@@ -495,7 +495,7 @@ m = TestEnum.");
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-81895
             string pkgPath = string.Empty;
 
-            ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
+            ILanguage py3 = GetLanguage(LanguageSpec.Python3);
             Code code = py3.CreateCode(
 $@"
 # venv: site-packages
@@ -518,7 +518,7 @@ import rx
         public void TestPython3_PIP_SitePackage_Shared()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-81895
-            ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
+            ILanguage py3 = GetLanguage(LanguageSpec.Python3);
             Code code = py3.CreateCode(
 @"
 # venv: site-packages
@@ -551,7 +551,7 @@ import fpdf
         [Test]
         public void TestPython3_Debug_Variables_Enum_CheckValue()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 from Rhino.DocObjects import ObjectType
 m = ObjectType.AnyObject
@@ -576,7 +576,7 @@ stop = m # line 4
         [Test]
         public void TestPython3_Debug_Variables_Enum_ShouldNotExpand()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 from Rhino.DocObjects import ObjectType
 m = ObjectType.Brep
@@ -608,7 +608,7 @@ stop = m # line 4
         [Test]
         public void TestPython3_Debug_Variables_RhinoObject()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import Rhino
 from Rhino.Geometry import Sphere, Point3d
@@ -683,7 +683,7 @@ stop = brep_obj # line 8
         [Test]
         public void TestPython3_StdErr()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import sys
 
@@ -710,7 +710,7 @@ result = sys.stderr is not None
         {
             // python 3 debugger does not stop on 'pass' statements
             // so using Test() instead
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 def Test():
     pass
@@ -737,7 +737,7 @@ First()
         {
             // python 3 debugger does not stop on 'pass' statements
             // so using Test() instead
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 def Test():
     pass
@@ -762,7 +762,7 @@ First()
         [Test]
         public void TestPython3_Diagnose_SuperInit_PythonClass()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 class Base:
     def __init__(self):
@@ -786,7 +786,7 @@ class MissingSuper(Base):
         [Test]
         public void TestPython3_Diagnose_SuperInit_RhinoCommon()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 from Rhino.Geometry import Point3d
 
@@ -808,7 +808,7 @@ class NewPoint(Point3d): # line 4, Point3d is a struct
         [Test]
         public void TestPython3_Diagnose_SuperInit_RhinoCommon_ImportAs()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import Rhino.Input.Custom as ric
 
@@ -830,7 +830,7 @@ class InheritedGetPoint(ric.GetPoint): # line 4
         [Test]
         public void TestPython3_Diagnose_SuperInit_EtoForms()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 from Eto.Forms import Form
 
@@ -852,7 +852,7 @@ class NewForm(Form):
         [Test]
         public void TestPython3_Complete_Import()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import ");
 
@@ -867,7 +867,7 @@ import ");
         [Test]
         public void TestPython3_Complete_LastIndex()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import Rhino
 Rhino.");
@@ -883,7 +883,7 @@ Rhino.");
         [Test]
         public void TestPython3_CompleteNot_InCommentBlock()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import Rhino
 Rhino.
@@ -910,7 +910,7 @@ Rhino.
         [Test]
         public void TestPython3_CompleteNot_InCommentBlock_Nested()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import Rhino
 Rhino.
@@ -968,7 +968,7 @@ Rhino.
         [Test]
         public void TestPython3_CompleteNot_InCommentBlock_Start()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"""""""
 ");
 
@@ -981,7 +981,7 @@ Rhino.
         [Test]
         public void TestPython3_CompleteNot_InFunctionDocstring()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import Rhino
 Rhino.
@@ -1014,7 +1014,7 @@ Rhino.
         [Test]
         public void TestPython3_CompleteNot_InLiteralString_Double()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import Rhino
 Rhino.
@@ -1038,7 +1038,7 @@ Rhino.
         [Test]
         public void TestPython3_CompleteNot_InLiteralString_DoubleEscaped()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import Rhino
 Rhino.
@@ -1062,7 +1062,7 @@ Rhino.
         [Test]
         public void TestPython3_CompleteNot_InLiteralString_Single()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import Rhino
 Rhino.
@@ -1086,7 +1086,7 @@ Rhino.
         [Test]
         public void TestPython3_CompleteNot_InLiteralString_SingleEscaped()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import Rhino
 Rhino.
@@ -1110,7 +1110,7 @@ Rhino.
         [Test]
         public void TestPython3_CompleteSignature()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import Rhino
 Rhino.Input.RhinoGet.GetOneObject(");
@@ -1147,7 +1147,7 @@ Rhino.Input.RhinoGet.GetOneObject(");
         [Test]
         public void TestPython3_CompleteSignature_ParameterIndex()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import Rhino
 Rhino.Input.RhinoGet.GetOneObject(prompt, ");
@@ -1170,7 +1170,7 @@ Rhino.Input.RhinoGet.GetOneObject(prompt, ");
         [Test]
         public void TestPython3_Format_Simple()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 class Test:
 
@@ -1193,7 +1193,7 @@ class Test:
             const string P = "#";
 
             // https://github.com/mcneel/rhino/pull/72450
-            ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
+            ILanguage py3 = GetLanguage(LanguageSpec.Python3);
 
             py3.CreateCode(
 $@"
@@ -1221,7 +1221,7 @@ import OpenEXR
         public void TestPython3_PIP_Install()
         {
             // https://github.com/mcneel/rhino/pull/72450
-            ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
+            ILanguage py3 = GetLanguage(LanguageSpec.Python3);
 
             Assert.NotNull(py3.Environs.Shared);
 
@@ -1646,7 +1646,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         public void TestPython3_Diagnose_SuperInit_RhinoCommon_GetObject()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-82559
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import Rhino
 import scriptcontext as sc
@@ -1674,7 +1674,7 @@ class GO_FilterPrevious(Rhino.Input.Custom.GetObject):
         {
             const string P = "#";
 
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 $@"
 import os
 import os as aa
@@ -1753,7 +1753,7 @@ RS.
         public void TestPython3_CompleteSignature_ParameterIndex_Nested()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-82584 Signature has wrong param index
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import Rhino
 Rhino.Input.RhinoGet.GetOneObject( (1,2,3), ");
@@ -1777,7 +1777,7 @@ Rhino.Input.RhinoGet.GetOneObject( (1,2,3), ");
         public void TestPython3_CompleteSignature_ParameterIndex_NestedFunction()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-82584 Signature has wrong param index
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import os.path as op
 import Rhino
@@ -1803,7 +1803,7 @@ Rhino.Input.RhinoGet.GetOneObject(op.dirname(""test""),");
         public void TestPython3_PIP_InstallWithDependencies()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-82730
-            ILanguage py3 = GetLanguage(this, LanguageSpec.Python3);
+            ILanguage py3 = GetLanguage(LanguageSpec.Python3);
 
             IEnviron environ = py3.Environs.CreateEnviron($"{SetupFixture.RHINOCODE_PYTHON_VENV_PREFIX}install_jaxcpu");
 
@@ -1817,7 +1817,7 @@ Rhino.Input.RhinoGet.GetOneObject(op.dirname(""test""),");
         [Test]
         public void TestPython3_Library()
         {
-            ILanguage python3 = GetLanguage(this, LanguageSpec.Python3);
+            ILanguage python3 = GetLanguage(LanguageSpec.Python3);
 
             TryGetTestFilesPath(out string fileDir);
             LanguageLibrary library = python3.CreateLibrary(new Uri(Path.Combine(fileDir, "py3", "test_library")));
@@ -1843,7 +1843,7 @@ Rhino.Input.RhinoGet.GetOneObject(op.dirname(""test""),");
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-83214
             // python 3 debugger does not stop on 'pass' statements
             // so using Test() instead
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 value = None
 def Test(v):
@@ -1877,7 +1877,7 @@ First()
         public void TestPython3_StructInitAllKwargs()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-83233
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import Rhino
 
@@ -2073,7 +2073,7 @@ def TestIndent():
         {
             const string INSTANCE = "__instance__";
 
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 $@"
 class Script_Instance:
     def RunScript(self, x, y):
@@ -2110,7 +2110,7 @@ class Script_Instance:
         public void TestPython3_TextFlagLookup()
         {
             const string P = "#";
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 $@"
 {P} flag: python.keepScope
 {P} flag: grasshopper.inputs.marshaller.asStructs
@@ -2129,7 +2129,7 @@ import os
         [Test]
         public void TestPython3_Threaded_ExclusiveStreams()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python3).CreateCode("print(a, b)");
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode("print(a, b)");
 
             string[] outputs = RunManyExclusiveStreams(code, 3);
 

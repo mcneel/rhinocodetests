@@ -29,7 +29,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             TestSkip(scriptInfo);
 
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(scriptInfo.Uri);
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(scriptInfo.Uri);
 
             RunContext ctx = GetRunContext();
 
@@ -46,7 +46,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         public void TestPython2_Compile_Script()
         {
             // assert throws compile exception on run/debug/profile
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import os
 
@@ -69,7 +69,7 @@ a = None[0
         [Test]
         public void TestPython2_RuntimeErrorLine_InScript()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import os
 
@@ -92,7 +92,7 @@ print(12 / 0)
         [Test]
         public void TestPython2_DebugStop()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import sys
 print(sys)  # line 3
@@ -113,7 +113,7 @@ print(sys)  # line 3
         [Test]
         public void TestPython2_DebugPauses_Script_StepOver()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 def First():
     pass # line 3
@@ -135,7 +135,7 @@ First()
         [Test]
         public void TestPython2_DebugPauses_Script_StepOut()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 def First():
     pass # line 3
@@ -157,7 +157,7 @@ First()
         [Test]
         public void TestPython2_Complete_RhinoScriptSyntax()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import rhinoscriptsyntax as rs
 rs.");
@@ -185,7 +185,7 @@ rs.");
         [Test]
         public void TestPython2_Complete_RhinoCommon_Rhino()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import Rhino
 Rhino.");
@@ -213,7 +213,7 @@ Rhino.");
         [Test]
         public void TestPython2_Complete_StdLib_os()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import os
 os.");
@@ -241,7 +241,7 @@ os.");
         [Test]
         public void TestPython2_Complete_StdLib_os_path()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import os.path as op
 op.");
@@ -269,7 +269,7 @@ op.");
         [Test]
         public void TestPython2_Complete_Import()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import ");
 
@@ -284,7 +284,7 @@ import ");
         [Test]
         public void TestPython2_Complete_LastIndex()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import Rhino
 Rhino.");
@@ -300,7 +300,7 @@ Rhino.");
         [Test]
         public void TestPython2_CompleteNot_InCommentBlock()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import Rhino
 Rhino.
@@ -327,7 +327,7 @@ Rhino.
         [Test]
         public void TestPython2_CompleteNot_InCommentBlock_Nested()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import Rhino
 Rhino.
@@ -385,7 +385,7 @@ Rhino.
         [Test]
         public void TestPython2_CompleteNot_InCommentBlock_Start()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"""""""
 ");
 
@@ -398,7 +398,7 @@ Rhino.
         [Test]
         public void TestPython2_CompleteNot_InFunctionDocstring()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import Rhino
 Rhino.
@@ -431,7 +431,7 @@ Rhino.
         [Test]
         public void TestPython2_CompleteNot_InLiteralString_Double()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import Rhino
 Rhino.
@@ -455,7 +455,7 @@ Rhino.
         [Test]
         public void TestPython2_CompleteNot_InLiteralString_Single()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import Rhino
 Rhino.
@@ -479,7 +479,7 @@ Rhino.
         [Test]
         public void TestPython2_CompleteNot_InLiteralString_DoubleEscaped()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import Rhino
 Rhino.
@@ -503,7 +503,7 @@ Rhino.
         [Test]
         public void TestPython2_CompleteNot_InLiteralString_SingleEscaped()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import Rhino
 Rhino.
@@ -527,7 +527,7 @@ Rhino.
         [Test]
         public void TestPython2_CompleteSignature()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import Rhino
 Rhino.Input.RhinoGet.GetOneObject(");
@@ -564,7 +564,7 @@ Rhino.Input.RhinoGet.GetOneObject(");
         [Test]
         public void TestPython2_CompleteSignature_ParameterIndex()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import Rhino
 Rhino.Input.RhinoGet.GetOneObject(prompt, ");
@@ -907,7 +907,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         {
             const string P = "#";
 
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 $@"
 import os
 import os as aa
@@ -986,7 +986,7 @@ RS.
         public void TestPython2_CompleteSignature_ParameterIndex_Nested()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-82584 Signature has wrong param index
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 import Rhino
 Rhino.Input.RhinoGet.GetOneObject( (1,2,3), ");
@@ -1011,7 +1011,7 @@ Rhino.Input.RhinoGet.GetOneObject( (1,2,3), ");
         [Test]
         public void TestPython2_Library()
         {
-            ILanguage python2 = GetLanguage(this, LanguageSpec.Python2);
+            ILanguage python2 = GetLanguage(LanguageSpec.Python2);
 
             TryGetTestFilesPath(out string fileDir);
             LanguageLibrary library = python2.CreateLibrary(new Uri(Path.Combine(fileDir, "py2", "test_library")));
@@ -1032,7 +1032,7 @@ Rhino.Input.RhinoGet.GetOneObject( (1,2,3), ");
         public void TestPython2_DebugDisconnects()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-83214
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
 value = None
 def Test(v):
@@ -1228,7 +1228,7 @@ def TestIndent():
         {
             const string INSTANCE = "__instance__";
 
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 $@"
 class Script_Instance:
     def RunScript(self, x, y):
@@ -1263,7 +1263,7 @@ class Script_Instance:
         public void TestPython2_TextFlagLookup()
         {
             const string P = "#";
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode(
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 $@"
 {P} flag: python.keepScope
 {P} flag: grasshopper.inputs.marshaller.asStructs
@@ -1282,7 +1282,7 @@ import os
         [Test]
         public void TestPython2_Threaded_ExclusiveStreams()
         {
-            Code code = GetLanguage(this, LanguageSpec.Python2).CreateCode("print(a, b)");
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode("print(a, b)");
 
             string[] outputs = RunManyExclusiveStreams(code, 3);
 

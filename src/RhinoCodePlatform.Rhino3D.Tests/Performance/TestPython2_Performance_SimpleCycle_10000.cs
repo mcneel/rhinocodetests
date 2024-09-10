@@ -17,7 +17,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests.Performance
         [OneTimeSetUp]
         public void SetUp()
         {
-            _code = GetLanguage(this, LanguageSpec.Python2).CreateCode("a = x + y");
+            _code = GetLanguage(LanguageSpec.Python2).CreateCode("a = x + y");
             _ctx = new RunContext
             {
                 AutoApplyParams = true,

@@ -30,7 +30,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             TestSkip(scriptInfo);
 
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(scriptInfo.Uri);
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(scriptInfo.Uri);
 
             RunContext ctx;
             if (scriptInfo.IsDebug)
@@ -54,7 +54,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         [Test]
         public void TestCSharp_CompileErrorLine_MissingFunction()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 
@@ -93,7 +93,7 @@ void DoStuff(int s)
         public void TestCSharp_Compile_Script()
         {
             // assert throws compile exception on run/debug/profile
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 using Rhino;
@@ -118,7 +118,7 @@ b = new Sphere(Point3d.Origin, x);
         [Test]
         public void TestCSharp_RuntimeErrorLine_InScript()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 
@@ -143,7 +143,7 @@ a = 5 / zero;
         [Test]
         public void TestCSharp_RuntimeErrorLine_InFunction()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 
@@ -202,7 +202,7 @@ struct Jose { }
         [Test]
         public void TestCSharp_Runtime_NULL_Input()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 a = x is null;
 ");
@@ -220,7 +220,7 @@ a = x is null;
         [Test]
         public void TestCSharp_DebugStop()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 Console.WriteLine(); // line 3
@@ -243,7 +243,7 @@ Console.WriteLine(); // line 3
         [Test]
         public void TestCSharp_DebugPauses_Script()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 using Rhino;
@@ -287,7 +287,7 @@ b = (int)sphere.Radius;
 
             // detect missing variables in global scope does not break debugging.
             // this could happen if roslyn trace-injector does not produce valid code
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 $@"
 using System;
 using Rhino;
@@ -330,7 +330,7 @@ public class Script_Instance
         {
             // detect auto-declare code params are in global scope.
             // this could happen if roslyn trace-injector does not produce valid code
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 using Rhino;
@@ -370,7 +370,7 @@ a = x + y; // line 5
         {
             // detect missing variables in global scope does not break debugging.
             // this could happen if roslyn trace-injector does not produce valid code
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 using Rhino;
@@ -403,7 +403,7 @@ public class Script_Instance
         [Test]
         public void TestCSharp_DebugPauses_Script_StepOver()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 void Pass() {}
@@ -429,7 +429,7 @@ First();
         [Test]
         public void TestCSharp_DebugPauses_Script_StepOut()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 void Pass() {}
@@ -457,7 +457,7 @@ First();
         {
             // detect auto-declare code params are in global scope.
             // this could happen if roslyn trace-injector does not produce valid code
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 void Pass() {}
@@ -483,7 +483,7 @@ First();
         [Test]
         public void TestCSharp_DebugReturn_Script()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 void Pass() {}
@@ -513,7 +513,7 @@ First();
         [Test]
         public void TestCSharp_DebugNested_Script()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 void Pass() {}
@@ -541,7 +541,7 @@ First();
         [Test]
         public void TestCSharp_DebugNestedNested_Script()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 void Pass() {}
@@ -1010,7 +1010,7 @@ public class Script_Instance : GH_ScriptInstance
         [Test]
         public void TestCSharp_Library()
         {
-            ILanguage csharp = GetLanguage(this, LanguageSpec.CSharp);
+            ILanguage csharp = GetLanguage(LanguageSpec.CSharp);
 
             TryGetTestFilesPath(out string fileDir);
             LanguageLibrary library = csharp.CreateLibrary(new Uri(Path.Combine(fileDir, "cs", "test_library")));
@@ -1022,7 +1022,7 @@ public class Script_Instance : GH_ScriptInstance
         public void TestCSharp_DebugDisconnects()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-83214
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 void Test(int v) { value = v; return; }
@@ -1055,7 +1055,7 @@ First();
         public void TestCSharp_DebugTracer_VoidLambda()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-83216
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 int value = 0;
@@ -1072,7 +1072,7 @@ Test(42);
         [Test]
         public void TestCSharp_TextFlagLookup()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 $@"
 // flag: grasshopper.inputs.marshaller.asStructs
 using System;
@@ -1089,7 +1089,7 @@ using System;
         [Test]
         public void TestCSharp_AwaitPass()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 // async: true
 using System;
@@ -1111,7 +1111,7 @@ int result = await Compute();
         [Test]
         public void TestCSharp_AwaitPass_IfStatement()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 // async: true
 using System;
@@ -1133,7 +1133,7 @@ if (await Compute()) { }
         [Test]
         public void TestCSharp_AwaitFail()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 using System.Threading;
@@ -1160,7 +1160,7 @@ int result = await Compute();
         [Test]
         public void TestCSharp_AwaitFail_IfStatement()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
 using System.Threading;
@@ -1187,7 +1187,7 @@ if (await Compute()) { }
         [Test]
         public void TestCSharp_Threaded_ExclusiveStreams()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode("using System;Console.WriteLine($\"{a} {b}\");");
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode("using System;Console.WriteLine($\"{a} {b}\");");
 
             string[] outputs = RunManyExclusiveStreams(code, 3);
 
@@ -1199,7 +1199,7 @@ if (await Compute()) { }
         [Test]
         public void TestCSharp_Threaded_ExclusiveStreams_NestedFunction()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(@"
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(@"
 using System;
 
 void testConsole()
@@ -1220,7 +1220,7 @@ testConsole();
         [Test]
         public void TestCSharp_Threaded_ExclusiveStreams_StaticFunction()
         {
-            Code code = GetLanguage(this, LanguageSpec.CSharp).CreateCode(@"
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(@"
 using System;
 
 Test.TestConsole(a, b);

@@ -111,7 +111,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         }
 
-        ILanguage GetGrasshopper() => GetLanguage(this, new LanguageSpec(" *.*.grasshopper", "1"));
+        ILanguage GetGrasshopper() => GetLanguage(new LanguageSpec(" *.*.grasshopper", "1"));
 
         static IEnumerable<object[]> GetTestDefinitions() => GetTestScripts(@"gh1\", "test_*.gh?");
     }
