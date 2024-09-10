@@ -9,9 +9,9 @@
   <ItemGroup>
     <PackageReference Include="Mono.Cecil" Version="0.11.4" ExcludeAssets="runtime" PrivateAssets="all" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
     <PackageReference Include="NUnit" Version="3.14.0" />
-    <PackageReference Include="Rhino.Testing" Version="8.0.21-beta" ExcludeAssets="compile" GeneratePathProperty="true" />
+    <PackageReference Include="Rhino.Testing" Version="8.0.23-beta" ExcludeAssets="compile" GeneratePathProperty="true" />
     <Reference Include="$(PkgRhino_Testing)\lib\net7.0\Rhino.Testing.dll" Private="true" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" PrivateAssets="all" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.4" />
