@@ -2,10 +2,8 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 
 using NUnit.Framework;
 
@@ -40,21 +38,9 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             protected override void WriteLine(string text) => TestContext.WriteLine(text);
         }
 
-        protected ILanguage m_language = default;
+        protected static readonly Dispatcher s_dispatcher = new();
 
-        protected static ILanguage GetLanguage(ScriptFixture fixture, LanguageSpec languageSpec)
-        {
-            if (fixture.m_language is null)
-            {
-                fixture.m_language = RhinoCode.Languages.QueryLatest(languageSpec);
-                if (fixture.m_language is null)
-                {
-                    throw new Exception($"Language query error | {RhinoCode.Logger.Text}");
-                }
-            }
-
-            return fixture.m_language;
-        }
+        protected static ILanguage GetLanguage(LanguageSpec languageSpec) => RhinoCode.Languages.QueryLatest(languageSpec);
 
         protected static bool TryGetTestFilesPath(out string fileDir)
         {
@@ -113,48 +99,40 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         protected static Stream GetOutputStream() => new NUnitStream();
 
-        protected static readonly Dispatcher s_dispatcher = new();
-
         protected static bool TryRunCode(ScriptInfo scriptInfo, Code code, RunContext context, out string errorMessage)
         {
-            errorMessage = default;
-
-            try
-            {
 #if RC8_12
-                if (scriptInfo.IsAsync)
-                    s_dispatcher.InvokeAsync(async () => await code.RunAsync(context)).Wait();
-
-                else
-#endif
-                    code.Run(context);
-
-                if (context.OutputStream is NUnitStream stream)
-                {
-                    stream.Flush();
-                    stream.Dispose();
-                }
-
-                return true;
-            }
-            catch (ExecuteException runEx)
+            if (scriptInfo.ExpectsRhinoDocument)
             {
-                if (scriptInfo.ExpectsError || scriptInfo.ExpectsWarning)
-                {
-                    if (runEx.InnerException is CompileException compileEx)
-#if RC8_11
-                        errorMessage = compileEx.Diagnosis.ToString();
-#else
-                        errorMessage = compileEx.Diagnostics.ToString();
-#endif
-                    else
-                        errorMessage = runEx.Message;
-                }
-                else
-                    throw;
+                Rhino.RhinoDoc currentDoc = Rhino.RhinoDoc.ActiveDoc;
+                using Rhino.RhinoDoc doc = CreateDocFromFile(scriptInfo.GetRhinoFile());
+                Rhino.RhinoDoc.ActiveDoc = doc;
+                bool res = TrySafeRunCode(scriptInfo, code, context, out errorMessage);
+                Rhino.RhinoDoc.ActiveDoc = currentDoc;
+                return res;
             }
+            else
+#endif
+                return TrySafeRunCode(scriptInfo, code, context, out errorMessage);
+        }
 
-            return false;
+        protected static Rhino.RhinoDoc CreateDoc()
+        {
+            Rhino.RhinoDoc doc = Rhino.RhinoDoc.CreateHeadless(string.Empty);
+            doc.Views.ActiveView =
+                doc.Views.Add(
+                        string.Empty,
+                        Rhino.Display.DefinedViewportProjection.Top,
+                        new System.Drawing.Rectangle(0, 0, 100, 100),
+                        floating: false
+                    );
+
+            return doc;
+        }
+
+        protected static Rhino.RhinoDoc CreateDocFromFile(string rhinofilepath)
+        {
+            return Rhino.RhinoDoc.OpenHeadless(rhinofilepath);
         }
 
         protected static string[] RunManyExclusiveStreams(Code code, int count)
@@ -209,6 +187,51 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             if (scriptInfo.IsSkipped)
                 Assert.Ignore();
+        }
+
+        static bool TrySafeRunCode(ScriptInfo scriptInfo, Code code, RunContext context, out string errorMessage)
+        {
+            errorMessage = default;
+
+            try
+            {
+#if RC8_12
+                if (scriptInfo.IsAsync)
+                {
+                    s_dispatcher.InvokeAsync(async () => await code.RunAsync(context))
+                                .Wait();
+                }
+
+                else
+#endif
+                    code.Run(context);
+
+                if (context.OutputStream is NUnitStream stream)
+                {
+                    stream.Flush();
+                    stream.Dispose();
+                }
+
+                return true;
+            }
+            catch (ExecuteException runEx)
+            {
+                if (scriptInfo.ExpectsError || scriptInfo.ExpectsWarning)
+                {
+                    if (runEx.InnerException is CompileException compileEx)
+#if RC8_11
+                        errorMessage = compileEx.Diagnosis.ToString();
+#else
+                        errorMessage = compileEx.Diagnostics.ToString();
+#endif
+                    else
+                        errorMessage = runEx.Message;
+                }
+                else
+                    throw;
+            }
+
+            return false;
         }
     }
 }
