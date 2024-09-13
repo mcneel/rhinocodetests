@@ -1,0 +1,46 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.13.24256\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "c90528ac-ad33-4903-8837-43940ee1d5f4",
+  "identity": {
+    "name": "UserObjectConverter",
+    "version": "0.1-beta",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "8"
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "880b0d10-7332-4799-bac7-a79ac33c20d9",
+      "language": {
+        "id": "mcneel.roslyn.csharp",
+        "version": "9.0.*"
+      },
+      "title": "ConvertLegacyUserObjects",
+      "uri": "ConvertLegacyUserObjects.cs"
+    }
+  ]
+}
