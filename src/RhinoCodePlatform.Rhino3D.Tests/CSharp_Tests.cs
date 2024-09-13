@@ -1240,6 +1240,181 @@ public static void TestConsole(int a, int b)
         }
 #endif
 
+#if RC8_13
+        [Test]
+        public void TestCSharp_DebugReturn_FromCtor()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+class F {
+    public F()
+    {
+        Pass();
+    }
+    public void Pass() { }
+    public void Show() { }
+}
+var f = new F();    // line 11
+f.Show();           // line 12
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 11), DebugAction.StepOver);
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 12));
+
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestCSharp_DebugIf_Scope()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+void Pass() {}
+if (int.TryParse(""12"", out int res))
+    Pass();             // line 5
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 5);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("test", 12),
+            });
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestCSharp_DebugIfElse_Scope()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+void Pass() {}
+object v = ""t"";
+if (v is int test)
+    Pass();
+// trace calls in else clause should not 'res'
+else
+    Pass();
+");
+
+            var controls = new DebugPauseDetectControls();
+            code.DebugControls = controls;
+
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test]
+        public void TestCSharp_DebugIfElse_Scope_Out_If()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+void Pass() {}
+if (int.TryParse(""12"", out int res))
+    Pass();             // line 5
+// trace calls in else clause should report 'res'
+else
+    Pass();              // line 8
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 5);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("res", 12),
+            });
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestCSharp_DebugIfElse_Scope_Out_Else()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+void Pass() {}
+if (int.TryParse(""-"", out int res))
+    Pass();             // line 5
+// trace calls in else clause should report 'res'
+else
+    Pass();              // line 8
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 8);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("res", 0),
+            });
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+            
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestCSharp_DebugIfElse_Scope_Is_If()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+void Pass() {}
+object v = 12;
+if (v is int test)
+    Pass();     // line 6
+// trace calls in else clause should not 'res'
+else
+    Pass();
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 6);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("test", 12),
+            });
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestCSharp_DebugIfElse_Scope_Is_Else()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+void Pass() {}
+object v = ""-"";
+if (v is int test)
+    Pass();
+// trace calls in else clause should not 'res'
+else
+    Pass();     // line 9
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 9);
+            var controls = new DebugVerifyVarsControls(breakpoint, new UnexpectedVariable[]
+            {
+                new("test"),
+            });
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+#endif
+
         // FIXME: Move csharp autocompletion to language module
         //        [Test]
         //        public void TestCSharp_ScriptInstance_Complete_Self()
