@@ -1,0 +1,46 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.13.24262\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "3f14bcff-f871-4ca8-bd51-abd6f0f08611",
+  "identity": {
+    "name": "TestEmptyLibs",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "8"
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "67e66029-f6f6-4145-a222-3ceabad4925a",
+      "language": {
+        "id": "*.*.python",
+        "version": "3.*.*"
+      },
+      "title": "TestEmptyLibsEmpty",
+      "uri": "empty.py"
+    }
+  ]
+}

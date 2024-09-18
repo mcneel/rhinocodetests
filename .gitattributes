@@ -8,3 +8,4 @@
 *.ico filter=lfs diff=lfs merge=lfs -text
 *.pt filter=lfs diff=lfs merge=lfs -text
 *.mp4 filter=lfs diff=lfs merge=lfs -text
+*.yak filter=lfs diff=lfs merge=lfs -text

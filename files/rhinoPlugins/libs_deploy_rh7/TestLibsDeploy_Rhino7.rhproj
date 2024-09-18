@@ -1,0 +1,58 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.13.24262\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "a68010a0-b69e-483a-9b16-641b244099a6",
+  "identity": {
+    "name": "TestLibsDeploy_Rhino7",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "7"
+      },
+      "title": "Rhino3D (7.*)",
+      "slug": "rh7"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "a772e4ad-75c7-4e9a-a629-3294d59ccbf3",
+      "language": {
+        "id": "*.*.python",
+        "version": "2.*.*"
+      },
+      "title": "TestLibsImport",
+      "uri": "TestLibsImport.py"
+    }
+  ],
+  "libraries": [
+    {
+      "type": "uri",
+      "library": {
+        "base": "testlibsimportlegacy/",
+        "language": {
+          "id": "*.*.python",
+          "version": "2.*.*"
+        }
+      }
+    }
+  ]
+}

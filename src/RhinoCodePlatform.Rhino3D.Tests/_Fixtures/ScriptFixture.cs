@@ -55,6 +55,20 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             return false;
         }
 
+        protected static bool TryGetTestFile(string subPath, out string filePath)
+        {
+            filePath = default;
+            Rhino.Testing.Configs configs = Rhino.Testing.Configs.Current;
+
+            if (SetupFixture.TryGetTestFiles(out string fileDir))
+            {
+                filePath = Path.GetFullPath(Path.Combine(configs.SettingsDir, fileDir, subPath));
+                return true;
+            }
+
+            return false;
+        }
+
         protected static IEnumerable<string> GetTestScript(string subPath, string filename)
         {
             Rhino.Testing.Configs configs = Rhino.Testing.Configs.Current;

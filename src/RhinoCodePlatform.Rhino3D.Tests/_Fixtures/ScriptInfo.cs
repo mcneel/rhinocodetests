@@ -11,7 +11,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 {
     public sealed class ScriptInfo
     {
-        static readonly Regex s_rhinoVersionFinder = new Regex(@"(rc|rh|gh)(?<major>\d)\.(?<minor>\d*)");
+        static readonly Regex s_rhinoVersionFinder = new Regex(@"(rc|rh|gh)(?<major>\d)\.(?<minor>\d{1,2})");
         static readonly Regex s_rhinoLocalOnlyFinder = new Regex(@"_onlylocal");
 
         public Uri Uri { get; }

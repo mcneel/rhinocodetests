@@ -1,0 +1,16 @@
+#! python 2
+import clr
+clr.AddReference("System.IO.MemoryMappedFiles")
+from System.IO import BinaryWriter
+from System.IO.MemoryMappedFiles import MemoryMappedFile
+from System.Text import Encoding
+
+mmf = MemoryMappedFile.OpenExisting("TestCommandArgsPy2");
+stream = mmf.CreateViewStream()
+writer = BinaryWriter(stream)
+writer.Write(Encoding.UTF8.GetBytes(__rhino_command__.ToString() + "\n"))
+writer.Write(Encoding.UTF8.GetBytes(__rhino_doc__.ToString() + "\n"))
+writer.Write(Encoding.UTF8.GetBytes(__rhino_runmode__.ToString() + "\n"))
+writer.Write(Encoding.UTF8.GetBytes(__is_interactive__.ToString() + "\n"))
+stream.Dispose()
+mmf.Dispose()

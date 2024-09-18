@@ -65,6 +65,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             LoadLanguages();
             LoadGrasshopperPlugins();
             LoadRhinoCode();
+            LoadRhinoPlugins();
         }
 
         sealed class TextContextStatusResponder : ProgressStatusResponder
@@ -124,7 +125,10 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             if (Directory.Exists(testPluginsPath))
             {
-                LoadGHA(Directory.GetFiles(testPluginsPath, "*.gha"));
+                string[] ghaFiles = Directory.GetFiles(testPluginsPath, "*.gha", SearchOption.AllDirectories).ToArray();
+                foreach (var ghaFile in ghaFiles)
+                    TestContext.Progress.WriteLine($"Loading GH1 plugin: {ghaFile}");
+                LoadGHA(ghaFiles);
             }
         }
 
@@ -169,6 +173,20 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                     if (a.Level >= logLevel)
                         TestContext.Progress.WriteLine(a.Message);
                 };
+            }
+        }
+
+        static void LoadRhinoPlugins()
+        {
+            string testPluginsPath = Path.Combine(s_settings.TestFilesDirectory, "rhinoPlugins");
+
+            if (Directory.Exists(testPluginsPath))
+            {
+                foreach (string rhpFile in Directory.GetFiles(testPluginsPath, "*.rhp", SearchOption.AllDirectories))
+                {
+                    TestContext.Progress.WriteLine($"Loading Rhino plugin: {rhpFile}");
+                    Rhino.PlugIns.PlugIn.LoadPlugIn(rhpFile, out Guid _);
+                }
             }
         }
     }
