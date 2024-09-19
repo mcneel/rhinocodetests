@@ -70,6 +70,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         sealed class TextContextStatusResponder : ProgressStatusResponder
         {
+#if RC8_13
+            public override void LoadProgressChanged(LanguageLoadProgressReport value)
+            {
+                TestContext.Progress.WriteLine($"Loading {value.Spec} ...");
+            }
+#endif
             public override void StatusChanged(ILanguage language, ProgressChangedEventArgs args)
             {
                 // e.g.
