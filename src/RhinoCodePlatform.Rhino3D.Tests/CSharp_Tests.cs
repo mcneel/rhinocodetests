@@ -1413,6 +1413,94 @@ else
 
             Assert.True(controls.Pass);
         }
+
+        [Test]
+        public void TestCSharp_DebugSwitch_Scope()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83950
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+int test = 12;
+switch (test)
+{
+    case 10:
+        int m = 42;
+        Console.WriteLine(m);
+        break;
+    case 12:
+        Console.WriteLine(""'m' should not be here"");
+        break;
+}
+");
+
+            var controls = new DebugPauseDetectControls();
+            code.DebugControls = controls;
+
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test]
+        public void TestCSharp_DebugSwitch_Scope_Expected()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83950
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+int test = 10;
+switch (test)
+{
+    case 10:
+        int m = 42;
+        Console.WriteLine(m); // line 8
+        break;
+    case 12:
+        Console.WriteLine(""'m' should not be here"");
+        break;
+}
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 8);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("m", 42),
+            });
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestCSharp_DebugSwitch_Scope_NotExpected()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83950
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+int test = 12;
+switch (test)
+{
+    case 10:
+        int m = 42;
+        Console.WriteLine(m);
+        break;
+    case 12:
+        Console.WriteLine(""'m' should not be here""); // line 11
+        break;
+}
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 11);
+            var controls = new DebugVerifyVarsControls(breakpoint, new UnexpectedVariable[]
+            {
+                new("m"),
+            });
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
 #endif
 
         // FIXME: Move csharp autocompletion to language module
