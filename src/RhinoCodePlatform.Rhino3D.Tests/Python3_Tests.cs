@@ -2107,6 +2107,80 @@ class Script_Instance:
         }
 
         [Test]
+        public void TestPython3_DebugExpand_NoError()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83942
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+$@"
+m = [42, 43]
+print(m) # line 3
+");
+
+            bool noExceptThrown = true;
+            var breakpoint = new CodeReferenceBreakpoint(code, 3);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("m"),
+            });
+            controls.OnReceivedExpected += (ExecVariable v) =>
+            {
+                try
+                {
+                    v.Expand();
+                }
+                catch (Exception)
+                {
+                    noExceptThrown = false;
+                }
+
+                return true;
+            };
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(noExceptThrown);
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestPython3_DebugExpand_ErrorsLargeInt()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83942
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+$@"
+m = [38675871645874365347856, 2587630952649356034856]
+print(m) # line 3
+");
+
+            bool exceptThrown = false;
+            bool exceptMatched = false;
+            var breakpoint = new CodeReferenceBreakpoint(code, 3);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("m"),
+            });
+            controls.OnReceivedExpected += (ExecVariable v) =>
+            {
+                try
+                {
+                    v.Expand();
+                }
+                catch (Exception ex)
+                {
+                    exceptThrown = true;
+                    exceptMatched = ex.Message.Contains("Python int too large to convert to C ssize_t in method Void .ctor");
+                }
+
+                return true;
+            };
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(exceptThrown && exceptMatched);
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
         public void TestPython3_TextFlagLookup()
         {
             const string P = "#";
