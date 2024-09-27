@@ -38,6 +38,5 @@
 
   <ItemGroup>
     <None Update="Rhino.Testing.Configs.xml" CopyToOutputDirectory="Always" />
-    <None Include="..\Directory.Build.props" Link="Directory.Build.props" />
   </ItemGroup>
 </Project>
