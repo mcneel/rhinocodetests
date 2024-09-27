@@ -5,7 +5,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [Serializable]
     [XmlRoot("Settings")]
-    public sealed class MxTestSettings
+    public sealed class TestSettings
     {
         [XmlElement]
         public string TestFilesDirectory { get; set; } = string.Empty;

@@ -11,6 +11,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhino.Runtime.Code.Tests", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RhinoCodePlatform.Rhino3D.Testing", "RhinoCodePlatform.Rhino3D.Testing\RhinoCodePlatform.Rhino3D.Testing.csproj", "{55B6040C-9EDB-4CA5-98D9-BADF469183E1}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RhinoCodePlatform.Rhino3D.Testing.Client", "RhinoCodePlatform.Rhino3D.Testing.Client\RhinoCodePlatform.Rhino3D.Testing.Client.csproj", "{BE8DB4B5-471C-486E-B408-82424F41AA7F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RhinoCodePlatform.Rhino3D.Tests.Client", "RhinoCodePlatform.Rhino3D.Tests.Client\RhinoCodePlatform.Rhino3D.Tests.Client.csproj", "{AEAC6B05-99F2-4990-AF25-447FE8FA8209}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +55,22 @@ Global
 		{55B6040C-9EDB-4CA5-98D9-BADF469183E1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{55B6040C-9EDB-4CA5-98D9-BADF469183E1}.Release|x64.ActiveCfg = Release|Any CPU
 		{55B6040C-9EDB-4CA5-98D9-BADF469183E1}.Release|x64.Build.0 = Release|Any CPU
+		{BE8DB4B5-471C-486E-B408-82424F41AA7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE8DB4B5-471C-486E-B408-82424F41AA7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE8DB4B5-471C-486E-B408-82424F41AA7F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BE8DB4B5-471C-486E-B408-82424F41AA7F}.Debug|x64.Build.0 = Debug|Any CPU
+		{BE8DB4B5-471C-486E-B408-82424F41AA7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE8DB4B5-471C-486E-B408-82424F41AA7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE8DB4B5-471C-486E-B408-82424F41AA7F}.Release|x64.ActiveCfg = Release|Any CPU
+		{BE8DB4B5-471C-486E-B408-82424F41AA7F}.Release|x64.Build.0 = Release|Any CPU
+		{AEAC6B05-99F2-4990-AF25-447FE8FA8209}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEAC6B05-99F2-4990-AF25-447FE8FA8209}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEAC6B05-99F2-4990-AF25-447FE8FA8209}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AEAC6B05-99F2-4990-AF25-447FE8FA8209}.Debug|x64.Build.0 = Debug|Any CPU
+		{AEAC6B05-99F2-4990-AF25-447FE8FA8209}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEAC6B05-99F2-4990-AF25-447FE8FA8209}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEAC6B05-99F2-4990-AF25-447FE8FA8209}.Release|x64.ActiveCfg = Release|Any CPU
+		{AEAC6B05-99F2-4990-AF25-447FE8FA8209}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -19,7 +19,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         public const string RHINOCODE_LOG_LEVEL_ENVVAR = "RHINOCODE_LOG_LEVEL";
         public const string RHINOCODE_PYTHON_VENV_PREFIX = "test_";
 
-        static readonly MxTestSettings s_settings;
+        static readonly TestSettings s_settings;
 
         static SetupFixture()
         {
@@ -29,15 +29,15 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             {
                 try
                 {
-                    XmlSerializer serializer = new(typeof(MxTestSettings));
-                    s_settings = Rhino.Testing.Configs.Deserialize<MxTestSettings>(serializer, settingsFile);
+                    XmlSerializer serializer = new(typeof(TestSettings));
+                    s_settings = Rhino.Testing.Configs.Deserialize<TestSettings>(serializer, settingsFile);
 
                     return;
                 }
                 catch (Exception) { }
             }
 
-            s_settings = new MxTestSettings();
+            s_settings = new TestSettings();
         }
 
         public static bool TryGetTestFiles(out string filesDir)
@@ -62,18 +62,21 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 throw new DirectoryNotFoundException(Rhino.Testing.Configs.Current.RhinoSystemDir);
             }
 
-            LoadLanguages();
-            LoadGrasshopperPlugins();
             LoadRhinoCode();
+            LoadLanguages();
             LoadRhinoPlugins();
+            LoadGrasshopperPlugins();
         }
 
-        sealed class TextContextStatusResponder : ProgressStatusResponder
+        sealed class TestContextStatusResponder : ProgressStatusResponder
         {
 #if RC8_13
             public override void LoadProgressChanged(LanguageLoadProgressReport value)
             {
-                TestContext.Progress.WriteLine($"Loading {value.Spec} ...");
+                if (value.IsComplete)
+                    TestContext.Progress.WriteLine($"Loading Languages Complete");
+                else
+                    TestContext.Progress.WriteLine($"Loading {value.Spec} ...");
             }
 #endif
             public override void StatusChanged(ILanguage language, ProgressChangedEventArgs args)
@@ -89,55 +92,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         }
 
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-        static void LoadLanguages()
-        {
-            Registrar.StartScripting();
-#if RC8_11
-            RhinoCode.ReportProgressToConsole = true;
-#else
-            Registrar.SendReportsToConsole = true;
-#endif
-            RhinoCode.Languages.WaitStatusComplete(LanguageSpec.Any, new TextContextStatusResponder());
-            foreach (ILanguage language in RhinoCode.Languages)
-            {
-                if (language.Status.IsErrored)
-                {
-                    throw new Exception($"Language init error | {RhinoCode.Logger.Text}");
-                }
-
-                // cleanup all python 3 environments before running tests
-                if (LanguageSpec.Python3.Matches(language.Id))
-                {
-                    IEnvirons environs = language.Environs;
-                    foreach (IEnviron environ in environs.QueryEnvirons()
-                                                         .Where(e => e.Id.StartsWith(RHINOCODE_PYTHON_VENV_PREFIX)))
-                    {
-                        environs.DeleteEnviron(environ);
-                    }
-                }
-            }
-
-            string libsCache = RhinoCode.Stage.LanguageLibraries.Directory;
-            if (Directory.Exists(libsCache))
-            {
-                Directory.Delete(libsCache, true);
-                Directory.CreateDirectory(libsCache);
-            }
-        }
-
-        static void LoadGrasshopperPlugins()
-        {
-            string testPluginsPath = Path.Combine(s_settings.TestFilesDirectory, "gh1Plugins");
-
-            if (Directory.Exists(testPluginsPath))
-            {
-                string[] ghaFiles = Directory.GetFiles(testPluginsPath, "*.gha", SearchOption.AllDirectories).ToArray();
-                foreach (var ghaFile in ghaFiles)
-                    TestContext.Progress.WriteLine($"Loading GH1 plugin: {ghaFile}");
-                LoadGHA(ghaFiles);
-            }
-        }
-
         static void LoadRhinoCode()
         {
             if (Environment.GetEnvironmentVariable(RHINOCODE_LOG_LEVEL_ENVVAR) is string level)
@@ -182,6 +136,43 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+        static void LoadLanguages()
+        {
+            Registrar.StartScripting();
+#if RC8_11
+            RhinoCode.ReportProgressToConsole = true;
+#else
+            Registrar.SendReportsToConsole = true;
+#endif
+            RhinoCode.Languages.WaitStatusComplete(LanguageSpec.Any, new TestContextStatusResponder());
+            foreach (ILanguage language in RhinoCode.Languages)
+            {
+                if (language.Status.IsErrored)
+                {
+                    throw new Exception($"Language init error | {RhinoCode.Logger.Text}");
+                }
+
+                // cleanup all python 3 environments before running tests
+                if (LanguageSpec.Python3.Matches(language.Id))
+                {
+                    IEnvirons environs = language.Environs;
+                    foreach (IEnviron environ in environs.QueryEnvirons()
+                                                         .Where(e => e.Id.StartsWith(RHINOCODE_PYTHON_VENV_PREFIX)))
+                    {
+                        environs.DeleteEnviron(environ);
+                    }
+                }
+            }
+
+            string libsCache = RhinoCode.Stage.LanguageLibraries.Directory;
+            if (Directory.Exists(libsCache))
+            {
+                Directory.Delete(libsCache, true);
+                Directory.CreateDirectory(libsCache);
+            }
+        }
+
         static void LoadRhinoPlugins()
         {
             string testPluginsPath = Path.Combine(s_settings.TestFilesDirectory, "rhinoPlugins");
@@ -193,6 +184,19 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                     TestContext.Progress.WriteLine($"Loading Rhino plugin: {rhpFile}");
                     Rhino.PlugIns.PlugIn.LoadPlugIn(rhpFile, out Guid _);
                 }
+            }
+        }
+
+        static void LoadGrasshopperPlugins()
+        {
+            string testPluginsPath = Path.Combine(s_settings.TestFilesDirectory, "gh1Plugins");
+
+            if (Directory.Exists(testPluginsPath))
+            {
+                string[] ghaFiles = Directory.GetFiles(testPluginsPath, "*.gha", SearchOption.AllDirectories).ToArray();
+                foreach (var ghaFile in ghaFiles)
+                    TestContext.Progress.WriteLine($"Loading GH1 plugin: {ghaFile}");
+                LoadGHA(ghaFiles);
             }
         }
     }

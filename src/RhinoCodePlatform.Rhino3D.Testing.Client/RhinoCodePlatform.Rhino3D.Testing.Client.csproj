@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('Windows'))">net7.0-windows</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('OSX'))">net7.0</TargetFrameworks>
+    <AssemblyName>rhinocodetesting-testclient</AssemblyName>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Rhino.Inside" Version="8.0.3-beta" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Rhino.Runtime.Code" HintPath="$(RhinoSystemDirectory)\Rhino.Runtime.Code.dll" Private="True" />
+    <Reference Include="RhinoCodePlatform.Rhino3D" HintPath="$(RhinoSystemDirectory)\RhinoCodePlatform.Rhino3D.dll" Private="False" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RhinoCodePlatform.Rhino3D.Testing\RhinoCodePlatform.Rhino3D.Testing.csproj" />
+  </ItemGroup>
+</Project>
