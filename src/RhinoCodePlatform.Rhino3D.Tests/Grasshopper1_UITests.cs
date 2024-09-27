@@ -10,6 +10,7 @@ using Rhino.Runtime.Code.Languages;
 
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
+using GKP = Grasshopper.Kernel.Parameters;
 
 #if RC8_11
 using RhinoCodePlatform.GH;
@@ -985,6 +986,129 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         }
 #endif
 
+#if RC8_13
+        [Test]
+        public void TestGH1_Component_ParamsExtract()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-84020
+
+            IGH_Param param;
+
+            param = new LGH1.Converters.GooConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_GenericObject>(param);
+
+            param = new LGH1.Converters.BooleanConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Boolean>(param);
+
+            param = new LGH1.Converters.IntConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Integer>(param);
+
+            param = new LGH1.Converters.StringConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_String>(param);
+
+            param = new LGH1.Converters.AnyStringConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_String>(param);
+
+            param = new LGH1.Converters.PythonStringConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_String>(param);
+
+            param = new LGH1.Converters.PythonFloatConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Number>(param);
+
+            param = new LGH1.Converters.DoubleConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Number>(param);
+
+            param = new LGH1.Converters.ComplexConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Complex>(param);
+
+            param = new LGH1.Converters.DateTimeConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Time>(param);
+
+            param = new LGH1.Converters.ColorConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Colour>(param);
+
+            param = new LGH1.Converters.FilePathConverter(new Uri(@"C:\test.file")).CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_FilePath>(param);
+
+            param = new LGH1.Converters.Point3dConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Point>(param);
+
+            param = new LGH1.Converters.Point3dListConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Point>(param);
+
+            param = new LGH1.Converters.Vector3dConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Vector>(param);
+
+            param = new LGH1.Converters.PlaneConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Plane>(param);
+
+            param = new LGH1.Converters.IntervalConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Interval>(param);
+
+            param = new LGH1.Converters.UVIntervalConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Interval2D>(param);
+
+            param = new LGH1.Converters.GuidConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Guid>(param);
+
+            param = new LGH1.Converters.BoxConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Box>(param);
+
+            param = new LGH1.Converters.TransformConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Transform>(param);
+
+            param = new LGH1.Converters.LineConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Line>(param);
+
+            param = new LGH1.Converters.CircleConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Circle>(param);
+
+            param = new LGH1.Converters.ArcConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Arc>(param);
+
+            param = new LGH1.Converters.CurveConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Curve>(param);
+
+            param = new LGH1.Converters.PolylineConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Curve>(param);
+
+            param = new LGH1.Converters.Rectangle3dConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Rectangle>(param);
+
+            param = new LGH1.Converters.MeshConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Mesh>(param);
+
+            param = new LGH1.Converters.SurfaceConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Surface>(param);
+
+            param = new LGH1.Converters.ExtrusionConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Extrusion>(param);
+
+            param = new LGH1.Converters.SubDConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_SubD>(param);
+
+            param = new LGH1.Converters.BrepConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Brep>(param);
+
+            param = new LGH1.Converters.PointCloudConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_PointCloud>(param);
+
+            param = new LGH1.Converters.GeometryBaseConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Geometry>(param);
+
+            param = new LGH1.Converters.HatchConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Hatch>(param);
+
+            param = new LGH1.Converters.TextEntityConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_TextEntity>(param);
+
+            param = new LGH1.Converters.TextDotConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_TextDot>(param);
+
+            param = new LGH1.Converters.LeaderConverter().CreateParameter();
+            Assert.IsInstanceOf<GKP.Param_Leader>(param);
+        }
+#endif
         static string EnsureCRLF(string input) => input.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
     }
 }
