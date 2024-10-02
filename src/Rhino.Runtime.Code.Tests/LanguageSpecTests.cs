@@ -51,6 +51,41 @@ namespace Rhino.Runtime.Code.Tests
         }
 
         [Test]
+        public void TestLanguageSpecCtorStarFamily()
+        {
+            try
+            {
+                var spec = new LanguageSpec("dd.*");
+            }
+            catch (Exception ex)
+            {
+                Assert.AreEqual("Implementation value can not be more stringent than previous filter", ex.Message);
+            }
+
+            try
+            {
+                var spec = new LanguageSpec("dd.ii.*");
+            }
+            catch (Exception ex)
+            {
+                Assert.AreEqual("Implementation value can not be more stringent than previous filter", ex.Message);
+            }
+        }
+
+        [Test]
+        public void TestLanguageSpecCtorStarImplementation()
+        {
+            try
+            {
+                var spec = new LanguageSpec("dd.*.*");
+            }
+            catch (Exception ex)
+            {
+                Assert.AreEqual("Developer value can not be more stringent than previous filter", ex.Message);
+            }
+        }
+
+        [Test]
         public void TestLanguageSpecCtor()
         {
             var spec = new LanguageSpec("dev.impl.fam", "1.2.3");
@@ -117,6 +152,62 @@ namespace Rhino.Runtime.Code.Tests
             Assert.AreEqual("*", spec.Taxon.Implementation);
             Assert.AreEqual(9, spec.Version.Major);
             Assert.AreEqual(-1, spec.Version.Minor);
+        }
+
+        [Test]
+        public void TestLanguageSpecParse()
+        {
+            LanguageSpec spec;
+
+            // without taxon:version separator
+            Assert.IsTrue(LanguageSpec.TryParse("python3", out spec));
+            Assert.AreEqual(new LanguageSpec("python", "3"), spec);
+
+            Assert.IsTrue(LanguageSpec.TryParse("*.python3.9", out spec));
+            Assert.AreEqual(new LanguageSpec("*.python", "3.9"), spec);
+
+            Assert.IsTrue(LanguageSpec.TryParse("mcneel.python3.9.10-dev", out spec));
+            Assert.AreEqual(new LanguageSpec("mcneel.python", "3.9.10"), spec);
+
+            // with taxon:version separator (:@-\s)
+            Assert.IsTrue(LanguageSpec.TryParse("gh1.csharp: 12.4-testing", out spec));
+            Assert.AreEqual(new LanguageSpec("gh1.csharp", "12.4"), spec);
+
+            Assert.IsTrue(LanguageSpec.TryParse("*.net.python@3.9", out spec));
+            Assert.AreEqual(new LanguageSpec("*.net.python", "3.9"), spec);
+
+            Assert.IsTrue(LanguageSpec.TryParse("*.python-3.10.*", out spec));
+            Assert.AreEqual(new LanguageSpec("*.python", "3.10.*"), spec);
+
+            Assert.IsTrue(LanguageSpec.TryParse("mcneel.python 3.9", out spec));
+            Assert.AreEqual(new LanguageSpec("mcneel.python", "3.9"), spec);
+
+            Assert.IsTrue(LanguageSpec.TryParse("python@*", out spec));
+            Assert.AreEqual(new LanguageSpec("python"), spec);
+
+            // no version
+            Assert.IsTrue(LanguageSpec.TryParse("python", out spec));
+            Assert.AreEqual(new LanguageSpec("python"), spec);
+            
+            Assert.IsTrue(LanguageSpec.TryParse("gh1.csharp", out spec));
+            Assert.AreEqual(new LanguageSpec("gh1.csharp"), spec);
+
+            // special cases
+            Assert.IsFalse(LanguageSpec.TryParse("python-*_custom@sep", out spec));
+            Assert.IsFalse(LanguageSpec.TryParse("python-3.*@custom", out spec));
+            Assert.IsFalse(LanguageSpec.TryParse("python-3.*:custom", out spec));
+
+            Assert.IsTrue(LanguageSpec.TryParse("python@*_custom", out spec));
+            Assert.AreEqual(new LanguageSpec("python"), spec);
+
+            Assert.IsTrue(LanguageSpec.TryParse("python-3.*_custom", out spec));
+            Assert.AreEqual(new LanguageSpec("python", "3"), spec);
+
+            Assert.IsTrue(LanguageSpec.TryParse("python-3.*-custom", out spec));
+            Assert.AreEqual(new LanguageSpec("python", "3"), spec);
+
+            Assert.IsTrue(LanguageSpec.TryParse("python-3.* custom", out spec));
+            Assert.AreEqual(new LanguageSpec("python", "3"), spec);
         }
     }
 }
