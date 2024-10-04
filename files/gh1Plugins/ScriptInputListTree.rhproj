@@ -1,0 +1,47 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.13.24278\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "55638d4c-6170-4b3e-86f9-e279e07e7054",
+  "identity": {
+    "name": "ScriptInputListTree",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "8"
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "type": "components",
+      "id": "97d989df-8831-4f2d-9195-d65c5201874a",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "ScriptInputListTree.ghx",
+      "uri": "ScriptInputListTree.ghx"
+    }
+  ]
+}
