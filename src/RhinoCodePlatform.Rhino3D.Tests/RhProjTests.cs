@@ -643,5 +643,47 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         static readonly ProjectServerSpec s_rhProjServerSpec = new ProjectServerSpec("mcneel.rhino3d.project");
 #endif
 
+#if RC8_14
+        [Test]
+        public void TestRhProj_ExistingCommandError_SameCode()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83900
+            IProjectServer rhpServer = RhinoCode.ProjectServers.WherePasses(s_rhProjServerSpec).First();
+            IProject project = rhpServer.CreateProject();
+
+            var code = new SourceCode(LanguageSpec.Python3, "source", new Uri(Path.GetTempFileName()));
+            project.Add(code);
+
+            ProjectCode command;
+
+            command = project.GetCodes().ElementAt(0);
+            Assert.AreEqual(LanguageSpec.Python3, command.LanguageSpec);
+
+            Assert.Throws<LibraryCodeExistsException>(() =>
+            {
+                project.Add(code);
+            });
+        }
+
+        [Test]
+        public void TestRhProj_ExistingCommandError_SameTitle()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83900
+            IProjectServer rhpServer = RhinoCode.ProjectServers.WherePasses(s_rhProjServerSpec).First();
+            IProject project = rhpServer.CreateProject();
+
+            project.Add(new SourceCode(LanguageSpec.Python3, "MySource.py", "source", new Uri(Path.GetTempFileName())));
+
+            ProjectCode command;
+
+            command = project.GetCodes().ElementAt(0);
+            Assert.AreEqual(LanguageSpec.Python3, command.LanguageSpec);
+
+            Assert.Throws<LibraryCodeExistsException>(() =>
+            {
+                project.Add(new SourceCode(LanguageSpec.Python3, "MySource.py3", "other-source", new Uri(Path.GetTempFileName())));
+            });
+        }
+#endif
     }
 }
