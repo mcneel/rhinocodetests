@@ -179,6 +179,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             if (Directory.Exists(testPluginsPath))
             {
+                string libsdir = Path.Combine(testPluginsPath, "libs");
+                if (Directory.Exists(libsdir))
+                {
+                    Directory.Delete(libsdir, true);
+                }
+
                 foreach (string rhpFile in Directory.GetFiles(testPluginsPath, "*.rhp", SearchOption.AllDirectories))
                 {
                     TestContext.Progress.WriteLine($"Loading Rhino plugin: {rhpFile}");
@@ -193,6 +199,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             if (Directory.Exists(testPluginsPath))
             {
+                string libsdir = Path.Combine(testPluginsPath, "libs");
+                if (Directory.Exists(libsdir))
+                {
+                    Directory.Delete(libsdir, true);
+                }
+
                 string[] ghaFiles = Directory.GetFiles(testPluginsPath, "*.gha", SearchOption.AllDirectories).ToArray();
                 foreach (var ghaFile in ghaFiles)
                     TestContext.Progress.WriteLine($"Loading GH1 plugin: {ghaFile}");

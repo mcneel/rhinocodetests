@@ -1,0 +1,58 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.14.24289\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "fee8de3f-bb6d-4162-a424-7f23a1f30a17",
+  "identity": {
+    "name": "TestCSharpLibWithNugetReference",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "testCSharpLibWithNugetReference/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "8"
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "c1a246b6-11dc-4d06-84b5-672aa2090ddf",
+      "language": {
+        "id": "mcneel.roslyn.csharp",
+        "version": "9.0.*"
+      },
+      "title": "TestCSharpLibWithNugetReference",
+      "uri": "TestCSharpLibWithNugetReference.cs"
+    }
+  ],
+  "libraries": [
+    {
+      "type": "uri",
+      "library": {
+        "base": "LibWithPackageRef/",
+        "language": {
+          "id": "*.*.csharp",
+          "version": "*.*.*"
+        }
+      }
+    }
+  ]
+}
