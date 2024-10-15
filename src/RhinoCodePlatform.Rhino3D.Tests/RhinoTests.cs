@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.IO.MemoryMappedFiles;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -53,7 +54,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             using MemoryMappedFile mmf_cs = GetSharedMemory("TestCommandArgsCS");
             Assert.IsTrue(RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-_TestCommandArgsCS") == Rhino.Commands.Result.Success);
             AssertArgsReport(mmf_cs, RunMode.Scripted);
-            
+
             using MemoryMappedFile mmf_py3 = GetSharedMemory("TestCommandArgsPy3");
             Assert.IsTrue(RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-_TestCommandArgsPy3") == Rhino.Commands.Result.Success);
             AssertArgsReport(mmf_py3, RunMode.Scripted);
@@ -61,6 +62,24 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             using MemoryMappedFile mmf_py2 = GetSharedMemory("TestCommandArgsPy2");
             Assert.IsTrue(RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-_TestCommandArgsPy2") == Rhino.Commands.Result.Success);
             AssertArgsReport(mmf_py2, RunMode.Scripted);
+        }
+
+        [Test]
+        public void TestRunScript_TestCSharpLibWithNugetReference()
+        {
+            Assert.IsTrue(TryGetTestFile(@"rhinoPlugins\TestCSharpLibWithNugetReference.rhp", out string rhpFile));
+
+            using MemoryMappedFile mmf_cs = GetSharedMemory("TestCSharpLibWithNugetReference");
+            Assert.IsTrue(RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-_TestCSharpLibWithNugetReference") == Rhino.Commands.Result.Success);
+            Assert.IsTrue(GetReportLines(mmf_cs).Any(l => l.StartsWith("TRUE")));
+
+            bool libfound = false;
+            string libsdir = Path.Combine(Path.GetDirectoryName(rhpFile), "libs");
+            foreach (var file in Directory.GetFiles(libsdir, "*.dll", SearchOption.AllDirectories))
+            {
+                libfound |= Path.GetFileNameWithoutExtension(file) == "LibWithPackageRef";
+            }
+            Assert.IsTrue(libfound);
         }
 
         //[Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhino", "test_redraw.py" })]
