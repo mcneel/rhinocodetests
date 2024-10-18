@@ -1108,6 +1108,91 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
             param = new LGH1.Converters.LeaderConverter().CreateParameter();
             Assert.IsInstanceOf<GKP.Param_Leader>(param);
         }
+
+        [Test]
+        public void TestGH1_Component_ParamsCollect_CSharp_Empty_WithParentsInCode()
+        {
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
+
+            // change the script
+            script.Text = @"
+using System;
+using System.IO;
+using System.IO.MemoryMappedFiles;
+using System.Text;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript()
+    {
+        using MemoryMappedFile mmf = MemoryMappedFile.OpenExisting(""TestCommandArgsGH"");
+        using MemoryMappedViewStream stream = mmf.CreateViewStream();
+        BinaryWriter writer = new BinaryWriter(stream);
+        writer.Write(Encoding.UTF8.GetBytes(""TRUE\n""));
+    }
+}
+";
+            Assert.IsNotEmpty(script.Inputs);
+            Assert.IsNotEmpty(script.Outputs);
+
+            // collect parameters from RunScript and apply to component
+            script.ParamsCollect();
+
+            Assert.IsFalse(script.HasErrors);
+            Assert.IsEmpty(script.Inputs);
+            Assert.IsEmpty(script.Outputs);
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsCollect_CSharp_Multiline()
+        {
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
+
+            // change the script
+            script.Text = @"
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+  private void RunScript(
+	Rhino.UI.Gumball.GumballMode x,
+	List<int> y,
+	ref object a)
+  {
+    a = null;
+  }
+}
+";
+
+            // collect parameters from RunScript and apply to component
+            script.ParamsCollect();
+
+            // assert inputs
+            ScriptParam[] inputs = script.Inputs.Select(i => i.CreateScriptParam()).ToArray();
+            Assert.AreEqual("x", inputs[0].Name);
+            Assert.AreEqual("GumballMode", inputs[0].ValueType.Name);
+
+            Assert.AreEqual("y", inputs[1].Name);
+            Assert.AreEqual("List<int>", inputs[1].ValueType.Name);
+        }
+
 #endif
         static string EnsureCRLF(string input) => input.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
     }
