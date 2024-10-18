@@ -81,6 +81,17 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
             Assert.IsTrue(libfound);
         }
+#endif
+
+#if RC8_13
+        [Test]
+        public void TestRunScript_TestCommandArgs_GHCommand()
+        {
+            using MemoryMappedFile mmf = GetSharedMemory("TestCommandArgsGH");
+            Assert.IsTrue(RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-_TestCommandArgsGH") == Rhino.Commands.Result.Success);
+            Assert.IsTrue(GetReportLines(mmf).Any(l => l.StartsWith("TRUE")));
+        }
+#endif
 
         //[Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhino", "test_redraw.py" })]
         //public void TestRunScript_RedrawEnabled(string scriptfile)
@@ -120,5 +131,4 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             return ms.ToArray();
         }
     }
-#endif
 }

@@ -147,11 +147,11 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 
             // assert inputs
             ScriptParam[] inputs = script.Inputs.Select(i => i.CreateScriptParam()).ToArray();
-            Assert.True(inputs[0].Name == "u");
-            Assert.True(inputs[0].ValueType.Name == "int");
+            Assert.AreEqual("u", inputs[0].Name);
+            Assert.AreEqual("int", inputs[0].ValueType.Name);
 
-            Assert.True(inputs[1].Name == "v");
-            Assert.True(inputs[1].ValueType.Name == "Point3d");
+            Assert.AreEqual("v", inputs[1].Name);
+            Assert.AreEqual("Point3d", inputs[1].ValueType.Name);
 
             // assert param converters
             IScriptParameter u_param = script.Inputs.ElementAt(0);
@@ -217,19 +217,19 @@ public class Script_Instance : GH_ScriptInstance
 
             // assert inputs
             ScriptParam[] inputs = script.Inputs.Select(i => i.CreateScriptParam()).ToArray();
-            Assert.True(inputs[0].Name == "u");
-            Assert.True(inputs[0].ValueType.Name == "int");
+            Assert.AreEqual("u", inputs[0].Name);
+            Assert.AreEqual("int", inputs[0].ValueType.Name);
 
-            Assert.True(inputs[1].Name == "v");
-            Assert.True(inputs[1].ValueType.Name == "double");
+            Assert.AreEqual("v", inputs[1].Name);
+            Assert.AreEqual("double", inputs[1].ValueType.Name);
 
             // assert outputs
             ScriptParam[] outputs = script.Outputs.Select(i => i.CreateScriptParam()).ToArray();
-            Assert.True(outputs[0].Name == "w");
-            Assert.True(outputs[0].ValueType.Name == "Point3d");
+            Assert.AreEqual("w", outputs[0].Name);
+            Assert.AreEqual("Point3d", outputs[0].ValueType.Name);
 
-            Assert.True(outputs[1].Name == "z");
-            Assert.True(outputs[1].ValueType.Name == "Surface");
+            Assert.AreEqual("z", outputs[1].Name);
+            Assert.AreEqual("Surface", outputs[1].ValueType.Name);
 
             // assert param converters
             IScriptParameter u_param = script.Inputs.ElementAt(0);
@@ -380,13 +380,13 @@ public class Script_Instance : GH_ScriptInstance
 ", EnsureCRLF(updatedText));
             // assert inputs
             ScriptParam[] inputs = script.Inputs.Select(i => i.CreateScriptParam()).ToArray();
-            Assert.True(inputs[0].Name == "x");
-            Assert.True(inputs[0].ValueType.Name == "int");
+            Assert.AreEqual("x", inputs[0].Name);
+            Assert.AreEqual("int", inputs[0].ValueType.Name);
 
             // assert outputs
             ScriptParam[] outputs = script.Outputs.Select(i => i.CreateScriptParam()).ToArray();
-            Assert.True(outputs[0].Name == "a");
-            Assert.True(outputs[0].ValueType.Name == "double");
+            Assert.AreEqual("a", outputs[0].Name);
+            Assert.AreEqual("double", outputs[0].ValueType.Name);
 
             // assert param converters
             IScriptParameter x_param = script.Inputs.ElementAt(0);
@@ -491,11 +491,11 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 
             // assert inputs
             ScriptParam[] inputs = script.Inputs.Select(i => i.CreateScriptParam()).ToArray();
-            Assert.True(inputs[0].Name == "x");
-            Assert.True(inputs[0].ValueType.Name == "string");
+            Assert.AreEqual("x", inputs[0].Name);
+            Assert.AreEqual("string", inputs[0].ValueType.Name);
 
-            Assert.True(inputs[1].Name == "y");
-            Assert.True(inputs[1].ValueType.Name == "Point3d");
+            Assert.AreEqual("y", inputs[1].Name);
+            Assert.AreEqual("Point3d", inputs[1].ValueType.Name);
 
             // verify parameter converters
             Assert.True(x_param.Converter is LGH1.Converters.PythonStringConverter);
@@ -545,8 +545,8 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 
             // assert inputs
             ScriptParam[] inputs = script.Inputs.Select(i => i.CreateScriptParam()).ToArray();
-            Assert.True(inputs[0].Name == "x");
-            Assert.True(inputs[0].ValueType.Name == "string");
+            Assert.AreEqual("x", inputs[0].Name);
+            Assert.AreEqual("string", inputs[0].ValueType.Name);
 
             // verify parameter converters
             Assert.True(x_param.Converter is LGH1.Converters.PythonStringConverter);
@@ -644,11 +644,11 @@ public class Script_Instance : GH_ScriptInstance
 
             // assert inputs
             ScriptParam[] inputs = script.Inputs.Select(i => i.CreateScriptParam()).ToArray();
-            Assert.True(inputs[0].Name == "x");
-            Assert.True(inputs[0].ValueType.Name == "GumballMode");
+            Assert.AreEqual("x", inputs[0].Name);
+            Assert.AreEqual("GumballMode", inputs[0].ValueType.Name);
 
-            Assert.True(inputs[1].Name == "y");
-            Assert.True(inputs[1].ValueType.Name == "Decoder");
+            Assert.AreEqual("y", inputs[1].Name);
+            Assert.AreEqual("Decoder", inputs[1].ValueType.Name);
 
             // assert param converters
             IScriptParameter x_param = script.Inputs.ElementAt(0);
@@ -840,16 +840,16 @@ public class Script_Instance : GH_ScriptInstance
 
             // assert inputs
             ScriptParam[] inputs = script.Inputs.Select(i => i.CreateScriptParam()).ToArray();
-            Assert.True(inputs[0].Name == "outline");
-            Assert.True(inputs[0].ValueType.Name == "int");
+            Assert.AreEqual("outline", inputs[0].Name);
+            Assert.AreEqual("int", inputs[0].ValueType.Name);
 
-            Assert.True(inputs[1].Name == "reference");
-            Assert.True(inputs[1].ValueType.Name == "int");
+            Assert.AreEqual("reference", inputs[1].Name);
+            Assert.AreEqual("int", inputs[1].ValueType.Name);
 
             // assert outputs
             ScriptParam[] outputs = script.Outputs.Select(i => i.CreateScriptParam()).ToArray();
-            Assert.True(outputs[0].Name == "w");
-            Assert.True(outputs[0].ValueType.Name == "Point3d");
+            Assert.AreEqual("w", outputs[0].Name);
+            Assert.AreEqual("Point3d", outputs[0].ValueType.Name);
 
             // assert param converters
             IScriptParameter outline_param = script.Inputs.ElementAt(0);
@@ -1108,6 +1108,91 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
             param = new LGH1.Converters.LeaderConverter().CreateParameter();
             Assert.IsInstanceOf<GKP.Param_Leader>(param);
         }
+
+        [Test]
+        public void TestGH1_Component_ParamsCollect_CSharp_Empty_WithParentsInCode()
+        {
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
+
+            // change the script
+            script.Text = @"
+using System;
+using System.IO;
+using System.IO.MemoryMappedFiles;
+using System.Text;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript()
+    {
+        using MemoryMappedFile mmf = MemoryMappedFile.OpenExisting(""TestCommandArgsGH"");
+        using MemoryMappedViewStream stream = mmf.CreateViewStream();
+        BinaryWriter writer = new BinaryWriter(stream);
+        writer.Write(Encoding.UTF8.GetBytes(""TRUE\n""));
+    }
+}
+";
+            Assert.IsNotEmpty(script.Inputs);
+            Assert.IsNotEmpty(script.Outputs);
+
+            // collect parameters from RunScript and apply to component
+            script.ParamsCollect();
+
+            Assert.IsFalse(script.HasErrors);
+            Assert.IsEmpty(script.Inputs);
+            Assert.IsEmpty(script.Outputs);
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsCollect_CSharp_Multiline()
+        {
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
+
+            // change the script
+            script.Text = @"
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+  private void RunScript(
+	Rhino.UI.Gumball.GumballMode x,
+	List<int> y,
+	ref object a)
+  {
+    a = null;
+  }
+}
+";
+
+            // collect parameters from RunScript and apply to component
+            script.ParamsCollect();
+
+            // assert inputs
+            ScriptParam[] inputs = script.Inputs.Select(i => i.CreateScriptParam()).ToArray();
+            Assert.AreEqual("x", inputs[0].Name);
+            Assert.AreEqual("GumballMode", inputs[0].ValueType.Name);
+
+            Assert.AreEqual("y", inputs[1].Name);
+            Assert.AreEqual("List<int>", inputs[1].ValueType.Name);
+        }
+
 #endif
         static string EnsureCRLF(string input) => input.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
     }
