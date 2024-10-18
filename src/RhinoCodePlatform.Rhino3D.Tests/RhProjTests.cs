@@ -11,11 +11,11 @@ using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Platform;
 using Rhino.Runtime.Code.Projects;
 using Rhino.Runtime.Code.Diagnostics;
+using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Storage;
 
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Rhino.Runtime.Code.Execution;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -640,7 +640,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             Assert.AreEqual(LanguageSpec.Python2, command.LanguageSpec);
         }
 
-        static readonly ProjectServerSpec s_rhProjServerSpec = new ProjectServerSpec("mcneel.rhino3d.project");
+        static readonly ProjectServerSpec s_rhProjServerSpec = new("mcneel.rhino3d.project");
 #endif
 
 #if RC8_14
