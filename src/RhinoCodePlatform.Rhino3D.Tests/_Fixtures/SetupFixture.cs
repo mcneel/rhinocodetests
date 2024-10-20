@@ -145,6 +145,15 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 #else
             Registrar.SendReportsToConsole = true;
 #endif
+
+#if RC8_14
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-84389
+            string netfwRefNuget = Path.Combine(RhinoCode.UserProfile, ".nuget", "packages", "microsoft.netframework.referenceassemblies.net48");
+            if (Directory.Exists(netfwRefNuget))
+            {
+                Directory.Delete(netfwRefNuget, recursive: true);
+            }
+#endif
             RhinoCode.Languages.WaitStatusComplete(LanguageSpec.Any, new TestContextStatusResponder());
             foreach (ILanguage language in RhinoCode.Languages)
             {
