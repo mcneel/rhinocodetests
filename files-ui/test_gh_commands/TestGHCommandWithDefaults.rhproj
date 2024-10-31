@@ -19,7 +19,7 @@
     }
   },
   "settings": {
-    "buildPath": "testGHCommandWithDefaults/",
+    "buildPath": "build/",
     "buildTarget": {
       "host": {
         "name": "Rhino3D",
@@ -59,6 +59,42 @@
       },
       "title": "command_cache_getGeom",
       "uri": "command_cache_getGeom.gh"
+    },
+    {
+      "id": "68780e41-edd1-4929-95f4-13638694570d",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "command_content_cache",
+      "uri": "command_content_cache.gh"
+    },
+    {
+      "id": "6959c0c8-df10-4006-8d57-4283d2c8565e",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "command_with_preview",
+      "uri": "command_with_preview.gh"
+    },
+    {
+      "id": "1793b102-75cb-4a07-b1b4-378d2dbcb6d8",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "command_with_preview_cached",
+      "uri": "command_with_preview_cached.gh"
+    },
+    {
+      "id": "00c5cf7c-fc32-41d6-96e3-ad280950083d",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "command_with_human_ui",
+      "uri": "command_with_human_ui.gh"
     }
   ]
 }

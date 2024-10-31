@@ -19,7 +19,7 @@
     }
   },
   "settings": {
-    "buildPath": "testLibraries/",
+    "buildPath": "build/",
     "buildTarget": {
       "host": {
         "name": "Rhino3D",
