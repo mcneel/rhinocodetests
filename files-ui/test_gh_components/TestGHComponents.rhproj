@@ -1,13 +1,13 @@
 {
   "host": {
     "name": "Rhino3D",
-    "version": "8.13.24305\u002B1000",
+    "version": "8.13.24304\u002B1000",
     "os": "windows",
     "arch": "x64"
   },
-  "id": "51885091-077e-44c7-9db9-4f2af9d56ba9",
+  "id": "7f4694c6-33b9-4388-a685-c3eecb4c376c",
   "identity": {
-    "name": "ScriptInstancePreviews",
+    "name": "TestGHComponents",
     "version": "0.1",
     "publisher": {
       "email": "ehsan@mcneel.com",
@@ -35,23 +35,20 @@
   "codes": [
     {
       "type": "components",
-      "id": "2d048048-350b-4ab8-a324-35a34307fc9f",
+      "id": "dabaf378-0fca-4dae-ac3a-1034395751a7",
       "language": {
         "id": "*.gh1.grasshopper",
         "version": "1.*.*"
       },
-      "title": "ScriptInstancePreviews_Single.ghx",
-      "uri": "ScriptInstancePreviews_Single.ghx"
-    },
-    {
-      "type": "components",
-      "id": "8a1b7fc0-a66d-4aa4-a412-3c1b01e462a3",
-      "language": {
-        "id": "*.gh1.grasshopper",
-        "version": "1.*.*"
-      },
-      "title": "ScriptInstancePreviews_Context.ghx",
-      "uri": "ScriptInstancePreviews_Context.ghx"
+      "title": "component_with_preview.gh",
+      "uri": "component_with_preview.gh",
+      "scripts": [
+        {
+          "id": "dabaf378-0fca-4dae-ac3a-1034395751a7",
+          "name": "component_with_preview",
+          "subcat": "Default"
+        }
+      ]
     }
   ]
 }
