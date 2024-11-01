@@ -1,0 +1,63 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.14.24306\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "4e1d1474-fb3b-4590-8156-813f5d43f941",
+  "identity": {
+    "name": "ComponentOptionalInputs",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "8"
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "type": "components",
+      "id": "dd48492a-d12b-4f5c-a80c-ed83cf20e5ca",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "ComponentOptionalInputs.ghx",
+      "uri": "ComponentOptionalInputs.ghx",
+      "scripts": [
+        {
+          "id": "5f285253-d0fa-4d0c-9e61-87fa3f5fca6f",
+          "name": "OptionalY",
+          "nickname": "OptionalY",
+          "subcat": "Default",
+          "exposure": "excluded"
+        },
+        {
+          "id": "b341bd28-e9fd-4363-a232-f3317cdcc5b9",
+          "name": "OptionalY",
+          "nickname": "OptionalY",
+          "description": "Python 3 scripting component",
+          "subcat": "Default"
+        }
+      ]
+    }
+  ]
+}

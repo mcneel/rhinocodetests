@@ -684,6 +684,36 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 project.Add(new SourceCode(LanguageSpec.Python3, "MySource.py3", "other-source", new Uri(Path.GetTempFileName())));
             });
         }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestHiddenCommandWithIcon.rhproj" })]
+        public void TestRhProj_RhinoGH8_HiddenCommandWithIconShouldNotBeInToolbar(string rhprojfile)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-84578
+            IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+
+            Assert.AreEqual(2, project.GetCodes().Count());
+
+            project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
+            project.Build(s_host, new NUnitProgressReporter());
+
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "TestHiddenCommandWithIcon.rhp")));
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testhiddencommandwithicon-0.1.1234.8888-rh8-any.yak")));
+
+            string ruiFile = Path.Combine(buildPath, "rh8", "TestHiddenCommandWithIcon.rui");
+            Assert.IsTrue(File.Exists(ruiFile));
+
+            string rui = File.ReadAllText(ruiFile);
+            Assert.IsTrue(rui.Contains("<tool_bar_item guid=\"561b03f8-e4d9-48ff-b594-3a53e223aca8\""));
+            Assert.IsTrue(rui.Contains("<icon guid=\"561b03f8-e4d9-48ff-b594-3a53e223aca8\""));
+
+            Assert.IsFalse(rui.Contains("<tool_bar_item guid=\"a3b65e88-1deb-4068-b407-a95e084a9013\""));
+            Assert.IsFalse(rui.Contains("<icon guid=\"a3b65e88-1deb-4068-b407-a95e084a9013\""));
+
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+        }
 #endif
     }
 }
