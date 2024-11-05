@@ -1,0 +1,46 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.14.24310\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "6d781543-ef2f-4b29-8533-d16d048c9fbd",
+  "identity": {
+    "name": "TestYakVersion",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "testYakVersion",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "8"
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "e9528a41-4075-465b-bc02-55f4ef075630",
+      "language": {
+        "id": "mcneel.pythonnet.python",
+        "version": "3.9.10"
+      },
+      "title": "command",
+      "uri": "command.py"
+    }
+  ]
+}

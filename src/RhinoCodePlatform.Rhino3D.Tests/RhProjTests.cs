@@ -181,12 +181,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
 
-            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
             project.Build(s_host, new NUnitProgressReporter());
 
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "TestSingle.rhp")));
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testsingle-0.1.1234.8888-rh8-any.yak")));
 
@@ -198,12 +198,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
 
-            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
             project.Build(s_host, new NUnitProgressReporter());
 
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string rhpFile = Path.Combine(buildPath, "rh8", "TestMultiple.rhp");
             Assert.IsTrue(File.Exists(rhpFile));
             using (ModuleDefinition rhp = ModuleDefinition.ReadModule(rhpFile))
@@ -238,12 +238,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
 
-            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
             project.Build(s_host, new NUnitProgressReporter());
 
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string rhpFile = Path.Combine(buildPath, "rh8", "TestMultipleExcluded.rhp");
             Assert.IsTrue(File.Exists(rhpFile));
             using (ModuleDefinition rhp = ModuleDefinition.ReadModule(rhpFile))
@@ -281,12 +281,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
 
-            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
             project.Build(s_host, new NUnitProgressReporter());
 
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "TestSingleComponent.Components.gha")));
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testsinglecomponent-0.1.1234.8888-rh8-any.yak")));
 
@@ -298,11 +298,11 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
 
-            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Build(s_host, new NUnitProgressReporter());
 
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string rhpFile = Path.Combine(buildPath, "rh8", "TestLibraries.rhp");
             Assert.IsTrue(File.Exists(rhpFile));
             TryExtractProjectFromRHP(rhpFile, out IProject rhpProj);
@@ -327,12 +327,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
 
-            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
             project.Build(s_host, new NUnitProgressReporter());
 
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string rhpFile = Path.Combine(buildPath, "rh8", "TestResources.rhp");
             Assert.IsTrue(File.Exists(rhpFile));
             TryExtractProjectFromRHP(rhpFile, out IProject rhpProj);
@@ -367,12 +367,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
 
-            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
             project.Build(s_host, new NUnitProgressReporter());
 
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string rhpFile = Path.Combine(buildPath, "rh7", "TestRhino7Build.rhp");
             Assert.IsTrue(File.Exists(rhpFile));
             using (ModuleDefinition rhp = ModuleDefinition.ReadModule(rhpFile))
@@ -400,12 +400,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
 
-            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
             project.Build(s_host, new NUnitProgressReporter());
 
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "TestRhino7BuildWithImage.rhp")));
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "TestRhino7BuildWithImage.Components.gha")));
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "testrhino7buildwithimage-0.1.1234.8888-rh7-any.yak")));
@@ -425,12 +425,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
 
-            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
             project.Build(s_host, new NUnitProgressReporter());
 
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string rhpFile = Path.Combine(buildPath, "rh7", "TestRhino7BuildWithGH.rhp");
             Assert.IsTrue(File.Exists(rhpFile));
             using (ModuleDefinition rhp = ModuleDefinition.ReadModule(rhpFile))
@@ -448,11 +448,11 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
 
-            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Build(s_host, new NUnitProgressReporter());
 
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string rhpFile = Path.Combine(buildPath, "rh7", "TestRhino7BuildWithExcluded.rhp");
             Assert.IsTrue(File.Exists(rhpFile));
             using (ModuleDefinition rhp = ModuleDefinition.ReadModule(rhpFile))
@@ -470,11 +470,11 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
 
-            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Build(s_host, new NUnitProgressReporter());
 
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string ghaFile = Path.Combine(buildPath, "rh7", "TestRhino7BuildWithExcludedComponent.Components.gha");
             Assert.IsTrue(File.Exists(ghaFile));
             using (ModuleDefinition gha = ModuleDefinition.ReadModule(ghaFile))
@@ -521,7 +521,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             IProject project = RhinoCode.ProjectServers.CreateProject(storage);
             IProject projectNoHost = new Testing.ProjectReaderServer().CreateProject(storage);
 
-            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             Assert.DoesNotThrow(() =>
@@ -551,7 +550,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             Assert.IsTrue(ex.Message.Contains("Grasshopper file is saved on Rhino 8.9 or earlier. Please re-save the file in Rhino 8.11 or above"));
 
-            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
 
@@ -567,7 +565,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             Assert.IsTrue(ex.Message.Contains("Grasshopper legacy RH_IN/RH_OUT params are only supported on Rhino 8.11 or above"));
 
-            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
 
@@ -711,6 +708,36 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             Assert.IsFalse(rui.Contains("<tool_bar_item guid=\"a3b65e88-1deb-4068-b407-a95e084a9013\""));
             Assert.IsFalse(rui.Contains("<icon guid=\"a3b65e88-1deb-4068-b407-a95e084a9013\""));
+
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+        }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestYakVersion.rhproj" })]
+        public void TestRhProj_Build_YakVersion(string rhprojfile)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-84604
+            IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+
+            project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
+            project.Build(s_host, new NUnitProgressReporter());
+
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testyakversion-0.1.1234+8888-rh8-any.yak")));
+
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+        }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestYakBetaVersion.rhproj" })]
+        public void TestRhProj_Build_YakBetaVersion(string rhprojfile)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-84604
+            IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+
+            project.Identity.Version = new ProjectVersion(0, 1, 1234, "beta", 8888);
+            project.Build(s_host, new NUnitProgressReporter());
+
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testyakbetaversion-0.1.1234-beta+8888-rh8-any.yak")));
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
