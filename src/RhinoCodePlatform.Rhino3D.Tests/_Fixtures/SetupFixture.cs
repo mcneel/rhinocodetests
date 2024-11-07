@@ -21,6 +21,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         public const string RHINOCODE_LOG_LEVEL_ENVVAR = "RHINOCODE_LOG_LEVEL";
         public const string RHINOCODE_PYTHON_VENV_PREFIX = "test_";
 
+        public static bool LOAD_COMPUTE { get; set; } = true;
+
         static readonly TestSettings s_settings;
 
         static SetupFixture()
@@ -245,6 +247,11 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         static void StartComputeInstance()
         {
+            if (!LOAD_COMPUTE)
+            {
+                return;
+            }
+
             string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string hops = Path.Combine(appdata, "McNeel", "Rhinoceros", "packages", "8.0", "Hops");
             string hopsmanifest = Path.Combine(hops, "manifest.txt");
@@ -296,8 +303,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 TestContext.Progress.WriteLine(err);
                 throw new Exception(err);
             }
-
-            Thread.Sleep(15 * 1000);
         }
 
         static void PatchHopsConfigs()
