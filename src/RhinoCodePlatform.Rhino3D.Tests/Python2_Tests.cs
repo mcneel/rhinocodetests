@@ -31,7 +31,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             Code code = GetLanguage(LanguageSpec.Python2).CreateCode(scriptInfo.Uri);
 
-            RunContext ctx = GetRunContext();
+            RunContext ctx = GetRunContext(scriptInfo);
 
             if (TryRunCode(scriptInfo, code, ctx, out string errorMessage))
             {

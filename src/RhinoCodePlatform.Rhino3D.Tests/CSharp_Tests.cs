@@ -32,11 +32,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(scriptInfo.Uri);
 
-            RunContext ctx;
-            if (scriptInfo.IsDebug)
-                ctx = new DebugContext();
-            else
-                ctx = new RunContext();
+            RunContext ctx = GetRunContext(scriptInfo);
 
             ctx.AutoApplyParams = true;
             ctx.OutputStream = GetOutputStream();
