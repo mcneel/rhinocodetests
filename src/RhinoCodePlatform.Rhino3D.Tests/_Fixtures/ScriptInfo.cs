@@ -22,6 +22,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         public bool IsDebug { get; } = false;
 
+        public bool IsProfile { get; } = false;
+
         public bool IsSkipped { get; } = false;
 
         public bool ExpectsError { get; } = false;
@@ -53,6 +55,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             Name = Uri.GetEndpointTitle();
             IsAsync = uriStr.Contains("_async");
             IsDebug = uriStr.Contains("_debug");
+            IsProfile = uriStr.Contains("_profile");
             IsSkipped = uriStr.Contains("_skip");
             ExpectsError = uriStr.Contains("_error");
             ExpectsWarning = uriStr.Contains("_warning");

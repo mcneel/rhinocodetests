@@ -55,17 +55,11 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             Code code = GetGrasshopper().CreateCode(scriptInfo.Uri);
 
-            var ctx = new RunContext
-            {
-                AutoApplyParams = true,
-                Outputs = {
-                    ["result"] = default,
-                },
-                Options = {
-                    ["grasshopper.runner.asCommand"] = false,
-                    ["grasshopper.runner.extractDoc"] = GHDOC_PARAM,
-                }
-            };
+            RunContext ctx = GetRunContext(scriptInfo);
+
+            ctx.AutoApplyParams = true;
+            ctx.Options["grasshopper.runner.asCommand"] = false;
+            ctx.Options["grasshopper.runner.extractDoc"] = GHDOC_PARAM;
 
             if (scriptInfo.ExpectsWarning)
             {

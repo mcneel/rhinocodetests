@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
+using System.Diagnostics;
+using System.Threading;
 
 using NUnit.Framework;
 
@@ -10,8 +12,6 @@ using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Logging;
 using Rhino.Runtime.Code.Environments;
-using System.Diagnostics;
-using System.Threading;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {

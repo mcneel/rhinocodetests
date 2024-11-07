@@ -9,6 +9,8 @@ using NUnit.Framework;
 
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
+using Rhino.Runtime.Code.Execution.Debugging;
+using Rhino.Runtime.Code.Execution.Profiling;
 using Rhino.Runtime.Code.Languages;
 
 using RhinoCodePlatform.Rhino3D.Testing;
@@ -96,19 +98,19 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
         }
 
-        protected static RunContext GetRunContext(bool captureStdout = true)
+        protected static RunContext GetRunContext(bool captureStdout = true) => GetRunContext(new RunContext(), captureStdout);
+
+        protected static RunContext GetRunContext(ScriptInfo scriptInfo, bool captureStdout = true)
         {
-            return new RunContext
-            {
-#if RC8_12
-                ResetStreamsPolicy = ResetStreamPolicy.ResetToPlatformStream,
-#endif
-                AutoApplyParams = true,
-                OutputStream = captureStdout ? GetOutputStream() : default,
-                Outputs = {
-                    ["result"] = default,
-                },
-            };
+            RunContext ctx;
+            if (scriptInfo.IsDebug)
+                ctx = new DebugContext();
+            else if (scriptInfo.IsProfile)
+                ctx = new ProfileContext();
+            else
+                ctx = new RunContext();
+
+            return GetRunContext(ctx, captureStdout);
         }
 
         protected static Stream GetOutputStream() => new NUnitStream();
@@ -201,6 +203,18 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             if (scriptInfo.IsSkipped)
                 Assert.Ignore();
+        }
+
+        static RunContext GetRunContext(RunContext ctx, bool captureStdout)
+        {
+#if RC8_12
+            ctx.ResetStreamsPolicy = ResetStreamPolicy.ResetToPlatformStream;
+#endif
+            ctx.AutoApplyParams = true;
+            ctx.OutputStream = captureStdout ? GetOutputStream() : default;
+            ctx.Outputs["result"] = default;
+
+            return ctx;
         }
 
         static bool TrySafeRunCode(ScriptInfo scriptInfo, Code code, RunContext context, out string errorMessage)
