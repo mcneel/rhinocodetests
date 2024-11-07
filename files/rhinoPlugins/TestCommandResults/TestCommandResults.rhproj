@@ -1,0 +1,100 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.14.24311\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "4bbb0fc9-786a-4757-afb2-c456f6478f3d",
+  "identity": {
+    "name": "TestCommandResults",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "8"
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "3a40f266-fb2e-46ee-88f5-2c3beef836ed",
+      "language": {
+        "id": "*.*.python",
+        "version": "3.*.*"
+      },
+      "title": "command_cancel_py3",
+      "uri": "command_cancel_py3.py"
+    },
+    {
+      "id": "9260951e-8851-4d88-beaa-7fc4e2c50510",
+      "language": {
+        "id": "*.*.python",
+        "version": "2.*.*"
+      },
+      "title": "command_cancel_py2",
+      "uri": "command_cancel_py2.py"
+    },
+    {
+      "id": "49d7bf1e-2cf9-4a60-9da9-aeecc241491c",
+      "language": {
+        "id": "*.*.csharp",
+        "version": "*.*.*"
+      },
+      "title": "command_cancel",
+      "uri": "command_cancel.cs"
+    },
+    {
+      "id": "0dcba767-6a73-46e0-81ca-217941e78252",
+      "language": {
+        "id": "*.*.python",
+        "version": "3.*.*"
+      },
+      "title": "command_cancel_outparam_py3",
+      "uri": "command_cancel_outparam_py3.py"
+    },
+    {
+      "id": "020ca46b-81fe-4b13-8f90-6ec395a6f6fc",
+      "language": {
+        "id": "*.*.python",
+        "version": "2.*.*"
+      },
+      "title": "command_cancel_outparam_py2",
+      "uri": "command_cancel_outparam_py2.py"
+    },
+    {
+      "id": "6c1b5588-1a0a-454d-9044-0c5a0c2b96fd",
+      "language": {
+        "id": "*.*.csharp",
+        "version": "*.*.*"
+      },
+      "title": "command_cancel_outparam",
+      "uri": "command_cancel_outparam.cs"
+    },
+    {
+      "id": "b5d6553b-37bc-41c9-b066-13b2a99ef2a4",
+      "language": {
+        "id": "mcneel.gh1.grasshopper",
+        "version": "1.0.*"
+      },
+      "title": "command_cancel_gh_py3",
+      "uri": "command_cancel_gh_py3.gh"
+    }
+  ]
+}

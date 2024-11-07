@@ -93,6 +93,30 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         }
 #endif
 
+#if RC8_14
+        [Test]
+        public void TestRunScript_TestCommandResult_CancelCommand()
+        {
+            Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel"));
+            Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel_py3"));
+            Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel_py2"));
+        }
+
+        [Test]
+        public void TestRunScript_TestCommandResult_CancelCommand_FromOutParam()
+        {
+            Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel_outparam"));
+            Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel_outparam_py3"));
+            Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel_outparam_py2"));
+        }
+
+        [Test]
+        public void TestRunScript_TestCommandResult_CancelCommand_GH()
+        {
+            Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel_gh_py3"));
+        }
+#endif
+
         //[Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhino", "test_redraw.py" })]
         //public void TestRunScript_RedrawEnabled(string scriptfile)
         //{
