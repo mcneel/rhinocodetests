@@ -1301,6 +1301,7 @@ import os
         [Test]
         public void TestPython2_CompleteSignature_GH_CurveXCurve()
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81419
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-84661
             Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
 @"
