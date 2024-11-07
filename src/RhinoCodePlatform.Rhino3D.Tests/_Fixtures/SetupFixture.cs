@@ -304,11 +304,28 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
             string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string ghsettings = Path.Combine(appdata, "Grasshopper", "grasshopper_kernel.xml");
-            string settings = File.ReadAllText(ghsettings);
-            settings = settings.Replace(
-                "<item name=\"Hops:Servers\" type_name=\"gh_string\" type_code=\"10\"></item>",
-                "<item name=\"Hops:Servers\" type_name=\"gh_string\" type_code=\"10\">http:\\\\localhost:5000</item>"
-                );
+
+            string settings;
+            if (File.Exists(ghsettings))
+            {
+                settings = File.ReadAllText(ghsettings);
+                settings = settings.Replace(
+                    "<item name=\"Hops:Servers\" type_name=\"gh_string\" type_code=\"10\"></item>",
+                    "<item name=\"Hops:Servers\" type_name=\"gh_string\" type_code=\"10\">http:\\\\localhost:5000</item>"
+                    );
+            }
+            else
+            {
+                const string ghSettingsWithHops = @"
+<Fragment name=""Settings"">
+  <items count=""1"">
+    <item name=""Hops:Servers"" type_name=""gh_string"" type_code=""10"">http://localhost:5000</item>
+  </items>
+</Fragment>
+";
+                settings = ghSettingsWithHops;
+            }
+
             File.WriteAllText(ghsettings, settings);
         }
 #endif
