@@ -10,6 +10,8 @@ using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Logging;
 using Rhino.Runtime.Code.Environments;
+using System.Diagnostics;
+using System.Threading;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -55,6 +57,10 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         public override void OneTimeSetup()
         {
+#if RC8_14
+            PatchHopsConfigs();
+#endif
+
             base.OneTimeSetup();
 
             if (!Directory.Exists(Rhino.Testing.Configs.Current.RhinoSystemDir))
@@ -66,6 +72,19 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             LoadLanguages();
             LoadRhinoPlugins();
             LoadGrasshopperPlugins();
+
+#if RC8_14
+            StartComputeInstance();
+#endif
+        }
+
+        public override void OneTimeTearDown()
+        {
+            base.OneTimeTearDown();
+
+#if RC8_14
+            s_compute?.Kill();
+#endif
         }
 
         sealed class TestContextStatusResponder : ProgressStatusResponder
@@ -220,5 +239,78 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 LoadGHA(ghaFiles);
             }
         }
+
+#if RC8_14
+        static Process s_compute;
+
+        static void StartComputeInstance()
+        {
+            string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string hops = Path.Combine(appdata, "McNeel", "Rhinoceros", "packages", "8.0", "Hops");
+            string hopsmanifest = Path.Combine(hops, "manifest.txt");
+            string currenthops = Path.Combine(hops, File.ReadAllText(hopsmanifest).Trim());
+
+            bool started = false;
+            var token = new CancellationTokenSource();
+            s_compute =
+            RhinoCode.RunBackgroundProcess(
+                                 Path.Combine(currenthops, "compute.geometry", "compute.geometry.exe"),
+                                 $"-rhinosysdir:\"{Rhino.Testing.Configs.Current.RhinoSystemDir}\"",
+                                 (object sender, DataReceivedEventArgs e) =>
+                                 {
+                                     if (e.Data is string line)
+                                     {
+                                         TestContext.Progress.WriteLine(line);
+
+                                         started |= line.Contains("Application started.");
+                                     }
+                                 },
+                                 (object sender, DataReceivedEventArgs e) =>
+                                 {
+                                     if (e.Data is string line)
+                                     {
+                                         TestContext.Progress.WriteLine(line);
+                                     }
+                                 },
+                                 (ProcessStartInfo s) =>
+                                 {
+
+                                 });
+
+            // give compute enough time to launch, or break after 10
+            int counter = 10;
+            while (!started)
+            {
+                Thread.Sleep(1000);
+                counter--;
+
+                if (0 >= counter)
+                {
+                    break;
+                }
+            }
+
+            if (s_compute.HasExited)
+            {
+                string err = $"Rhino.Compute launch failed with exit code {s_compute.ExitCode}";
+                TestContext.Progress.WriteLine(err);
+                throw new Exception(err);
+            }
+
+            Thread.Sleep(15 * 1000);
+        }
+
+        static void PatchHopsConfigs()
+        {
+            string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string ghsettings = Path.Combine(appdata, "Grasshopper", "grasshopper_kernel.xml");
+            string settings = File.ReadAllText(ghsettings);
+            settings = settings.Replace(
+                "<item name=\"Hops:Servers\" type_name=\"gh_string\" type_code=\"10\"></item>",
+                "<item name=\"Hops:Servers\" type_name=\"gh_string\" type_code=\"10\">http:\\\\localhost:5000</item>"
+                );
+            File.WriteAllText(ghsettings, settings);
+        }
+#endif
     }
 }
