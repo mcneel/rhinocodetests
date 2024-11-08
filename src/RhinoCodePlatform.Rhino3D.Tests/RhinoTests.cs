@@ -33,34 +33,50 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         }
 
         [Test]
-        public void TestRunScript_TestCommandArgs()
+        public void TestRunScript_TestCommandArgs_CS()
         {
             using MemoryMappedFile mmf_cs = GetSharedMemory("TestCommandArgsCS");
-            Assert.IsTrue(RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "TestCommandArgsCS") == Rhino.Commands.Result.Success);
+            Assert.AreEqual(Result.Success, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "TestCommandArgsCS"));
             AssertArgsReport(mmf_cs, RunMode.Interactive);
+        }
 
+        [Test]
+        public void TestRunScript_TestCommandArgs_Py3()
+        {
             using MemoryMappedFile mmf_py3 = GetSharedMemory("TestCommandArgsPy3");
-            Assert.IsTrue(RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "TestCommandArgsPy3") == Rhino.Commands.Result.Success);
+            Assert.AreEqual(Result.Success, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "TestCommandArgsPy3"));
             AssertArgsReport(mmf_py3, RunMode.Interactive);
+        }
 
+        [Test]
+        public void TestRunScript_TestCommandArgs_Py2()
+        {
             using MemoryMappedFile mmf_py2 = GetSharedMemory("TestCommandArgsPy2");
-            Assert.IsTrue(RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "TestCommandArgsPy2") == Rhino.Commands.Result.Success);
+            Assert.AreEqual(Result.Success, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "TestCommandArgsPy2"));
             AssertArgsReport(mmf_py2, RunMode.Interactive);
         }
 
         [Test]
-        public void TestRunScript_TestCommandArgs_Script()
+        public void TestRunScript_TestCommandArgs_Script_CS()
         {
             using MemoryMappedFile mmf_cs = GetSharedMemory("TestCommandArgsCS");
-            Assert.IsTrue(RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-_TestCommandArgsCS") == Rhino.Commands.Result.Success);
+            Assert.AreEqual(Result.Success, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-_TestCommandArgsCS"));
             AssertArgsReport(mmf_cs, RunMode.Scripted);
+        }
 
+        [Test]
+        public void TestRunScript_TestCommandArgs_Script_Py3()
+        {
             using MemoryMappedFile mmf_py3 = GetSharedMemory("TestCommandArgsPy3");
-            Assert.IsTrue(RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-_TestCommandArgsPy3") == Rhino.Commands.Result.Success);
+            Assert.AreEqual(Result.Success, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-_TestCommandArgsPy3"));
             AssertArgsReport(mmf_py3, RunMode.Scripted);
+        }
 
+        [Test]
+        public void TestRunScript_TestCommandArgs_Script_Py2()
+        {
             using MemoryMappedFile mmf_py2 = GetSharedMemory("TestCommandArgsPy2");
-            Assert.IsTrue(RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-_TestCommandArgsPy2") == Rhino.Commands.Result.Success);
+            Assert.AreEqual(Result.Success, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-_TestCommandArgsPy2"));
             AssertArgsReport(mmf_py2, RunMode.Scripted);
         }
 
@@ -70,7 +86,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             Assert.IsTrue(TryGetTestFile(@"rhinoPlugins\TestCSharpLibWithNugetReference.rhp", out string rhpFile));
 
             using MemoryMappedFile mmf_cs = GetSharedMemory("TestCSharpLibWithNugetReference");
-            Assert.IsTrue(RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-_TestCSharpLibWithNugetReference") == Rhino.Commands.Result.Success);
+            Assert.AreEqual(Result.Success, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-_TestCSharpLibWithNugetReference"));
             Assert.IsTrue(GetReportLines(mmf_cs).Any(l => l.StartsWith("TRUE")));
 
             bool libfound = false;
@@ -88,32 +104,70 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         public void TestRunScript_TestCommandArgs_GHCommand()
         {
             using MemoryMappedFile mmf = GetSharedMemory("TestCommandArgsGH");
-            Assert.IsTrue(RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-_TestCommandArgsGH") == Rhino.Commands.Result.Success);
+            Assert.AreEqual(Result.Success, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-_TestCommandArgsGH"));
             Assert.IsTrue(GetReportLines(mmf).Any(l => l.StartsWith("TRUE")));
         }
 #endif
 
 #if RC8_14
         [Test]
-        public void TestRunScript_TestCommandResult_CancelCommand()
+        public void TestRunScript_TestCommandResult_CancelCommand_CS()
         {
             Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel"));
-            Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel_py3"));
-            Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel_py2"));
         }
 
         [Test]
-        public void TestRunScript_TestCommandResult_CancelCommand_FromOutParam()
+        public void TestRunScript_TestCommandResult_CancelCommand_Py3()
         {
-            Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel_outparam"));
-            Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel_outparam_py3"));
-            Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel_outparam_py2"));
+            Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel_py3"));
+        }
+
+        [Test]
+        public void TestRunScript_TestCommandResult_CancelCommand_Py2()
+        {
+            Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel_py2"));
         }
 
         [Test]
         public void TestRunScript_TestCommandResult_CancelCommand_GH()
         {
             Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel_gh_py3"));
+        }
+
+        [Test]
+        public void TestRunScript_TestCommandResult_CancelCommand_FromOutParam_CS()
+        {
+            Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel_outparam"));
+        }
+
+        [Test]
+        public void TestRunScript_TestCommandResult_CancelCommand_FromOutParam_Py3()
+        {
+            Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel_outparam_py3"));
+        }
+
+        [Test]
+        public void TestRunScript_TestCommandResult_CancelCommand_FromOutParam_Py2()
+        {
+            Assert.AreEqual(Result.Cancel, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-command_cancel_outparam_py2"));
+        }
+
+        [Test]
+        public void TestRunScript_TestLibs_CSharpInPython3()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-84426
+            using MemoryMappedFile mmf_py3 = GetSharedMemory("TestCSharpInPython3");
+            Assert.AreEqual(Result.Success, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-TestCSharpInPython3"));
+            Assert.AreEqual("Test.CSharpInPython3.TestClass", GetReportLines(mmf_py3)[0][..30]);
+        }
+
+        [Test]
+        public void TestRunScript_TestLibs_CSharpInPython2()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-84426
+            using MemoryMappedFile mmf_py2 = GetSharedMemory("TestCSharpInPython2");
+            Assert.AreEqual(Result.Success, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-TestCSharpInPython2"));
+            Assert.AreEqual("<Test.CSharpInPython2.TestClass", GetReportLines(mmf_py2)[0][..31]);
         }
 #endif
 
@@ -139,7 +193,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             Assert.AreEqual(RunMode.Interactive == mode ? "True" : "False", lines[3]);
         }
 
-        static MemoryMappedFile GetSharedMemory(string name) => MemoryMappedFile.CreateNew(name, 10000);
+        static MemoryMappedFile GetSharedMemory(string name) => MemoryMappedFile.CreateNew(name, 1024);
 
         static string[] GetReportLines(MemoryMappedFile mmf)
         {
