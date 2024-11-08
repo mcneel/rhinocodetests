@@ -1,0 +1,58 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.14.24313\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "be0552d4-c385-44fa-8380-b1485d26dd5c",
+  "identity": {
+    "name": "TestLibs_CSharpInPython3",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "8"
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "1206f1ac-f8d2-4815-88a7-c87256bdb60f",
+      "language": {
+        "id": "*.*.python",
+        "version": "3.*.*"
+      },
+      "title": "TestCSharpInPython3",
+      "uri": "TestCSharpInPython3.py"
+    }
+  ],
+  "libraries": [
+    {
+      "type": "uri",
+      "library": {
+        "base": "TestCSLibraryForPython3/",
+        "language": {
+          "id": "*.*.csharp",
+          "version": "*.*.*"
+        }
+      }
+    }
+  ]
+}
