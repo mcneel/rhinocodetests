@@ -5,7 +5,6 @@ from System.IO import BinaryWriter
 from System.IO.MemoryMappedFiles import MemoryMappedFile
 from System.Text import Encoding
 
-clr.AddReference("TestCSLibraryForPython2")
 from Test.CSharpInPython2 import TestClass
 
 print(str(TestClass()))

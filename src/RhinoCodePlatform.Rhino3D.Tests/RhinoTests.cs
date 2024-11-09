@@ -153,7 +153,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         }
 
         [Test]
-        public void TestRunScript_TestLibs_CSharpInPython3()
+        public void TestRunScript_TestLibs_CSharpInPython_Py3()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-84426
             using MemoryMappedFile mmf_py3 = GetSharedMemory("TestCSharpInPython3");
@@ -162,7 +162,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         }
 
         [Test]
-        public void TestRunScript_TestLibs_CSharpInPython2()
+        public void TestRunScript_TestLibs_CSharpInPython_Py2()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-84426
             using MemoryMappedFile mmf_py2 = GetSharedMemory("TestCSharpInPython2");
