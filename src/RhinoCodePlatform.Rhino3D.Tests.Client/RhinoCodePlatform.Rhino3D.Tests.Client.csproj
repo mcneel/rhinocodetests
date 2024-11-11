@@ -2,6 +2,10 @@
   <PropertyGroup>
     <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('Windows'))">net7.0-windows</TargetFrameworks>
     <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('OSX'))">net7.0</TargetFrameworks>
+    <LangVersion>10</LangVersion>
+    <IsPackable>false</IsPackable>
+    <Nullable>disable</Nullable>
+    <Platforms>AnyCPU;x86;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
