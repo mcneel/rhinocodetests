@@ -2284,6 +2284,115 @@ Returns:
         }
 #endif
 
+#if RC8_15
+        [Test]
+        public void TestPython3_DebugSelf()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81598
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+class F:
+    def Test(self):
+        print() # line 4
+
+f = F()
+f.Test()
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 4);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("self"),
+            });
+
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestPython3_DebugSelf_TypeParameter()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81598
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+class F:
+    class_test = 42
+
+    def Test(self):
+        print() # line 6
+
+f = F()
+f.Test()
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 6);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("self"),
+            })
+            {
+                OnReceivedExpected = (v) =>
+                {
+                    if (v.Id == "self")
+                    {
+                        ExecVariable[] members = v.Expand().ToArray();
+                        Assert.IsTrue(members.Any(m => m.Id == "class_test"));
+                    }
+
+                    return true;
+                }
+            };
+
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestPython3_DebugSelf_InstanceParameter()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81598
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+class F:
+    def __init__(self):
+        self.test = 42
+
+    def Test(self):
+        print() # line 7
+
+f = F()
+f.Test()
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 7);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("self"),
+            })
+            {
+                OnReceivedExpected = (v) =>
+                {
+                    if (v.Id == "self")
+                    {
+                        ExecVariable[] members = v.Expand().ToArray();
+                        Assert.IsTrue(members.Any(m => m.Id == "test"));
+                    }
+
+                    return true;
+                }
+            };
+
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+#endif
+
         static DiagnoseOptions s_errorsOnly = new() { Errors = true, Hints = false, Infos = false, Warnings = false };
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py3\", "test_*.py");
     }
