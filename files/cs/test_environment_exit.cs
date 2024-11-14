@@ -1,6 +1,14 @@
 // #! csharp
 using System;
+using Rhino.Runtime.Code.Execution;
 
-Environment.Exit(12);
+try
+{
+    Environment.Exit(12);
+}
+catch(SystemExitException)
+{
+
+}
 
 result = true;

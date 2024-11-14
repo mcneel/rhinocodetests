@@ -1499,6 +1499,36 @@ switch (test)
         }
 #endif
 
+#if RC8_15
+        [Test]
+        public void TestCSharp_DebugThis_ClassMethod()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81598
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+class F {
+    public void Test() {
+        Console.WriteLine(); // line 5
+    }
+}
+var f = new F();
+f.Test();
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 5);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("this"),
+            });
+
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+#endif
+
         // FIXME: Move csharp autocompletion to language module
         //        [Test]
         //        public void TestCSharp_ScriptInstance_Complete_Self()
