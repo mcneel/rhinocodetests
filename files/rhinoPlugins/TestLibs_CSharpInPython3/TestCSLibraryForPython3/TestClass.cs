@@ -2,7 +2,7 @@
 using System;
 
 
-namespace Test.CSharpInPython3
+namespace TestCSharpInPython3
 {
     public class TestClass
     {
