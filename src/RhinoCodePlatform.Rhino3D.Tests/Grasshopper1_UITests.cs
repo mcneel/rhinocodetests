@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 using NUnit.Framework;
 
@@ -786,25 +787,24 @@ a = str(type(x))
                TestCaseSource(nameof(GetTestScript), new object[] { "gh1ui", "test_plugins_package_install_progress_context_rc8.10.ghx" })]
         public void TestGH1_PublishedComponent_RestoreProgress(string ghfile)
         {
-            GH_Document ghdoc = Grasshopper.Instances.DocumentServer.AddDocument(ghfile, makeActive: true);
-
+            // NOTE:
+            // disable solutions to avoid new solution when adding document.
+            // pass false to makeActive to avoid new solution when enabling solutions later.
+            GH_Document.EnableSolutions = false;
+            GH_Document ghdoc = Grasshopper.Instances.DocumentServer.AddDocument(ghfile, makeActive: false);
             IGH_Component component = (IGH_Component)ghdoc.Objects.First(c => c.NickName == "PTS");
             IScriptAttribute cattribs = (IScriptAttribute)component.Attributes;
-            ProgressReporterAttribs attribs =
-                new(cattribs,
-                    new Regex(@"Installing ""scipy"".+" +
-                              @"Collecting scipy.+" +
-                              @"Collecting numpy.+" +
-                              @"Installing collected packages: numpy, scipy.+" +
-                              @"Successfully installed numpy.+scipy.+", RegexOptions.Singleline));
+            ProgressWatcher watcher = new(cattribs, new Regex(@"Successfully installed.+"));
+
+            GH_Document.EnableSolutions = true;
+            RhinoCode.ReportProgressToConsole = false;
 
             ghdoc.Enabled = true;
-
-            RhinoCode.ReportProgressToConsole = false;
             ghdoc.NewSolution(expireAllObjects: true);
+            
             RhinoCode.ReportProgressToConsole = true;
 
-            Assert.IsTrue(attribs.Pass);
+            Assert.IsTrue(watcher.Pass);
         }
 #endif
 

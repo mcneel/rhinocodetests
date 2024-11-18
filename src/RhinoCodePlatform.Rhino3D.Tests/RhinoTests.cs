@@ -4,7 +4,7 @@ using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-
+using System.Threading;
 using NUnit.Framework;
 
 using Rhino;
@@ -156,18 +156,18 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         public void TestRunScript_TestLibs_CSharpInPython_Py3()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-84426
-            using MemoryMappedFile mmf_py3 = GetSharedMemory("TestCSharpInPython3");
+            using MemoryMappedFile mmf_py3 = GetSharedMemory("TestCSPy3");
             Assert.AreEqual(Result.Success, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-TestCSharpInPython3"));
-            Assert.AreEqual("Test.CSharpInPython3.TestClass", GetReportLines(mmf_py3)[0][..30]);
+            Assert.AreEqual("TestCSharpInPython3.TestClass", GetReportLines(mmf_py3)[0][..29]);
         }
 
         [Test]
         public void TestRunScript_TestLibs_CSharpInPython_Py2()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-84426
-            using MemoryMappedFile mmf_py2 = GetSharedMemory("TestCSharpInPython2");
+            using MemoryMappedFile mmf_py2 = GetSharedMemory("TestCSPy2");
             Assert.AreEqual(Result.Success, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-TestCSharpInPython2"));
-            Assert.AreEqual("<Test.CSharpInPython2.TestClass", GetReportLines(mmf_py2)[0][..31]);
+            Assert.AreEqual("<TestCSharpInPython2.TestClass", GetReportLines(mmf_py2)[0][..30]);
         }
 #endif
 

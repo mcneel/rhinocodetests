@@ -41,6 +41,15 @@
       },
       "title": "TestCSharpInPython3",
       "uri": "TestCSharpInPython3.py"
+    },
+    {
+      "id": "f3a62dfe-6b3e-4f50-bc78-8b2e7baba9fd",
+      "language": {
+        "id": "*.*.python",
+        "version": "3.*.*"
+      },
+      "title": "TestCSharpInPython3File",
+      "uri": "TestCSharpInPython3_File.py"
     }
   ],
   "libraries": [
