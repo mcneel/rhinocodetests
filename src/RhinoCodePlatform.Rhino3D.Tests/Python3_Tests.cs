@@ -2393,6 +2393,19 @@ f.Test()
         }
 #endif
 
+#if RC8_15
+        [Test]
+        public void TestPython3_PIP_INI_Exists()
+        {
+            string defaultEnvLocation = GetLanguage(LanguageSpec.Python3).Environs.OfIdentity("default").Location;
+            // e.g. ~/.rhinocode/py39-rh8/
+            string cwd = Path.GetDirectoryName(Path.GetDirectoryName(defaultEnvLocation));
+            string pipini = Path.Combine(cwd, "pip.ini");
+
+            Assert.True(File.Exists(pipini));
+        }
+#endif
+
         static DiagnoseOptions s_errorsOnly = new() { Errors = true, Hints = false, Infos = false, Warnings = false };
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py3\", "test_*.py");
     }

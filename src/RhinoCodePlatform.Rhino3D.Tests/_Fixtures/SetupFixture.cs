@@ -12,6 +12,7 @@ using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Logging;
 using Rhino.Runtime.Code.Environments;
+using Rhino.Runtime.Code.Storage;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -77,6 +78,10 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
 #if RC8_14
             StartComputeInstance();
+#endif
+
+#if RC8_15
+            PatchPIPConfigs();
 #endif
         }
 
@@ -332,6 +337,23 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
 
             File.WriteAllText(ghsettings, settings);
+        }
+#endif
+
+#if RC8_15
+        static void PatchPIPConfigs()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83985
+            string pdata = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            string pipdata = Path.Combine(pdata, "pip");
+            
+            pipdata.EnsureDirectory();
+            
+            string pipini = Path.Combine(pipdata, "pip.ini");
+            File.WriteAllText(pipini, @"
+[global]
+user = true
+");
         }
 #endif
     }
