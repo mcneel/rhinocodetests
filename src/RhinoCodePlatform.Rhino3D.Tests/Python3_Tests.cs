@@ -14,9 +14,8 @@ using Rhino.Runtime.Code.Execution.Profiling;
 using Rhino.Runtime.Code.Environments;
 using Rhino.Runtime.Code.Diagnostics;
 using Rhino.Runtime.Code.Languages;
+using Rhino.Runtime.Code.Platform;
 using Rhino.Runtime.Code.Testing;
-
-
 
 #if RC8_11
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
@@ -2403,6 +2402,133 @@ f.Test()
             string pipini = Path.Combine(cwd, "pip.ini");
 
             Assert.True(File.Exists(pipini));
+        }
+
+        [Test]
+        public void TestPython3_ExecSpec_Platform_First()
+        {
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+# platform: rhino3d@8
+# platform: revit 2023
+import os
+");
+
+            ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
+
+            Assert.True(execSpec.TryGetPlatformSpec(out PlatformSpec pspec));
+            Assert.AreEqual(new PlatformSpec("*.*.rhino3d", "8.*.*"), pspec);
+        }
+
+        [Test]
+        public void TestPython3_ExecSpec_Platform_FirstValid()
+        {
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+# platform: 
+# platform: rhino3d@8
+import os
+");
+
+            ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
+
+            Assert.True(execSpec.TryGetPlatformSpec(out PlatformSpec pspec));
+            Assert.AreEqual(new PlatformSpec("*.*.rhino3d", "8.*.*"), pspec);
+        }
+
+        [Test]
+        public void TestPython3_ExecSpec_Async_First()
+        {
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+# async: true
+# async: false
+import os
+");
+
+            ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
+
+            Assert.True(execSpec.TryGetAsync(out bool? isAsync));
+            Assert.True(isAsync ?? false);
+        }
+
+        [Test]
+        public void TestPython3_ExecSpec_Async_FirstValid()
+        {
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+# async: maybe
+# async: true
+import os
+");
+
+            ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
+
+            Assert.True(execSpec.TryGetAsync(out bool? isAsync));
+            Assert.True(isAsync ?? false);
+        }
+
+        [Test]
+        public void TestPython3_ExecSpec_EnvironId_First()
+        {
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+# venv: first_custom
+# venv: second_custom
+import os
+");
+
+            ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
+
+            Assert.True(execSpec.TryGetEnvironId(out string environid));
+            Assert.AreEqual("first_custom", environid);
+        }
+
+        [Test]
+        public void TestPython3_ExecSpec_EnvironId_FirstValid()
+        {
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+# venv: 
+# venv: first_custom
+import os
+");
+
+            ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
+
+            Assert.True(execSpec.TryGetEnvironId(out string environid));
+            Assert.AreEqual("first_custom", environid);
+        }
+
+        [Test]
+        public void TestPython3_Flags_Defaults()
+        {
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode();
+
+            ReadOnlyContextOptions cdefautls = code.GetContextOptionsDefaults();
+            foreach (string key in cdefautls)
+            {
+                Assert.False(cdefautls.Get<bool>(key));
+            }
+        }
+
+        [Test]
+        public void TestPython3_Flags()
+        {
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+# flag: pythonnet.pureScope
+# flag: python.reloadEngine
+# flag: python.keepScope
+import os
+");
+
+            ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
+
+            Assert.True(execSpec.TryGetContextOptions(out ReadOnlyContextOptions opts));
+            Assert.True(opts.Get("pythonnet.pureScope", false));
+            Assert.True(opts.Get("python.reloadEngine", false));
+            Assert.True(opts.Get("python.keepScope", false));
         }
 #endif
 

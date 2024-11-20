@@ -105,6 +105,20 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         }
 
+#if RC8_15
+        [Test]
+        public void TestGrasshopper_Flags_Defaults()
+        {
+            Code code = GetGrasshopper().CreateCode();
+
+            ReadOnlyContextOptions cdefautls = code.GetContextOptionsDefaults();
+            foreach (string key in cdefautls)
+            {
+                Assert.False(cdefautls.Get<bool>(key));
+            }
+        }
+#endif
+
         ILanguage GetGrasshopper() => GetLanguage(new LanguageSpec(" *.*.grasshopper", "1"));
 
         static IEnumerable<object[]> GetTestDefinitions() => GetTestScripts(@"gh1\", "test_*.gh?");
