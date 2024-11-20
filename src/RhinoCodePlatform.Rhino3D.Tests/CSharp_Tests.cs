@@ -12,6 +12,7 @@ using Rhino.Runtime.Code.Execution.Debugging;
 using Rhino.Runtime.Code.Execution.Profiling;
 using Rhino.Runtime.Code.Diagnostics;
 using Rhino.Runtime.Code.Languages;
+using Rhino.Runtime.Code.Platform;
 using Rhino.Runtime.Code.Testing;
 
 #if RC8_11
@@ -1526,6 +1527,167 @@ f.Test();
             code.Debug(new DebugContext());
 
             Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestCSharp_ExecSpec_Platform_First()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+// platform: rhino3d@8
+// platform: revit 2023
+using System;
+");
+
+            ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
+
+            Assert.True(execSpec.TryGetPlatformSpec(out PlatformSpec pspec));
+            Assert.AreEqual(new PlatformSpec("*.*.rhino3d", "8.*.*"), pspec);
+        }
+
+        [Test]
+        public void TestCSharp_ExecSpec_Platform_FirstValid()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+// platform: 
+// platform: rhino3d@8
+using System;
+");
+
+            ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
+
+            Assert.True(execSpec.TryGetPlatformSpec(out PlatformSpec pspec));
+            Assert.AreEqual(new PlatformSpec("*.*.rhino3d", "8.*.*"), pspec);
+        }
+
+        [Test]
+        public void TestCSharp_ExecSpec_Async_First()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+// async: true
+// async: false
+using System;
+");
+
+            ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
+
+            Assert.True(execSpec.TryGetAsync(out bool? isAsync));
+            Assert.True(isAsync ?? false);
+        }
+
+        [Test]
+        public void TestCSharp_ExecSpec_Async_FirstValid()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+// async: maybe
+// async: true
+using System;
+");
+
+            ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
+
+            Assert.True(execSpec.TryGetAsync(out bool? isAsync));
+            Assert.True(isAsync ?? false);
+        }
+
+        [Test]
+        public void TestCSharp_ExecSpec_EnvironId_First()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+// venv: first_custom
+// venv: second_custom
+using System;
+");
+
+            ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
+
+            Assert.True(execSpec.TryGetEnvironId(out string environid));
+            Assert.AreEqual("first_custom", environid);
+        }
+
+        [Test]
+        public void TestCSharp_ExecSpec_EnvironId_FirstValid()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+// venv: 
+// venv: first_custom
+using System;
+");
+
+            ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
+
+            Assert.True(execSpec.TryGetEnvironId(out string environid));
+            Assert.AreEqual("first_custom", environid);
+        }
+
+        [Test]
+        public void TestCSharp_Flags_Defaults()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode();
+
+            ReadOnlyContextOptions cdefautls = code.GetContextOptionsDefaults();
+            foreach (string key in cdefautls)
+            {
+                Assert.False(cdefautls.Get<bool>(key));
+            }
+        }
+
+        [Test]
+        public void TestCSharp_Flags()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+# flag: csharp.compiler.optimize
+# flag: csharp.compiler.unsafe
+import os
+");
+
+            ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
+
+            Assert.True(execSpec.TryGetContextOptions(out ReadOnlyContextOptions opts));
+            Assert.True(opts.Get("csharp.compiler.optimize", false));
+            Assert.True(opts.Get("csharp.compiler.unsafe", false));
+        }
+
+        [Test]
+        public void TestCSharp_Compile_Unsafe_Error()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81598
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+
+unsafe
+{
+    int d = 42;
+}
+");
+
+            ExecuteException run = Assert.Throws<ExecuteException>(() => code.Run(new RunContext()));
+            Assert.IsInstanceOf(typeof(CompileException), run.InnerException);
+        }
+
+        [Test]
+        public void TestCSharp_Compile_Unsafe()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81598
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+// flag: csharp.compiler.unsafe
+using System;
+
+unsafe
+{
+    int d = 42;
+}
+");
+
+            Assert.DoesNotThrow(() => code.Run(new RunContext()));
         }
 #endif
 
