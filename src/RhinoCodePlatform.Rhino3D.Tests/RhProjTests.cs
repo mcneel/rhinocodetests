@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.IO.Compression;
 using System.Collections.Generic;
+using System.Reflection;
 
 using NUnit.Framework;
 
@@ -774,6 +775,63 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testyakbetaversion-0.1.1234-beta+8888-rh8-any.yak")));
+
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+        }
+#endif
+
+#if RC8_15
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestCommandHelpUri.rhproj" })]
+        public void TestRhProj_Build_CommandHelpUri(string rhprojfile)
+        {
+            IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+
+            project.Build(s_host, new NUnitProgressReporter());
+
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
+            string rhpFile = Path.Combine(buildPath, "rh8", "TestCommandHelpUri.rhp");
+            Assert.IsTrue(File.Exists(rhpFile));
+            TryExtractProjectFromRHP(rhpFile, out IProject rhpProj);
+
+            RhinoCodePlatform.Projects.Rhino3DCommand cmd;
+
+            cmd = rhpProj.GetCodes().OfType<RhinoCodePlatform.Projects.Rhino3DCommand>().ElementAt(0);
+            Assert.AreEqual("https://www.rhino3d.com/", cmd.HelpURL.Light.ToString());
+
+            cmd = rhpProj.GetCodes().OfType<RhinoCodePlatform.Projects.Rhino3DCommand>().ElementAt(1);
+            Assert.AreEqual(string.Empty, cmd.HelpURL.Light.ToString());
+
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+        }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestRhino7CommandHelpUri.rhproj" })]
+        public void TestRhProj_Build_RhinoGH7_CommandHelpUri(string rhprojfile)
+        {
+            IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+
+            project.Build(s_host, new NUnitProgressReporter());
+
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
+            string rhpFile = Path.Combine(buildPath, "rh7", "TestRhino7CommandHelpUri.rhp");
+            Assert.IsTrue(File.Exists(rhpFile));
+
+            byte[] rhpBytes = File.ReadAllBytes(rhpFile);
+            Assembly rhp = Assembly.Load(rhpBytes);
+
+            Type cmdType;
+            Rhino.Commands.Command cmd;
+
+            cmdType = rhp.DefinedTypes.First(t => t.Name.StartsWith("ProjectCommand_Python_9be227a0"));
+            cmd = (Rhino.Commands.Command)Activator.CreateInstance(cmdType);
+            Assert.AreEqual(string.Empty, cmdType.GetProperty("CommandContextHelpUrl", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cmd));
+            
+            cmdType = rhp.DefinedTypes.First(t => t.Name.StartsWith("ProjectCommand_Python_a9404519"));
+            cmd = (Rhino.Commands.Command)Activator.CreateInstance(cmdType);
+            Assert.AreEqual("https://www.rhino3d.com/", cmdType.GetProperty("CommandContextHelpUrl", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cmd));
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
