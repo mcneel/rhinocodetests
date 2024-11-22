@@ -13,7 +13,7 @@ namespace RhinoCodePlatform.Rhino3D.Testing
             public DispatcherSyncContext(Dispatcher disp) => _disp = disp;
             public override void Post(SendOrPostCallback d, object? state)
             {
-                _disp.AsyncInvoke(() => d(state));
+                _disp.EnqueueAction(() => d(state));
             }
         }
 
@@ -30,7 +30,7 @@ namespace RhinoCodePlatform.Rhino3D.Testing
         {
             var dt = new TaskCompletionSource<bool>();
 
-            AsyncInvoke(async () =>
+            EnqueueAction(async () =>
             {
                 try
                 {
@@ -46,7 +46,27 @@ namespace RhinoCodePlatform.Rhino3D.Testing
             return dt.Task;
         }
 
-        public void AsyncInvoke(Action action) => _queue.Add(action);
+        public Task<TResult> InvokeAsync<TResult>(Func<Task<TResult>> action)
+        {
+            var dt = new TaskCompletionSource<TResult>();
+
+            EnqueueAction(async () =>
+            {
+                try
+                {
+                    TResult res = await action();
+                    dt.SetResult(res);
+                }
+                catch (Exception ex)
+                {
+                    dt.SetException(ex);
+                }
+            });
+
+            return dt.Task;
+        }
+
+        public void EnqueueAction(Action action) => _queue.Add(action);
 
         static void Execute(object dispatcher)
         {

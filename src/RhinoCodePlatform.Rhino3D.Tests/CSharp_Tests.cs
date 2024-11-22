@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 using NUnit.Framework;
 
@@ -14,6 +13,8 @@ using Rhino.Runtime.Code.Diagnostics;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Platform;
 using Rhino.Runtime.Code.Testing;
+using Rhino.Runtime.Code.Text;
+
 
 #if RC8_11
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
@@ -1355,7 +1356,7 @@ else
             });
             code.DebugControls = controls;
             code.Debug(new DebugContext());
-            
+
             Assert.True(controls.Pass);
         }
 
@@ -1689,96 +1690,164 @@ unsafe
 
             Assert.DoesNotThrow(() => code.Run(new RunContext()));
         }
+
+        [Test]
+        public void TestCSharp_Complete_Provider()
+        {
+            string s = "using System.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+
+            Assert.IsNotEmpty(completions);
+
+            string[] names = completions.Select(c => c.label).ToArray();
+            Assert.Contains(nameof(System.Reflection), names);
+            Assert.Contains(nameof(System.Collections), names);
+        }
+
+        [Test]
+        public void TestCSharp_ScriptInstance_Complete_Self()
+        {
+            string s = @"// #! csharp
+using System;
+using Rhino;
+using Grasshopper;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript()
+    {
+        this.";
+            var script = new Grasshopper1Script(s + @"
+    }
+}
+");
+
+            Code code = script.CreateCode();
+
+            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+
+            Assert.IsNotEmpty(completions);
+
+            string[] names = completions.Select(c => c.label).ToArray();
+            Assert.Contains("Component", names);
+            Assert.Contains("GrasshopperDocument", names);
+            Assert.Contains("Iteration", names);
+            Assert.Contains("RhinoDocument", names);
+        }
+
+        [Test]
+        public void TestCSharp_ScriptInstance_Complete_SelfRhinoDoc()
+        {
+            string s = @"// #! csharp
+using System;
+using Rhino;
+using Grasshopper;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript()
+    {
+        this.RhinoDocument.";
+            var script = new Grasshopper1Script(s + @"
+    }
+}
+");
+
+            Code code = script.CreateCode();
+
+            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+
+            Assert.IsNotEmpty(completions);
+
+            string[] names = completions.Select(c => c.label).ToArray();
+            Assert.Contains("ActiveCommandId", names);
+            Assert.Contains("Objects", names);
+        }
+
+        [Test]
+        public void TestCSharp_ScriptInstance_Complete_AssemblyReference()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-72523
+            string s = @"// #! csharp
+# r ""{0}""
+using System;
+using Rhino;
+using Grasshopper;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript()
+    {
+        zTools.";
+            s = s.Replace("{0}", GetTestScript("cs", "zTools.dll").First());
+            var script = new Grasshopper1Script(s + @"
+    }
+}
+");
+
+            Code code = script.CreateCode();
+
+            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+
+            Assert.IsNotEmpty(completions);
+
+            string[] names = completions.Select(c => c.label).ToArray();
+            Assert.Contains("CurveFeature", names);
+            Assert.Contains("MeshFeature", names);
+        }
 #endif
 
-        // FIXME: Move csharp autocompletion to language module
-        //        [Test]
-        //        public void TestCSharp_ScriptInstance_Complete_Self()
-        //        {
-        //            var script = new Grasshopper1Script(@"// #! csharp
-        //using System;
-        //using Rhino;
-        //using Grasshopper;
-
-        //public class Script_Instance : GH_ScriptInstance
-        //{
-        //    private void RunScript()
-        //    {
-        //        this.
-        //    }
-        //}
-        //");
-
-        //            Code code = script.CreateCode();
-
-        //            IEnumerable<CompletionInfo> completions =
-        //                code.Language.Support.Complete(SupportRequest.Empty, code, 168, CompleteOptions.Empty);
-
-        //            CompletionInfo cinfo;
-        //            bool result = true;
-
-        //            cinfo = completions.First(c => c.Text == "Iteration");
-        //            result &= CompletionKind.Property == cinfo.Kind;
-
-        //            cinfo = completions.First(c => c.Text == "RhinoDocument");
-        //            result &= CompletionKind.Property == cinfo.Kind;
-
-        //            cinfo = completions.First(c => c.Text == "GrasshopperDocument");
-        //            result &= CompletionKind.Property == cinfo.Kind;
-
-        //            cinfo = completions.First(c => c.Text == "Component");
-        //            result &= CompletionKind.Property == cinfo.Kind;
-
-        //            cinfo = completions.First(c => c.Text == "Print");
-        //            result &= CompletionKind.Function == cinfo.Kind;
-
-        //            cinfo = completions.First(c => c.Text == "Reflect");
-        //            result &= CompletionKind.Function == cinfo.Kind;
-
-        //            cinfo = completions.First(c => c.Text == "AddRuntimeMessage");
-        //            result &= CompletionKind.Function == cinfo.Kind;
-
-        //            Assert.True(result);
-        //        }
-
-        //        [Test]
-        //        public void TestCSharp_ScriptInstance_Complete_SelfRhinoDoc()
-        //        {
-        //            var script = new Grasshopper1Script(@"// #! csharp
-        //using System;
-        //using Rhino;
-        //using Grasshopper;
-
-        //public class Script_Instance : GH_ScriptInstance
-        //{
-        //    private void RunScript()
-        //    {
-        //        this.RhinoDocument.
-        //    }
-        //}
-        //");
-
-        //            Code code = script.CreateCode();
-
-        //            IEnumerable<CompletionInfo> completions =
-        //                code.Language.Support.Complete(SupportRequest.Empty, code, 182, CompleteOptions.Empty);
-
-        //            CompletionInfo cinfo;
-        //            bool result = true;
-
-        //            cinfo = completions.First(c => c.Text == "ActiveCommandId");
-        //            result &= CompletionKind.Property == cinfo.Kind;
-
-        //            cinfo = completions.First(c => c.Text == "OpenDocuments");
-        //            result &= CompletionKind.Function == cinfo.Kind;
-
-        //            Assert.True(result);
-        //        }
-
-        // FIXME:
-        // add completion tests for RH-72523
-        // see test files on RH-84876
-
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
+
+        static IEnumerable<Ed.Common.CompletionItem> CompleteAtEndingPeriod(Code code, string textUptoPeriod)
+        {
+            if (code.Text.TryGetPosition(textUptoPeriod.Length, out TextPosition position))
+            {
+                if (!code.Text.TryGetTransformed(SupportGroup.Complete, textUptoPeriod.Length, out string xformedCode, out int xformedPosition))
+                {
+                    xformedCode = code.Text;
+                    xformedPosition = textUptoPeriod.Length;
+                }
+
+                return s_dispatcher.InvokeAsync(() =>
+                {
+                    CSharpCompletionProvider.CompletionProvider provider = GetCompletionProvider(code);
+                    return provider.GetCompletionItems(xformedCode, xformedPosition, position.LineNumber, position.ColumnNumber, '.');
+                }).GetAwaiter().GetResult();
+            }
+
+            return Array.Empty<Ed.Common.CompletionItem>();
+        }
+
+        static CSharpCompletionProvider.CompletionProvider GetCompletionProvider(Code code)
+        {
+            CSharpCompletionProvider.CompletionProvider provider =
+                CSharpCompletionProvider.CompletionProvider.Create(
+                    CSharpCompletionProvider.CompletionProvider.DefaultUsings,
+                    CSharpCompletionProvider.CompletionProvider.DefaultAssemblies.Select(r => r.Location).ToList()
+                );
+
+            AddCSharpReferences(provider, code.Language.Runtime.References);
+            AddCSharpReferences(provider, RhinoCode.Platforms.GetReferences());
+            AddCSharpReferences(provider, code.References);
+
+            if (code.Text.GetPackageSpecs()
+                    .Packages.TryResolveReferences(code, out IEnumerable<CompileReference> references, out Diagnosis _))
+            {
+                AddCSharpReferences(provider, references);
+            }
+
+            return provider;
+        }
+
+        static void AddCSharpReferences(CSharpCompletionProvider.CompletionProvider provider, IEnumerable<CompileReference> references)
+        {
+            foreach (string path in references.GetAssemblies().Select(r => r.Path))
+            {
+                provider.AddAssembly(path);
+            }
+        }
     }
 }
