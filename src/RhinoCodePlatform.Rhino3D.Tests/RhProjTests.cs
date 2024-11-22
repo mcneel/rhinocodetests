@@ -838,6 +838,27 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestCommandDefaultIcon.rhproj" })]
+        public void TestRhProj_Build_CommandDefaultIcon(string rhprojfile)
+        {
+            IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+
+            project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
+            project.Build(s_host, new NUnitProgressReporter());
+
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
+            string ruiFile = Path.Combine(buildPath, "rh8", "TestCommandDefaultIcon.rui");
+            string rui = File.ReadAllText(ruiFile);
+            Assert.IsTrue(rui.Contains("<icon guid=\"a55c3fa8-6202-45c1-8d79-e3641411fc18\">"));
+            Assert.IsTrue(rui.Contains("<icon guid=\"21ace57c-eb59-45b2-8e8a-c82b6b128d36\">"));
+            Assert.IsTrue(rui.Contains("<light><svg"));
+            Assert.IsTrue(rui.Contains("<dark><svg"));
+
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+        }
 #endif
 
         static readonly BindingFlags s_protectedFlags = BindingFlags.NonPublic | BindingFlags.Instance;
