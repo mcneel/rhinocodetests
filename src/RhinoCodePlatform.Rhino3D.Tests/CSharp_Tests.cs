@@ -1801,6 +1801,8 @@ public class Script_Instance : GH_ScriptInstance
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
 
+#if RC8_15
+
         static IEnumerable<Ed.Common.CompletionItem> CompleteAtEndingPeriod(Code code, string textUptoPeriod)
         {
             if (code.Text.TryGetPosition(textUptoPeriod.Length, out TextPosition position))
@@ -1849,5 +1851,6 @@ public class Script_Instance : GH_ScriptInstance
                 provider.AddAssembly(path);
             }
         }
+#endif
     }
 }
