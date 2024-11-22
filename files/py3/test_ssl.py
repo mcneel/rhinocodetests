@@ -3,7 +3,7 @@ import os.path as op
 import urllib.request
 import tempfile
 
-url = 'https://file-examples.com/wp-content/storage/2017/10/file_example_PNG_1MB.png'
+url = 'https://www.rhino3d.com/inside/revit/static/images/reference/rir-interface01.png'
 
 save_path = op.join(tempfile.gettempdir(), 'test.png')
 
