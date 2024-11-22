@@ -634,7 +634,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 #endif
 
 #if RC8_12
-            [Test]
+        [Test]
         public void TestRhProj_Create()
         {
             IProjectServer rhpServer = RhinoCode.ProjectServers.WherePasses(s_rhProjServerSpec).First();
@@ -661,7 +661,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             project.Add(path, new SourceCode(LanguageSpec.Python2, "#! python 3\nimport sys\nprint(sys.version)", new Uri(Path.GetTempFileName())));
 
             ProjectCode command;
-            
+
             command = project.GetCodes().ElementAt(0);
             Assert.AreEqual(LanguageSpec.Python2, command.LanguageSpec);
 
@@ -824,17 +824,22 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             Type cmdType;
             Rhino.Commands.Command cmd;
+            PropertyInfo prop;
 
             cmdType = rhp.DefinedTypes.First(t => t.Name.StartsWith("ProjectCommand_Python_9be227a0"));
             cmd = (Rhino.Commands.Command)Activator.CreateInstance(cmdType);
-            Assert.AreEqual(string.Empty, cmdType.GetProperty("CommandContextHelpUrl", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cmd));
-            
+            prop = cmdType.GetProperty("CommandContextHelpUrl", s_protectedFlags);
+            Assert.AreEqual(string.Empty, prop.GetValue(cmd));
+
             cmdType = rhp.DefinedTypes.First(t => t.Name.StartsWith("ProjectCommand_Python_a9404519"));
             cmd = (Rhino.Commands.Command)Activator.CreateInstance(cmdType);
-            Assert.AreEqual("https://www.rhino3d.com/", cmdType.GetProperty("CommandContextHelpUrl", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cmd));
+            prop = cmdType.GetProperty("CommandContextHelpUrl", s_protectedFlags);
+            Assert.AreEqual("https://www.rhino3d.com/", prop.GetValue(cmd));
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
 #endif
+
+        static readonly BindingFlags s_protectedFlags = BindingFlags.NonPublic | BindingFlags.Instance;
     }
 }

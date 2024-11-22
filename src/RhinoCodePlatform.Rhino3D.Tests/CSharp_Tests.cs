@@ -1775,6 +1775,10 @@ unsafe
         //            Assert.True(result);
         //        }
 
+        // FIXME:
+        // add completion tests for RH-72523
+        // see test files on RH-84876
+
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
     }
 }
