@@ -226,7 +226,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 #if RC8_12
                 if (scriptInfo.IsAsync)
                 {
-                    s_dispatcher.InvokeAsync(async () => await code.RunAsync(context))
+                    s_dispatcher.InvokeAsync(() => code.RunAsync(context))
                                 .Wait();
                 }
 

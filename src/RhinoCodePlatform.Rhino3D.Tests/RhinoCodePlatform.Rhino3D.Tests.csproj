@@ -26,6 +26,8 @@
     <Reference Include="RhinoCodePlatform.GH1" HintPath="$(RhinoSystemDirectory)\RhinoCodePlatform.GH1.dll" Private="False" />
     <Reference Include="RhinoCodePlatform.Projects" HintPath="$(RhinoSystemDirectory)\RhinoCodePlatform.Projects.dll" Private="False" />
     <Reference Include="RhinoCodePlatform.Rhino3D" HintPath="$(RhinoSystemDirectory)\RhinoCodePlatform.Rhino3D.dll" Private="False" />
+    <Reference Include="CSharpCompletionProvider" HintPath="$(RhinoPluginsDirectory)\CSharpCompletionProvider.dll" Private="False" />
+    <Reference Include="Ed.Common" HintPath="$(RhinoSystemDirectory)\Ed.Common.dll" Private="False" />
     <Reference Include="Grasshopper" HintPath="$(GrasshopperPluginDirectory)\Grasshopper.dll" Private="False" />
     <Reference Include="GH_IO" HintPath="$(GrasshopperPluginDirectory)\GH_IO.dll" Private="False" />
     <Reference Include="RhinoCodePluginGH" HintPath="$(GrasshopperPluginDirectory)\Components\RhinoCodePluginGH.gha" Private="False" />
