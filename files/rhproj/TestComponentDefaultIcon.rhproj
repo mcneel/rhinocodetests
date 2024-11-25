@@ -1,0 +1,72 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.10.24191\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "e63f5a41-132f-45ce-b107-f0efb3372e83",
+  "identity": {
+    "name": "TestComponentDefaultIcon",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    },
+    "copyright": "Copyright \u00A9 2024 Ehsan Iran-Nejad",
+    "license": "MIT",
+    "url": "https://ein.sh/"
+  },
+  "settings": {
+    "buildPath": "testComponentDefaultIcon/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "8"
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "type": "components",
+      "id": "5468cacb-acb4-4ae0-a10f-69ea87eaa651",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "components.ghx",
+      "uri": "components.ghx",
+      "scripts": [
+        {
+          "id": "29686ec3-9dd7-422e-9eff-39c92d7f6232",
+          "name": "First",
+          "nickname": "First",
+          "description": "C# scripting component",
+          "subcat": "Default"
+        },
+        {
+          "id": "26ddc562-f23c-4a63-813a-662e3e7f66fe",
+          "name": "Second",
+          "nickname": "Second",
+          "description": "Python 3 scripting component",
+          "subcat": "Default"
+        },
+        {
+          "id": "d24ccf9e-29a2-44ff-ae86-d21189c5eb87",
+          "name": "Third",
+          "nickname": "Third",
+          "subcat": "Default"
+        }
+      ]
+    }
+  ]
+}

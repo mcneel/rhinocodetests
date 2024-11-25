@@ -5,9 +5,9 @@
     "os": "windows",
     "arch": "x64"
   },
-  "id": "baaecbc1-7c37-4cf4-8862-a91c3cb7fa2e",
+  "id": "28d1044b-3230-4ec3-8024-4e2e380b5327",
   "identity": {
-    "name": "TestCommandDefaultIcon",
+    "name": "TestRhino7ComponentDefaultIcon",
     "version": "0.1",
     "publisher": {
       "email": "ehsan@mcneel.com",
@@ -22,14 +22,14 @@
     "url": "https://ein.sh/"
   },
   "settings": {
-    "buildPath": "testCommandDefaultIcon/",
+    "buildPath": "testRhino7ComponentDefaultIcon/",
     "buildTarget": {
       "host": {
         "name": "Rhino3D",
-        "version": "8"
+        "version": "7"
       },
-      "title": "Rhino3D (8.*)",
-      "slug": "rh8"
+      "title": "Rhino3D (7.*)",
+      "slug": "rh7"
     },
     "publishTarget": {
       "title": "McNeel Yak Server"
@@ -37,22 +37,14 @@
   },
   "codes": [
     {
-      "id": "a55c3fa8-6202-45c1-8d79-e3641411fc18",
-      "language": {
-        "id": "*.*.python",
-        "version": "*.*.*"
-      },
-      "title": "FirstCommand",
-      "uri": "command.py"
-    },
-    {
-      "id": "21ace57c-eb59-45b2-8e8a-c82b6b128d36",
+      "type": "components",
+      "id": "ccd6fbb2-fae3-4f12-b49d-f2a470104346",
       "language": {
         "id": "*.gh1.grasshopper",
         "version": "1.*.*"
       },
-      "title": "SecondCommand",
-      "uri": "command.ghx"
+      "title": "components_r7.ghx",
+      "uri": "components_r7.ghx"
     }
   ]
 }

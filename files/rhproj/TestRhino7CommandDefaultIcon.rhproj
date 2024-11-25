@@ -1,0 +1,77 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.10.24191\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "1f0f72f4-fae5-4e58-96c6-c5f7407b1774",
+  "identity": {
+    "name": "TestRhino7CommandDefaultIcon",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    },
+    "copyright": "Copyright \u00A9 2024 Ehsan Iran-Nejad",
+    "license": "MIT",
+    "url": "https://ein.sh/",
+    "image": {
+      "toolbarIcons": {
+        "light": {
+          "guidMap": [
+            {
+              "guid": "62247880-9a83-4d3e-9d33-23a855f82130",
+              "index": 0
+            },
+            {
+              "guid": "4692ab38-58f2-43ba-a630-96478067bffd",
+              "index": 1
+            }
+          ],
+          "small": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAQCAYAAAB3AH1ZAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAH1SURBVEhLpZXNattAEIBHP65saowvfggfTFo/gF/AkD5A6bX0jQI59NZLnyL0akOT5gEMBlMcfDBtbKOVbHW\u002BjVZVhJODNDDM7ux\u002Bq9nZ3ZEnT4Kt6muSqZ5yi9bm7eTpdBoNBoNPQRB88TxvzIyX5HQ6/UyS5Pr27vbb/a/7Pa4mfKg\u002BD3gymVx/uLyUN1EkJo7FJImkqrExkqapGLW5vp/P51e6kK8LfFXeNOF9AiBy4L\u002BPj7JcLmX98CDb7VZ2\u002B70cj0fxfV86nY70\u002B33pdrsyGo0kiqLPyraa8gTgk7aw1ZLdbidZlon2LYRF9QOFr9fryeFwoH2hLBlsxNsMqGqkqZ0UhuEzEIhFywvqGYIgjXkWsGLMk9NNciBShhHOsip1\u002BSKARJ1uYtk6pR/k7dIOCqnL/8\u002BAOklZVQCr9mwGavKlIzB2kAgR2q5f\u002BHMfz6oqdfkiAJzusjjI7Uiv\u002BbPFYn3nVanLFwHgZLB8YwFR7eSztHbq\u002BLkM1OUJIKM8ksK9Fg73dLgwgF6\u002BGH7sYrGQdrtNgbmDbcpTSDJq82w2u6JCrVYre57siNtKtPRR2sCbzYaPUYaPTXlyEwyHw7fj8fgj5VGjf6e\u002BF4XIgW9\u002B3Hxf/17/UVfchCcAG4QqdR21P6hczwm/UXbOQfKesDV5Mf8At8W45JVn2psAAAAASUVORK5CYII=",
+          "normal": "iVBORw0KGgoAAAANSUhEUgAAADAAAAAYCAYAAAC8/X7cAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAMbSURBVFhHtVc9bxpBEF3uAGPLMkRu3LhNmsgSpVtX/gV0iRR\u002BQZo0LtKkSJkofyCK5C4FjSWEf4Qj2bEE6UlrEAIM95V5e/fO4wtX2NI\u002B6bFzszNvbvb27riKeQBsLxvJpyLJGGfUcKJvRQ4PD/3j4\u002BO3vu9/qFQqr8SFQk9FnCTJaLVafen3\u002B\u002BfL5XINnzBxqW9XotPpvGu325\u002B73e5Wq9VshmFowjAyUfSYQRDkdhzH9hgj4uGTcToYDFbX19cfe73eD9FGkcSlvi8//tHR0fnZ2dmL9XrdHI//mru7iZlOp2Y\u002Bn5vFYmGkayNzVkxWwcgqmmq1amq1mmk0GmZnZ8fS87zGwcFB8Ovq6vXv29vvoh0JjUt9uydxWXd3d5sQRTIowZawAT1uImKbe3tYtZbn\u002By8l1C5OmuJOnzeVlyRp9wDFASazmLZJwPqEuNw4FGKCdKZPw\u002B5JCjBRiwHaZgygc7IChC0Cw5V\u002BugyCKApLBTBijtCC9PMYN9smuNLPs4IgtAGAHotF9TFtXbCsAVf6eQPcn0zQSdrnCwHOF\u002BPw6NsEV/rqCgS5CIMBnUyfp2w\u002B9sjyK\u002BBGP28AEwwCdBIJYTHs0wDQJ0S7rAFX\u002Bo8aABisRyAX53FBmP7CUyKHK/28AUwgEECwpt2X6piiOh7w5bVS1oAr/TRCwAkkUcSOSBZSnNQvJQDiAP4ObIIr/bwB3GTyb9EmMAni2I9FccbAZpychWXZFXClnzfwX2dIygSKBbQvPYkHX1kDrvTzBvRTIk1KV4ErocfczuIq8kLnXPEpQbjSRwPYbPGjPSoEkEQCFAawJ7kyLApkBfRyO9W3XrlhRjIxnc1m1gkwgQV4DPCGklm7r4mbmxuzv78/iaPoT\u002BayhVzqV\u002BUnkQ\u002BKr5eXl59OTk4m4/G4hf2KFUO3oLZxM2Kefs7BB/HhcLhe3t9/g3hGp/q4Rt729vbW6enpm616/b18LDz7m1VWZgTxi4uLn1L0Xnwr\u002BF3qp5tMrpqwJqxnNv3PATYpNjy\u002BhzHiHnCmTyGMIMRZ4DlFuG1AFErfRs70TfIP/ZKieTR0gP0AAAAASUVORK5CYII=",
+          "large": "iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAASvSURBVGhDxZk9S11ZFIb3/fBqoVjIpBQs7JP8AcP8gAFrBf0D08w0DkOmTRFSpJr5AYKNYCWCWGRg\u002BnALERQbwUZU8AvN6L0n69n3vDfrbG/MTBLcLyzX3muvvd511v7wcG4t3Idsqf5WFE6rPQiPyu\u002BDq113gk3ytfDEXSeVRAxZ\u002BBVYJPW5ubkXrVbr13q9/rxWqz2Jo9\u002BIoiiOut3u\u002B4uLi7erq6t/m\u002BnOpGOiRLLx\u002BwI0FhcXX05NTf2xsLAQJiYmQqPRCJ1OJ9jknli7YxqbxIJXfO7u7qKWDQ2urq7C5uZmcXBw8Gp5efmVmf41IRGKkI3fV/7H6enpzaWlpXBychKsWuH29taGzKFWC7YikYw2Ivg\u002BPpCSuMAYSd3c3ITz8/OwsbFR7Ozs/LS2tvbOhj\u002BYUIRs/JwzULdt94utQCQ/PT2N5EwmKBpytQE6FfmggdpDQ0NhbGwsjI6OhpmZmdr4\u002BPjPNjxkokyz8euiMd/6c7bd2dmZdauVBQSjukB2aRGmc9KkSYDVMdsz6/LwCIPZ\u002BPs7wJyeMCgSBQUE8dqD4Knd24ijWM1mM66sjf1gXRw0MRs/f/ol04VBAJ0j2tIKTEC0J9K4BHgfaT2gQbxZ\u002BXuzy066xTRRoC1yD1VY45oju2xoLqQSOCl41Dn4K5FIAEc5p/DBvR8JKSnZBT0E0rD2oLhCDv5qAdwW9EFop\u002BSCyBXY\u002B0ggBl3z0TYfhBz8lQLwkkEwoMnqo70NLUCuMws0Jg2x3XKx/VABcvBXCqDzISJBfQRyCNMV8X3aAsQiJ0k/liIHf6UAOoNy8gSCP6d\u002BJWTzoq0nENddQveQg7/iwfbAKd1iQH2vByXatCqjIWfrlQN23faoeIDPIQd/pQCqLlpbDe0xqOq\u002B7c9bnEvbbPJ7qAA5\u002BAcWQBeKyKQVRKCvVQBq9yuPRsp5xP0vR\u002BAx\u002BSsF8DckwUSQkqvtx9hyiKpvxr6OK1EiXQGPHPz3doCcfdX9ysjGuCRFtFly5hh9SRQBDxUgB39lNoMiE1RlBdEYWnbvb53eWPkAPVPPBtIEPHLwVwrAFvQVJTh9BVAQD2xsO507P9/PUZyHCpCDv1IABkUKNNkHAurjK8Q5ziYf7D6pL12Cj83/acTACohIWpMVmP\u002BzQP146SCOmDma75PE9qUd8Nj8KkD00mBKTl/C\u002Bzo63rokU/qi5QNELJvsbgU\u002BZZaRH4bYsAl8Oo4TEU2QFvr/apJxkWi\u002BT17x\u002BDI7PDzMgx7FwR53Vv6elzXM\u002BB6H6\u002BvrflCgybLFy\u002BYz44PaQMns7\u002B/HBGyrt63LcseHR\u002BfiZ4QkuvxosLW1FT8d82FSN7KvZOVFwyAyIW1r7uXlZWi322F7ezvs7e0Vx8fHf5qZtx4kKz8zEG6W1vz8/O\u002BTk5O/8elYr40kwtZES9SnyvjQl81rxvDhs/TIyEjY3d0tDg8PX6\u002BsrLwxvptS\u002BPifjV8lo1RNk9bs7OwLvptb9Z6afJefpiyZI0uqbZX/a319/R8z8asMP4qgWYls/CoAmiTiSpjoRwts3uf/QmcccOZ4WK5hVh3REcjG74PSRiCWkAD4GnIPEkHiuSvFX4IgA38oPgJnESflgsUS2gAAAABJRU5ErkJggg=="
+        }
+      }
+    }
+  },
+  "settings": {
+    "buildPath": "testRhino7CommandDefaultIcon/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "7"
+      },
+      "title": "Rhino3D (7.*)",
+      "slug": "rh7"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "62247880-9a83-4d3e-9d33-23a855f82130",
+      "language": {
+        "id": "mcneel.ironpython.python",
+        "version": "2.7.12"
+      },
+      "title": "FirstCommand",
+      "uri": "command_r7.py2"
+    },
+    {
+      "id": "4692ab38-58f2-43ba-a630-96478067bffd",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "SecondCommand",
+      "uri": "command_r7.ghx"
+    }
+  ]
+}

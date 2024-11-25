@@ -850,12 +850,110 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             project.Build(s_host, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
-            string ruiFile = Path.Combine(buildPath, "rh8", "TestCommandDefaultIcon.rui");
+            string ruiFile = Path.Combine(buildPath, project.Settings.BuildTarget.Slug, "TestCommandDefaultIcon.rui");
             string rui = File.ReadAllText(ruiFile);
             Assert.IsTrue(rui.Contains("<icon guid=\"a55c3fa8-6202-45c1-8d79-e3641411fc18\">"));
             Assert.IsTrue(rui.Contains("<icon guid=\"21ace57c-eb59-45b2-8e8a-c82b6b128d36\">"));
             Assert.IsTrue(rui.Contains("<light><svg"));
             Assert.IsTrue(rui.Contains("<dark><svg"));
+
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+        }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestRhino7CommandDefaultIcon.rhproj" })]
+        public void TestRhProj_Build_RhinoGH7_CommandDefaultIcon(string rhprojfile)
+        {
+            IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+
+            project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
+            project.Build(s_host, new NUnitProgressReporter());
+
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
+            string ruiFile = Path.Combine(buildPath, project.Settings.BuildTarget.Slug, "TestRhino7CommandDefaultIcon.rui");
+            string rui = File.ReadAllText(ruiFile);
+
+            Assert.IsTrue(rui.Contains(@"<small_bitmap item_width=""16"" item_height=""16"">
+      <bitmap_item guid=""62247880-9a83-4d3e-9d33-23a855f82130"" index=""0"" />
+      <bitmap_item guid=""4692ab38-58f2-43ba-a630-96478067bffd"" index=""1"" />
+      <bitmap>iVBORw0KGgoAAAANSUhEUgAAACAAAAAQCAYAAAB3AH1ZAAAAAXNSR0IArs4c6"));
+
+            Assert.IsTrue(rui.Contains(@"<normal_bitmap item_width=""24"" item_height=""24"">
+      <bitmap_item guid=""62247880-9a83-4d3e-9d33-23a855f82130"" index=""0"" />
+      <bitmap_item guid=""4692ab38-58f2-43ba-a630-96478067bffd"" index=""1"" />
+      <bitmap>iVBORw0KGgoAAAANSUhEUgAAADAAAAAYCAYAAAC8/X7cAAAAAXNSR0IArs4c6"));
+
+            Assert.IsTrue(rui.Contains(@"<large_bitmap item_width=""32"" item_height=""32"">
+      <bitmap_item guid=""62247880-9a83-4d3e-9d33-23a855f82130"" index=""0"" />
+      <bitmap_item guid=""4692ab38-58f2-43ba-a630-96478067bffd"" index=""1"" />
+      <bitmap>iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAAAXNSR0IArs4c6"));
+
+
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+        }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestComponentDefaultIcon.rhproj" })]
+        public void TestRhProj_Build_ComponentDefaultIcon(string rhprojfile)
+        {
+            IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+
+            project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
+            project.Build(s_host, new NUnitProgressReporter());
+
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
+            string ghaFile = Path.Combine(buildPath, project.Settings.BuildTarget.Slug, "TestComponentDefaultIcon.Components.gha");
+
+            byte[] ghaData = File.ReadAllBytes(ghaFile);
+            Assembly gha = Assembly.Load(ghaData);
+
+            Type componentType;
+            Grasshopper.Kernel.GH_Component c;
+
+            componentType = gha.GetType("RhinoCodePlatform.Rhino3D.Projects.Plugin.GH.ProjectComponent_26ddc562");
+            c = (Grasshopper.Kernel.GH_Component)Activator.CreateInstance(componentType);
+            Assert.IsNotNull(componentType.GetField("m_icon", s_protectedFlags).GetValue(c));
+
+            componentType = gha.GetType("RhinoCodePlatform.Rhino3D.Projects.Plugin.GH.ProjectComponent_29686ec3");
+            c = (Grasshopper.Kernel.GH_Component)Activator.CreateInstance(componentType);
+            Assert.IsNotNull(componentType.GetField("m_icon", s_protectedFlags).GetValue(c));
+
+            componentType = gha.GetType("RhinoCodePlatform.Rhino3D.Projects.Plugin.GH.ProjectComponent_d24ccf9e");
+            c = (Grasshopper.Kernel.GH_Component)Activator.CreateInstance(componentType);
+            Assert.IsNotNull(componentType.GetField("m_icon", s_protectedFlags).GetValue(c));
+
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+        }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestRhino7ComponentDefaultIcon.rhproj" })]
+        public void TestRhProj_Build_RhinoGH7_ComponentDefaultIcon(string rhprojfile)
+        {
+            IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+
+            DeleteDirectory(rhprojfile, project.Settings.BuildPath);
+
+            project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
+            project.Build(s_host, new NUnitProgressReporter());
+
+            string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
+            string ghaFile = Path.Combine(buildPath, project.Settings.BuildTarget.Slug, "TestRhino7ComponentDefaultIcon.Components.gha");
+
+            byte[] ghaData = File.ReadAllBytes(ghaFile);
+            Assembly gha = Assembly.Load(ghaData);
+
+            Type componentType;
+            Grasshopper.Kernel.GH_Component c;
+
+            componentType = gha.GetType("RhinoCodePlatform.Rhino3D.Projects.Plugin.GH.ProjectComponent_Python_d24ccf9e");
+            Assert.IsNotNull(componentType);
+            c = (Grasshopper.Kernel.GH_Component)Activator.CreateInstance(componentType);
+            Assert.IsNotNull(componentType.GetField("m_icon", s_protectedFlags).GetValue(c));
+
+            componentType = gha.GetType("RhinoCodePlatform.Rhino3D.Projects.Plugin.GH.ProjectComponent_Python_f071defa");
+            c = (Grasshopper.Kernel.GH_Component)Activator.CreateInstance(componentType);
+            Assert.IsNotNull(componentType.GetField("m_icon", s_protectedFlags).GetValue(c));
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
