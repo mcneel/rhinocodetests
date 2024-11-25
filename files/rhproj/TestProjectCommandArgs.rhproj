@@ -1,0 +1,64 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.15.24330\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "63683cab-a70f-43e5-b537-0e97cec60ac8",
+  "identity": {
+    "name": "TestProjectCommandArgs",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "8"
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "3317cc64-8869-44e3-9354-a2ea36128e3a",
+      "language": {
+        "id": "*.*.csharp",
+        "version": "*.*.*"
+      },
+      "title": "TestCommandArgsCS",
+      "uri": "TestCommandArgs.cs"
+    },
+    {
+      "id": "0a48e908-c20a-44cd-bb23-1edb32454969",
+      "language": {
+        "id": "*.*.python",
+        "version": "3.*.*"
+      },
+      "title": "TestCommandArgsPY3",
+      "uri": "TestCommandArgs.py"
+    },
+    {
+      "id": "d250d678-ef92-465b-8489-fcf92a9446fb",
+      "language": {
+        "id": "*.*.python",
+        "version": "2.*.*"
+      },
+      "title": "TestCommandArgsPY2",
+      "uri": "TestCommandArgs.py2"
+    }
+  ]
+}
