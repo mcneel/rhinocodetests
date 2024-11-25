@@ -957,6 +957,30 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestProjectCommandArgs.rhproj" })]
+        public void TestRhProj_ProjectCommandArgs(string rhprojfile)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-83901
+            IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+
+            foreach (ProjectCode code in project.GetCodes())
+            {
+                Rhino.Runtime.Code.Code c = new StorageEntry(code.Uri).CreateCode();
+
+                var ctx = new RunContext();
+                project.Server.TryPrepareContext(project, c, ctx);
+
+                string[] inputs = ctx.Inputs.Parameters.ToArray();
+                Assert.Contains("__rhino_command__", inputs);
+                Assert.Contains("__is_interactive__", inputs);
+                Assert.Contains("__rhino_doc__", inputs);
+                Assert.Contains("__rhino_runmode__", inputs);
+
+                string[] outputs = ctx.Outputs.Parameters.ToArray();
+                Assert.Contains("__rhino_command_result__", outputs);
+            }
+        }
 #endif
 
         static readonly BindingFlags s_protectedFlags = BindingFlags.NonPublic | BindingFlags.Instance;
