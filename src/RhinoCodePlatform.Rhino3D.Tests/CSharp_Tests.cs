@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Collections.Generic;
 
 using NUnit.Framework;
@@ -1796,6 +1797,48 @@ public class Script_Instance : GH_ScriptInstance
             string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains("CurveFeature", names);
             Assert.Contains("MeshFeature", names);
+        }
+
+        [Test]
+        public void TestCSharp_CompileGuard_Library()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-84921
+            ILanguage csharp = GetLanguage(LanguageSpec.CSharp);
+
+            TryGetTestFilesPath(out string fileDir);
+            LanguageLibrary library = csharp.CreateLibrary(new Uri(Path.Combine(fileDir, "cs", "test_library_compileguard")));
+
+            Assert.IsTrue(library.TryBuild(new LibraryBuildOptions(), out CompileReference cred, out Diagnosis _));
+
+            byte[] data = File.ReadAllBytes(cred.Path);
+            Assembly a = Assembly.Load(data);
+
+            Type t = a.GetType("Test_Library_CompileGuard.Test");
+            dynamic inst = Activator.CreateInstance(t);
+
+            Assert.AreEqual(42, inst.TestLibrary());
+        }
+
+        [Test]
+        public void TestCSharp_CompileGuard_Library_Not()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-84921
+            ILanguage csharp = GetLanguage(LanguageSpec.CSharp);
+
+            TryGetTestFilesPath(out string fileDir);
+            LanguageLibrary library = csharp.CreateLibrary(new Uri(Path.Combine(fileDir, "cs", "test_library_compileguard_not")));
+
+            // NOTE:
+            // using BuildOptions does not add LIBRARY compile guard
+            Assert.IsTrue(library.TryBuild(new BuildOptions(), out CompileReference cred, out Diagnosis _));
+
+            byte[] data = File.ReadAllBytes(cred.Path);
+            Assembly a = Assembly.Load(data);
+
+            Type t = a.GetType("Test_Library_CompileGuard_Not.Test");
+            dynamic inst = Activator.CreateInstance(t);
+
+            Assert.AreEqual(42, inst.TestNotLibrary());
         }
 #endif
 
