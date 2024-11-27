@@ -2,6 +2,6 @@
 using System;
 
 result = false;
-#if RHINO_8_15
+#if NET
 result = true;
 #endif
