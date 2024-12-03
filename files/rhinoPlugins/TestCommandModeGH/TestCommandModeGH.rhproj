@@ -34,13 +34,13 @@
   },
   "codes": [
     {
-      "id": "259a212e-5850-490c-9262-38e515ac6291",
+      "id": "563b2d3e-b451-419a-8fce-188aed965035",
       "language": {
         "id": "*.gh1.grasshopper",
         "version": "1.*.*"
       },
-      "title": "TestCommandArgsGH",
-      "uri": "TestCommandArgsGH.gh"
+      "title": "TestCommandModeGH",
+      "uri": "TestCommandModeGH.gh"
     }
   ]
 }

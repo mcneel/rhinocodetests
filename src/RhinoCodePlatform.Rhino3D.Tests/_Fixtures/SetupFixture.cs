@@ -223,7 +223,13 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 foreach (string rhpFile in Directory.GetFiles(testPluginsPath, "*.rhp", SearchOption.AllDirectories))
                 {
                     TestContext.Progress.WriteLine($"Loading Rhino plugin: {rhpFile}");
-                    Rhino.PlugIns.PlugIn.LoadPlugIn(rhpFile, out Guid _);
+                    Rhino.PlugIns.LoadPlugInResult res = Rhino.PlugIns.PlugIn.LoadPlugIn(rhpFile, out Guid _);
+                    if (Rhino.PlugIns.LoadPlugInResult.Success != res)
+                    {
+                        string err = $"Error loading Rhino plugin {rhpFile}";
+                        TestContext.Progress.WriteLine(err);
+                        throw new Exception(err);
+                    }
                 }
             }
         }
