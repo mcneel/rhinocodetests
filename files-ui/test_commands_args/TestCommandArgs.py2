@@ -3,7 +3,7 @@
 # special vars should be available when project is open
 # and this code belongs to the project
 # and NOT available otherwise
-print("{0}\n".format(__rhino_command__))
-print("{0}\n".format(__rhino_doc__))
-print("{0}\n".format(__rhino_runmode__))
-print("{0}\n".format(__is_interactive__))
+print(__rhino_command__)
+print(__rhino_doc__)
+print(__rhino_runmode__)
+print(__is_interactive__)

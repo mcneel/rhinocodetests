@@ -1204,7 +1204,7 @@ import OpenEXR
 
             Code code = py3.CreateCode(
 $@"
-{P} venv: test_access_denied
+{P} venv: {SetupFixture.RHINOCODE_PYTHON_VENV_PREFIX}access_denied
 {P} r: openexr-tools
 import OpenEXR
 ");

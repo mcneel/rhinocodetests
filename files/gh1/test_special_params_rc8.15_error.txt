@@ -1,0 +1,4 @@
+The name '__rhino_command__' does not exist in the current context \[42\:19\]
+The name '__rhino_doc__' does not exist in the current context \[43\:15\]
+The name '__rhino_runmode__' does not exist in the current context \[44\:16\]
+The name '__is_interactive__' does not exist in the current context \[45\:25\]
