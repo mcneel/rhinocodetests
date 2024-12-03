@@ -99,16 +99,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         }
 #endif
 
-#if RC8_13
-        [Test]
-        public void TestRunScript_TestCommandArgs_GHCommand()
-        {
-            using MemoryMappedFile mmf = GetSharedMemory("TestCommandArgsGH");
-            Assert.AreEqual(Result.Success, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-_TestCommandArgsGH"));
-            Assert.IsTrue(GetReportLines(mmf).Any(l => l.StartsWith("TRUE")));
-        }
-#endif
-
 #if RC8_14
         [Test]
         public void TestRunScript_TestCommandResult_CancelCommand_CS()
@@ -168,6 +158,24 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             using MemoryMappedFile mmf_py2 = GetSharedMemory("TestCSPy2");
             Assert.AreEqual(Result.Success, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-TestCSharpInPython2"));
             Assert.AreEqual("<TestCSharpInPython2.TestClass", GetReportLines(mmf_py2)[0][..30]);
+        }
+#endif
+
+#if RC8_15
+        [Test]
+        public void TestRunScript_TestCommandArgs_GH()
+        {
+            using MemoryMappedFile mmf_gh = GetSharedMemory("TestCommandArgsGH");
+            Assert.AreEqual(Result.Success, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "TestCommandArgsGH"));
+            AssertArgsReport(mmf_gh, RunMode.Interactive);
+        }
+
+        [Test]
+        public void TestRunScript_TestCommandArgs_Script_GH()
+        {
+            using MemoryMappedFile mmf_gh = GetSharedMemory("TestCommandArgsGH");
+            Assert.AreEqual(Result.Success, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-_TestCommandArgsGH"));
+            AssertArgsReport(mmf_gh, RunMode.Scripted);
         }
 #endif
 

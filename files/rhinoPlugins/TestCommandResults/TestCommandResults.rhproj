@@ -90,8 +90,8 @@
     {
       "id": "b5d6553b-37bc-41c9-b066-13b2a99ef2a4",
       "language": {
-        "id": "mcneel.gh1.grasshopper",
-        "version": "1.0.*"
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
       },
       "title": "command_cancel_gh_py3",
       "uri": "command_cancel_gh_py3.gh"
