@@ -167,12 +167,15 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 int id = i;
                 ts.Add(Task.Run(() =>
                 {
+#if RC8_15
+                    var inputs = new ContextParams(ConvertDirection.Incoming)
+#else
                     var inputs = new ContextInputs
+#endif
                     {
                         ["a"] = 21 + id,
                         ["b"] = 21 + id,
                     };
-
                     var outStream = new RunContextStream();
                     code.Run(new RunContext($"Execute [{i} of {count}]")
                     {
