@@ -1192,8 +1192,76 @@ public class Script_Instance : GH_ScriptInstance
             Assert.AreEqual("y", inputs[1].Name);
             Assert.AreEqual("List<int>", inputs[1].ValueType.Name);
         }
-
 #endif
+
+#if RC8_15
+        [Test]
+        public void TestGH1_Component_ParamsCollect_CSharp_RunScriptIndent()
+        {
+            // https://github.com/mcneel/rhino/commit/1a06f12095ac2031197a3e264a0e89588e24ff39
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
+
+            // change the script
+            script.Text = @"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(object x, object y, object z, ref object a)
+    {
+    }
+}
+";
+
+            script.ParamsCollect();
+
+            IScriptParameter x_param = script.Inputs.ElementAt(0);
+            x_param.Access = ScriptParamAccess.Tree;
+
+            IScriptParameter y_param = script.Inputs.ElementAt(1);
+            y_param.Access = ScriptParamAccess.Tree;
+
+            script.ParamsApply();
+
+            Assert.AreEqual(@"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(
+		DataTree<object> x,
+		DataTree<object> y,
+		object z,
+		ref object a)
+    {
+    }
+}
+", script.Text);
+        }
+#endif
+
         static string EnsureCRLF(string input) => input.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
     }
 }
