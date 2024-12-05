@@ -1840,17 +1840,113 @@ public class Script_Instance : GH_ScriptInstance
 
             Assert.AreEqual(42, inst.TestNotLibrary());
         }
+
+        [Test]
+        public void TestCSharp_Complete_ProjectServerArgs_RhinoCommand()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85037
+            string s = @"// #! csharp
+using System;
+Console.WriteLine(__rhino_command__.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @");
+Console.WriteLine(__rhino_doc__);
+Console.WriteLine(__rhino_runmode__);
+Console.WriteLine(__is_interactive__);
+");
+
+            code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
+
+            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+
+            Assert.IsNotEmpty(completions);
+
+            string[] names = completions.Select(c => c.label).ToArray();
+            Assert.Contains(nameof(Rhino.Commands.Command.Id), names);
+            Assert.Contains(nameof(Rhino.Commands.Command.EnglishName), names);
+            Assert.Contains(nameof(Rhino.Commands.Command.LocalName), names);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_ProjectServerArgs_RhinoDoc()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85037
+            string s = @"// #! csharp
+using System;
+Console.WriteLine(__rhino_command__);
+Console.WriteLine(__rhino_doc__.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @");
+Console.WriteLine(__rhino_runmode__);
+Console.WriteLine(__is_interactive__);
+");
+
+            code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
+
+            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+
+            Assert.IsNotEmpty(completions);
+
+            string[] names = completions.Select(c => c.label).ToArray();
+            Assert.Contains(nameof(Rhino.RhinoDoc.Bitmaps), names);
+            Assert.Contains(nameof(Rhino.RhinoDoc.HatchPatterns), names);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_ProjectServerArgs_RhinoRunMode()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85037
+            string s = @"// #! csharp
+using System;
+Console.WriteLine(__rhino_command__);
+Console.WriteLine(__rhino_doc__);
+Console.WriteLine(__rhino_runmode__.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @");
+Console.WriteLine(__is_interactive__);
+");
+
+            code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
+
+            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+
+            Assert.IsNotEmpty(completions);
+
+            string[] names = completions.Select(c => c.label).ToArray();
+            Assert.Contains("byte", names);
+            Assert.Contains("char", names);
+            Assert.Contains(nameof(Enum.HasFlag), names);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_ProjectServerArgs_RhinoRunModeIsInteractive()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85037
+            string s = @"// #! csharp
+using System;
+Console.WriteLine(__rhino_command__);
+Console.WriteLine(__rhino_doc__);
+Console.WriteLine(__rhino_runmode__);
+Console.WriteLine(__is_interactive__.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @");
+");
+
+            code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
+
+            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+
+            Assert.IsNotEmpty(completions);
+
+            string[] names = completions.Select(c => c.label).ToArray();
+            Assert.Contains(nameof(bool.TryFormat), names);
+        }
 #endif
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
 
 #if RC8_15
-
         static IEnumerable<Ed.Common.CompletionItem> CompleteAtEndingPeriod(Code code, string textUptoPeriod)
         {
             if (code.Text.TryGetPosition(textUptoPeriod.Length, out TextPosition position))
             {
-                if (!code.Text.TryGetTransformed(SupportGroup.Complete, textUptoPeriod.Length, out string xformedCode, out int xformedPosition))
+                if (!code.Text.TryGetTransformed(textUptoPeriod.Length, CompleteOptions.Empty, out string xformedCode, out int xformedPosition))
                 {
                     xformedCode = code.Text;
                     xformedPosition = textUptoPeriod.Length;

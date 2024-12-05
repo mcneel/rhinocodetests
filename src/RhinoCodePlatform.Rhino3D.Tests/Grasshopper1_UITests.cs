@@ -1199,6 +1199,7 @@ public class Script_Instance : GH_ScriptInstance
         public void TestGH1_Component_ParamsCollect_CSharp_RunScriptIndent()
         {
             // https://github.com/mcneel/rhino/commit/1a06f12095ac2031197a3e264a0e89588e24ff39
+            // https://github.com/mcneel/rhino/commit/0b1febc688eab7680746f6452e98d41ecda80aad
             IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
 
             // change the script

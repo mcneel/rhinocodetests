@@ -535,7 +535,11 @@ Rhino.Input.RhinoGet.GetOneObject(");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
+#if RC8_15
+                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteSignatureOptions.Empty);
+#else
                 code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+#endif
 
             Assert.AreEqual(2, signatures.Count());
 
@@ -572,7 +576,11 @@ Rhino.Input.RhinoGet.GetOneObject(prompt, ");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
+#if RC8_15
+                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteSignatureOptions.Empty);
+#else
                 code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+#endif
 
             Assert.AreEqual(2, signatures.Count());
 
@@ -903,7 +911,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 #endif
 
 #if RC8_10
-        [Test]
+            [Test]
         public void TestPython2_Complete_SkipBlockComments()
         {
             const string P = "#";
@@ -994,7 +1002,11 @@ Rhino.Input.RhinoGet.GetOneObject( (1,2,3), ");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
+#if RC8_15
+                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteSignatureOptions.Empty);
+#else
                 code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+#endif
 
             Assert.AreEqual(2, signatures.Count());
 
@@ -1311,7 +1323,11 @@ comps.CurveXCurve(");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
+#if RC8_15
+                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteSignatureOptions.Empty);
+#else
                 code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+#endif
 
             Assert.AreEqual(1, signatures.Count());
 
@@ -1345,7 +1361,11 @@ comps.CurveXCurve(arg,");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
+#if RC8_15
+                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteSignatureOptions.Empty);
+#else
                 code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+#endif
 
             Assert.AreEqual(1, signatures.Count());
 
