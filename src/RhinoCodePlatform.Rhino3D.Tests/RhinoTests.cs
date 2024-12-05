@@ -186,14 +186,44 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             AssertArgsReport(name, mmf_gh, RunMode.Scripted);
         }
 
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhino", "test_command_args.cs" })]
+        public void TestRunScript_ScriptEditorCommandArgs_Script_CS(string scriptfile)
+        {
+            TestRunScript_ScriptEditorCommandArgs_Script("TestScriptEditorCommandArgsCS", scriptfile);
+        }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhino", "test_command_args.py" })]
+        public void TestRunScript_ScriptEditorCommandArgs_Script_PY3(string scriptfile)
+        {
+            TestRunScript_ScriptEditorCommandArgs_Script("TestScriptEditorCommandArgsPy3", scriptfile);
+        }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhino", "test_command_args.py2" })]
+        public void TestRunScript_ScriptEditorCommandArgs_Script_PY2(string scriptfile)
+        {
+            TestRunScript_ScriptEditorCommandArgs_Script("TestScriptEditorCommandArgsPy2", scriptfile);
+        }
+
         [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhino", "test_redraw.py" })]
         public void TestRunScript_RedrawEnabled(string scriptfile)
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85032
+            Assert.Ignore("Awaiting fix RH-85032");
+
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-83100
             Assert.IsTrue(RhinoDoc.ActiveDoc.Views.RedrawEnabled);
-
-            RhinoApp.RunScript($"-_ScriptEditor Run {scriptfile}", echo: false);
+            Assert.IsTrue(RhinoApp.RunScript(RhinoDoc.ActiveDoc.RuntimeSerialNumber, $"-_ScriptEditor _Run \"{scriptfile}\"", echo: false));
             Assert.IsTrue(RhinoDoc.ActiveDoc.Views.RedrawEnabled);
+        }
+
+        static void TestRunScript_ScriptEditorCommandArgs_Script(string name, string scriptfile)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85032
+            Assert.Ignore("Awaiting fix RH-85032");
+
+            using MemoryMappedFile mmf = GetSharedMemory(name);
+            Assert.IsTrue(RhinoApp.RunScript(RhinoDoc.ActiveDoc.RuntimeSerialNumber, $"-_ScriptEditor _Run \"{scriptfile}\"", echo: false));
+            AssertArgsReport(name, mmf, RunMode.Scripted);
         }
 #endif
 
@@ -207,6 +237,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             TestContext.Write(string.Join(Environment.NewLine, lines));
             TestContext.WriteLine("</data>");
 
+            Assert.GreaterOrEqual(lines.Length, 4);
             Assert.IsTrue(s_cmdClassNameMatcher.IsMatch(lines[0]));
             Assert.AreEqual("Rhino.RhinoDoc", lines[1]);
             Assert.AreEqual(RunMode.Interactive == mode ? "Interactive" : "Scripted", lines[2]);
