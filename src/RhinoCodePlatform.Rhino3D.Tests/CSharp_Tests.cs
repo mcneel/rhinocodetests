@@ -1939,6 +1939,82 @@ Console.WriteLine(__is_interactive__.";
             string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains(nameof(bool.TryFormat), names);
         }
+
+        [Test]
+        public void TestCSharp_CompileGuard_Library_AsCode()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-84921
+            ILanguage csharp = GetLanguage(LanguageSpec.CSharp);
+
+            // ensure main.cs is executed including types.cs and
+            // without LIBRARY compile guard
+            TryGetTestFilesPath(out string fileDir);
+            Uri mainFile = new(Path.Combine(fileDir, "cs", "test_library_as_code", "Main.cs"));
+            Uri otherFile = new(Path.Combine(fileDir, "cs", "test_library_as_code", "Types.cs"));
+
+            Code code = csharp.CreateCode(mainFile);
+            code.Text.References.Add(new SourceCode(otherFile));
+
+            int _add_;
+            double _solve_;
+
+            var ctx = new RunContext
+            {
+                AutoApplyParams = true,
+                Outputs =
+                {
+                    [nameof(_add_)] = 0,
+                    [nameof(_solve_)] = 0d,
+                }
+            };
+
+            Assert.DoesNotThrow(() => code.Run(ctx));
+
+            Assert.IsTrue(ctx.Outputs.TryGet(nameof(_add_), out _add_));
+            Assert.AreEqual(52, _add_);
+
+            Assert.IsTrue(ctx.Outputs.TryGet(nameof(_solve_), out _solve_));
+            Assert.AreEqual(42, _solve_);
+        }
+
+        [Test]
+        public void TestCSharp_CompileGuard_Library_AsCode_Debug()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-84921
+            ILanguage csharp = GetLanguage(LanguageSpec.CSharp);
+
+            // ensure main.cs is executed including types.cs and
+            // without LIBRARY compile guard,
+            // and containing DEBUG guard
+            TryGetTestFilesPath(out string fileDir);
+            Uri mainFile = new(Path.Combine(fileDir, "cs", "test_library_as_code", "Main.cs"));
+            Uri otherFile = new(Path.Combine(fileDir, "cs", "test_library_as_code", "Types.cs"));
+
+            Code code = csharp.CreateCode(mainFile);
+            code.Text.References.Add(new SourceCode(otherFile));
+
+            int _add_;
+            double _solve_;
+
+            var ctx = new DebugContext
+            {
+                AutoApplyParams = true,
+                Outputs =
+                {
+                    [nameof(_add_)] = 0,
+                    [nameof(_solve_)] = 0d,
+                }
+            };
+
+            code.DebugControls = new DebugContinueAllControls();
+            Assert.DoesNotThrow(() => code.Debug(ctx));
+
+            Assert.IsTrue(ctx.Outputs.TryGet(nameof(_add_), out _add_));
+            Assert.AreEqual(500, _add_);
+
+            Assert.IsTrue(ctx.Outputs.TryGet(nameof(_solve_), out _solve_));
+            Assert.AreEqual(42, _solve_);
+        }
 #endif
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");

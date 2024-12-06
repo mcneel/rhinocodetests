@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 
 using Rhino.Runtime.Code;
+using Rhino.Runtime.Code.Text;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Execution.Debugging;
 using Rhino.Runtime.Code.Execution.Profiling;
@@ -2553,6 +2554,37 @@ import os
             Assert.True(opts.Get("pythonnet.pureScope", false));
             Assert.True(opts.Get("python.reloadEngine", false));
             Assert.True(opts.Get("python.keepScope", false));
+        }
+
+        [Test]
+        public void TestPython3_Hover_Empty()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85077
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+import os
+jack : int = 42");
+
+            IEnumerable<HoverInfo> hovers =
+                code.Language.Support.Hover(SupportRequest.Empty, code, 1, HoverOptions.Empty);
+
+            Assert.IsEmpty(hovers);
+        }
+
+        [Test]
+        public void TestPython3_Hover_Int()
+        {
+            string s = @"
+import os
+jac";
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85077
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(s + "k : int = 42");
+
+            IEnumerable<HoverInfo> hovers =
+                code.Language.Support.Hover(SupportRequest.Empty, code, s.Length, HoverOptions.Empty);
+
+            Assert.IsNotEmpty(hovers);
+            Assert.AreEqual("int", hovers.First().Text);
         }
 #endif
 
