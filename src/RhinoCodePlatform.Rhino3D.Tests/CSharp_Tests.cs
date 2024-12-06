@@ -1830,7 +1830,9 @@ public class Script_Instance : GH_ScriptInstance
 
             // NOTE:
             // using BuildOptions does not add LIBRARY compile guard
-            Assert.IsTrue(library.TryBuild(new BuildOptions(), out CompileReference cred, out Diagnosis _));
+            var opts = new LibraryBuildOptions();
+            opts.CompileGuards.Remove(LibraryBuildOptions.DEFINE_LIBRARY.Identifier);
+            Assert.IsTrue(library.TryBuild(opts, out CompileReference cred, out Diagnosis _));
 
             byte[] data = File.ReadAllBytes(cred.Path);
             Assembly a = Assembly.Load(data);
