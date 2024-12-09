@@ -5,7 +5,6 @@ using NUnit.Framework;
 
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
-using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Text;
 
 using Grasshopper.Kernel;
@@ -15,11 +14,8 @@ using Grasshopper.Kernel.Types;
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
-    public class Grasshopper1_Tests : ScriptFixture
+    public class Grasshopper1_Tests : GH1ScriptFixture
     {
-        const string GHDOC_PARAM = "__ghdoc__";
-        static readonly Guid s_assertTrue = new("0890a32c-4e30-4f06-a98f-ed62b45838cf");
-
         [Test]
         public void TestGH1_Error()
         {
@@ -45,7 +41,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 return;
             }
 
-            throw new Exception("Failed collecting erorr from Grasshopper definition");
+            throw new Exception("Failed collecting error from Grasshopper definition");
         }
 
         [Test, TestCaseSource(nameof(GetTestDefinitions))]
@@ -118,8 +114,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
         }
 #endif
-
-        ILanguage GetGrasshopper() => GetLanguage(new LanguageSpec(" *.*.grasshopper", "1"));
 
         static IEnumerable<object[]> GetTestDefinitions() => GetTestScripts(@"gh1\", "test_*.gh?");
     }

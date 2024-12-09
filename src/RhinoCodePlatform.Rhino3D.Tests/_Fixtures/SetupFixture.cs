@@ -279,7 +279,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                                      if (e.Data is string line)
                                      {
                                          TestContext.Progress.WriteLine(line);
-
                                          started |= line.Contains("Application started.");
                                      }
                                  },
@@ -292,7 +291,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                                  },
                                  (ProcessStartInfo s) =>
                                  {
-
+                                     s.EnvironmentVariables["RHINO_COMPUTE_DEBUG"] = "True";
                                  });
 
             // give compute enough time to launch, or break after 10
@@ -352,9 +351,9 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-83985
             string pdata = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             string pipdata = Path.Combine(pdata, "pip");
-            
+
             pipdata.EnsureDirectory();
-            
+
             string pipini = Path.Combine(pipdata, "pip.ini");
             File.WriteAllText(pipini, @"
 [global]
