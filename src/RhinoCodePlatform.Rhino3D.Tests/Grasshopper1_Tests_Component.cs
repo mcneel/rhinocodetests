@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 
 using NUnit.Framework;
 
@@ -27,11 +26,12 @@ using RhinoCodePlatform.Rhino3D.Testing;
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
 
 using GHP = RhinoCodePluginGH;
+using Rhino;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
-    public class Grasshopper1_UITests : ScriptFixture
+    public class Grasshopper1_Tests_Component : GH1ScriptFixture
     {
 #if RC8_8
         [Test]
@@ -801,7 +801,7 @@ a = str(type(x))
 
             ghdoc.Enabled = true;
             ghdoc.NewSolution(expireAllObjects: true);
-            
+
             RhinoCode.ReportProgressToConsole = true;
 
             Assert.IsTrue(watcher.Pass);
@@ -1261,7 +1261,15 @@ public class Script_Instance : GH_ScriptInstance
 }
 ", script.Text);
         }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "gh1ui", "test_csharp_runScriptAsync_rc8.15.ghx" })]
+        public void TestGH1_Component_RunScript_CSharp_Async(string ghfile)
+        {
+            Test_ScriptWithWait(new Uri(ghfile), 3);
+        }
 #endif
+
+        static ILanguage GetGrasshopper() => GetLanguage(new LanguageSpec(" *.*.grasshopper", "1"));
 
         static string EnsureCRLF(string input) => input.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
     }

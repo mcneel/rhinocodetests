@@ -243,6 +243,11 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                     stream.Dispose();
                 }
 
+                if (scriptInfo.ExpectsError || scriptInfo.ExpectsWarning)
+                {
+                    throw new Exception("Script expected error or warning but none occured");
+                }
+
                 return true;
             }
             catch (ExecuteException runEx)
