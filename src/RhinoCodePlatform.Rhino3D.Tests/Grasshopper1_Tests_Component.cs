@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
+using Rhino.Runtime.Code.Diagnostics;
 
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
@@ -1269,7 +1270,209 @@ public class Script_Instance : GH_ScriptInstance
         }
 #endif
 
-        static ILanguage GetGrasshopper() => GetLanguage(new LanguageSpec(" *.*.grasshopper", "1"));
+#if RC8_16
+        [Test]
+        public void TestGH1_Component_ParamsCollect_CSharp_AsyncRunScript_CompileError()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85144
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
+
+            // change the script
+            script.Text = @"
+using System;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(int u, double v, ref Point3d w, ref Surface z)
+    {
+    }
+}
+";
+            script.ReBuild();
+
+            Assert.IsTrue(script.TryGetCode(out Code code));
+            CompileException ex = Assert.Throws<CompileException>(() => code.Build(new BuildContext()));
+            Diagnostic d = ex.Diagnosis.OrderBy(d => d.Severity).First();
+            Assert.AreEqual(DiagnosticSeverity.Error, d.Severity);
+            Assert.IsTrue(d.Message.Contains("Async methods cannot have ref, in or out parameters"));
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsCollect_CSharp_AsyncRunScript()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85144
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
+
+            // change the script
+            script.Text = @"
+using System;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(int u, double v)
+    {
+    }
+}
+";
+
+            // collect parameters from RunScript and apply to component
+            script.ParamsCollect();
+
+            // assert inputs
+            ScriptParam[] inputs = script.Inputs.Select(i => i.CreateScriptParam()).ToArray();
+            Assert.AreEqual("u", inputs[0].Name);
+            Assert.AreEqual("int", inputs[0].ValueType.Name);
+
+            Assert.AreEqual("v", inputs[1].Name);
+            Assert.AreEqual("double", inputs[1].ValueType.Name);
+
+            // assert param converters
+            IScriptParameter u_param = script.Inputs.ElementAt(0);
+            IScriptParameter v_param = script.Inputs.ElementAt(1);
+
+            Assert.True(u_param.Converter is LGH1.Converters.IntConverter);
+            Assert.True(v_param.Converter is LGH1.Converters.DoubleConverter);
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsApply_CSharp_AsyncRunScript()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85144
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
+
+            // change the script
+            script.Text = @"
+using System;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(object x, object y)
+    {
+    }
+}
+";
+
+            script.ReBuild();
+            script.ParamsCollect();
+
+            IGH_Component component = (IGH_Component)script;
+            // create a few long parameters to push RunScript signature to become multiline
+            component.Params.RegisterInputParam(new GHP.Parameters.ScriptVariableParam("z") { Access = GH_ParamAccess.list });
+
+            // zui calls this automatically when parameter is added
+            ((IGH_VariableParameterComponent)component).VariableParameterMaintenance();
+
+            script.ReBuild();
+            script.ParamsApply();
+
+            Assert.AreEqual(@"
+using System;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(
+		object x,
+		object y,
+		System.Collections.Generic.List<object> z)
+    {
+    }
+}
+", EnsureCRLF(script.Text));
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsApply_CSharp_AsyncRunScript_CompileError()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85144
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
+
+            // change the script
+            script.Text = @"
+using System;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(object x, object y, ref object a)
+    {
+    }
+}
+";
+
+            script.ReBuild();
+            script.ParamsCollect();
+
+            IGH_Component component = (IGH_Component)script;
+            // create a few long parameters to push RunScript signature to become multiline
+            component.Params.RegisterInputParam(new GHP.Parameters.ScriptVariableParam("z") { Access = GH_ParamAccess.list });
+
+            // zui calls this automatically when parameter is added
+            ((IGH_VariableParameterComponent)component).VariableParameterMaintenance();
+
+            script.ReBuild();
+            script.ParamsApply();
+
+            Assert.AreEqual(@"
+using System;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(
+		object x,
+		object y,
+		System.Collections.Generic.List<object> z,
+		ref object a)
+    {
+    }
+}
+", EnsureCRLF(script.Text));
+
+            Assert.IsTrue(script.TryGetCode(out Code code));
+            code.ExpireCache();
+
+            script.ReBuild();
+
+            CompileException ex = Assert.Throws<CompileException>(() => code.Build(new BuildContext()));
+            Diagnostic d = ex.Diagnosis.OrderBy(d => d.Severity).First();
+            Assert.AreEqual(DiagnosticSeverity.Error, d.Severity);
+            Assert.IsTrue(d.Message.Contains("Async methods cannot have ref, in or out parameters"));
+        }
+#endif
 
         static string EnsureCRLF(string input) => input.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
     }

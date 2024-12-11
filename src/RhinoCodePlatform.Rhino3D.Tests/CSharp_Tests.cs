@@ -15,6 +15,8 @@ using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Platform;
 using Rhino.Runtime.Code.Testing;
 using Rhino.Runtime.Code.Text;
+using Rhino;
+
 
 
 #if RC8_11
@@ -2047,6 +2049,44 @@ Console.WriteLine(Thread.CurrentThread.CurrentUICulture);
 
             Assert.IsTrue(ctx.Outputs.TryGet(nameof(_solve_), out _solve_));
             Assert.AreEqual(42, _solve_);
+        }
+#endif
+
+#if RC8_16
+        [Test]
+        public void TestCSharp_CompileGuard_Specific()
+        {
+            int major = RhinoApp.Version.Major;
+            int minor = RhinoApp.Version.Minor;
+
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode($@"
+using System;
+
+result = false;
+#if RHINO_{major}_{minor}
+result = true;
+#endif
+");
+
+            RunContext ctx = GetRunContext(captureStdout: false);
+
+            ctx.AutoApplyParams = true;
+            ctx.Outputs["result"] = default;
+
+            Assert.DoesNotThrow(() => code.Run(ctx));
+            Assert.True(ctx.Outputs.TryGet("result", out bool data));
+            Assert.True(data);
+        }
+
+        [Test]
+        public void TestCSharp_Compile_LastInlineComment()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85148
+            Code code = GetLanguage(LanguageSpec.CSharp9).CreateCode(@"
+using System;
+Console.WriteLine(); // Comment");
+
+            Assert.DoesNotThrow(() => code.Build(new BuildContext()));
         }
 #endif
 
