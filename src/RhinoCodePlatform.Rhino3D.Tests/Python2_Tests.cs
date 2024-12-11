@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using NUnit.Framework;
 
+using Rhino;
+
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
@@ -1514,6 +1516,30 @@ import os
             Assert.True(execSpec.TryGetContextOptions(out ReadOnlyContextOptions opts));
             Assert.True(opts.Get("python.reloadEngine", false));
             Assert.True(opts.Get("python.keepScope", false));
+        }
+#endif
+
+#if RC8_16
+        [Test]
+        public void TestPython2_CompileGuard_Specific()
+        {
+            int major = RhinoApp.Version.Major;
+            int minor = RhinoApp.Version.Minor;
+
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode($@"
+result = False
+if __context__.CompileGuards.Contains(""RHINO_{major}_{minor}""):
+    result = True
+");
+
+            RunContext ctx = GetRunContext(captureStdout: false);
+
+            ctx.AutoApplyParams = true;
+            ctx.Outputs["result"] = default;
+
+            Assert.DoesNotThrow(() => code.Run(ctx));
+            Assert.True(ctx.Outputs.TryGet("result", out bool data));
+            Assert.True(data);
         }
 #endif
 

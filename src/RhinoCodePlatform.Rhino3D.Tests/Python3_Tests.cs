@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 using NUnit.Framework;
 
+using Rhino;
+
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Text;
 using Rhino.Runtime.Code.Execution;
@@ -2585,6 +2587,30 @@ jac";
 
             Assert.IsNotEmpty(hovers);
             Assert.AreEqual("int", hovers.First().Text);
+        }
+#endif
+
+#if RC8_16
+        [Test]
+        public void TestPython3_CompileGuard_Specific()
+        {
+            int major = RhinoApp.Version.Major;
+            int minor = RhinoApp.Version.Minor;
+
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode($@"
+result = False
+if __context__.CompileGuards.Contains(""RHINO_{major}_{minor}""):
+    result = True
+");
+
+            RunContext ctx = GetRunContext(captureStdout: false);
+
+            ctx.AutoApplyParams = true;
+            ctx.Outputs["result"] = default;
+
+            Assert.DoesNotThrow(() => code.Run(ctx));
+            Assert.True(ctx.Outputs.TryGet("result", out bool data));
+            Assert.True(data);
         }
 #endif
 
