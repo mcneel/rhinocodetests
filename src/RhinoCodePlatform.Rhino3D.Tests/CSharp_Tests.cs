@@ -1941,6 +1941,39 @@ Console.WriteLine(__is_interactive__.";
         }
 
         [Test]
+        public void TestCSharp_Complete_ProjectServerArgs_PositionInUsings()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85098
+            string s = @"// #! csharp
+using System;
+using System.Linq;
+using System.Threading;
+using System.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"
+using Rhino;
+
+var lcid = Rhino.ApplicationSettings.AppearanceSettings.LanguageIdentifier;
+var culture = System.Globalization.CultureInfo.GetCultureInfo(lcid);
+
+Console.WriteLine(lcid);
+
+Console.WriteLine(culture);
+Console.WriteLine(Thread.CurrentThread.CurrentCulture);
+Console.WriteLine(Thread.CurrentThread.CurrentUICulture);
+");
+
+            code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
+
+            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+
+            Assert.IsNotEmpty(completions);
+
+            string[] names = completions.Select(c => c.label).ToArray();
+            Assert.Contains(nameof(System.Threading), names);
+            Assert.Contains(nameof(System.Globalization), names);
+        }
+
+        [Test]
         public void TestCSharp_CompileGuard_Library_AsCode()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-84921
