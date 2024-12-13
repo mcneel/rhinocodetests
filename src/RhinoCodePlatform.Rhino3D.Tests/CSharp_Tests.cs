@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 using NUnit.Framework;
 
+using Rhino;
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Execution.Debugging;
@@ -15,9 +16,6 @@ using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Platform;
 using Rhino.Runtime.Code.Testing;
 using Rhino.Runtime.Code.Text;
-using Rhino;
-
-
 
 #if RC8_11
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
@@ -2087,6 +2085,36 @@ using System;
 Console.WriteLine(); // Comment");
 
             Assert.DoesNotThrow(() => code.Build(new BuildContext()));
+        }
+
+        [Test]
+        public void TestCSharp_Complete_ScriptInstance_XformerStack()
+        {
+            // this is a test to make sure C# autocompletion transformer stack
+            // is processing in correct order
+            string s = @"// #! csharp
+using System;
+using Rhino.";
+            Code code = new Grasshopper1Script(s + @"
+using Grasshopper;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(object x, object y, ref object a)
+    {
+    }
+}
+").CreateCode();
+
+            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+
+            Assert.IsNotEmpty(completions);
+
+            string[] names = completions.Select(c => c.label).ToArray();
+            Assert.Contains(nameof(Rhino.Geometry), names);
+            Assert.Contains(nameof(Rhino.Display), names);
+            Assert.Contains(nameof(Rhino.Runtime), names);
+            Assert.Contains(nameof(Rhino.UI), names);
         }
 #endif
 
