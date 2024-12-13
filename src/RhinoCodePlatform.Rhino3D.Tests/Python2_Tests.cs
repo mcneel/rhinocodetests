@@ -1541,6 +1541,93 @@ if __context__.CompileGuards.Contains(""RHINO_{major}_{minor}""):
             Assert.True(ctx.Outputs.TryGet("result", out bool data));
             Assert.True(data);
         }
+
+        [Test]
+        public void TestPython2_Complete_ScriptInstance_XformerStack()
+        {
+            string s = @"#! python 2
+import System
+import Rhino.";
+            Code code = new Grasshopper1Script(s + @"
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self, x, y):
+        return
+").CreateCode();
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            completions = support.Complete(SupportRequest.Empty, code, s.Length, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+
+            string[] names = completions.Select(c => c.Text).ToArray();
+            Assert.Contains(nameof(Rhino.Geometry), names);
+            Assert.Contains(nameof(Rhino.Display), names);
+            Assert.Contains(nameof(Rhino.Runtime), names);
+            Assert.Contains(nameof(Rhino.UI), names);
+        }
+
+        [Test]
+        public void TestPython2_Complete_ScriptInstance_XformerStack_WithSpace()
+        {
+            string s = @"#! python 2
+import System
+import Rhino.";
+            Code code = new Grasshopper1Script(s + @"
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(  Grasshopper.Kernel.GH_ScriptInstance      ):
+    def RunScript(self, x, y):
+        return
+").CreateCode();
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            completions = support.Complete(SupportRequest.Empty, code, s.Length, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+
+            string[] names = completions.Select(c => c.Text).ToArray();
+            Assert.Contains(nameof(Rhino.Geometry), names);
+            Assert.Contains(nameof(Rhino.Display), names);
+            Assert.Contains(nameof(Rhino.Runtime), names);
+            Assert.Contains(nameof(Rhino.UI), names);
+        }
+
+        [Test]
+        public void TestPython2_Complete_ScriptInstance_XformerStack_WithSpace_LegacyComponent()
+        {
+            string s = @"#! python 2
+import System
+import Rhino.";
+            Code code = new Grasshopper1Script(s + @"
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(  component      ):
+    def RunScript(self, x, y):
+        return
+").CreateCode();
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            completions = support.Complete(SupportRequest.Empty, code, s.Length, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+
+            string[] names = completions.Select(c => c.Text).ToArray();
+            Assert.Contains(nameof(Rhino.Geometry), names);
+            Assert.Contains(nameof(Rhino.Display), names);
+            Assert.Contains(nameof(Rhino.Runtime), names);
+            Assert.Contains(nameof(Rhino.UI), names);
+        }
 #endif
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py2\", "test_*.py");
