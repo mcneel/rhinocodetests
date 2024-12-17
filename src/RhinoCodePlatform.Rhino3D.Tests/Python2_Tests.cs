@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 using NUnit.Framework;
@@ -1627,6 +1628,125 @@ class MyComponent(  component      ):
             Assert.Contains(nameof(Rhino.Display), names);
             Assert.Contains(nameof(Rhino.Runtime), names);
             Assert.Contains(nameof(Rhino.UI), names);
+        }
+
+        [Test]
+        public void TestPython2_ThreadSafeScope()
+        {
+            const int THREAD_COUNT = 5;
+            const int THREAD_CHECK_COUNT = 20;
+            const string INP_NAME = "__inp__";
+            const string INP_CHECK_NAME = "__inp_check__";
+            const string OUT_NAME = "__out__";
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode($@"
+import time
+
+for m in range({THREAD_CHECK_COUNT}):
+    time.sleep(0.100)
+    {INP_CHECK_NAME}({INP_NAME})
+
+{OUT_NAME} = 42 + {INP_NAME}
+");
+
+            code.Inputs.Add(INP_NAME);
+            code.Inputs.Add(INP_CHECK_NAME);
+            code.Outputs.Add(OUT_NAME);
+
+            // NOTE:
+            // setting ["python.keepScope"] = true
+            // will make this code fail and cause race condition
+
+            using RunGroup group = code.RunWith("test");
+            int counter = 0;
+            Parallel.For(0, THREAD_COUNT, (i) =>
+            {
+                int checkcounter = 0;
+                var ctx = new RunContext($"Thread {i}")
+                {
+                    Inputs = { [INP_NAME] =  i,
+                                [INP_CHECK_NAME] = (int index) => {
+                                    Assert.AreEqual(i, index);
+                                    checkcounter++;
+                                }
+                    },
+                    Outputs = { [OUT_NAME] = -1 },
+                };
+
+                code.Run(ctx);
+
+                Assert.IsTrue(ctx.Outputs.TryGet(OUT_NAME, out int value));
+                Assert.AreEqual(42 + i, value);
+
+                Assert.AreEqual(THREAD_CHECK_COUNT, checkcounter);
+
+                Interlocked.Increment(ref counter);
+            });
+
+            Assert.AreEqual(THREAD_COUNT, counter);
+        }
+
+        [Test]
+        public void TestPython2_ContextTracking()
+        {
+            const int THREAD_COUNT = 5;
+            const string CID_NAME = "__cid__";
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode($@"
+{CID_NAME} = __context__.Id.Id
+");
+
+            code.Outputs.Add(CID_NAME);
+
+            using RunGroup group = code.RunWith("test");
+            int counter = 0;
+            Parallel.For(0, THREAD_COUNT, (i) =>
+            {
+                var ctx = new RunContext($"Thread {i}")
+                {
+                    Outputs = { [CID_NAME] = Guid.Empty }
+                };
+
+                code.Run(ctx);
+
+                Assert.IsTrue(ctx.Outputs.TryGet(CID_NAME, out Guid cid));
+                Assert.AreEqual(ctx.Id.Id, cid);
+                Interlocked.Increment(ref counter);
+            });
+
+            Assert.AreEqual(THREAD_COUNT, counter);
+        }
+
+        [Test]
+        public void TestPython2_ContextTracking_CurrentContext()
+        {
+            const int THREAD_COUNT = 5;
+            const string CTX_CHECK_NAME = "__ctx_check__";
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode($@"
+{CTX_CHECK_NAME}()
+");
+
+            code.Inputs.Add(CTX_CHECK_NAME);
+
+            using RunGroup group = code.RunWith("test");
+            int counter = 0;
+            Parallel.For(0, THREAD_COUNT, (i) =>
+            {
+                bool checked_context = false;
+                var ctx = new RunContext($"Thread {i}");
+
+                ctx.Inputs[CTX_CHECK_NAME] = () =>
+                {
+                    Assert.AreEqual(ctx.Id, code.CurrentContext);
+                    checked_context = true;
+                };
+
+                code.Run(ctx);
+
+                Assert.IsTrue(checked_context);
+
+                Interlocked.Increment(ref counter);
+            });
+
+            Assert.AreEqual(THREAD_COUNT, counter);
         }
 #endif
 
