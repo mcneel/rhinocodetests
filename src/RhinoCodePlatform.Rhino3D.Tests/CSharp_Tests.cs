@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 using NUnit.Framework;
 
@@ -16,6 +18,8 @@ using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Platform;
 using Rhino.Runtime.Code.Testing;
 using Rhino.Runtime.Code.Text;
+using System.Collections.Concurrent;
+
 
 #if RC8_11
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
@@ -2115,6 +2119,61 @@ public class Script_Instance : GH_ScriptInstance
             Assert.Contains(nameof(Rhino.Display), names);
             Assert.Contains(nameof(Rhino.Runtime), names);
             Assert.Contains(nameof(Rhino.UI), names);
+        }
+
+        [Test]
+        public void TestCSharp_ContextTracking()
+        {
+            const int THREAD_COUNT = 5;
+            const string CID_NAME = "__cid__";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode($@"
+using System;
+{CID_NAME} = __context__.Id.Id;
+");
+
+            code.Outputs.Add(CID_NAME);
+
+            using RunGroup group = code.RunWith("test");
+            int counter = 0;
+            Parallel.For(0, THREAD_COUNT, (i) =>
+            {
+                var ctx = new RunContext($"Thread {i}")
+                {
+                    Outputs = { [CID_NAME] = Guid.Empty }
+                };
+
+                code.Run(ctx);
+
+                Assert.IsTrue(ctx.Outputs.TryGet(CID_NAME, out Guid cid));
+                Assert.AreEqual(ctx.Id.Id, cid);
+                Interlocked.Increment(ref counter);
+            });
+
+            Assert.AreEqual(THREAD_COUNT, counter);
+        }
+
+        [Test]
+        public void TestCSharp_ContextTracking_CurrentContext()
+        {
+            const int THREAD_COUNT = 5;
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(@"
+// async: true
+using System.Threading.Tasks;
+await Task.Delay(1000);
+");
+
+            using RunGroup group = code.RunWith("test");
+            int counter = 0;
+            Parallel.For(0, THREAD_COUNT, (i) =>
+            {
+                var ctx = new RunContext($"Thread {i}");
+                _ = code.RunAsync(ctx);
+
+                Assert.AreEqual(ctx.Id, code.CurrentContext);
+                Interlocked.Increment(ref counter);
+            });
+
+            Assert.AreEqual(THREAD_COUNT, counter);
         }
 #endif
 
