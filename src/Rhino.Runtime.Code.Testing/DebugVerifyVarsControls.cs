@@ -79,8 +79,7 @@ namespace Rhino.Runtime.Code.Testing
                                                .ToArray();
 
                     bool verified = vars.All(v => OnReceivedExpected?.Invoke(v) ?? true);
-                    bool all_expected = _expected.All(ev => vars.Any(v => v.Id == ev.Id
-                                                                  && ev.ExpectsValue ? v.ValueRepr == ev.ValueRepr : true));
+                    bool all_expected = _expected.All(ev => vars.Any(v => v.Id == ev.Id && ev.ExpectsValue ? v.Equals(ev) : true));
                     bool no_unexpected = !_unexpected.Any(uev => vars.Any(v => v.Id == uev.Id));
 
                     Pass = verified && all_expected && no_unexpected;
