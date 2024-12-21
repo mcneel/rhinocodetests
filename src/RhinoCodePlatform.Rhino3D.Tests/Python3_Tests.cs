@@ -2821,6 +2821,166 @@ for m in range({THREAD_CHECK_COUNT}):
 
             Assert.AreEqual(THREAD_COUNT, counter);
         }
+
+        [Test]
+        public void TestPython3_DebugForEachLoop_Variable()
+        {
+            const string INDEX_VAR = "i";
+            const string SUM_VAR = "total";
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+$@"
+{SUM_VAR} = 0
+for {INDEX_VAR} in range(0, 3): # line 3
+    {SUM_VAR} += {INDEX_VAR}    # line 4
+");
+
+            DebugExpressionVariableResult getIndex(ExecFrame frame)
+            {
+                return frame.Evaluate().OfType<DebugExpressionVariableResult>().FirstOrDefault(r => r.Value.Id == INDEX_VAR);
+            }
+
+            DebugExpressionVariableResult getSum(ExecFrame frame)
+            {
+                return frame.Evaluate().OfType<DebugExpressionVariableResult>().FirstOrDefault(r => r.Value.Id == SUM_VAR);
+            }
+
+            int bp3Counter = -1;
+            int bp4Counter = 0;
+            var bp3 = new CodeReferenceBreakpoint(code, 3);
+            var bp4 = new CodeReferenceBreakpoint(code, 4);
+
+            ExecFrame prevFrame = ExecFrame.Empty;
+            var controls = new DebugContinueAllControls();
+            controls.Breakpoints.Add(bp3);
+            controls.Breakpoints.Add(bp4);
+            controls.Paused += (IDebugControls c) =>
+            {
+                if (c.Results.CurrentThread.CurrentFrame is ExecFrame frame
+                        && ExecEvent.Line == frame.Event)
+                {
+                    if (bp3.Matches(frame))
+                    {
+                        switch (bp3Counter)
+                        {
+                            // first arrive at line 3
+                            // i does not exist
+                            case -1:
+                                DebugExpressionVariableResult er = getIndex(frame);
+                                Assert.IsNull(er);
+                                break;
+
+                            // i = 0
+                            case 0:
+                                DebugExpressionVariableResult er0 = getIndex(frame);
+                                Assert.IsInstanceOf<DebugExpressionVariableResult>(er0);
+                                // i does not exist in previous frame
+                                Assert.IsFalse(er0.IsModified);
+                                Assert.IsTrue(er0.Value.TryGetValue(out int v0));
+                                Assert.AreEqual(0, v0);
+                                break;
+
+                            // i = 1
+                            case 1:
+                                DebugExpressionVariableResult er1 = getIndex(frame);
+                                er1 = getIndex(prevFrame).WithValue(er1.Value);
+                                Assert.IsFalse(er1.IsModified);
+                                Assert.IsTrue(er1.Value.TryGetValue(out int v1));
+                                Assert.AreEqual(1, v1);
+
+                                DebugExpressionVariableResult ers1 = getSum(frame);
+                                ers1 = getSum(prevFrame).WithValue(ers1.Value);
+                                Assert.IsTrue(ers1.IsModified);      // sum is modified!
+                                Assert.IsTrue(ers1.Value.TryGetValue(out int sum1));
+                                Assert.AreEqual(1, sum1);
+                                break;
+
+                            // i = 2
+                            case 2:
+                                DebugExpressionVariableResult er2 = getIndex(frame);
+                                er2 = getIndex(prevFrame).WithValue(er2.Value);
+                                Assert.IsFalse(er2.IsModified);
+                                Assert.IsTrue(er2.Value.TryGetValue(out int v2));
+                                Assert.AreEqual(2, v2);
+
+                                DebugExpressionVariableResult ers2 = getSum(frame);
+                                ers2 = getSum(prevFrame).WithValue(ers2.Value);
+                                Assert.IsTrue(ers2.IsModified);      // sum is modified!
+                                Assert.IsTrue(ers2.Value.TryGetValue(out int sum2));
+                                Assert.AreEqual(3, sum2);
+                                break;
+
+                            // breakpoint 3 will never see i as 3
+                            default:
+                                Assert.Fail("breakpoint 3 should never see i as 3");
+                                break;
+                        }
+                        bp3Counter++;
+                    }
+
+                    else
+                    if (bp4.Matches(frame))
+                    {
+                        switch (bp4Counter)
+                        {
+                            // first arrive at line 4
+                            // i = 0
+                            case 0:
+                                DebugExpressionVariableResult er0 = getIndex(frame);
+                                // python does not stop twice on for loop so
+                                // i is not available in frame previous to this
+                                Assert.IsFalse(er0.IsModified);
+                                Assert.IsTrue(er0.Value.TryGetValue(out int v0));
+                                Assert.AreEqual(0, v0);
+                                break;
+
+                            // i = 1
+                            case 1:
+                                DebugExpressionVariableResult er1 = getIndex(frame);
+                                er1 = getIndex(prevFrame).WithValue(er1.Value);
+                                Assert.IsTrue(er1.IsModified);      // i is modified!
+                                Assert.IsTrue(er1.Value.TryGetValue(out int v1));
+                                Assert.AreEqual(1, v1);
+
+                                DebugExpressionVariableResult ers0 = getSum(frame);
+                                Assert.IsInstanceOf<DebugExpressionVariableResult>(ers0);
+                                Assert.IsFalse(ers0.IsModified);
+                                Assert.IsTrue(ers0.Value.TryGetValue(out int sum0));
+                                Assert.AreEqual(0, sum0);
+                                break;
+
+                            // i = 2
+                            case 2:
+                                DebugExpressionVariableResult er2 = getIndex(frame);
+                                er2 = getIndex(prevFrame).WithValue(er2.Value);
+                                Assert.IsTrue(er2.IsModified);      // i is modified!
+                                Assert.IsTrue(er2.Value.TryGetValue(out int v2));
+                                Assert.AreEqual(2, v2);
+
+                                DebugExpressionVariableResult ers1 = getSum(frame);
+                                ers1 = getSum(prevFrame).WithValue(ers1.Value);
+                                // sum is not modified since it was 1 on entering loop on previous pause
+                                Assert.IsFalse(ers1.IsModified);
+                                Assert.IsTrue(ers1.Value.TryGetValue(out int sum1));
+                                Assert.AreEqual(1, sum1);
+                                break;
+
+                            // breakpoint 4 will never see sum as 2
+                            default:
+                                Assert.Fail("breakpoint 4 should never see sum as 2");
+                                break;
+                        }
+                        bp4Counter++;
+                    }
+
+                    prevFrame = frame;
+                }
+            };
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.AreEqual(-1 + 4, bp3Counter);
+            Assert.AreEqual(3, bp4Counter);
+        }
 #endif
 
         static DiagnoseOptions s_errorsOnly = new() { Errors = true, Hints = false, Infos = false, Warnings = false };
