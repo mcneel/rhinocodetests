@@ -7,8 +7,10 @@ using Rhino.Runtime.Code.Diagnostics;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Execution.Debugging;
-using RhinoCodePlatform.Projects.Proxies;
 using Rhino.Runtime.Code.Execution.Profiling;
+using Rhino.Runtime.Code.Testing;
+
+using RhinoCodePlatform.Projects.Proxies;
 
 namespace Rhino.Runtime.Code.Tests
 {
@@ -61,6 +63,70 @@ namespace Rhino.Runtime.Code.Tests
             Code code = GetProxyLanguage().CreateCode();
             code.Profiler = default;
             Assert.Throws<NoProfilerException>(() => code.Profile(new ProfileContext()));
+        }
+
+        [Test]
+        public void Test_RunGroupExistsException_Debug()
+        {
+            Code code = GetProxyLanguage().CreateCode();
+            code.DebugControls = new DebugContinueAllControls();
+            RunGroupExistsException ex = Assert.Throws<RunGroupExistsException>(() =>
+            {
+                using RunGroup rg = code.RunWith("test");
+                {
+                    code.Debug(new DebugContext());
+                }
+            });
+
+            Assert.AreEqual(BuildKind.Run, ex.BuildKind);
+        }
+
+        [Test]
+        public void Test_RunGroupExistsException_Profile()
+        {
+            Code code = GetProxyLanguage().CreateCode();
+            code.Profiler = new Profiler();
+            RunGroupExistsException ex = Assert.Throws<RunGroupExistsException>(() =>
+            {
+                using RunGroup rg = code.RunWith("test");
+                {
+                    code.Profile(new ProfileContext());
+                }
+            });
+
+            Assert.AreEqual(BuildKind.Run, ex.BuildKind);
+        }
+
+        [Test]
+        public void Test_RunGroupExistsException_DebugGroup()
+        {
+            Code code = GetProxyLanguage().CreateCode();
+            code.DebugControls = new DebugContinueAllControls();
+            RunGroupExistsException ex = Assert.Throws<RunGroupExistsException>(() =>
+            {
+                using RunGroup rg = code.RunWith("test");
+                {
+                    code.DebugWith("testdebug");
+                }
+            });
+
+            Assert.AreEqual(BuildKind.Run, ex.BuildKind);
+        }
+
+        [Test]
+        public void Test_RunGroupExistsException_ProfileGroup()
+        {
+            Code code = GetProxyLanguage().CreateCode();
+            code.DebugControls = new DebugContinueAllControls();
+            RunGroupExistsException ex = Assert.Throws<RunGroupExistsException>(() =>
+            {
+                using RunGroup rg = code.RunWith("test");
+                {
+                    code.ProfileWith("testdebug");
+                }
+            });
+
+            Assert.AreEqual(BuildKind.Run, ex.BuildKind);
         }
 
         static readonly LanguageSpec s_proxyLanguage = new("*.*.proxyLang");

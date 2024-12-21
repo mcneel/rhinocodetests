@@ -2,9 +2,10 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 using NUnit.Framework;
 
@@ -18,6 +19,7 @@ using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Platform;
 using Rhino.Runtime.Code.Testing;
 using Rhino.Runtime.Code.Text;
+
 
 
 #if RC8_11
@@ -2168,11 +2170,161 @@ await Task.Delay(1000);
                 var ctx = new RunContext($"Thread {i}");
                 _ = code.RunAsync(ctx);
 
-                Assert.AreEqual(ctx.Id, code.CurrentContext);
+                Assert.AreEqual(ctx.Id, code.ContextTracker.CurrentContext);
                 Interlocked.Increment(ref counter);
             });
 
             Assert.AreEqual(THREAD_COUNT, counter);
+        }
+
+        [Test]
+        public void TestCSharp_ContextTracking_MainContext()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+
+var ts = new List<Task>();
+ts.Add(Task.Run(T.Work));
+ts.Add(Task.Run(T.Work));
+Task.WaitAll(ts.ToArray());
+
+static class T
+{
+    public static void Work()
+    {
+        Pass(); // line 17
+    }
+    public static void Pass() {}
+}
+");
+
+            int counter = 0;
+            var dctx = new DebugContext();
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 17));
+            controls.Paused += (c) =>
+            {
+                ContextIdentity context = c.Results.CurrentContext;
+                Assert.AreEqual(dctx.Id, context);
+                counter++;
+            };
+
+            code.DebugControls = controls;
+            code.Debug(dctx);
+
+            Assert.True(controls.Pass);
+            Assert.AreEqual(2, counter);
+        }
+
+        [Test]
+        public void TestCSharp_ContextTracking_GroupContext_Many()
+        {
+            const int THREAD_COUNT = 5;
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+
+var ts = new List<Task>();
+ts.Add(Task.Run(T.Work));
+ts.Add(Task.Run(T.Work));
+Task.WaitAll(ts.ToArray());
+
+static class T
+{
+    public static void Work()
+    {
+        Pass(); // line 17
+    }
+    public static void Pass() {}
+}
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 17));
+
+            code.DebugControls = controls;
+
+            using DebugGroup group = code.DebugWith("test");
+            int counter = 0;
+            Parallel.For(0, THREAD_COUNT, (i) =>
+            {
+                var dctx = new DebugContext($"Thread {i}");
+                controls.Paused += (c) =>
+                {
+                    ContextIdentity context = c.Results.CurrentContext;
+                    Assert.AreEqual(group.Context.Id, context);
+                };
+
+                code.Debug(dctx);
+                Interlocked.Increment(ref counter);
+            });
+
+            Assert.AreEqual(THREAD_COUNT, counter);            
+            Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestCSharp_ContextTracking_FirstContext_Many()
+        {
+            //NOTE:
+            // see notes on Code.ContextTracker.CurrentContext
+            const int THREAD_COUNT = 5;
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+
+var ts = new List<Task>();
+ts.Add(Task.Run(T.Work));
+ts.Add(Task.Run(T.Work));
+Task.WaitAll(ts.ToArray());
+
+static class T
+{
+    public static void Work()
+    {
+        Pass(); // line 17
+    }
+    public static void Pass() {}
+}
+");
+
+            var controls = new DebugPauseDetectControls();
+            controls.ExpectPause(new CodeReferenceBreakpoint(code, 17));
+
+            code.DebugControls = controls;
+
+            int counter = 0;
+            var contexts = new ConcurrentBag<ContextIdentity>();
+            Parallel.For(0, THREAD_COUNT, (i) =>
+            {
+                var dctx = new DebugContext($"Thread {i}");
+                contexts.Add(dctx.Id);
+
+                controls.Paused += (c) =>
+                {
+                    ContextIdentity context = c.Results.CurrentContext;
+                    Assert.Contains(context, contexts);
+                };
+
+                code.Debug(dctx);
+                Interlocked.Increment(ref counter);
+            });
+
+            Assert.AreEqual(THREAD_COUNT, counter);            
+            Assert.True(controls.Pass);
         }
 
         [Test]

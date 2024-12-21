@@ -56,6 +56,7 @@ namespace Rhino.Runtime.Code.Testing
         public void ExpectPause(CodeReferenceBreakpoint breakpoint)
         {
             _expected.Enqueue(new DebugPause(breakpoint, DebugAction.Continue));
+            Breakpoints.Add(breakpoint);
         }
 
         public void DoNotExpectPause(CodeReferenceBreakpoint breakpoint)

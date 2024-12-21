@@ -1735,7 +1735,7 @@ for m in range({THREAD_CHECK_COUNT}):
 
                 ctx.Inputs[CTX_CHECK_NAME] = () =>
                 {
-                    Assert.AreEqual(ctx.Id, code.CurrentContext);
+                    Assert.AreEqual(ctx.Id, code.ContextTracker.CurrentContext);
                     checked_context = true;
                 };
 
