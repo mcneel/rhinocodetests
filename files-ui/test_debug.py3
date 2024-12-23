@@ -34,4 +34,5 @@ for i in range(3):
 g = Test()
 some_list = [1, 2, 3, 4]
 print(2)
+some_list[2] = 42
 print("last")
