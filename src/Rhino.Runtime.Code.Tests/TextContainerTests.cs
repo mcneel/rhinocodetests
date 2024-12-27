@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 using NUnit.Framework;
 
@@ -65,7 +66,7 @@ namespace Rhino.Runtime.Code.Tests
                 new (5, 1, c, "print"),
             });
 
-            c = new TextSearchCriteria(@"\bprint\b", isRegex: true);
+            c = new TextSearchCriteria(new Regex(@"\bprint\b"));
             yield return new(s, c, new TextSearchMatch[]
             {
                 new (5, 1, c, "print"),
@@ -90,7 +91,7 @@ namespace Rhino.Runtime.Code.Tests
                 new (2, 1,c, "print"),
             });
 
-            c = new TextSearchCriteria(@"\bprint\b", isRegex: true);
+            c = new TextSearchCriteria(new Regex(@"\bprint\b"));
             yield return new(s, c, new TextSearchMatch[]
             {
                 new (2, 1, c, "print"),
@@ -98,7 +99,7 @@ namespace Rhino.Runtime.Code.Tests
                 new (8, 1, c, "PRINT"),
             });
 
-            c = new TextSearchCriteria(@"\bprint\b", isRegex: true, isCaseSensitive: true);
+            c = new TextSearchCriteria(new Regex(@"\bprint\b"), isCaseSensitive: true);
             yield return new(s, c, new TextSearchMatch[]
             {
                 new (2, 1, c, "print"),
@@ -157,7 +158,7 @@ namespace Rhino.Runtime.Code.Tests
 
             TextSearchMatch[] matches = t.Search(criteria).ToArray();
             Assert.AreEqual(expected, matches.Length);
-            Assert.IsTrue(t.Replace(matches, "RSC"));
+            Assert.IsTrue(t.Replace(criteria, matches));
             Assert.AreEqual(replaced, (string)t);
         }
         static IEnumerable<TestCaseData> GetTestReplaceCases()
@@ -173,7 +174,7 @@ namespace Rhino.Runtime.Code.Tests
 
             TextSearchMatch[] matches = t.Search(criteria).ToArray();
             Assert.AreEqual(expected, matches.Length);
-            Assert.IsTrue(t.Replace(matches.Last(), "RSC"));
+            Assert.IsTrue(t.Replace(criteria, matches.Last()));
             Assert.AreEqual(replaced, (string)t);
         }
         static IEnumerable<TestCaseData> GetTestReplaceLastCases()
