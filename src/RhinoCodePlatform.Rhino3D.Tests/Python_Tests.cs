@@ -426,24 +426,6 @@ for {INDEX_VAR} in range(0, 3): # line 3
         }
 
         [Test, TestCaseSource(nameof(GetPythons))]
-        public void TestPython_DebugTracing_StackWatch_L1(LanguageSpec spec)
-        {
-            Code code = GetLanguage(spec).CreateCode(
-            $@"
-");
-            var controls = new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
-            {
-                new (StackActionKind.Pushed, ExecEvent.Call, 1, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 1, ExecEvent.Line, 1),
-                new (StackActionKind.Swapped, ExecEvent.Line, 1, ExecEvent.Return, 1)
-            };
-
-            code.DebugControls = controls;
-            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.IsTrue(controls.Count == 0);
-        }
-
-        [Test, TestCaseSource(nameof(GetPythons))]
         public void TestPython_DebugTracing_StackWatch_L1_Single(LanguageSpec spec)
         {
             Code code = GetLanguage(spec).CreateCode(
@@ -455,113 +437,6 @@ import os
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
                 new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
                 new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Return, 2)
-            };
-
-            code.DebugControls = controls;
-            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.IsTrue(controls.Count == 0);
-        }
-
-        [Test, TestCaseSource(nameof(GetPythons))]
-        public void TestPython_DebugTracing_StackWatch_Function_L2(LanguageSpec spec)
-        {
-            Code code = GetLanguage(spec).CreateCode(
-            $@"
-def L1():
-    pass
-L1()
-");
-            var controls = new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
-            {
-                // start
-                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
-                // python defining L1()
-                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
-                // python running  L1()
-                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Line, 4),
-                // python entering level 2
-                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 3),
-                new (StackActionKind.Swapped, ExecEvent.Line, 3, ExecEvent.Return, 3),
-                // python returning to level 1
-                new (StackActionKind.Swapped, ExecEvent.Line, 4, ExecEvent.Return, 4)
-            };
-
-            code.DebugControls = controls;
-            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.IsTrue(controls.Count == 0);
-        }
-
-        [Test, TestCaseSource(nameof(GetPythons))]
-        public void TestPython_DebugTracing_StackWatch_Function_L2_Class(LanguageSpec spec)
-        {
-            Code code = GetLanguage(spec).CreateCode(
-            $@"
-class D:
-    pass
-def L1():
-    pass
-L1()
-");
-            var controls = new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
-            {
-                // start
-                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
-                // python defining class D
-                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
-                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Line, 3),
-                new (StackActionKind.Swapped, ExecEvent.Line, 3, ExecEvent.Return, 3),
-                // python defining class L1()
-                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Line, 4),
-                // python running L1()
-                new (StackActionKind.Swapped, ExecEvent.Line, 4, ExecEvent.Line, 6),
-                // python entering L1()
-                new (StackActionKind.Pushed, ExecEvent.Call, 4, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 4, ExecEvent.Line, 5),
-                new (StackActionKind.Swapped, ExecEvent.Line, 5, ExecEvent.Return, 5),
-                // return back to level 1
-                new (StackActionKind.Swapped, ExecEvent.Line, 6, ExecEvent.Return, 6),
-            };
-
-            code.DebugControls = controls;
-            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.IsTrue(controls.Count == 0);
-        }
-
-        [Test, TestCaseSource(nameof(GetPythons))]
-        public void TestPython_DebugTracing_StackWatch_Function_L3(LanguageSpec spec)
-        {
-            Code code = GetLanguage(spec).CreateCode(
-            $@"
-def L2():
-    pass
-def L1():
-    L2()
-L1()
-");
-            var controls = new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
-            {
-                // start
-                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
-                // defining L2()
-                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
-                // defining L1()
-                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Line, 4),
-                // python running  L1()
-                new (StackActionKind.Swapped, ExecEvent.Line, 4, ExecEvent.Line, 6),
-                // python entering level 2
-                new (StackActionKind.Pushed, ExecEvent.Call, 4, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 4, ExecEvent.Line, 5),
-                // python entering level 3
-                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 3),
-                new (StackActionKind.Swapped, ExecEvent.Line, 3, ExecEvent.Return, 3),
-                // python returning to level 2
-                new (StackActionKind.Swapped, ExecEvent.Line, 5, ExecEvent.Return, 5),
-                // python returning to level 1
-                new (StackActionKind.Swapped, ExecEvent.Line, 6, ExecEvent.Return, 6)
             };
 
             code.DebugControls = controls;
@@ -768,7 +643,6 @@ Foo()                               # LINE 17
         [Test, TestCaseSource(nameof(GetPythons))]
         public void TestPython_DebugTracing_StepIn_EndingPass(LanguageSpec spec)
         {
-
             Code code = GetLanguage(spec).CreateCode(
             $@"
 import sys
@@ -817,6 +691,63 @@ Foo()                               # LINE 17
                 new (17, ExecEvent.Return, DebugAction.StepIn),
             };
             controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 16));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test, TestCaseSource(nameof(GetPythons))]
+        public void TestPython_DebugTracing_StepIn_Recursive(LanguageSpec spec)
+        {
+            Code code = GetLanguage(spec).CreateCode(
+$@"
+def recursive(a):           # CALL 2
+    if a == 0:              # LINE 3
+        return              # LINE / RETURN 4
+    recursive(a - 1)        # LINE 5
+recursive(5)                # LINE 6
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new ( 6, ExecEvent.Line, DebugAction.StepIn),
+
+                // 5
+                new ( 3, ExecEvent.Line, DebugAction.StepIn),
+                new ( 5, ExecEvent.Line, DebugAction.StepIn),
+                // 4
+                new ( 3, ExecEvent.Line, DebugAction.StepIn),
+                new ( 5, ExecEvent.Line, DebugAction.StepIn),
+                // 3
+                new ( 3, ExecEvent.Line, DebugAction.StepIn),
+                new ( 5, ExecEvent.Line, DebugAction.StepIn),
+                // 2
+                new ( 3, ExecEvent.Line, DebugAction.StepIn),
+                new ( 5, ExecEvent.Line, DebugAction.StepIn),
+                // 1
+                new ( 3, ExecEvent.Line, DebugAction.StepIn),
+                new ( 5, ExecEvent.Line, DebugAction.StepIn),
+                // 0
+                new ( 3, ExecEvent.Line, DebugAction.StepIn),
+                new ( 4, ExecEvent.Line, DebugAction.StepIn),
+
+                // unroll
+                new ( 5, ExecEvent.Return, DebugAction.StepIn), //1
+                new ( 5, ExecEvent.Return, DebugAction.StepIn), //2
+                new ( 5, ExecEvent.Return, DebugAction.StepIn), //3
+                new ( 5, ExecEvent.Return, DebugAction.StepIn), //4
+                new ( 5, ExecEvent.Return, DebugAction.StepIn), //5
+
+                new ( 6, ExecEvent.Return, DebugAction.StepIn),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 6));
             controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
             {
                 bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
@@ -973,6 +904,285 @@ func_test_error()                               # LINE 10
         }
 
         [Test, TestCaseSource(nameof(GetPythons))]
+        public void TestPython_DebugTracing_StepOut_L1(LanguageSpec spec)
+        {
+            Code code = GetLanguage(spec).CreateCode(
+            $@"
+import sys
+class Test:
+    def __init__(self):
+        self.some_value = 12
+
+Test()  # LINE 7
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new ( 7, ExecEvent.Line, DebugAction.StepOut),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 7));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test, TestCaseSource(nameof(GetPythons))]
+        public void TestPython_DebugTracing_StepOut_L2(LanguageSpec spec)
+        {
+            Code code = GetLanguage(spec).CreateCode(
+$@"
+import sys
+def Foo():                          # CALL 3
+    pass                            # LINE 4
+class Test:
+    def __init__(self):             # CALL 6
+        self.some_value = 12        # LINE 7
+
+def func_call_test():               # CALL 9
+    def nested_func_call_test():    # LINE 10
+        d = Test()                  # LINE 11
+        Foo()                       # LINE 12
+    Foo()                           # LINE 13
+    nested_func_call_test()         # LINE 14
+
+func_call_test()                    # LINE 16
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                // func_call_test()
+                new (16, ExecEvent.Line, DebugAction.StepIn),
+                new (10, ExecEvent.Line, DebugAction.StepOver),
+                new (13, ExecEvent.Line, DebugAction.StepOut),
+                new (16, ExecEvent.Return, DebugAction.StepOver),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 16));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test, TestCaseSource(nameof(GetPythons))]
+        public void TestPython_DebugTracing_StepOut_L3(LanguageSpec spec)
+        {
+            Code code = GetLanguage(spec).CreateCode(
+$@"
+import sys
+def Foo():                          # CALL 3
+    pass                            # LINE 4
+class Test:
+    def __init__(self):             # CALL 6
+        self.some_value = 12        # LINE 7
+
+def func_call_test():               # CALL 9
+    def nested_func_call_test():    # LINE 10
+        d = Test()                  # LINE 11
+        Foo()                       # LINE 12
+    Foo()                           # LINE 13
+    nested_func_call_test()         # LINE 14
+
+func_call_test()                    # LINE 16
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                // func_call_test()
+                new (16, ExecEvent.Line, DebugAction.StepIn),
+                new (10, ExecEvent.Line, DebugAction.StepOver),
+                new (13, ExecEvent.Line, DebugAction.StepOver),
+                new (14, ExecEvent.Line, DebugAction.StepIn),
+                new (11, ExecEvent.Line, DebugAction.StepOut),
+                new (14, ExecEvent.Return, DebugAction.StepOver),
+                new (16, ExecEvent.Return, DebugAction.StepOver),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 16));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test, TestCaseSource(nameof(GetPythons))]
+        public void TestPython_DebugTracing_StepOut_L3_LastLine(LanguageSpec spec)
+        {
+            Code code = GetLanguage(spec).CreateCode(
+$@"
+import sys
+def Foo():                          # CALL 3
+    pass                            # LINE 4
+class Test:
+    def __init__(self):             # CALL 6
+        self.some_value = 12        # LINE 7
+
+def func_call_test():               # CALL 9
+    def nested_func_call_test():    # LINE 10
+        d = Test()                  # LINE 11
+        Foo()                       # LINE 12
+    Foo()                           # LINE 13
+    nested_func_call_test()         # LINE 14
+
+func_call_test()                    # LINE 16
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                // func_call_test()
+                new (16, ExecEvent.Line, DebugAction.StepIn),
+                new (10, ExecEvent.Line, DebugAction.StepOver),
+                new (13, ExecEvent.Line, DebugAction.StepOver),
+                new (14, ExecEvent.Line, DebugAction.StepIn),
+                new (11, ExecEvent.Line, DebugAction.StepOver),
+                new (12, ExecEvent.Line, DebugAction.StepOut),
+                new (14, ExecEvent.Return, DebugAction.StepOver),
+                new (16, ExecEvent.Return, DebugAction.StepOver),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 16));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test, TestCaseSource(nameof(GetPythons))]
+        public void TestPython_DebugTracing_StepOver_L1(LanguageSpec spec)
+        {
+            Code code = GetLanguage(spec).CreateCode(
+$@"
+import sys
+def func_call_test():
+    pass
+
+func_call_test()                    # LINE 6
+func_call_test()                    # LINE 7
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 6));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test, TestCaseSource(nameof(GetPythons))]
+        public void TestPython_DebugTracing_StepOver_ForLoop(LanguageSpec spec)
+        {
+            Code code = GetLanguage(spec).CreateCode(
+$@"
+import sys
+def Foo():
+    pass
+for _ in range(2):      # LINE 5
+    Foo()               # LINE 6
+Foo()                   # LINE 7
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                // before
+                new ( 5, ExecEvent.Line, DebugAction.StepOver),
+
+                // 0
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, DebugAction.StepOver),
+
+                // 1
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, DebugAction.StepOver),
+
+                // after
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 5));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test, TestCaseSource(nameof(GetPythons))]
+        public void TestPython_DebugTracing_StepOver_WhileLoop(LanguageSpec spec)
+        {
+            Code code = GetLanguage(spec).CreateCode(
+$@"
+m = 2
+while(m > 0):   # LINE 3
+    m -= 1      # LINE 4
+print(m)        # LINE 5
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                // before
+                new (3, ExecEvent.Line, DebugAction.StepOver),
+
+                // 2
+                new ( 4, ExecEvent.Line, DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, DebugAction.StepOver),
+
+                // 1
+                new ( 4, ExecEvent.Line, DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, DebugAction.StepOver),
+
+                // after
+                new ( 5, ExecEvent.Line, DebugAction.StepOver),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 3));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test, TestCaseSource(nameof(GetPythons))]
         public void TestPython_DebugTracing_Continue_Exception_Handled(LanguageSpec spec)
         {
             Code code = GetLanguage(spec).CreateCode(
@@ -1014,6 +1224,50 @@ func_test_error()                               # LINE 10
             }
         }
 
+        [Test, TestCaseSource(nameof(GetPythons))]
+        public void TestPython_DebugTracing_Continue_Exception_Handled_PauseOnAny(LanguageSpec spec)
+        {
+            Code code = GetLanguage(spec).CreateCode(
+            $@"
+def func_test_error_inner():                    # CALL 2
+    try:                                        # LINE 3
+        raise Exception('Last Line Error')      # LINE / EXCEPTION 4
+    except:
+        pass
+def func_test_error():                          # CALL 7
+    func_test_error_inner()                     # LINE 8
+func_test_error()                               # LINE 9
+func_test_error()                               # LINE 10
+");
+
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new ( 9, ExecEvent.Line, DebugAction.Continue),
+                new ( 4, ExecEvent.Exception, DebugAction.Continue),
+            };
+            controls.SetPauseOnExceptionPolicy(DebugPauseOnExceptionPolicy.PauseOnAny);
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 9));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            try
+            {
+                code.Debug(new DebugContext());
+            }
+            catch (ExecuteException ex)
+            {
+                if (ex.InnerException is TestException te)
+                    throw te;
+            }
+        }
+
         static IEnumerable<TestCaseData> GetPythonsAndDebugActions()
         {
             yield return new(LanguageSpec.Python2, DebugAction.Continue);
@@ -1027,8 +1281,54 @@ func_test_error()                               # LINE 10
             yield return new(LanguageSpec.Python3, DebugAction.StepOver);
         }
 
+        [Test, TestCaseSource(nameof(GetPythons))]
+        public void TestPython_DebugTracing_StepIn_Exception_Handled(LanguageSpec spec)
+        {
+            Code code = GetLanguage(spec).CreateCode(
+            $@"
+def func_test_error_inner():                    # CALL 2
+    try:                                        # LINE 3
+        raise Exception('Last Line Error')      # LINE 4
+    except:                                     # LINE 5
+        pass                                    # LINE 6
+def func_test_error():                          # CALL 7
+    func_test_error_inner()                     # LINE 8
+func_test_error()                               # LINE 9
+func_test_error()                               # LINE 10
+");
+
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new ( 9, ExecEvent.Line, DebugAction.StepIn),
+                new ( 8, ExecEvent.Line, DebugAction.StepIn),
+                new ( 3, ExecEvent.Line, DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, DebugAction.Stop),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 9));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            try
+            {
+                code.Debug(new DebugContext());
+            }
+            catch (ExecuteException ex)
+            {
+                if (ex.InnerException is TestException te)
+                    throw te;
+            }
+        }
+
         [Test, TestCaseSource(nameof(GetPythonsAndDebugActions))]
-        public void TestPython_DebugTracing_StepIn_Exception_Handled(LanguageSpec spec, DebugAction action)
+        public void TestPython_DebugTracing_StepIn_Exception_Handled_PauseOnAny(LanguageSpec spec, DebugAction action)
         {
             Code code = GetLanguage(spec).CreateCode(
             $@"
@@ -1052,6 +1352,7 @@ func_test_error()                               # LINE 10
                 new ( 4, ExecEvent.Line, DebugAction.StepOver),
                 new ( 4, ExecEvent.Exception, action),
             };
+            controls.SetPauseOnExceptionPolicy(DebugPauseOnExceptionPolicy.PauseOnAny);
             controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 9));
             controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
             {
@@ -1150,7 +1451,7 @@ func_test_error()
         }
 
         [Test, TestCaseSource(nameof(GetPythonsAndDebugActions))]
-        public void TestPython_DebugTracing_Exception_Loop(LanguageSpec spec, DebugAction action)
+        public void TestPython_DebugTracing_Exception_ForLoop(LanguageSpec spec, DebugAction action)
         {
             Code code = GetLanguage(spec).CreateCode(
 $@"
@@ -1187,6 +1488,76 @@ for i in range(0, 3):
                 if (ex.InnerException is TestException te)
                     throw te;
             }
+        }
+
+        [Test, TestCaseSource(nameof(GetPythonsAndDebugActions))]
+        public void TestPython_DebugTracing_Exception_StepIn_DoNotPauseOnException(LanguageSpec spec, DebugAction action)
+        {
+            Code code = GetLanguage(spec).CreateCode(
+$@"
+def func_test_error():
+    raise Exception('Last Line Error')
+func_test_error()
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new ( 4, ExecEvent.Line, DebugAction.StepIn),
+                new ( 3, ExecEvent.Line, action),
+            };
+            controls.SetPauseOnExceptionPolicy(DebugPauseOnExceptionPolicy.PauseOnNone);
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 4));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+
+            try
+            {
+                code.Debug(new DebugContext());
+            }
+            catch (ExecuteException ex)
+            {
+                if (ex.InnerException is TestException te)
+                    throw te;
+            }
+        }
+
+
+        [Test, TestCaseSource(nameof(GetPythons))]
+        public void TestPython_DebugTracing_Pass_Single(LanguageSpec spec)
+        {
+
+            Code code = GetLanguage(spec).CreateCode(
+            $@"
+import sys
+def Foo():      # CALL 3
+    pass        # LINE 4
+Foo()           # LINE 5
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new ( 5, ExecEvent.Line, DebugAction.StepIn),
+                new ( 4, ExecEvent.Line, DebugAction.StepIn),
+                new ( 5, ExecEvent.Return, DebugAction.StepIn),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 5));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
         }
 
         [Test, TestCaseSource(nameof(GetPythonsAndDebugActions))]

@@ -2981,6 +2981,169 @@ for {INDEX_VAR} in range(0, 3): # line 3
             Assert.AreEqual(-1 + 4, bp3Counter);
             Assert.AreEqual(3, bp4Counter);
         }
+
+        [Test]
+        public void TestPython3_DebugTracing_StackWatch_Function_L2()
+        {
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+            $@"
+def L1():
+    pass
+L1()
+");
+            var controls = new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
+            {
+                // start
+                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
+                // python defining L1()
+                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
+                // python running  L1()
+                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Line, 4),
+                // python entering level 2
+                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 3),
+                new (StackActionKind.Swapped, ExecEvent.Line, 3, ExecEvent.Return, 3),
+                // python returning to level 1
+                new (StackActionKind.Swapped, ExecEvent.Line, 4, ExecEvent.Return, 4)
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+            Assert.IsTrue(controls.Count == 0);
+        }
+
+        [Test]
+        public void TestPython3_DebugTracing_StackWatch_Function_L2_Class()
+        {
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+            $@"
+class D:
+    pass
+def L1():
+    pass
+L1()
+");
+            var controls = new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
+            {
+                // start
+                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
+                // python defining class D
+                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
+                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Line, 3),
+                new (StackActionKind.Swapped, ExecEvent.Line, 3, ExecEvent.Return, 3),
+                // python defining class L1()
+                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Line, 4),
+                // python running L1()
+                new (StackActionKind.Swapped, ExecEvent.Line, 4, ExecEvent.Line, 6),
+                // python entering L1()
+                new (StackActionKind.Pushed, ExecEvent.Call, 4, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 4, ExecEvent.Line, 5),
+                new (StackActionKind.Swapped, ExecEvent.Line, 5, ExecEvent.Return, 5),
+                // return back to level 1
+                new (StackActionKind.Swapped, ExecEvent.Line, 6, ExecEvent.Return, 6),
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+            Assert.IsTrue(controls.Count == 0);
+        }
+
+        [Test]
+        public void TestPython3_DebugTracing_StackWatch_Function_L3()
+        {
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+            $@"
+def L2():
+    pass
+def L1():
+    L2()
+L1()
+");
+            var controls = new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
+            {
+                // start
+                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
+                // defining L2()
+                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
+                // defining L1()
+                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Line, 4),
+                // python running  L1()
+                new (StackActionKind.Swapped, ExecEvent.Line, 4, ExecEvent.Line, 6),
+                // python entering level 2
+                new (StackActionKind.Pushed, ExecEvent.Call, 4, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 4, ExecEvent.Line, 5),
+                // python entering level 3
+                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 3),
+                new (StackActionKind.Swapped, ExecEvent.Line, 3, ExecEvent.Return, 3),
+                // python returning to level 2
+                new (StackActionKind.Swapped, ExecEvent.Line, 5, ExecEvent.Return, 5),
+                // python returning to level 1
+                new (StackActionKind.Swapped, ExecEvent.Line, 6, ExecEvent.Return, 6)
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+            Assert.IsTrue(controls.Count == 0);
+        }
+
+        [Test]
+        public void TestPython3_DebugTracing_StackWatch_L1()
+        {
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+            $@"
+");
+            var controls = new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
+            {
+                new (StackActionKind.Pushed, ExecEvent.Call, 1, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 1, ExecEvent.Line, 1),
+                new (StackActionKind.Swapped, ExecEvent.Line, 1, ExecEvent.Return, 1)
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+            Assert.IsTrue(controls.Count == 0);
+        }
+
+        [Test]
+        public void TestPython3_DebugTracing_Pass_Middle()
+        {
+
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+            $@"
+import sys
+def Foo():
+    pass
+def pass_in_middle():       # CALL 5
+    Foo()                   # LINE 6
+    pass                    # does not stop here
+    Foo()                   # LINE 8
+pass_in_middle()            # LINE 9
+");
+
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new ( 9, ExecEvent.Line, DebugAction.StepIn),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+                // not stopping on pass on line 7
+                new ( 8, ExecEvent.Line, DebugAction.StepOver),
+                new ( 9, ExecEvent.Return, DebugAction.StepOver),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 9));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
 #endif
 
         static DiagnoseOptions s_errorsOnly = new() { Errors = true, Hints = false, Infos = false, Warnings = false };
