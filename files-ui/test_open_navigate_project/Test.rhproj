@@ -204,6 +204,15 @@
       },
       "title": "TestAsync",
       "uri": "TestAsync.py"
+    },
+    {
+      "id": "4404efd4-671a-45f1-8798-ed4d3ecd58ea",
+      "language": {
+        "id": "*.*.python",
+        "version": "3.*.*"
+      },
+      "title": "MustBeMissing",
+      "uri": "MustBeMissing.py"
     }
   ]
 }
