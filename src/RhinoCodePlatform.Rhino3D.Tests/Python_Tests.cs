@@ -384,7 +384,7 @@ import os
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.IsTrue(controls.Count == 0);
+            Assert.AreEqual(0, controls.Count);
         }
 
         [Test, TestCaseSource(nameof(GetPythons))]
@@ -520,7 +520,7 @@ Foo()           # LINE 7
         }
 
         [Test, TestCaseSource(nameof(GetPythons))]
-        public void TestPython_DebugTracing_StepIn_(LanguageSpec spec)
+        public void TestPython_DebugTracing_StepIn(LanguageSpec spec)
         {
 
             Code code = GetLanguage(spec).CreateCode(
@@ -1500,11 +1500,6 @@ Foo()           # LINE 5
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-        }
-
-        [Test, TestCaseSource(nameof(GetPythonsAndDebugActions))]
-        public void TestPython_DebugTracing_(LanguageSpec spec, DebugAction action)
-        {
         }
 #endif
     }
