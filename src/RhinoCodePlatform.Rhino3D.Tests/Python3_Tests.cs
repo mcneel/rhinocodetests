@@ -2650,6 +2650,24 @@ for m in range({THREAD_CHECK_COUNT}):
         }
 
         [Test]
+        public void TestPython3_DebugTracing_StackWatch_L1()
+        {
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+            $@"
+");
+            var controls = new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
+            {
+                new (StackActionKind.Pushed, ExecEvent.Call, 1, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 1, ExecEvent.Line, 1),
+                new (StackActionKind.Swapped, ExecEvent.Line, 1, ExecEvent.Return, 1)
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+            Assert.AreEqual(0, controls.Count);
+        }
+
+        [Test]
         public void TestPython3_DebugTracing_StackWatch_Function_L2()
         {
             Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
@@ -2676,7 +2694,7 @@ L1()
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.IsTrue(controls.Count == 0);
+            Assert.AreEqual(0, controls.Count);
         }
 
         [Test]
@@ -2714,7 +2732,7 @@ L1()
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.IsTrue(controls.Count == 0);
+            Assert.AreEqual(0, controls.Count);
         }
 
         [Test]
@@ -2753,25 +2771,7 @@ L1()
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.IsTrue(controls.Count == 0);
-        }
-
-        [Test]
-        public void TestPython3_DebugTracing_StackWatch_L1()
-        {
-            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
-            $@"
-");
-            var controls = new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
-            {
-                new (StackActionKind.Pushed, ExecEvent.Call, 1, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 1, ExecEvent.Line, 1),
-                new (StackActionKind.Swapped, ExecEvent.Line, 1, ExecEvent.Return, 1)
-            };
-
-            code.DebugControls = controls;
-            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.IsTrue(controls.Count == 0);
+            Assert.AreEqual(0, controls.Count);
         }
 
         [Test]
