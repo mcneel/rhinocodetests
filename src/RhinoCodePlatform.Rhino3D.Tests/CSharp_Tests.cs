@@ -1662,6 +1662,55 @@ import os
             Assert.True(opts.Get("csharp.compiler.unsafe", false));
         }
 
+        static IEnumerable<Ed.Common.CompletionItem> CompleteAtEndingPeriod(Code code, string textUptoPeriod)
+        {
+            if (code.Text.TryGetPosition(textUptoPeriod.Length, out TextPosition position))
+            {
+                if (!code.Text.TryGetTransformed(textUptoPeriod.Length, CompleteOptions.Empty, out string xformedCode, out int xformedPosition))
+                {
+                    xformedCode = code.Text;
+                    xformedPosition = textUptoPeriod.Length;
+                }
+
+                return s_dispatcher.InvokeAsync(() =>
+                {
+                    CSharpCompletionProvider.CompletionProvider provider = GetCompletionProvider(code);
+                    return provider.GetCompletionItems(xformedCode, xformedPosition, position.LineNumber, position.ColumnNumber, '.');
+                }).GetAwaiter().GetResult();
+            }
+
+            return Array.Empty<Ed.Common.CompletionItem>();
+        }
+
+        static CSharpCompletionProvider.CompletionProvider GetCompletionProvider(Code code)
+        {
+            CSharpCompletionProvider.CompletionProvider provider =
+                CSharpCompletionProvider.CompletionProvider.Create(
+                    CSharpCompletionProvider.CompletionProvider.DefaultUsings,
+                    CSharpCompletionProvider.CompletionProvider.DefaultAssemblies.Select(r => r.Location).ToList()
+                );
+
+            AddCSharpReferences(provider, code.Language.Runtime.References);
+            AddCSharpReferences(provider, RhinoCode.Platforms.GetReferences());
+            AddCSharpReferences(provider, code.References);
+
+            if (code.Text.GetPackageSpecs()
+                    .Packages.TryResolveReferences(code, out IEnumerable<CompileReference> references, out Diagnosis _))
+            {
+                AddCSharpReferences(provider, references);
+            }
+
+            return provider;
+        }
+
+        static void AddCSharpReferences(CSharpCompletionProvider.CompletionProvider provider, IEnumerable<CompileReference> references)
+        {
+            foreach (string path in references.GetAssemblies().Select(r => r.Path))
+            {
+                provider.AddAssembly(path);
+            }
+        }
+
         [Test]
         public void TestCSharp_Compile_Unsafe_Error()
         {
@@ -2338,8 +2387,9 @@ Test();            // LINE 5
 ", new StackAction[]
             {
                 // start
-                new (StackActionKind.Pushed, ExecEvent.Call, 5, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 5, ExecEvent.Line, 5),
+                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
+                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Line, 5),
                 // entering level 2
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
                 new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 3),
@@ -2358,8 +2408,9 @@ Test();            // LINE 6
 ", new StackAction[]
             {
                 // start
-                new (StackActionKind.Pushed, ExecEvent.Call, 6, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 6, ExecEvent.Line, 6),
+                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
+                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Line, 6),
                 // entering level 2
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
                 new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 4),
@@ -2377,8 +2428,9 @@ Test();            // LINE 6
 ", new StackAction[]
             {
                 // start
-                new (StackActionKind.Pushed, ExecEvent.Call, 5, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 5, ExecEvent.Line, 5),
+                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
+                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Line, 5),
                 // entering level 2
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
                 new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 3),
@@ -2418,8 +2470,10 @@ Test();            // LINE 8
             var controls = new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
             {
                 // start
-                new (StackActionKind.Pushed, ExecEvent.Call, 8, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 8, ExecEvent.Line, 8),
+                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
+                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Line, 5),
+                new (StackActionKind.Swapped, ExecEvent.Line, 5, ExecEvent.Line, 8),
                 // entering level 2
                 new (StackActionKind.Pushed, ExecEvent.Call, 5, 0, 0),
                 new (StackActionKind.Swapped, ExecEvent.Call, 5, ExecEvent.Line, 6),
@@ -2438,14 +2492,23 @@ Test();            // LINE 8
             Assert.AreEqual(0, controls.Count);
         }
 
-        [Test]
-        public void TestCSharp_DebugTracing_ForEachLoop_Variable()
+        static IEnumerable<TestCaseData> GetLoopVariableSources()
         {
-            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85276
             const string INDEX_VAR = "i";
             const string SUM_VAR = "sum";
-            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
+
+            yield return new($@"
+using System;
+using System.Linq;
+
+int {SUM_VAR} = 0;
+for (int {INDEX_VAR} = 0; i < 3; i++) // line 6
+{{
+    {SUM_VAR} += {INDEX_VAR};   // line 8
+}}
+", INDEX_VAR, SUM_VAR) { TestName = nameof(TestCSharp_DebugTracing_LoopVariable) + "_ForLoop" };
+
+            yield return new($@"
 using System;
 using System.Linq;
 
@@ -2454,16 +2517,23 @@ foreach (int {INDEX_VAR} in Enumerable.Range(0, 3)) // line 6
 {{
     {SUM_VAR} += {INDEX_VAR};   // line 8
 }}
-");
+", INDEX_VAR, SUM_VAR) { TestName = nameof(TestCSharp_DebugTracing_LoopVariable) + "_ForEachLoop" };
+        }
+
+        [Test, TestCaseSource(nameof(GetLoopVariableSources))]
+        public void TestCSharp_DebugTracing_LoopVariable(string source, string index, string sum)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85276
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(source);
 
             DebugExpressionVariableResult getIndex(ExecFrame frame)
             {
-                return frame.Evaluate().OfType<DebugExpressionVariableResult>().FirstOrDefault(r => r.Value.Id == INDEX_VAR);
+                return frame.Evaluate().OfType<DebugExpressionVariableResult>().FirstOrDefault(r => r.Value.Id == index);
             }
 
             DebugExpressionVariableResult getSum(ExecFrame frame)
             {
-                return frame.Evaluate().OfType<DebugExpressionVariableResult>().FirstOrDefault(r => r.Value.Id == SUM_VAR);
+                return frame.Evaluate().OfType<DebugExpressionVariableResult>().FirstOrDefault(r => r.Value.Id == sum);
             }
 
             int bp6Counter = -1;
@@ -2501,31 +2571,34 @@ foreach (int {INDEX_VAR} in Enumerable.Range(0, 3)) // line 6
                                 Assert.AreEqual(0, v0);
                                 break;
 
-                            // i is still zero since we have not evaluated the next iteration
-                            // i = 0
+                            // i = 1
                             case 1:
                                 DebugExpressionVariableResult er1 = getIndex(frame);
                                 er1 = getIndex(prevFrame).WithValue(er1.Value);
                                 Assert.IsFalse(er1.IsModified);
                                 Assert.IsTrue(er1.Value.TryGetValue(out int v1));
-                                Assert.AreEqual(0, v1);
-                                break;
+                                Assert.AreEqual(1, v1);
 
-                            // i is now 1, before running the last iteration
-                            // i = 1
-                            case 2:
-                                DebugExpressionVariableResult er2 = getIndex(frame);
-                                er2 = getIndex(prevFrame).WithValue(er2.Value);
-                                Assert.IsFalse(er2.IsModified);
-                                Assert.IsTrue(er2.Value.TryGetValue(out int v2));
-                                Assert.AreEqual(1, v2);
-
-                                // check value of modified sum on last loop round
                                 DebugExpressionVariableResult ers1 = getSum(frame);
                                 ers1 = getSum(prevFrame).WithValue(ers1.Value);
                                 Assert.IsTrue(ers1.IsModified);      // sum is modified!
                                 Assert.IsTrue(ers1.Value.TryGetValue(out int sum1));
                                 Assert.AreEqual(1, sum1);
+                                break;
+
+                            // i = 2
+                            case 2:
+                                DebugExpressionVariableResult er2 = getIndex(frame);
+                                er2 = getIndex(prevFrame).WithValue(er2.Value);
+                                Assert.IsFalse(er2.IsModified);
+                                Assert.IsTrue(er2.Value.TryGetValue(out int v2));
+                                Assert.AreEqual(2, v2);
+
+                                DebugExpressionVariableResult ers2 = getSum(frame);
+                                ers2 = getSum(prevFrame).WithValue(ers2.Value);
+                                Assert.IsTrue(ers2.IsModified);      // sum is modified!
+                                Assert.IsTrue(ers2.Value.TryGetValue(out int sum2));
+                                Assert.AreEqual(3, sum2);
                                 break;
 
                             // breakpoint 6 will never see i as 2
@@ -2545,7 +2618,8 @@ foreach (int {INDEX_VAR} in Enumerable.Range(0, 3)) // line 6
                             // i = 0
                             case 0:
                                 DebugExpressionVariableResult er0 = getIndex(frame);
-                                er0 = getIndex(prevFrame).WithValue(er0.Value);
+                                // csharp does not stop twice on for loop so
+                                // i is not available in frame previous to this
                                 Assert.IsFalse(er0.IsModified);
                                 Assert.IsTrue(er0.Value.TryGetValue(out int v0));
                                 Assert.AreEqual(0, v0);
@@ -2604,7 +2678,7 @@ foreach (int {INDEX_VAR} in Enumerable.Range(0, 3)) // line 6
         public void TestCSharp_DebugTracing_StackWatch_L1_Single()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
+@"
 int m = 42;
 ");
             var controls = new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
@@ -2623,13 +2697,12 @@ int m = 42;
         public void TestCSharp_DebugTracing_L1()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-            $@"
-void Test() {{     // LINE 2
+@"
+void Test() {      // LINE 2
     int m = 42;    // LINE 3
-}}
+}
 Test();            // LINE 5
 ");
-
 
             var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
             {
@@ -2651,16 +2724,79 @@ Test();            // LINE 5
         }
 
         [Test]
+        public void TestCSharp_DebugTracing_L1_DoBlock()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+void Test() {      // LINE 2
+    int m = 42;    // LINE 3
+}
+Test();            // LINE 5
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new ( 5, ExecEvent.Line, DebugAction.StepIn),
+                    new ( 3, ExecEvent.Line, DebugAction.StepOut),
+                new ( 5, ExecEvent.Return, DebugAction.Continue),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 5));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"Expected: {step.Event} [{step.Line}:] !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test]
+        public void TestCSharp_DebugTracing_L1_WithStructuredTrivia()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+            @"
+using System;
+
+#if DEBUG
+
+int a = 42;         // LINE 6
+
+#else
+int a = 0;          // LINE 9
+#endif
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new (6, ExecEvent.Line, DebugAction.StepOver),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 6));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"Expected: {step.Event} [{step.Line}:] !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test]
         public void TestCSharp_DebugTracing_L2()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-            $@"
-void Test2() {{
+@"
+void Test2() {
     int a = 42;     // LINE 3
-}}
-void Test() {{
+}
+void Test() {
     Test2();        // LINE 6
-}}
+}
 Test();             // LINE 8
 ");
 
@@ -2689,15 +2825,15 @@ Test();             // LINE 8
         public void TestCSharp_DebugTracing_L2_Class()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-            $@"
-class Test2 {{
-    public Test2() {{
+@"
+class Test2 {
+    public Test2() {
         int m = 42;         // LINE 4
-    }}
-}}
-void Test() {{
+    }
+}
+void Test() {
     var t = new Test2();    // LINE 8
-}}
+}
 Test();                     // LINE 10
 ");
 
@@ -2724,26 +2860,68 @@ Test();                     // LINE 10
         }
 
         [Test]
+        public void TestCSharp_DebugTracing_L2_WithStructuredTrivia()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+            @"
+using System;
+
+int Add(int x, int y)
+{
+#if DEBUG
+
+
+    return 500;         // LINE 9
+
+
+#else
+    return x + y + 10;
+#endif
+}
+
+Add(21, 21);            // LINE 17
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new (17, ExecEvent.Line, DebugAction.StepIn),
+                    new ( 9, ExecEvent.Line, DebugAction.StepOut),
+                new (17, ExecEvent.Return, DebugAction.Continue),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 17));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"Expected: {step.Event} [{step.Line}:] !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test]
         public void TestCSharp_DebugTracing_StepIn()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-            $@"
-void Foo() {{
+@"
+void Foo() {
     var m = 12;                         // LINE 3
-}}
-class Test {{
-    public Test() {{
+}
+class Test {
+    public Test() {
         var some_value = 12;            // LINE 7
-    }}
-}}
-void func_call_test() {{
-    void nested_func_call_test() {{     // LINE 11
+    }
+}
+void func_call_test() {
+    void nested_func_call_test() {      // LINE 11
         var d = new Test();             // LINE 12
         Foo();                          // LINE 13
-    }}
+    }
     Foo();                              // LINE 15
     nested_func_call_test();            // LINE 16
-}}
+}
 func_call_test();                       // LINE 18
 Foo();                                  // LINE 19
 ");
@@ -2792,12 +2970,12 @@ Foo();                                  // LINE 19
         public void TestCSharp_DebugTracing_StepIn_Recursive()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
-void recursive(int a) {{
+@"
+void recursive(int a) {
     if (a == 0)             // LINE 3
         return;             // LINE 4
     recursive(a - 1);       // LINE 5
-}}
+}
 recursive(5);               // LINE 7
 ");
 
@@ -2850,23 +3028,23 @@ recursive(5);               // LINE 7
         public void TestCSharp_DebugTracing_StepOut()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
-void Foo() {{
+@"
+void Foo() {
     var m = 12;                         // LINE 3
-}}
-class Test {{
-    public Test() {{
+}
+class Test {
+    public Test() {
         var some_value = 12;            // LINE 7
-    }}
-}}
-void func_call_test() {{
-    void nested_func_call_test() {{     // LINE 11
+    }
+}
+void func_call_test() {
+    void nested_func_call_test() {      // LINE 11
         var d = new Test();             // LINE 12
         Foo();                          // LINE 13
-    }}
+    }
     Foo();                              // LINE 15
     nested_func_call_test();            // LINE 16
-}}
+}
 func_call_test();                       // LINE 18
 Foo();                                  // LINE 19
 ");
@@ -2903,20 +3081,20 @@ Foo();                                  // LINE 19
         public void TestCSharp_DebugTracing_StepOver_Exception_Handled()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-            $@"
+@"
 using System;
 void func_test_error_inner()
-{{
+{
     try                                             // LINE 5
-    {{
+    {
         throw new Exception(""Handled Error"");     // LINE 7
-    }}
-    catch {{}}
-}}
+    }
+    catch {}
+}
 void func_test_error()
-{{
+{
     func_test_error_inner();                        // LINE 13
-}}
+}
 func_test_error();                                  // LINE 15
 func_test_error();                                  // LINE 16
 ");
@@ -2952,12 +3130,12 @@ func_test_error();                                  // LINE 16
         public void TestCSharp_DebugTracing_StepOut_L1()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-            $@"
-class Test {{
-    public Test() {{
+@"
+class Test {
+    public Test() {
         var some_value = 12;    // LINE 4
-    }}
-}}
+    }
+}
 
 var d = new Test();             // LINE 8
 ");
@@ -2983,23 +3161,23 @@ var d = new Test();             // LINE 8
         public void TestCSharp_DebugTracing_StepOut_L2()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
-void Foo() {{
+@"
+void Foo() {
     var m = 12;                         // LINE 3
-}}
-class Test {{
-    public Test() {{
+}
+class Test {
+    public Test() {
         var some_value = 12;            // LINE 7
-    }}
-}}
-void func_call_test() {{
-    void nested_func_call_test() {{     // LINE 11
+    }
+}
+void func_call_test() {
+    void nested_func_call_test() {      // LINE 11
         var d = new Test();             // LINE 12
         Foo();                          // LINE 13
-    }}
+    }
     Foo();                              // LINE 15
     nested_func_call_test();            // LINE 16
-}}
+}
 func_call_test();                       // LINE 18
 ");
 
@@ -3028,23 +3206,23 @@ func_call_test();                       // LINE 18
         public void TestCSharp_DebugTracing_StepOut_L3()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
-void Foo() {{
+@"
+void Foo() {
     var m = 12;                         // LINE 3
-}}
-class Test {{
-    public Test() {{
+}
+class Test {
+    public Test() {
         var some_value = 12;            // LINE 7
-    }}
-}}
-void func_call_test() {{
-    void nested_func_call_test() {{     // LINE 11
+    }
+}
+void func_call_test() {
+    void nested_func_call_test() {      // LINE 11
         var d = new Test();             // LINE 12
         Foo();                          // LINE 13
-    }}
+    }
     Foo();                              // LINE 15
     nested_func_call_test();            // LINE 16
-}}
+}
 func_call_test();                       // LINE 18
 ");
 
@@ -3075,23 +3253,23 @@ func_call_test();                       // LINE 18
         public void TestCSharp_DebugTracing_StepOut_L3_LastLine()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
-void Foo() {{
+@"
+void Foo() {
     var m = 12;                         // LINE 3
-}}
-class Test {{
-    public Test() {{
+}
+class Test {
+    public Test() {
         var some_value = 12;            // LINE 7
-    }}
-}}
-void func_call_test() {{
-    void nested_func_call_test() {{     // LINE 11
+    }
+}
+void func_call_test() {
+    void nested_func_call_test() {      // LINE 11
         var d = new Test();             // LINE 12
         Foo();                          // LINE 13
-    }}
+    }
     Foo();                              // LINE 15
     nested_func_call_test();            // LINE 16
-}}
+}
 func_call_test();                       // LINE 18
 ");
 
@@ -3123,10 +3301,10 @@ func_call_test();                       // LINE 18
         public void TestCSharp_DebugTracing_StepOver_L1()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
-void func_call_test() {{
+@"
+void func_call_test() {
     var m = 12;                     // LINE 3
-}}
+}
 
 func_call_test();                   // LINE 6
 func_call_test();                   // LINE 7
@@ -3150,28 +3328,105 @@ func_call_test();                   // LINE 7
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
         }
 
-        [Test]
-        public void TestCSharp_DebugTracing_StepOver_ForLoop()
+        static IEnumerable<TestCaseData> GetStepOverForLoops()
         {
-            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
-void Foo() {{
+            yield return new(@"
+void Foo() {
     var m = 12;              // LINE 3
-}}
+}
 
-for(int i =0; i < 2; i++)   // LINE 6
-{{
-    Foo();                  // LINE 8
-}}
+for(int i =0; i < 2; i++) Foo();  // LINE 6
 
-Foo();                      // LINE 11
-");
-
-            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+Foo();                       // LINE 8
+", new ExpectedPauseEventStep[]
             {
                 // before
                 new ( 6, ExecEvent.Line, DebugAction.StepOver),
-                new ( 6, ExecEvent.Line, DebugAction.StepOver), // FIXME should not be here
+
+                // 0
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 1
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // after
+                new ( 8, ExecEvent.Line, DebugAction.StepOver),
+            })
+            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForLoop) + "_NoBlock" };
+
+            yield return new(@"
+void Foo() {
+    var m = 12;              // LINE 3
+}
+
+for(int i =0; i < 2; i++)    // LINE 6
+    Foo();                   // LINE 7
+
+Foo();                       // LINE 9
+", new ExpectedPauseEventStep[]
+            {
+                // before
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 0
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 1
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // after
+                new ( 9, ExecEvent.Line, DebugAction.StepOver),
+            })
+            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForLoop) + "_NoBlockExpanded" };
+
+            yield return new(@"
+void Foo() {
+    var m = 12;              // LINE 3
+}
+
+for(int i =0; i < 2; i++) {  // LINE 6
+    Foo();                   // LINE 7
+}
+
+Foo();                       // LINE 10
+", new ExpectedPauseEventStep[]
+            {
+                // before
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 0
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 1
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // after
+                new (10, ExecEvent.Line, DebugAction.StepOver),
+            })
+            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForLoop) + "_CompactBrace" };
+
+            yield return new(
+@"
+void Foo() {
+    var m = 12;              // LINE 3
+}
+
+for(int i =0; i < 2; i++)    // LINE 6
+{
+    Foo();                   // LINE 8
+}
+
+Foo();                       // LINE 11
+", new ExpectedPauseEventStep[]
+            {
+                // before
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
 
                 // 0
                 new ( 8, ExecEvent.Line, DebugAction.StepOver),
@@ -3179,11 +3434,51 @@ Foo();                      // LINE 11
 
                 // 1
                 new ( 8, ExecEvent.Line, DebugAction.StepOver),
-                // new ( 6, ExecEvent.Line, DebugAction.StepOver), // FIXME shoud be here
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
 
                 // after
                 new (11, ExecEvent.Line, DebugAction.StepOver),
-            };
+            })
+            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForLoop) + "_ExpandedBrace" };
+
+            yield return new(
+@"
+void Foo() {
+    var m = 12;              // LINE 3
+}
+
+for(int i =0; i < 2; i++)    // LINE 6
+{ Foo();                     // LINE 7
+}
+
+Foo();                       // LINE 10
+", new ExpectedPauseEventStep[]
+            {
+                // before
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 0
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 1
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // after
+                new (10, ExecEvent.Line, DebugAction.StepOver),
+            })
+            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForLoop) + "_ExpandedBraceSameLine" };
+        }
+
+        [Test, TestCaseSource(nameof(GetStepOverForLoops))]
+        public void TestCSharp_DebugTracing_StepOver_ForLoop(string source, ExpectedPauseEventStep[] actions)
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(source);
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>();
+            foreach (ExpectedPauseEventStep step in actions)
+                controls.Add(step);
             controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 6));
             controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
             {
@@ -3197,39 +3492,174 @@ Foo();                      // LINE 11
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
         }
 
-        [Test]
-        public void TestCSharp_DebugTracing_StepOver_ForEachLoop()
+        static IEnumerable<TestCaseData> GetStepOverForEachLoops()
         {
-            // FIXME:
-            Assert.Ignore();
-            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
+            yield return new(@"
+using System;
+using System.Linq;
+
+int total = 0;
+foreach (int i in Enumerable.Range(0, 3)) total += i;   // line 6
+
+int f = total;
+", new ExpectedPauseEventStep[]
+            {
+                // before
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 0
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 1
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 2
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // after
+                new ( 8, ExecEvent.Line, DebugAction.StepOver),
+            })
+            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForEachLoop) + "_NoBlock" };
+
+            yield return new(@"
+using System;
+using System.Linq;
+
+int total = 0;
+foreach (int i in Enumerable.Range(0, 3))   // line 6
+    total += i;   // line 7
+
+int f = total;
+", new ExpectedPauseEventStep[]
+            {
+                // before
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 0
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 1
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 2
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // after
+                new ( 9, ExecEvent.Line, DebugAction.StepOver),
+            })
+            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForEachLoop) + "_NoBlockExpanded" };
+
+            yield return new(@"
+using System;
+using System.Linq;
+
+int total = 0;
+foreach (int i in Enumerable.Range(0, 3)) { // LINE 6
+    total += i;   // line 7
+}
+int f = total;
+", new ExpectedPauseEventStep[]
+            {
+                // before
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 0
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 1
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 2
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // after
+                new ( 9, ExecEvent.Line, DebugAction.StepOver),
+            })
+            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForEachLoop) + "_CompactBrace" };
+
+            yield return new(
+@"
 using System;
 using System.Linq;
 
 int total = 0;
 foreach (int i in Enumerable.Range(0, 3)) // LINE 6
-{{
+{
     total += i;   // line 8
-}}
+}
 int f = total;
-");
-
-            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+", new ExpectedPauseEventStep[]
             {
+                // before
                 new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
                 // 0
                 new ( 8, ExecEvent.Line, DebugAction.StepOver),
-                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
                 // 1
                 new ( 8, ExecEvent.Line, DebugAction.StepOver),
-                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
                 // 2
                 new ( 8, ExecEvent.Line, DebugAction.StepOver),
-                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
 
-                new ( 10, ExecEvent.Line, DebugAction.StepOver),
-            };
+                // after
+                new (10, ExecEvent.Line, DebugAction.StepOver),
+            })
+            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForEachLoop) + "_ExpandedBrace" };
+
+            yield return new(
+@"
+using System;
+using System.Linq;
+
+int total = 0;
+foreach (int i in Enumerable.Range(0, 3)) // LINE 6
+{ total += i;   // line 7
+}
+int f = total;
+", new ExpectedPauseEventStep[]
+            {
+                // before
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 0
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 1
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 2
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // after
+                new ( 9, ExecEvent.Line, DebugAction.StepOver),
+            })
+            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForEachLoop) + "_ExpandedBraceSameLine" };
+        }
+
+        [Test, TestCaseSource(nameof(GetStepOverForEachLoops))]
+        public void TestCSharp_DebugTracing_StepOver_ForEachLoop(string source, ExpectedPauseEventStep[] actions)
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(source);
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>();
+            foreach (ExpectedPauseEventStep step in actions)
+                controls.Add(step);
             controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 6));
             controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
             {
@@ -3256,11 +3686,11 @@ int f = total;
         public void TestCSharp_DebugTracing_StepOver_WhileLoop()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
+@"
 int m = 2;
-while(m > 0) {{
+while(m > 0) {
     m -= 1;
-}}
+}
 int f = m;
 ");
 
@@ -3298,24 +3728,23 @@ int f = m;
         public void TestCSharp_DebugTracing_Continue_Exception_Handled()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-            $@"
+@"
 using System;
 void func_test_error_inner()
-{{
+{
     try                                             // LINE 5
-    {{
+    {
         throw new Exception(""Handled Error"");     // LINE 7
-    }}
-    catch {{}}
-}}
+    }
+    catch {}
+}
 void func_test_error()
-{{
+{
     func_test_error_inner();                        // LINE 13
-}}
+}
 func_test_error();                                  // LINE 15
 func_test_error();                                  // LINE 16
 ");
-
 
             var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
             {
@@ -3347,24 +3776,23 @@ func_test_error();                                  // LINE 16
         {
             Assert.Ignore();
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-            $@"
+@"
 using System;
 void func_test_error_inner()
-{{
+{
     try                                             // LINE 5
-    {{
+    {
         throw new Exception(""Handled Error"");     // LINE 7
-    }}
-    catch {{}}
-}}
+    }
+    catch {}
+}
 void func_test_error()
-{{
+{
     func_test_error_inner();                        // LINE 13
-}}
+}
 func_test_error();                                  // LINE 15
 func_test_error();                                  // LINE 16
 ");
-
 
             var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
             {
@@ -3397,24 +3825,23 @@ func_test_error();                                  // LINE 16
         public void TestCSharp_DebugTracing_StepIn_Exception_Handled()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-            $@"
+@"
 using System;
 void func_test_error_inner()
-{{
+{
     try                                             // LINE 5
-    {{
+    {
         throw new Exception(""Handled Error"");     // LINE 7
-    }}
-    catch {{}}
-}}
+    }
+    catch {}
+}
 void func_test_error()
-{{
+{
     func_test_error_inner();                        // LINE 13
-}}
+}
 func_test_error();                                  // LINE 15
 func_test_error();                                  // LINE 16
 ");
-
 
             var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
             {
@@ -3458,20 +3885,20 @@ func_test_error();                                  // LINE 16
         {
             Assert.Ignore();
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-            $@"
+@"
 using System;
 void func_test_error_inner()
-{{
+{
     try                                             // LINE 5
-    {{
+    {
         throw new Exception(""Handled Error"");     // LINE 7
-    }}
-    catch {{}}
-}}
+    }
+    catch {}
+}
 void func_test_error()
-{{
+{
     func_test_error_inner();                        // LINE 13
-}}
+}
 func_test_error();                                  // LINE 15
 func_test_error();                                  // LINE 16
 ");
@@ -3511,12 +3938,12 @@ func_test_error();                                  // LINE 16
         public void TestCSharp_DebugTracing_Exception_StepIn(DebugAction action)
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
+@"
 using System;
 void func_test_error()
-{{
+{
     throw new Exception(""Handled Error"");     // LINE 5
-}}
+}
 func_test_error();                              // LINE 7
 ");
 
@@ -3552,12 +3979,12 @@ func_test_error();                              // LINE 7
         public void TestCSharp_DebugTracing_Exception_StepOver(DebugAction action)
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
+@"
 using System;
 void func_test_error()
-{{
+{
     throw new Exception(""Handled Error"");     // LINE 5
-}}
+}
 func_test_error();                              // LINE 7
 ");
 
@@ -3588,30 +4015,54 @@ func_test_error();                              // LINE 7
             }
         }
 
-        [Test, TestCaseSource(nameof(GetDebugActions))]
-        public void TestCSharp_DebugTracing_Exception_ForLoop(DebugAction action)
+        static IEnumerable<TestCaseData> GetDebugTracingExceptionForLoop()
         {
-            // FIXME:
-            Assert.Ignore();
-            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
+            foreach (DebugAction action in GetDebugActions().Select(da => (DebugAction)da.Arguments[0]))
+                yield return new(@"
+using Rhino.Runtime.Code.Execution;
+
+int total = 0;
+for(int i =0; i < 3; i++) {                 // LINE 5
+    total += i;                             // LINE 6
+    throw new ExecuteException(""EX"");     // LINE 7
+}
+", new ExpectedPauseEventStep[]
+                {
+                new ( 5, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                new ( 7, ExecEvent.Exception, action),
+                })
+                { TestName = nameof(GetDebugTracingExceptionForLoop) + $"_Compact_{action}" };
+
+            foreach (DebugAction action in GetDebugActions().Select(da => (DebugAction)da.Arguments[0]))
+                yield return new(@"
 using Rhino.Runtime.Code.Execution;
 
 int total = 0;
 for(int i =0; i < 3; i++)                   // LINE 5
-{{
+{
     total += i;                             // LINE 7
     throw new ExecuteException(""EX"");     // LINE 8
-}}
-");
-
-            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
-            {
+}
+", new ExpectedPauseEventStep[]
+                {
                 new ( 5, ExecEvent.Line, DebugAction.StepOver),
                 new ( 7, ExecEvent.Line, DebugAction.StepOver),
                 new ( 8, ExecEvent.Line, DebugAction.StepOver),
                 new ( 8, ExecEvent.Exception, action),
-            };
+                })
+                { TestName = nameof(GetDebugTracingExceptionForLoop) + $"_Expanded_{action}" };
+        }
+
+        [Test, TestCaseSource(nameof(GetDebugTracingExceptionForLoop))]
+        public void TestCSharp_DebugTracing_Exception_ForLoop(string source, ExpectedPauseEventStep[] actions)
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(source);
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>();
+            foreach (ExpectedPauseEventStep step in actions)
+                controls.Add(step);
             controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 5));
             controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
             {
@@ -3638,12 +4089,12 @@ for(int i =0; i < 3; i++)                   // LINE 5
         public void TestCSharp_DebugTracing_Exception_StepIn_DoNotPauseOnException(DebugAction action)
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
+@"
 using System;
 void func_test_error()
-{{
+{
     throw new Exception(""Handled Error"");     // LINE 5
-}}
+}
 func_test_error();                              // LINE 7
 ");
 
@@ -3675,6 +4126,39 @@ func_test_error();                              // LINE 7
             }
         }
 
+        [Test]
+        public void TestCSharp_DebugTracing_Exception_StopDebug()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+void func_test_error()
+{
+    throw new Exception(""Handled Error"");     // LINE 5
+}
+func_test_error();                              // LINE 7
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new ( 7, ExecEvent.Line, DebugAction.StepIn),
+                new ( 5, ExecEvent.Line, DebugAction.StepOver),
+                new ( 5, ExecEvent.Exception, DebugAction.Stop),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 7));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+
+            Assert.Throws<DebugStopException>(() => code.Debug(new DebugContext()));
+        }
+
         static readonly Regex s_sourceIdFinder = new(@"\[Rhino.Runtime.Code.Execution.SourceFrameAttribute\((?<id>.+?)\)\]");
         static readonly Regex s_traceFinder = new(@"Rhino.+?RoslynTracer.Trace\(.+?,\s(?<trace>\d+),\s(?<event>\d+),.+?\);");
 
@@ -3683,7 +4167,6 @@ func_test_error();                              // LINE 7
             code.Text.TryGetTransformed(new DebugContext(), out string tracedSource);
             tracedSource = s_sourceIdFinder.Replace(tracedSource, "[ID($1)]");
             tracedSource = s_traceFinder.Replace(tracedSource, "TRACE($1,$2);");
-            tracedSource = tracedSource.Replace("\r\n", "\n");
             return tracedSource;
         }
 
@@ -3691,80 +4174,86 @@ func_test_error();                              // LINE 7
         public void TestCSharp_DebugTraceInsert_ForLoop()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
+@"
 int total = 0;
 for(int i =0; i < 3; i++)
-{{
+{
     total += i;
-}}");
+}");
 
             string tracedSource = GetTracedSource(code);
-            // TestContext.Progress.WriteLine(tracedSource);
+            // TestContext.Progress.WriteLine(tracedSource.Replace("\"", "\"\""));
             Assert.AreEqual(@"sealed class __RhinoCodeScript__{[ID(""Main()"")]
 public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
+
 TRACE(2,0);TRACE(2,1);int total = 0;
-TRACE(2,2);{object __roslynloopcache__i__ = default;TRACE(3,1);for(int i =0; i < 3; i++)
-{__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;TRACE(3,1);__roslynloopcache__i__ = i;TRACE(5,1);    total += i;
-}}
+{object __roslynloopcache__i__ = default;bool __roslynloopstop__ = false;TRACE(3,1);for(int i =0; i < 3; i++)
+{
+__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__)TRACE(3,1);__roslynloopstop__ = true;__roslynloopcache__i__ = i;    TRACE(5,1);total += i;
+}TRACE(3,1);}
 }
 }
 
 ", tracedSource);
         }
-        
+
         [Test]
         public void TestCSharp_DebugTraceInsert_ForLoop_Multi()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
+@"
 int total = 0;
 for(int i =0,j = 1; i < 3; i++, j++)
-{{
+{
     total += i;
     total += j;
-}}");
+}");
 
             string tracedSource = GetTracedSource(code);
-            // TestContext.Progress.WriteLine(tracedSource);
+            // TestContext.Progress.WriteLine(tracedSource.Replace("\"", "\"\""));
             Assert.AreEqual(@"sealed class __RhinoCodeScript__{[ID(""Main()"")]
 public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
+
 TRACE(2,0);TRACE(2,1);int total = 0;
-TRACE(2,2);{object __roslynloopcache__i__ = default;object __roslynloopcache__j__ = default;TRACE(3,1);for(int i =0,j = 1; i < 3; i++, j++)
-{__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;__roslynloopcache__j__ = __roslynloopcache__j__ ?? j;TRACE(3,1);__roslynloopcache__i__ = i;__roslynloopcache__j__ = j;TRACE(5,1);    total += i;
-TRACE(6,1);    total += j;
-}}
+{object __roslynloopcache__i__ = default;object __roslynloopcache__j__ = default;bool __roslynloopstop__ = false;TRACE(3,1);for(int i =0,j = 1; i < 3; i++, j++)
+{
+__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;__roslynloopcache__j__ = __roslynloopcache__j__ ?? j;if(__roslynloopstop__)TRACE(3,1);__roslynloopstop__ = true;__roslynloopcache__i__ = i;__roslynloopcache__j__ = j;    TRACE(5,1);total += i;
+    TRACE(6,1);total += j;
+}TRACE(3,1);}
 }
 }
 
 ", tracedSource);
         }
-        
+
         [Test]
         public void TestCSharp_DebugTraceInsert_ForEachLoop()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-$@"
+@"
 using System;
 using System.Linq;
 
 int total = 0;
 foreach (int i in Enumerable.Range(0, 3))
-{{
+{
     total += i;
-}}
+}
 int f = total;");
 
             string tracedSource = GetTracedSource(code);
-            // TestContext.Progress.WriteLine(tracedSource);
+            // TestContext.Progress.WriteLine(tracedSource.Replace("\"", "\"\""));
             Assert.AreEqual(@"
 using System;
 using System.Linq;
 sealed class __RhinoCodeScript__{[ID(""Main()"")]
 public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
+
 TRACE(5,0);TRACE(5,1);int total = 0;
-{object __roslynloopcache__i__ = default;TRACE(6,1);foreach (int i in Enumerable.Range(0, 3))
-{__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;TRACE(6,1);__roslynloopcache__i__ = i;TRACE(8,1);    total += i;
-}}TRACE(10,1);int f = total;TRACE(10,2);
+{object __roslynloopcache__i__ = default;bool __roslynloopstop__ = false;TRACE(6,1);foreach (int i in Enumerable.Range(0, 3))
+{
+__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__)TRACE(6,1);__roslynloopstop__ = true;__roslynloopcache__i__ = i;    TRACE(8,1);total += i;
+}TRACE(6,1);}TRACE(10,1);int f = total;TRACE(10,2);
 }
 }
 
@@ -3773,56 +4262,5 @@ TRACE(5,0);TRACE(5,1);int total = 0;
 #endif
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
-
-#if RC8_15
-        static IEnumerable<Ed.Common.CompletionItem> CompleteAtEndingPeriod(Code code, string textUptoPeriod)
-        {
-            if (code.Text.TryGetPosition(textUptoPeriod.Length, out TextPosition position))
-            {
-                if (!code.Text.TryGetTransformed(textUptoPeriod.Length, CompleteOptions.Empty, out string xformedCode, out int xformedPosition))
-                {
-                    xformedCode = code.Text;
-                    xformedPosition = textUptoPeriod.Length;
-                }
-
-                return s_dispatcher.InvokeAsync(() =>
-                {
-                    CSharpCompletionProvider.CompletionProvider provider = GetCompletionProvider(code);
-                    return provider.GetCompletionItems(xformedCode, xformedPosition, position.LineNumber, position.ColumnNumber, '.');
-                }).GetAwaiter().GetResult();
-            }
-
-            return Array.Empty<Ed.Common.CompletionItem>();
-        }
-
-        static CSharpCompletionProvider.CompletionProvider GetCompletionProvider(Code code)
-        {
-            CSharpCompletionProvider.CompletionProvider provider =
-                CSharpCompletionProvider.CompletionProvider.Create(
-                    CSharpCompletionProvider.CompletionProvider.DefaultUsings,
-                    CSharpCompletionProvider.CompletionProvider.DefaultAssemblies.Select(r => r.Location).ToList()
-                );
-
-            AddCSharpReferences(provider, code.Language.Runtime.References);
-            AddCSharpReferences(provider, RhinoCode.Platforms.GetReferences());
-            AddCSharpReferences(provider, code.References);
-
-            if (code.Text.GetPackageSpecs()
-                    .Packages.TryResolveReferences(code, out IEnumerable<CompileReference> references, out Diagnosis _))
-            {
-                AddCSharpReferences(provider, references);
-            }
-
-            return provider;
-        }
-
-        static void AddCSharpReferences(CSharpCompletionProvider.CompletionProvider provider, IEnumerable<CompileReference> references)
-        {
-            foreach (string path in references.GetAssemblies().Select(r => r.Path))
-            {
-                provider.AddAssembly(path);
-            }
-        }
-#endif
     }
 }
