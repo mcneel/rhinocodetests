@@ -20,6 +20,8 @@ using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Platform;
 using Rhino.Runtime.Code.Testing;
 using Rhino.Runtime.Code.Text;
+using System.Text.RegularExpressions;
+
 
 #if RC8_11
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
@@ -2344,7 +2346,8 @@ Test();            // LINE 5
                 new (StackActionKind.Swapped, ExecEvent.Line, 3, ExecEvent.Return, 3),
                 // returning to level 1
                 new (StackActionKind.Swapped, ExecEvent.Line, 5, ExecEvent.Return, 5)
-            }) { TestName = nameof(TestCSharp_DebugTracing_StackWatch_Function_L2) + "_CompactBrace" };
+            })
+            { TestName = nameof(TestCSharp_DebugTracing_StackWatch_Function_L2) + "_CompactBrace" };
 
             yield return new($@"
 void Test()        // LINE 2
@@ -2363,7 +2366,8 @@ Test();            // LINE 6
                 new (StackActionKind.Swapped, ExecEvent.Line, 4, ExecEvent.Return, 4),
                 // returning to level 1
                 new (StackActionKind.Swapped, ExecEvent.Line, 6, ExecEvent.Return, 6)
-            }) { TestName = nameof(TestCSharp_DebugTracing_StackWatch_Function_L2) + "_ExpandedBrace" };
+            })
+            { TestName = nameof(TestCSharp_DebugTracing_StackWatch_Function_L2) + "_ExpandedBrace" };
 
             yield return new($@"
 void Test()        // LINE 2
@@ -2381,7 +2385,8 @@ Test();            // LINE 6
                 new (StackActionKind.Swapped, ExecEvent.Line, 3, ExecEvent.Return, 3),
                 // returning to level 1
                 new (StackActionKind.Swapped, ExecEvent.Line, 5, ExecEvent.Return, 5)
-            }) { TestName = nameof(TestCSharp_DebugTracing_StackWatch_Function_L2) + "_ExpandedBraceSameLine"};
+            })
+            { TestName = nameof(TestCSharp_DebugTracing_StackWatch_Function_L2) + "_ExpandedBraceSameLine" };
         }
 
         [Test, TestCaseSource(nameof(GetL2Sources))]
@@ -2434,7 +2439,7 @@ Test();            // LINE 8
         }
 
         [Test]
-        public void TestCSharp_DebugForEachLoop_Variable()
+        public void TestCSharp_DebugTracing_ForEachLoop_Variable()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-85276
             const string INDEX_VAR = "i";
@@ -3193,6 +3198,61 @@ Foo();                      // LINE 11
         }
 
         [Test]
+        public void TestCSharp_DebugTracing_StepOver_ForEachLoop()
+        {
+            // FIXME:
+            Assert.Ignore();
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+$@"
+using System;
+using System.Linq;
+
+int total = 0;
+foreach (int i in Enumerable.Range(0, 3)) // LINE 6
+{{
+    total += i;   // line 8
+}}
+int f = total;
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+                // 0
+                new ( 8, ExecEvent.Line, DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                // 1
+                new ( 8, ExecEvent.Line, DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+                // 2
+                new ( 8, ExecEvent.Line, DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, DebugAction.StepOver),
+
+                new ( 10, ExecEvent.Line, DebugAction.StepOver),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 6));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+
+            try
+            {
+                code.Debug(new DebugContext());
+            }
+            catch (ExecuteException ex)
+            {
+                if (ex.InnerException is TestException te)
+                    throw te;
+            }
+        }
+
+        [Test]
         public void TestCSharp_DebugTracing_StepOver_WhileLoop()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
@@ -3613,6 +3673,102 @@ func_test_error();                              // LINE 7
                 if (ex.InnerException is TestException te)
                     throw te;
             }
+        }
+
+        static readonly Regex s_sourceIdFinder = new(@"\[Rhino.Runtime.Code.Execution.SourceFrameAttribute\((?<id>.+?)\)\]");
+        static readonly Regex s_traceFinder = new(@"Rhino.+?RoslynTracer.Trace\(.+?,\s(?<trace>\d+),\s(?<event>\d+),.+?\);");
+
+        static string GetTracedSource(Code code)
+        {
+            code.Text.TryGetTransformed(new DebugContext(), out string tracedSource);
+            tracedSource = s_sourceIdFinder.Replace(tracedSource, "[ID($1)]");
+            tracedSource = s_traceFinder.Replace(tracedSource, "TRACE($1,$2);");
+            tracedSource = tracedSource.Replace("\r\n", "\n");
+            return tracedSource;
+        }
+
+        [Test]
+        public void TestCSharp_DebugTraceInsert_ForLoop()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+$@"
+int total = 0;
+for(int i =0; i < 3; i++)
+{{
+    total += i;
+}}");
+
+            string tracedSource = GetTracedSource(code);
+            // TestContext.Progress.WriteLine(tracedSource);
+            Assert.AreEqual(@"sealed class __RhinoCodeScript__{[ID(""Main()"")]
+public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
+TRACE(2,0);TRACE(2,1);int total = 0;
+TRACE(2,2);{object __roslynloopcache__i__ = default;TRACE(3,1);for(int i =0; i < 3; i++)
+{__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;TRACE(3,1);__roslynloopcache__i__ = i;TRACE(5,1);    total += i;
+}}
+}
+}
+
+", tracedSource);
+        }
+        
+        [Test]
+        public void TestCSharp_DebugTraceInsert_ForLoop_Multi()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+$@"
+int total = 0;
+for(int i =0,j = 1; i < 3; i++, j++)
+{{
+    total += i;
+    total += j;
+}}");
+
+            string tracedSource = GetTracedSource(code);
+            // TestContext.Progress.WriteLine(tracedSource);
+            Assert.AreEqual(@"sealed class __RhinoCodeScript__{[ID(""Main()"")]
+public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
+TRACE(2,0);TRACE(2,1);int total = 0;
+TRACE(2,2);{object __roslynloopcache__i__ = default;object __roslynloopcache__j__ = default;TRACE(3,1);for(int i =0,j = 1; i < 3; i++, j++)
+{__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;__roslynloopcache__j__ = __roslynloopcache__j__ ?? j;TRACE(3,1);__roslynloopcache__i__ = i;__roslynloopcache__j__ = j;TRACE(5,1);    total += i;
+TRACE(6,1);    total += j;
+}}
+}
+}
+
+", tracedSource);
+        }
+        
+        [Test]
+        public void TestCSharp_DebugTraceInsert_ForEachLoop()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+$@"
+using System;
+using System.Linq;
+
+int total = 0;
+foreach (int i in Enumerable.Range(0, 3))
+{{
+    total += i;
+}}
+int f = total;");
+
+            string tracedSource = GetTracedSource(code);
+            // TestContext.Progress.WriteLine(tracedSource);
+            Assert.AreEqual(@"
+using System;
+using System.Linq;
+sealed class __RhinoCodeScript__{[ID(""Main()"")]
+public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
+TRACE(5,0);TRACE(5,1);int total = 0;
+{object __roslynloopcache__i__ = default;TRACE(6,1);foreach (int i in Enumerable.Range(0, 3))
+{__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;TRACE(6,1);__roslynloopcache__i__ = i;TRACE(8,1);    total += i;
+}}TRACE(10,1);int f = total;TRACE(10,2);
+}
+}
+
+", tracedSource);
         }
 #endif
 
