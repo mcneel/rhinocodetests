@@ -3469,6 +3469,39 @@ Foo();                       // LINE 10
                 new (10, ExecEvent.Line, DebugAction.StepOver),
             })
             { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForLoop) + "_ExpandedBraceSameLine" };
+
+            yield return new(
+@"
+void Foo() {
+    var m = 12;              // LINE 3
+}
+
+for(int i =0; i < 2; i++)    // LINE 6
+{
+    int f = 42;              // LINE 8
+    Foo();                   // LINE 9
+}
+
+Foo();                       // LINE 10
+", new ExpectedPauseEventStep[]
+            {
+                // before
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 0
+                new ( 8, ExecEvent.Line, DebugAction.StepOver),
+                new ( 9, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // 1
+                new ( 8, ExecEvent.Line, DebugAction.StepOver),
+                new ( 9, ExecEvent.Line, DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, DebugAction.StepOver),
+
+                // after
+                new (12, ExecEvent.Line, DebugAction.StepOver),
+            })
+            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForLoop) + "_WithVariableInLoopScope" };
         }
 
         [Test, TestCaseSource(nameof(GetStepOverForLoops))]
