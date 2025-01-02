@@ -4220,10 +4220,37 @@ for(int i =0; i < 3; i++)
 public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
 
 TRACE(2,0);TRACE(2,1);int total = 0;
-{object __roslynloopcache__i__ = default;bool __roslynloopstop__ = false;TRACE(3,1);for(int i =0; i < 3; i++)
+{object __roslynloopcache__i__ = default;bool __roslynloopstop__0__ = false;TRACE(3,1);for(int i =0; i < 3; i++)
 {
-__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__)TRACE(3,1);__roslynloopstop__ = true;__roslynloopcache__i__ = i;    TRACE(5,1);total += i;
+__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__0__)TRACE(3,1);__roslynloopstop__0__ = true;__roslynloopcache__i__ = i;    TRACE(5,1);total += i;
 }TRACE(3,1);}
+}
+}
+
+", tracedSource);
+        }
+
+        [Test]
+        public void TestCSharp_DebugTraceInsert_ForLoop_Nested()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+int total = 0;
+for(int i = 0; i < 3; i++)
+    for (int j = 0; j < 2; j++)
+        total += i + j;
+");
+
+            string tracedSource = GetTracedSource(code);
+            // TestContext.Progress.WriteLine(tracedSource.Replace("\"", "\"\""));
+            Assert.AreEqual(@"sealed class __RhinoCodeScript__{[ID(""Main()"")]
+public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
+
+TRACE(2,0);TRACE(2,1);int total = 0;
+{object __roslynloopcache__i__ = default;bool __roslynloopstop__0__ = false;TRACE(3,1);for(int i = 0; i < 3; i++)
+{__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__0__)TRACE(3,1);__roslynloopstop__0__ = true;__roslynloopcache__i__ = i;    TRACE(4,1);{object __roslynloopcache__j__ = default;bool __roslynloopstop__1__ = false;    TRACE(4,1);for (int j = 0; j < 2; j++)
+{__roslynloopcache__j__ = __roslynloopcache__j__ ?? j;if(__roslynloopstop__1__)TRACE(4,1);__roslynloopstop__1__ = true;__roslynloopcache__j__ = j;        TRACE(5,1);total += i + j;
+}TRACE(4,1);}}TRACE(3,1);}
 }
 }
 
@@ -4248,9 +4275,9 @@ for(int i =0,j = 1; i < 3; i++, j++)
 public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
 
 TRACE(2,0);TRACE(2,1);int total = 0;
-{object __roslynloopcache__i__ = default;object __roslynloopcache__j__ = default;bool __roslynloopstop__ = false;TRACE(3,1);for(int i =0,j = 1; i < 3; i++, j++)
+{object __roslynloopcache__i__ = default;object __roslynloopcache__j__ = default;bool __roslynloopstop__0__ = false;TRACE(3,1);for(int i =0,j = 1; i < 3; i++, j++)
 {
-__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;__roslynloopcache__j__ = __roslynloopcache__j__ ?? j;if(__roslynloopstop__)TRACE(3,1);__roslynloopstop__ = true;__roslynloopcache__i__ = i;__roslynloopcache__j__ = j;    TRACE(5,1);total += i;
+__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;__roslynloopcache__j__ = __roslynloopcache__j__ ?? j;if(__roslynloopstop__0__)TRACE(3,1);__roslynloopstop__0__ = true;__roslynloopcache__i__ = i;__roslynloopcache__j__ = j;    TRACE(5,1);total += i;
     TRACE(6,1);total += j;
 }TRACE(3,1);}
 }
@@ -4283,10 +4310,43 @@ sealed class __RhinoCodeScript__{[ID(""Main()"")]
 public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
 
 TRACE(5,0);TRACE(5,1);int total = 0;
-{object __roslynloopcache__i__ = default;bool __roslynloopstop__ = false;TRACE(6,1);foreach (int i in Enumerable.Range(0, 3))
+{object __roslynloopcache__i__ = default;bool __roslynloopstop__0__ = false;TRACE(6,1);foreach (int i in Enumerable.Range(0, 3))
 {
-__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__)TRACE(6,1);__roslynloopstop__ = true;__roslynloopcache__i__ = i;    TRACE(8,1);total += i;
+__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__0__)TRACE(6,1);__roslynloopstop__0__ = true;__roslynloopcache__i__ = i;    TRACE(8,1);total += i;
 }TRACE(6,1);}TRACE(10,1);int f = total;TRACE(10,2);
+}
+}
+
+", tracedSource);
+        }
+
+        [Test]
+        public void TestCSharp_DebugTraceInsert_ForEachLoop_Nested()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+using System.Linq;
+
+int total = 0;
+foreach (int i in Enumerable.Range(0, 3))
+    foreach (int j in Enumerable.Range(0, 3))
+        total += i + j;
+");
+
+            string tracedSource = GetTracedSource(code);
+            // TestContext.Progress.WriteLine(tracedSource.Replace("\"", "\"\""));
+            Assert.AreEqual(@"
+using System;
+using System.Linq;
+sealed class __RhinoCodeScript__{[ID(""Main()"")]
+public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
+
+TRACE(5,0);TRACE(5,1);int total = 0;
+{object __roslynloopcache__i__ = default;bool __roslynloopstop__0__ = false;TRACE(6,1);foreach (int i in Enumerable.Range(0, 3))
+{__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__0__)TRACE(6,1);__roslynloopstop__0__ = true;__roslynloopcache__i__ = i;    TRACE(7,1);{object __roslynloopcache__j__ = default;bool __roslynloopstop__1__ = false;    TRACE(7,1);foreach (int j in Enumerable.Range(0, 3))
+{__roslynloopcache__j__ = __roslynloopcache__j__ ?? j;if(__roslynloopstop__1__)TRACE(7,1);__roslynloopstop__1__ = true;__roslynloopcache__j__ = j;        TRACE(8,1);total += i + j;
+}TRACE(7,1);}}TRACE(6,1);}
 }
 }
 

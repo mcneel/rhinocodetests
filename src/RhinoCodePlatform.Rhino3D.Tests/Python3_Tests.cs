@@ -2811,6 +2811,22 @@ pass_in_middle()            # LINE 9
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
         }
+
+        [Test]
+        public void TestPython3_Complete_GenericTypes()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85354
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+from system.Collection.Generic import ");
+
+            string text = code.Text;
+            IEnumerable<CompletionInfo> completions =
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+
+            Assert.IsNotEmpty(completions);
+            Assert.IsEmpty(completions.Where(c => c.Text.Contains('`')));
+        }
 #endif
 
         static DiagnoseOptions s_errorsOnly = new() { Errors = true, Hints = false, Infos = false, Warnings = false };

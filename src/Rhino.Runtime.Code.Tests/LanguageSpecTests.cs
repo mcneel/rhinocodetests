@@ -193,9 +193,9 @@ namespace Rhino.Runtime.Code.Tests
             Assert.AreEqual(new LanguageSpec("gh1.csharp"), spec);
 
             // special cases
-            Assert.IsFalse(LanguageSpec.TryParse("python-*_custom@sep", out spec));
-            Assert.IsFalse(LanguageSpec.TryParse("python-3.*@custom", out spec));
-            Assert.IsFalse(LanguageSpec.TryParse("python-3.*:custom", out spec));
+            Assert.IsFalse(LanguageSpec.TryParse("python-*_custom@sep", out _));
+            Assert.IsFalse(LanguageSpec.TryParse("python-3.*@custom", out _));
+            Assert.IsFalse(LanguageSpec.TryParse("python-3.*:custom", out _));
 
             Assert.IsTrue(LanguageSpec.TryParse("python@*_custom", out spec));
             Assert.AreEqual(new LanguageSpec("python"), spec);
