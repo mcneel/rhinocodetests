@@ -2206,7 +2206,7 @@ class Script_Instance : RhinoCodePlatform.Rhino3D.Languages.GH1.Grasshopper1Scri
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(source);
 
             string scriptClassSource = GetScriptClassSource(code);
-            TestContext.Progress.WriteLine(scriptClassSource.Replace("\"", "\"\""));
+            // TestContext.Progress.WriteLine(scriptClassSource.Replace("\"", "\"\""));
             Assert.AreEqual(expected, scriptClassSource);
         }
 
