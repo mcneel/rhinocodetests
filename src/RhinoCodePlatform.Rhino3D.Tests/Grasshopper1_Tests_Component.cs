@@ -148,12 +148,18 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
             script.ParamsCollect();
 
             // assert inputs
+            ScriptParam input;
             ScriptParam[] inputs = script.Inputs.Select(i => i.CreateScriptParam()).ToArray();
-            Assert.AreEqual("u", inputs[0].Name);
-            Assert.AreEqual("int", inputs[0].ValueType.Name);
 
-            Assert.AreEqual("v", inputs[1].Name);
-            Assert.AreEqual("Point3d", inputs[1].ValueType.Name);
+            input = inputs[0];
+            Assert.AreEqual("u", input.Name);
+            Assert.AreEqual("int", input.ValueType.Name);
+            Assert.IsTrue(input.IsOptional);
+
+            input = inputs[1];
+            Assert.AreEqual("v", input.Name);
+            Assert.AreEqual("Point3d", input.ValueType.Name);
+            Assert.IsTrue(input.IsOptional);
 
             // assert param converters
             IScriptParameter u_param = script.Inputs.ElementAt(0);
@@ -186,9 +192,16 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
             script.ParamsCollect();
 
             // assert inputs
+            ScriptParam input;
             ScriptParam[] inputs = script.Inputs.Select(i => i.CreateScriptParam()).ToArray();
-            Assert.True(inputs[0].Name == "u");
-            Assert.True(inputs[1].Name == "v");
+
+            input = inputs[0];
+            Assert.True(input.Name == "u");
+            Assert.IsTrue(input.IsOptional);
+
+            input = inputs[1];
+            Assert.True(input.Name == "v");
+            Assert.IsTrue(input.IsOptional);
         }
 
         [Test]
@@ -218,12 +231,18 @@ public class Script_Instance : GH_ScriptInstance
             script.ParamsCollect();
 
             // assert inputs
+            ScriptParam input;
             ScriptParam[] inputs = script.Inputs.Select(i => i.CreateScriptParam()).ToArray();
-            Assert.AreEqual("u", inputs[0].Name);
-            Assert.AreEqual("int", inputs[0].ValueType.Name);
 
-            Assert.AreEqual("v", inputs[1].Name);
-            Assert.AreEqual("double", inputs[1].ValueType.Name);
+            input = inputs[0];
+            Assert.AreEqual("u", input.Name);
+            Assert.AreEqual("int", input.ValueType.Name);
+            Assert.IsTrue(input.IsOptional);
+
+            input = inputs[1];
+            Assert.AreEqual("v", input.Name);
+            Assert.AreEqual("double", input.ValueType.Name);
+            Assert.IsTrue(input.IsOptional);
 
             // assert outputs
             ScriptParam[] outputs = script.Outputs.Select(i => i.CreateScriptParam()).ToArray();
