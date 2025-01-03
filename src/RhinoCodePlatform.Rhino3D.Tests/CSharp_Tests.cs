@@ -22,7 +22,6 @@ using Rhino.Runtime.Code.Testing;
 using Rhino.Runtime.Code.Text;
 using System.Text.RegularExpressions;
 
-
 #if RC8_11
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
 #else
@@ -2107,6 +2106,111 @@ Console.WriteLine(Thread.CurrentThread.CurrentUICulture);
 
 #if RC8_16
         [Test]
+        public void TestCSharp_DebugCompile_ScriptInstance()
+        {
+            var script = new Grasshopper1Script(@"// #! csharp
+// Grasshopper Script Instance
+#region Usings
+using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+#endregion
+
+public class Script_Instance : GH_ScriptInstance
+{
+    #region Notes
+    /* 
+      Members:
+        RhinoDoc RhinoDocument
+        GH_Document GrasshopperDocument
+        IGH_Component Component
+        int Iteration
+
+      Methods (Virtual & overridable):
+        Print(string text)
+        Print(string format, params object[] args)
+        Reflect(object obj)
+        Reflect(object obj, string method_name)
+    */
+    #endregion
+
+    private void RunScript(object x, object y, ref object a)
+    {
+        // Write your logic here
+        a = null;
+    }
+}
+");
+
+            Code code = script.CreateCode();
+            code.DebugControls = new DebugContinueAllControls();
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        static string GetScriptClassSource(Code code)
+        {
+            code.Text.TryGetTransformed(new RunContext(), out string scriptClassSource);
+            return scriptClassSource;
+        }
+
+        static IEnumerable<TestCaseData> GetScriptClassSourceCases()
+        {
+            yield return new(@"
+#region Usings
+using System;
+#endregion
+
+__context__.Outputs[""__gh_scriptinstance__""] = new Script_Instance();class Script_Instance : RhinoCodePlatform.Rhino3D.Languages.GH1.Grasshopper1ScriptInstance
+{
+    private void RunScript(object x, object y, ref object a)
+    {
+        a = default;
+    }
+}
+",
+@"
+#region Usings
+using System;
+#endregion
+
+sealed class __RhinoCodeScript__{[Rhino.Runtime.Code.Execution.SourceFrameAttribute(""Main()"")]
+public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
+__context__.Outputs[""__gh_scriptinstance__""] = new Script_Instance();
+}
+}
+class Script_Instance : RhinoCodePlatform.Rhino3D.Languages.GH1.Grasshopper1ScriptInstance
+{
+    private void RunScript(object x, object y, ref object a)
+    {
+        a = default;
+    }
+}
+
+")
+            { TestName = "TestCSharp_ScriptClassSource_RegionBeforeStatement" };
+        }
+
+        [Test, TestCaseSource(nameof(GetScriptClassSourceCases))]
+        public void TestCSharp_ScriptClassSource(string source, string expected)
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(source);
+
+            string scriptClassSource = GetScriptClassSource(code);
+            TestContext.Progress.WriteLine(scriptClassSource.Replace("\"", "\"\""));
+            Assert.AreEqual(expected, scriptClassSource);
+        }
+
+        [Test]
         public void TestCSharp_CompileGuard_Specific()
         {
             int major = RhinoApp.Version.Major;
@@ -2397,7 +2501,7 @@ Test();            // LINE 5
                 // returning to level 1
                 new (StackActionKind.Swapped, ExecEvent.Line, 5, ExecEvent.Return, 5)
             })
-            { TestName = nameof(TestCSharp_DebugTracing_StackWatch_Function_L2) + "_CompactBrace" };
+            { TestName = "TestCSharp_DebugTracing_StackWatch_Function_L2_CompactBrace" };
 
             yield return new($@"
 void Test()        // LINE 2
@@ -2418,7 +2522,7 @@ Test();            // LINE 6
                 // returning to level 1
                 new (StackActionKind.Swapped, ExecEvent.Line, 6, ExecEvent.Return, 6)
             })
-            { TestName = nameof(TestCSharp_DebugTracing_StackWatch_Function_L2) + "_ExpandedBrace" };
+            { TestName = "TestCSharp_DebugTracing_StackWatch_Function_L2_ExpandedBrace" };
 
             yield return new($@"
 void Test()        // LINE 2
@@ -2438,7 +2542,7 @@ Test();            // LINE 6
                 // returning to level 1
                 new (StackActionKind.Swapped, ExecEvent.Line, 5, ExecEvent.Return, 5)
             })
-            { TestName = nameof(TestCSharp_DebugTracing_StackWatch_Function_L2) + "_ExpandedBraceSameLine" };
+            { TestName = "TestCSharp_DebugTracing_StackWatch_Function_L2_ExpandedBraceSameLine" };
         }
 
         [Test, TestCaseSource(nameof(GetL2Sources))]
@@ -2506,7 +2610,7 @@ for (int {INDEX_VAR} = 0; i < 3; i++) // line 6
 {{
     {SUM_VAR} += {INDEX_VAR};   // line 8
 }}
-", INDEX_VAR, SUM_VAR) { TestName = nameof(TestCSharp_DebugTracing_LoopVariable) + "_ForLoop" };
+", INDEX_VAR, SUM_VAR) { TestName = "TestCSharp_DebugTracing_LoopVariable_ForLoop" };
 
             yield return new($@"
 using System;
@@ -2517,7 +2621,7 @@ foreach (int {INDEX_VAR} in Enumerable.Range(0, 3)) // line 6
 {{
     {SUM_VAR} += {INDEX_VAR};   // line 8
 }}
-", INDEX_VAR, SUM_VAR) { TestName = nameof(TestCSharp_DebugTracing_LoopVariable) + "_ForEachLoop" };
+", INDEX_VAR, SUM_VAR) { TestName = "TestCSharp_DebugTracing_LoopVariable_ForEachLoop" };
         }
 
         [Test, TestCaseSource(nameof(GetLoopVariableSources))]
@@ -3328,7 +3432,7 @@ func_call_test();                   // LINE 7
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
         }
 
-        static IEnumerable<TestCaseData> GetStepOverForLoops()
+        static IEnumerable<TestCaseData> GetStepOverForLoopsCases()
         {
             yield return new(@"
 void Foo() {
@@ -3354,7 +3458,7 @@ Foo();                       // LINE 8
                 // after
                 new ( 8, ExecEvent.Line, DebugAction.StepOver),
             })
-            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForLoop) + "_NoBlock" };
+            { TestName = "TestCSharp_DebugTracing_StepOver_ForLoop_NoBlock" };
 
             yield return new(@"
 void Foo() {
@@ -3381,7 +3485,7 @@ Foo();                       // LINE 9
                 // after
                 new ( 9, ExecEvent.Line, DebugAction.StepOver),
             })
-            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForLoop) + "_NoBlockExpanded" };
+            { TestName = "TestCSharp_DebugTracing_StepOver_ForLoop_NoBlockExpanded" };
 
             yield return new(@"
 void Foo() {
@@ -3409,7 +3513,7 @@ Foo();                       // LINE 10
                 // after
                 new (10, ExecEvent.Line, DebugAction.StepOver),
             })
-            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForLoop) + "_CompactBrace" };
+            { TestName = "TestCSharp_DebugTracing_StepOver_ForLoop_CompactBrace" };
 
             yield return new(
 @"
@@ -3439,7 +3543,7 @@ Foo();                       // LINE 11
                 // after
                 new (11, ExecEvent.Line, DebugAction.StepOver),
             })
-            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForLoop) + "_ExpandedBrace" };
+            { TestName = "TestCSharp_DebugTracing_StepOver_ForLoop_ExpandedBrace" };
 
             yield return new(
 @"
@@ -3468,7 +3572,7 @@ Foo();                       // LINE 10
                 // after
                 new (10, ExecEvent.Line, DebugAction.StepOver),
             })
-            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForLoop) + "_ExpandedBraceSameLine" };
+            { TestName = "TestCSharp_DebugTracing_StepOver_ForLoop_ExpandedBraceSameLine" };
 
             yield return new(
 @"
@@ -3501,10 +3605,10 @@ Foo();                       // LINE 10
                 // after
                 new (12, ExecEvent.Line, DebugAction.StepOver),
             })
-            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForLoop) + "_WithVariableInLoopScope" };
+            { TestName = "TestCSharp_DebugTracing_StepOver_ForLoop_WithVariableInLoopScope" };
         }
 
-        [Test, TestCaseSource(nameof(GetStepOverForLoops))]
+        [Test, TestCaseSource(nameof(GetStepOverForLoopsCases))]
         public void TestCSharp_DebugTracing_StepOver_ForLoop(string source, ExpectedPauseEventStep[] actions)
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(source);
@@ -3525,7 +3629,7 @@ Foo();                       // LINE 10
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
         }
 
-        static IEnumerable<TestCaseData> GetStepOverForEachLoops()
+        static IEnumerable<TestCaseData> GetStepOverForEachLoopsCases()
         {
             yield return new(@"
 using System;
@@ -3555,7 +3659,7 @@ int f = total;
                 // after
                 new ( 8, ExecEvent.Line, DebugAction.StepOver),
             })
-            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForEachLoop) + "_NoBlock" };
+            { TestName = "TestCSharp_DebugTracing_StepOver_ForEachLoop_NoBlock" };
 
             yield return new(@"
 using System;
@@ -3586,7 +3690,7 @@ int f = total;
                 // after
                 new ( 9, ExecEvent.Line, DebugAction.StepOver),
             })
-            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForEachLoop) + "_NoBlockExpanded" };
+            { TestName = "TestCSharp_DebugTracing_StepOver_ForEachLoop_NoBlockExpanded" };
 
             yield return new(@"
 using System;
@@ -3617,7 +3721,7 @@ int f = total;
                 // after
                 new ( 9, ExecEvent.Line, DebugAction.StepOver),
             })
-            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForEachLoop) + "_CompactBrace" };
+            { TestName = "TestCSharp_DebugTracing_StepOver_ForEachLoop_CompactBrace" };
 
             yield return new(
 @"
@@ -3650,7 +3754,7 @@ int f = total;
                 // after
                 new (10, ExecEvent.Line, DebugAction.StepOver),
             })
-            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForEachLoop) + "_ExpandedBrace" };
+            { TestName = "TestCSharp_DebugTracing_StepOver_ForEachLoop_ExpandedBrace" };
 
             yield return new(
 @"
@@ -3682,10 +3786,10 @@ int f = total;
                 // after
                 new ( 9, ExecEvent.Line, DebugAction.StepOver),
             })
-            { TestName = nameof(TestCSharp_DebugTracing_StepOver_ForEachLoop) + "_ExpandedBraceSameLine" };
+            { TestName = "TestCSharp_DebugTracing_StepOver_ForEachLoop_ExpandedBraceSameLine" };
         }
 
-        [Test, TestCaseSource(nameof(GetStepOverForEachLoops))]
+        [Test, TestCaseSource(nameof(GetStepOverForEachLoopsCases))]
         public void TestCSharp_DebugTracing_StepOver_ForEachLoop(string source, ExpectedPauseEventStep[] actions)
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(source);
@@ -3905,7 +4009,7 @@ func_test_error();                                  // LINE 16
             }
         }
 
-        static IEnumerable<TestCaseData> GetDebugActions()
+        static IEnumerable<TestCaseData> GetDebugActionCases()
         {
             yield return new(DebugAction.Continue);
             yield return new(DebugAction.StepIn);
@@ -3913,7 +4017,7 @@ func_test_error();                                  // LINE 16
             yield return new(DebugAction.StepOver);
         }
 
-        [Test, TestCaseSource(nameof(GetDebugActions))]
+        [Test, TestCaseSource(nameof(GetDebugActionCases))]
         public void TestCSharp_DebugTracing_StepIn_Exception_Handled_PauseOnAny(DebugAction action)
         {
             Assert.Ignore();
@@ -3967,7 +4071,7 @@ func_test_error();                                  // LINE 16
             }
         }
 
-        [Test, TestCaseSource(nameof(GetDebugActions))]
+        [Test, TestCaseSource(nameof(GetDebugActionCases))]
         public void TestCSharp_DebugTracing_Exception_StepIn(DebugAction action)
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
@@ -4008,7 +4112,7 @@ func_test_error();                              // LINE 7
             }
         }
 
-        [Test, TestCaseSource(nameof(GetDebugActions))]
+        [Test, TestCaseSource(nameof(GetDebugActionCases))]
         public void TestCSharp_DebugTracing_Exception_StepOver(DebugAction action)
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
@@ -4048,9 +4152,9 @@ func_test_error();                              // LINE 7
             }
         }
 
-        static IEnumerable<TestCaseData> GetDebugTracingExceptionForLoop()
+        static IEnumerable<TestCaseData> GetDebugTracingExceptionForLoopCases()
         {
-            foreach (DebugAction action in GetDebugActions().Select(da => (DebugAction)da.Arguments[0]))
+            foreach (DebugAction action in GetDebugActionCases().Select(da => (DebugAction)da.Arguments[0]))
                 yield return new(@"
 using Rhino.Runtime.Code.Execution;
 
@@ -4066,9 +4170,9 @@ for(int i =0; i < 3; i++) {                 // LINE 5
                 new ( 7, ExecEvent.Line, DebugAction.StepOver),
                 new ( 7, ExecEvent.Exception, action),
                 })
-                { TestName = nameof(GetDebugTracingExceptionForLoop) + $"_Compact_{action}" };
+                { TestName = nameof(GetDebugTracingExceptionForLoopCases) + $"_Compact_{action}" };
 
-            foreach (DebugAction action in GetDebugActions().Select(da => (DebugAction)da.Arguments[0]))
+            foreach (DebugAction action in GetDebugActionCases().Select(da => (DebugAction)da.Arguments[0]))
                 yield return new(@"
 using Rhino.Runtime.Code.Execution;
 
@@ -4085,10 +4189,10 @@ for(int i =0; i < 3; i++)                   // LINE 5
                 new ( 8, ExecEvent.Line, DebugAction.StepOver),
                 new ( 8, ExecEvent.Exception, action),
                 })
-                { TestName = nameof(GetDebugTracingExceptionForLoop) + $"_Expanded_{action}" };
+                { TestName = nameof(GetDebugTracingExceptionForLoopCases) + $"_Expanded_{action}" };
         }
 
-        [Test, TestCaseSource(nameof(GetDebugTracingExceptionForLoop))]
+        [Test, TestCaseSource(nameof(GetDebugTracingExceptionForLoopCases))]
         public void TestCSharp_DebugTracing_Exception_ForLoop(string source, ExpectedPauseEventStep[] actions)
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(source);
@@ -4118,7 +4222,7 @@ for(int i =0; i < 3; i++)                   // LINE 5
             }
         }
 
-        [Test, TestCaseSource(nameof(GetDebugActions))]
+        [Test, TestCaseSource(nameof(GetDebugActionCases))]
         public void TestCSharp_DebugTracing_Exception_StepIn_DoNotPauseOnException(DebugAction action)
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
@@ -4195,7 +4299,7 @@ func_test_error();                              // LINE 7
         static readonly Regex s_sourceIdFinder = new(@"\[Rhino.Runtime.Code.Execution.SourceFrameAttribute\((?<id>.+?)\)\]");
         static readonly Regex s_traceFinder = new(@"Rhino.+?RoslynTracer.Trace\(.+?,\s(?<trace>\d+),\s(?<event>\d+),.+?\);");
 
-        static string GetTracedSource(Code code)
+        static string GetDebugTracedSource(Code code)
         {
             code.Text.TryGetTransformed(new DebugContext(), out string tracedSource);
             tracedSource = s_sourceIdFinder.Replace(tracedSource, "[ID($1)]");
@@ -4214,11 +4318,11 @@ for(int i =0; i < 3; i++)
     total += i;
 }");
 
-            string tracedSource = GetTracedSource(code);
+            string tracedSource = GetDebugTracedSource(code);
             // TestContext.Progress.WriteLine(tracedSource.Replace("\"", "\"\""));
-            Assert.AreEqual(@"sealed class __RhinoCodeScript__{[ID(""Main()"")]
+            Assert.AreEqual(@"
+sealed class __RhinoCodeScript__{[ID(""Main()"")]
 public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
-
 TRACE(2,0);TRACE(2,1);int total = 0;
 {object __roslynloopcache__i__ = default;bool __roslynloopstop__0__ = false;TRACE(3,1);for(int i =0; i < 3; i++)
 {
@@ -4241,11 +4345,11 @@ for(int i = 0; i < 3; i++)
         total += i + j;
 ");
 
-            string tracedSource = GetTracedSource(code);
+            string tracedSource = GetDebugTracedSource(code);
             // TestContext.Progress.WriteLine(tracedSource.Replace("\"", "\"\""));
-            Assert.AreEqual(@"sealed class __RhinoCodeScript__{[ID(""Main()"")]
+            Assert.AreEqual(@"
+sealed class __RhinoCodeScript__{[ID(""Main()"")]
 public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
-
 TRACE(2,0);TRACE(2,1);int total = 0;
 {object __roslynloopcache__i__ = default;bool __roslynloopstop__0__ = false;TRACE(3,1);for(int i = 0; i < 3; i++)
 {__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__0__)TRACE(3,1);__roslynloopstop__0__ = true;__roslynloopcache__i__ = i;    TRACE(4,1);{object __roslynloopcache__j__ = default;bool __roslynloopstop__1__ = false;    TRACE(4,1);for (int j = 0; j < 2; j++)
@@ -4269,11 +4373,11 @@ for(int i =0,j = 1; i < 3; i++, j++)
     total += j;
 }");
 
-            string tracedSource = GetTracedSource(code);
+            string tracedSource = GetDebugTracedSource(code);
             // TestContext.Progress.WriteLine(tracedSource.Replace("\"", "\"\""));
-            Assert.AreEqual(@"sealed class __RhinoCodeScript__{[ID(""Main()"")]
+            Assert.AreEqual(@"
+sealed class __RhinoCodeScript__{[ID(""Main()"")]
 public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
-
 TRACE(2,0);TRACE(2,1);int total = 0;
 {object __roslynloopcache__i__ = default;object __roslynloopcache__j__ = default;bool __roslynloopstop__0__ = false;TRACE(3,1);for(int i =0,j = 1; i < 3; i++, j++)
 {
@@ -4301,14 +4405,14 @@ foreach (int i in Enumerable.Range(0, 3))
 }
 int f = total;");
 
-            string tracedSource = GetTracedSource(code);
+            string tracedSource = GetDebugTracedSource(code);
             // TestContext.Progress.WriteLine(tracedSource.Replace("\"", "\"\""));
             Assert.AreEqual(@"
 using System;
 using System.Linq;
+
 sealed class __RhinoCodeScript__{[ID(""Main()"")]
 public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
-
 TRACE(5,0);TRACE(5,1);int total = 0;
 {object __roslynloopcache__i__ = default;bool __roslynloopstop__0__ = false;TRACE(6,1);foreach (int i in Enumerable.Range(0, 3))
 {
@@ -4334,14 +4438,14 @@ foreach (int i in Enumerable.Range(0, 3))
         total += i + j;
 ");
 
-            string tracedSource = GetTracedSource(code);
+            string tracedSource = GetDebugTracedSource(code);
             // TestContext.Progress.WriteLine(tracedSource.Replace("\"", "\"\""));
             Assert.AreEqual(@"
 using System;
 using System.Linq;
+
 sealed class __RhinoCodeScript__{[ID(""Main()"")]
 public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
-
 TRACE(5,0);TRACE(5,1);int total = 0;
 {object __roslynloopcache__i__ = default;bool __roslynloopstop__0__ = false;TRACE(6,1);foreach (int i in Enumerable.Range(0, 3))
 {__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__0__)TRACE(6,1);__roslynloopstop__0__ = true;__roslynloopcache__i__ = i;    TRACE(7,1);{object __roslynloopcache__j__ = default;bool __roslynloopstop__1__ = false;    TRACE(7,1);foreach (int j in Enumerable.Range(0, 3))
