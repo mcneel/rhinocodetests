@@ -2891,6 +2891,39 @@ int a = 0;          // LINE 9
         }
 
         [Test]
+        public void TestCSharp_DebugTracing_L1_Lambda_Return()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"using System;
+
+Func<int> c1 = () =>
+{
+    return 42;                // LINE 5
+};
+
+c1();                         // LINE 8
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new ( 8, ExecEvent.Line, DebugAction.StepIn),
+                    new ( 5, ExecEvent.Line, DebugAction.StepIn),
+                new ( 8, ExecEvent.Return, DebugAction.Continue),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 8));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"Expected: {step.Event} [{step.Line}:] !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test]
         public void TestCSharp_DebugTracing_L2()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
@@ -2992,6 +3025,45 @@ Add(21, 21);            // LINE 17
                 new (17, ExecEvent.Return, DebugAction.Continue),
             };
             controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 17));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"Expected: {step.Event} [{step.Line}:] !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test]
+        public void TestCSharp_DebugTracing_L2_Lambda_Return()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"using System;
+
+Func<int> c2 = () => {
+    return 42;                // LINE 4
+};
+
+Func<int> c1 = () =>
+{
+    return c2();              // LINE 9
+};
+
+c1();                         // LINE 12
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new (12, ExecEvent.Line, DebugAction.StepIn),
+                    new ( 9, ExecEvent.Line, DebugAction.StepIn),
+                        new ( 4, ExecEvent.Line, DebugAction.StepIn),
+                    new ( 9, ExecEvent.Return, DebugAction.StepOut),
+                new (12, ExecEvent.Return, DebugAction.Continue),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 12));
             controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
             {
                 bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
@@ -3129,6 +3201,52 @@ Compute();                          // LINE 18
                 new ( 18, ExecEvent.Return, DebugAction.Continue),
             };
             controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 18));
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"Expected: {step.Event} [{step.Line}:] !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test]
+        public void TestCSharp_DebugTracing_L3_Lambda_Return()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"using System;
+
+Func<int> c3 = () => {
+    return 42;                // LINE 4
+};
+
+Func<int> c2 = () =>
+{
+    return c3();              // LINE 9
+};
+
+Func<int> c1 = () =>
+{
+    return c2();              // LINE 14
+};
+
+c1();                         // LINE 17
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new (17, ExecEvent.Line, DebugAction.StepIn),
+                    new (14, ExecEvent.Line, DebugAction.StepIn),
+                        new ( 9, ExecEvent.Line, DebugAction.StepIn),
+                            new ( 4, ExecEvent.Line, DebugAction.StepIn),
+                        new ( 9, ExecEvent.Return, DebugAction.StepOut),
+                    new (14, ExecEvent.Return, DebugAction.StepOut),
+                new (17, ExecEvent.Return, DebugAction.Continue),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 17));
             controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
             {
                 bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
