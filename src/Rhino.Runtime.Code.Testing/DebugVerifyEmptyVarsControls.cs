@@ -26,10 +26,17 @@ namespace Rhino.Runtime.Code.Testing
                 if (ExecEvent.Line == frame.Event
                         && _bp.Matches(frame))
                 {
+#if RC8_16
+                    string[] vars = frame.Evaluate()
+                                         .OfType<DebugExpressionExecVariableResult>()
+                                         .Select(devr => devr.Result.Id.Identifier)
+                                         .ToArray();
+#else
                     string[] vars = frame.Evaluate()
                                          .OfType<DebugExpressionVariableResult>()
                                          .Select(devr => devr.Value.Id)
                                          .ToArray();
+#endif
 
                     Pass = vars.Length == 0;
                 }

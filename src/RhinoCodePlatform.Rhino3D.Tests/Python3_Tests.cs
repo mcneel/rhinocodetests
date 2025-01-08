@@ -595,7 +595,7 @@ stop = m # line 4
                 OnReceivedExpected = (v) =>
                 {
                     // enum value of "m" must not be expandable in debugger
-                    if (v.Id == "m")
+                    if (GetIdentifier(v) == "m")
                         return !v.CanExpand;
                     return true;
                 }
@@ -630,43 +630,43 @@ stop = brep_obj # line 8
             {
                 OnReceivedExpected = (v) =>
                 {
-                    if (v.Id == "brep_obj")
+                    if (GetIdentifier(v) == "brep_obj")
                     {
                         ExecVariable[] members = v.Expand().ToArray();
 
-                        Assert.IsTrue(members.Any(m => m.Id == "Geometry"));
+                        Assert.IsTrue(members.Any(m => GetIdentifier(m) == "Geometry"));
 
                         // Guid is not exapandable
-                        ExecVariable id = members.First(m => m.Id == "Id");
+                        ExecVariable id = members.First(m => GetIdentifier(m) == "Id");
                         Assert.IsFalse(id.CanExpand);
 
                         // bool is not exapandable
-                        ExecVariable isHidden = members.First(m => m.Id == "IsHidden");
+                        ExecVariable isHidden = members.First(m => GetIdentifier(m) == "IsHidden");
                         Assert.IsFalse(isHidden.CanExpand);
 
                         // None is not exapandable
-                        ExecVariable renderMaterial = members.First(m => m.Id == "RenderMaterial");
+                        ExecVariable renderMaterial = members.First(m => GetIdentifier(m) == "RenderMaterial");
                         Assert.IsFalse(isHidden.CanExpand);
 
                         ExecVariable[] expanded;
 
                         // assert enumerable with one item has [0] and Count
-                        ExecVariable geom = members.First(m => m.Id == "Geometry");
-                        ExecVariable edges = geom.Expand().First(m => m.Id == "Edges");
+                        ExecVariable geom = members.First(m => GetIdentifier(m) == "Geometry");
+                        ExecVariable edges = geom.Expand().First(m => GetIdentifier(m) == "Edges");
                         expanded = edges.Expand().ToArray();
                         Assert.Greater(expanded.Length, 2);
-                        Assert.Contains("[0]", expanded.Select(e => e.Id).ToList());
-                        Assert.Contains("Count", expanded.Select(e => e.Id).ToList());
+                        Assert.Contains("[0]", expanded.Select(e => GetIdentifier(e)).ToList());
+                        Assert.Contains("Count", expanded.Select(e => GetIdentifier(e)).ToList());
 
                         // assert array only has one Length member
-                        ExecVariable subobjMat = members.First(m => m.Id == "SubobjectMaterialComponents");
+                        ExecVariable subobjMat = members.First(m => GetIdentifier(m) == "SubobjectMaterialComponents");
                         expanded = subobjMat.Expand().ToArray();
                         Assert.AreEqual(1, expanded.Length);
-                        Assert.AreEqual("Length", expanded[0].Id);
+                        Assert.AreEqual("Length", GetIdentifier(expanded[0]));
 
                         // assert color is expandable
-                        ExecVariable attribs = members.First(m => m.Id == "Attributes");
-                        ExecVariable objColor = attribs.Expand().First(m => m.Id == "ObjectColor");
+                        ExecVariable attribs = members.First(m => GetIdentifier(m) == "Attributes");
+                        ExecVariable objColor = attribs.Expand().First(m => GetIdentifier(m) == "ObjectColor");
                         Assert.IsTrue(objColor.CanExpand);
                     }
 
@@ -2362,10 +2362,10 @@ f.Test()
             {
                 OnReceivedExpected = (v) =>
                 {
-                    if (v.Id == "self")
+                    if (GetIdentifier(v) == "self")
                     {
                         ExecVariable[] members = v.Expand().ToArray();
-                        Assert.IsTrue(members.Any(m => m.Id == "class_test"));
+                        Assert.IsTrue(members.Any(m => GetIdentifier(m) == "class_test"));
                     }
 
                     return true;
@@ -2403,10 +2403,10 @@ f.Test()
             {
                 OnReceivedExpected = (v) =>
                 {
-                    if (v.Id == "self")
+                    if (GetIdentifier(v) == "self")
                     {
                         ExecVariable[] members = v.Expand().ToArray();
-                        Assert.IsTrue(members.Any(m => m.Id == "test"));
+                        Assert.IsTrue(members.Any(m => GetIdentifier(m) == "test"));
                     }
 
                     return true;
@@ -2828,6 +2828,15 @@ from system.Collection.Generic import ");
             Assert.IsEmpty(completions.Where(c => c.Text.Contains('`')));
         }
 #endif
+
+        static string GetIdentifier(ExecVariable variable)
+        {
+#if RC8_16
+            return variable.Id.Identifier;
+#else
+            return variable.Id;
+#endif
+        }
 
         static DiagnoseOptions s_errorsOnly = new() { Errors = true, Hints = false, Infos = false, Warnings = false };
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py3\", "test_*.py");
