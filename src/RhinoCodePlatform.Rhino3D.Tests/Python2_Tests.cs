@@ -59,6 +59,7 @@ a = None[0
 
 
             code.DebugControls = new DebugContinueAllControls();
+            code.Profiler = EmptyProfiler.Default;
 
             ExecuteException run = Assert.Throws<ExecuteException>(() => code.Run(new RunContext()));
             Assert.IsInstanceOf(typeof(CompileException), run.InnerException);
