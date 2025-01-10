@@ -108,6 +108,7 @@ b = new Sphere(Point3d.Origin, x);
 
 
             code.DebugControls = new DebugContinueAllControls();
+            code.Profiler = EmptyProfiler.Default;
 
             ExecuteException run = Assert.Throws<ExecuteException>(() => code.Run(new RunContext()));
             Assert.IsInstanceOf(typeof(CompileException), run.InnerException);

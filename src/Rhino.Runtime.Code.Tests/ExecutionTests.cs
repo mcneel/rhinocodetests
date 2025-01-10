@@ -50,12 +50,21 @@ namespace Rhino.Runtime.Code.Tests
             Assert.Throws<NoDebugControlsException>(() => code.Debug(new DebugContext()));
         }
 
+#if RC8_16
+        [Test]
+        public void Test_MissingDefaultProfiler()
+        {
+            Code code = GetProxyLanguage().CreateCode();
+            Assert.Throws<NoProfilerException>(() => code.Profile(new ProfileContext()));
+        }
+#else
         [Test]
         public void Test_HasProfiler()
         {
             Code code = GetProxyLanguage().CreateCode();
             Assert.DoesNotThrow(() => code.Profile(new ProfileContext()));
         }
+#endif
 
         [Test]
         public void Test_MissingProfiler()
@@ -85,7 +94,7 @@ namespace Rhino.Runtime.Code.Tests
         public void Test_RunGroupExistsException_Profile()
         {
             Code code = GetProxyLanguage().CreateCode();
-            code.Profiler = new Profiler();
+            code.Profiler = EmptyProfiler.Default;
             RunGroupExistsException ex = Assert.Throws<RunGroupExistsException>(() =>
             {
                 using RunGroup rg = code.RunWith("test");
@@ -117,7 +126,7 @@ namespace Rhino.Runtime.Code.Tests
         public void Test_RunGroupExistsException_ProfileGroup()
         {
             Code code = GetProxyLanguage().CreateCode();
-            code.DebugControls = new DebugContinueAllControls();
+            code.Profiler = EmptyProfiler.Default;
             RunGroupExistsException ex = Assert.Throws<RunGroupExistsException>(() =>
             {
                 using RunGroup rg = code.RunWith("test");
