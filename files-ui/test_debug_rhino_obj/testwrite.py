@@ -4,7 +4,7 @@ import scriptcontext as sc
 
 import os
 
-Import_File =  r"C:\Users\ein\Downloads\testwrite2.3dm"
+Import_File =  r"C:\Users\ein\gits\rhinocodetests\files-ui\test_debug_rhino_obj\testwrite2.3dm"
 
 temp_doc = Rhino.RhinoDoc.CreateHeadless(None)
 wait_export_file = Rhino.FileIO.File3dm.Read(Import_File)
