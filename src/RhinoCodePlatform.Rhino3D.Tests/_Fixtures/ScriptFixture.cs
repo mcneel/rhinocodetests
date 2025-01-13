@@ -123,12 +123,22 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 Rhino.RhinoDoc currentDoc = Rhino.RhinoDoc.ActiveDoc;
                 using Rhino.RhinoDoc doc = CreateDocFromFile(scriptInfo.GetRhinoFile());
                 Rhino.RhinoDoc.ActiveDoc = doc;
-                bool res = TrySafeRunCode(scriptInfo, code, context, out errorMessage);
-                Rhino.RhinoDoc.ActiveDoc = currentDoc;
+                bool res = false;
+                try
+                {
+                    // this can throw if script is not 'Expecting' an error
+                    res = TrySafeRunCode(scriptInfo, code, context, out errorMessage);
+                }
+                finally
+                {
+                    Rhino.RhinoDoc.ActiveDoc = currentDoc;
+                }
                 return res;
             }
             else
 #endif
+                // this can throw if script is not 'Expecting' an error.
+                // exceptions will bubble up and fail the test
                 return TrySafeRunCode(scriptInfo, code, context, out errorMessage);
         }
 
