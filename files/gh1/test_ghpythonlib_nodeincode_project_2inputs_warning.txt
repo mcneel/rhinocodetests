@@ -1,0 +1,3 @@
+.+Vicarious argument deduced from defaults at position 2.+
+.+input 1 curve. error: Data conversion failed from Brep to Curve.+
+.+solver component. error: Data conversion failed from Brep to Curve.+
