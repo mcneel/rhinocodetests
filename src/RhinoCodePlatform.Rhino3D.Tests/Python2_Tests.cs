@@ -1439,8 +1439,13 @@ import os
 
             ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
 
+#if RC9_0
+            Assert.True(execSpec.TryGetAsync(out bool isAsync));
+            Assert.True(isAsync);
+#else
             Assert.True(execSpec.TryGetAsync(out bool? isAsync));
             Assert.True(isAsync ?? false);
+#endif
         }
 
         [Test]
@@ -1455,8 +1460,13 @@ import os
 
             ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
 
+#if RC9_0
+            Assert.True(execSpec.TryGetAsync(out bool isAsync));
+            Assert.True(isAsync);
+#else
             Assert.True(execSpec.TryGetAsync(out bool? isAsync));
             Assert.True(isAsync ?? false);
+#endif
         }
 
         [Test]
