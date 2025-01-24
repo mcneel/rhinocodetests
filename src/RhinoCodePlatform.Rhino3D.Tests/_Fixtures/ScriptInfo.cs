@@ -67,9 +67,9 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             {
                 int major = int.Parse(m.Groups["major"].Value);
                 int minor = int.Parse(m.Groups["minor"].Value);
+                Version minVersion = new Version(major, minor);
 
-                if (apiVersion.Major < major
-                        || apiVersion.Minor < minor)
+                if (apiVersion < minVersion)
                 {
                     IsSkipped = true;
                 }
@@ -79,9 +79,9 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 {
                     major = int.Parse(m.Groups["major"].Value);
                     minor = int.Parse(m.Groups["minor"].Value);
+                    Version maxVersion = new Version(major, minor);
 
-                    if (apiVersion.Major > major
-                            || apiVersion.Minor > minor)
+                    if (apiVersion > maxVersion)
                     {
                         IsSkipped = true;
                     }
