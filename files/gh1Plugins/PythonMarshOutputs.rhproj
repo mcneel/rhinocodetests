@@ -1,0 +1,56 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.17.25024\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "16beae7b-03df-4b37-8326-a69cc592cc37",
+  "identity": {
+    "name": "PythonMarshOutputs",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "8"
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "type": "components",
+      "id": "dcc401f2-0735-41db-9d44-4b7593660af3",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "PythonMarshOutputs.ghx",
+      "uri": "PythonMarshOutputs.ghx",
+      "scripts": [
+        {
+          "id": "4d9f2d9b-4e8c-4222-981e-12deb662f3e7",
+          "name": "DoMarsh",
+          "nickname": "PMSH",
+          "description": "Passes a list of mesh to output",
+          "subcat": "Default"
+        }
+      ]
+    }
+  ]
+}
