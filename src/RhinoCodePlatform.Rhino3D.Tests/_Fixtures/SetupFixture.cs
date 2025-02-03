@@ -102,7 +102,11 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 if (value.IsComplete)
                     TestContext.Progress.WriteLine($"Loading Languages Complete");
                 else
+#if RC9_0
+                    TestContext.Progress.WriteLine($"Loading {value.LanguageSpec} ...");
+#else
                     TestContext.Progress.WriteLine($"Loading {value.Spec} ...");
+#endif
             }
 #endif
             public override void StatusChanged(ILanguage language, ProgressChangedEventArgs args)
