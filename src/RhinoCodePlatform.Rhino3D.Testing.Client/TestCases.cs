@@ -109,7 +109,11 @@ namespace RhinoCodePlatform.Rhino3D.Testing.Client
                 if (value.IsComplete)
                     Console.WriteLine($"Loaded Languages");
                 else
+#if RC9_0
+                    Console.WriteLine($"Loading {value.LanguageSpec} ...");
+#else
                     Console.WriteLine($"Loading {value.Spec} ...");
+#endif
             }
 
             public override void StatusChanged(ILanguage language, ProgressChangedEventArgs args)
