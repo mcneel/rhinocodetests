@@ -1031,7 +1031,7 @@ Rhino.Input.RhinoGet.GetOneObject( (1,2,3), ");
             ILanguage python2 = GetLanguage(LanguageSpec.Python2);
 
             TryGetTestFilesPath(out string fileDir);
-            LanguageLibrary library = python2.CreateLibrary(new Uri(Path.Combine(fileDir, "py2", "test_library")));
+            ILanguageLibrary library = python2.CreateLibrary(new Uri(Path.Combine(fileDir, "py2", "test_library")));
 
             ICode code;
 
