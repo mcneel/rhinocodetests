@@ -1840,7 +1840,7 @@ Rhino.Input.RhinoGet.GetOneObject(op.dirname(""test""),");
             ILanguage python3 = GetLanguage(LanguageSpec.Python3);
 
             TryGetTestFilesPath(out string fileDir);
-            LanguageLibrary library = python3.CreateLibrary(new Uri(Path.Combine(fileDir, "py3", "test_library")));
+            ILanguageLibrary library = python3.CreateLibrary(new Uri(Path.Combine(fileDir, "py3", "test_library")));
 
             ICode code;
 

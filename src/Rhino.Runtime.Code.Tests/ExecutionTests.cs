@@ -18,8 +18,11 @@ namespace Rhino.Runtime.Code.Tests
     public class ExecutionTests
     {
         [OneTimeSetUp]
+#if RC9_0
+        public void Setup() => RhinoCode.Languages.Register(new ProxyLanguage());
+#else
         public void Setup() => RhinoCode.Languages.Register(new ProxyLanguage(), Enumerable.Empty<ILanguageSpecifier>());
-
+#endif
         [Test]
         public void Test_CompileException()
         {

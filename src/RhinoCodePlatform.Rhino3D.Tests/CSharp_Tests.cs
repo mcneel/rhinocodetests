@@ -1018,7 +1018,7 @@ public class Script_Instance : GH_ScriptInstance
             ILanguage csharp = GetLanguage(LanguageSpec.CSharp);
 
             TryGetTestFilesPath(out string fileDir);
-            LanguageLibrary library = csharp.CreateLibrary(new Uri(Path.Combine(fileDir, "cs", "test_library")));
+            ILanguageLibrary library = csharp.CreateLibrary(new Uri(Path.Combine(fileDir, "cs", "test_library")));
 
             Assert.True(library.GetCodes().All(c => LanguageSpec.CSharp.Matches(c.LanguageSpec)));
         }
@@ -1861,7 +1861,7 @@ public class Script_Instance : GH_ScriptInstance
             ILanguage csharp = GetLanguage(LanguageSpec.CSharp);
 
             TryGetTestFilesPath(out string fileDir);
-            LanguageLibrary library = csharp.CreateLibrary(new Uri(Path.Combine(fileDir, "cs", "test_library_compileguard")));
+            ILanguageLibrary library = csharp.CreateLibrary(new Uri(Path.Combine(fileDir, "cs", "test_library_compileguard")));
 
             Assert.IsTrue(library.TryBuild(new LibraryBuildOptions(), out CompileReference cred, out Diagnosis _));
 
@@ -1881,7 +1881,7 @@ public class Script_Instance : GH_ScriptInstance
             ILanguage csharp = GetLanguage(LanguageSpec.CSharp);
 
             TryGetTestFilesPath(out string fileDir);
-            LanguageLibrary library = csharp.CreateLibrary(new Uri(Path.Combine(fileDir, "cs", "test_library_compileguard_not")));
+            ILanguageLibrary library = csharp.CreateLibrary(new Uri(Path.Combine(fileDir, "cs", "test_library_compileguard_not")));
 
             // NOTE:
             // using BuildOptions does not add LIBRARY compile guard
