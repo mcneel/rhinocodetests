@@ -303,6 +303,50 @@ Rhino.");
         }
 
         [Test]
+        public void TestPython2_Complete_AfterSingleQuoteComment()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86072
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
+@"
+import Rhino
+Rhino.
+'""'
+Rhino.
+");
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            completions = support.Complete(SupportRequest.Empty, code, 22, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 35, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+        }
+
+        [Test]
+        public void TestPython2_Complete_AfterDoubleQuoteComment()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86072
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
+@"
+import Rhino
+Rhino.
+""'""
+Rhino.
+");
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            completions = support.Complete(SupportRequest.Empty, code, 22, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 35, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+        }
+
+        [Test]
         public void TestPython2_CompleteNot_InCommentBlock()
         {
             Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
@@ -432,6 +476,7 @@ Rhino.
             completions = support.Complete(SupportRequest.Empty, code, 125, CompleteOptions.Empty);
             Assert.IsNotEmpty(completions);
         }
+
 
         [Test]
         public void TestPython2_CompleteNot_InLiteralString_Double()

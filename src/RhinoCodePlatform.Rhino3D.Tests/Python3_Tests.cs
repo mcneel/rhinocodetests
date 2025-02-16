@@ -885,6 +885,50 @@ Rhino.");
         }
 
         [Test]
+        public void TestPython3_Complete_AfterSingleQuoteComment()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86072
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+Rhino.
+'""'
+Rhino.
+");
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            completions = support.Complete(SupportRequest.Empty, code, 22, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 35, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+        }
+
+        [Test]
+        public void TestPython3_Complete_AfterDoubleQuoteComment()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86072
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+import Rhino
+Rhino.
+""'""
+Rhino.
+");
+
+            IEnumerable<CompletionInfo> completions;
+            ISupport support = code.Language.Support;
+
+            completions = support.Complete(SupportRequest.Empty, code, 22, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+
+            completions = support.Complete(SupportRequest.Empty, code, 35, CompleteOptions.Empty);
+            Assert.IsNotEmpty(completions);
+        }
+
+        [Test]
         public void TestPython3_CompleteNot_InCommentBlock()
         {
             Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
