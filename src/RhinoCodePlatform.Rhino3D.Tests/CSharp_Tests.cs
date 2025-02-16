@@ -4418,7 +4418,7 @@ for(int i =0; i < 3; i++) {                 // LINE 5
                 new ( 7, ExecEvent.Line, DebugAction.StepOver),
                 new ( 7, ExecEvent.Exception, action),
                 })
-                { TestName = nameof(GetDebugTracingExceptionForLoopCases) + $"_Compact_{action}" };
+                { TestName = nameof(TestCSharp_DebugTracing_Exception_ForLoop) + $"_Compact_{action}" };
 
             foreach (DebugAction action in GetDebugActionCases().Select(da => (DebugAction)da.Arguments[0]))
                 yield return new(@"
@@ -4437,7 +4437,7 @@ for(int i =0; i < 3; i++)                   // LINE 5
                 new ( 8, ExecEvent.Line, DebugAction.StepOver),
                 new ( 8, ExecEvent.Exception, action),
                 })
-                { TestName = nameof(GetDebugTracingExceptionForLoopCases) + $"_Expanded_{action}" };
+                { TestName = nameof(TestCSharp_DebugTracing_Exception_ForLoop) + $"_Expanded_{action}" };
         }
 
         [Test, TestCaseSource(nameof(GetDebugTracingExceptionForLoopCases))]
