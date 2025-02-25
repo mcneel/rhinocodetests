@@ -1494,6 +1494,27 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 
             script.ConvertToScriptInstance(addSolve: false, addPreview: true);
 
+#if RC8_18
+            Assert.AreEqual($@"#! python 3
+import System
+import Rhino
+import Grasshopper
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        return
+
+    {P} Preview overrides 
+    def get_ClippingBox(self):
+        return Rhino.Geometry.BoundingBox.Empty
+
+    def DrawViewportWires(self, args):
+        pass
+
+    def DrawViewportMeshes(self, args):
+        pass
+", script.Text);
+#else
             Assert.AreEqual($@"#! python 3
 import System
 import Rhino
@@ -1514,6 +1535,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def DrawViewportMeshes(self, args):
         pass
 ", script.Text);
+#endif
         }
 
         [Test]
@@ -1532,6 +1554,34 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 
             script.ConvertToScriptInstance(addSolve: true, addPreview: true);
 
+#if RC8_18
+            Assert.AreEqual($@"#! python 3
+import System
+import Rhino
+import Grasshopper
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        return
+
+    {P} Solve overrides 
+    def BeforeRunScript(self):
+        pass
+
+    def AfterRunScript(self):
+        pass
+
+    {P} Preview overrides 
+    def get_ClippingBox(self):
+        return Rhino.Geometry.BoundingBox.Empty
+
+    def DrawViewportWires(self, args):
+        pass
+
+    def DrawViewportMeshes(self, args):
+        pass
+", script.Text);
+#else
             Assert.AreEqual($@"#! python 3
 import System
 import Rhino
@@ -1559,6 +1609,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def DrawViewportMeshes(self, args):
         pass
 ", script.Text);
+#endif
         }
 
         [Test]
@@ -1578,6 +1629,34 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
             script.ConvertToScriptInstance(addSolve: true, addPreview: false);
             script.ConvertToScriptInstance(addSolve: false, addPreview: true);
 
+#if RC8_18
+            Assert.AreEqual($@"#! python 3
+import System
+import Rhino
+import Grasshopper
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self):
+        return
+
+    {P} Solve overrides 
+    def BeforeRunScript(self):
+        pass
+
+    def AfterRunScript(self):
+        pass
+
+    {P} Preview overrides 
+    def get_ClippingBox(self):
+        return Rhino.Geometry.BoundingBox.Empty
+
+    def DrawViewportWires(self, args):
+        pass
+
+    def DrawViewportMeshes(self, args):
+        pass
+", script.Text);
+#else
             Assert.AreEqual($@"#! python 3
 import System
 import Rhino
@@ -1605,6 +1684,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def DrawViewportMeshes(self, args):
         pass
 ", script.Text);
+#endif
         }
 
         [Test]
