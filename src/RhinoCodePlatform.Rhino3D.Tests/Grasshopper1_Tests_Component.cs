@@ -1,9 +1,11 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 using NUnit.Framework;
 
+using Rhino;
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
@@ -27,7 +29,6 @@ using RhinoCodePlatform.Rhino3D.Testing;
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
 
 using GHP = RhinoCodePluginGH;
-using Rhino;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -1490,6 +1491,130 @@ public class Script_Instance : GH_ScriptInstance
             Diagnostic d = ex.Diagnosis.OrderBy(d => d.Severity).First();
             Assert.AreEqual(DiagnosticSeverity.Error, d.Severity);
             Assert.IsTrue(d.Message.Contains("Async methods cannot have ref, in or out parameters"));
+        }
+#endif
+
+#if RC8_18
+        static IEnumerable<TestCaseData> GetConflictingNamespaceTestCases()
+        {
+            yield return new(@"
+using System;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(System.Drawing.Color u, double v)
+    {
+    }
+}
+",
+@"
+using System;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(System.Drawing.Color u, double v)
+    {
+    }
+}
+")
+            { TestName = "TestGH1_Component_ParamsCollect_CSharp_ConflictingNamespaces_SystemDrawingColor_Long" };
+
+            yield return new(@"
+using System;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(System.Drawing.Color u, double v)
+    {
+    }
+}
+",
+@"
+using System;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(Color u, double v)
+    {
+    }
+}
+")
+            { TestName = "TestGH1_Component_ParamsCollect_CSharp_ConflictingNamespaces_SystemDrawingColor_Short" };
+
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86380
+            yield return new(@"
+using System;
+using System.Drawing;
+using Eto.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(System.Drawing.Color u, double v)
+    {
+    }
+}
+",
+@"
+using System;
+using System.Drawing;
+using Eto.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(System.Drawing.Color u, double v)
+    {
+    }
+}
+")
+            { TestName = "TestGH1_Component_ParamsCollect_CSharp_ConflictingNamespaces_SystemDrawingColor_LongEto" };
+        }
+
+        [Test, TestCaseSource(nameof(GetConflictingNamespaceTestCases))]
+        public void TestGH1_Component_ParamsCollect_CSharp_ConflictingNamespaces(string source, string expected)
+        {
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test", source);
+
+            // collect parameters from RunScript and apply to component
+            script.ParamsCollect();
+            Assert.AreEqual(expected, script.Text);
         }
 #endif
 
