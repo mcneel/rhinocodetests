@@ -1,9 +1,11 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 using NUnit.Framework;
 
+using Rhino;
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
@@ -27,7 +29,6 @@ using RhinoCodePlatform.Rhino3D.Testing;
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
 
 using GHP = RhinoCodePluginGH;
-using Rhino;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -1490,6 +1491,674 @@ public class Script_Instance : GH_ScriptInstance
             Diagnostic d = ex.Diagnosis.OrderBy(d => d.Severity).First();
             Assert.AreEqual(DiagnosticSeverity.Error, d.Severity);
             Assert.IsTrue(d.Message.Contains("Async methods cannot have ref, in or out parameters"));
+        }
+#endif
+
+#if RC8_18
+        [Test]
+        public void TestGH1_Component_CreateAPI_EmptyScriptAndParams_CSharp()
+        {
+            GHP.Components.CSharpComponent c = GHP.Components.CSharpComponent.Create("Test", emptyScript: true);
+
+            Assert.IsTrue(c.TryGetSource(out string source));
+            Assert.AreEqual(string.Empty, source);
+            Assert.IsEmpty(c.Params.Input);
+            Assert.IsEmpty(c.Params.Output);
+        }
+
+        [Test]
+        public void TestGH1_Component_CreateAPI_DefaultScriptAndParams_CSharp()
+        {
+            GHP.Components.CSharpComponent c = GHP.Components.CSharpComponent.Create("Test");
+
+            Assert.IsTrue(c.TryGetSource(out string source));
+            Assert.AreEqual(@"// Grasshopper Script Instance
+#region Usings
+using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+#endregion
+
+public class Script_Instance : GH_ScriptInstance
+{
+    #region Notes
+    /* 
+      Members:
+        RhinoDoc RhinoDocument
+        GH_Document GrasshopperDocument
+        IGH_Component Component
+        int Iteration
+
+      Methods (Virtual & overridable):
+        Print(string text)
+        Print(string format, params object[] args)
+        Reflect(object obj)
+        Reflect(object obj, string method_name)
+    */
+    #endregion
+
+    private void RunScript(object x, object y, out object a)
+    {
+        // Write your logic here
+        a = null;
+    }
+}
+", source);
+
+            Assert.AreEqual(2, c.Params.Input.Count);
+            Assert.AreEqual(2, c.Params.Output.Count);
+
+            GHP.Parameters.ScriptVariableParam vp;
+
+            vp = (GHP.Parameters.ScriptVariableParam)c.Params.Input[0];
+            Assert.AreEqual("x", vp.VariableName);
+
+            vp = (GHP.Parameters.ScriptVariableParam)c.Params.Input[1];
+            Assert.AreEqual("y", vp.VariableName);
+
+            Param_String outp = (Param_String)c.Params.Output[0];
+            Assert.AreEqual("out", outp.NickName);
+
+            vp = (GHP.Parameters.ScriptVariableParam)c.Params.Output[1];
+            Assert.AreEqual("a", vp.VariableName);
+        }
+
+        [Test]
+        public void TestGH1_Component_CreateAPI_CustomScriptAndParams_CSharp()
+        {
+            GHP.Components.CSharpComponent c = GHP.Components.CSharpComponent.Create("Test", "using System;", emptyParams: true);
+
+            GHP.Parameters.ScriptVariableParam p;
+
+            p = new GHP.Parameters.ScriptVariableParam("first")
+            {
+                PrettyName = "First Input",
+                ToolTip = "This is the first input",
+                Optional = true,
+                AllowTreeAccess = true,
+            };
+            p.CreateAttributes();
+            c.Params.Input.Add(p);
+
+            p = new GHP.Parameters.ScriptVariableParam("second")
+            {
+                PrettyName = "Second Input",
+                ToolTip = "This is the second input",
+                Optional = true,
+                AllowTreeAccess = true,
+            };
+            p.CreateAttributes();
+            c.Params.Input.Add(p);
+
+            p = new GHP.Parameters.ScriptVariableParam("output")
+            {
+                Hidden = true
+            };
+            p.CreateAttributes();
+            c.Params.Output.Add(p);
+
+            c.Params.OnParametersChanged();
+            c.VariableParameterMaintenance();
+
+            Assert.IsTrue(c.TryGetSource(out string source));
+            Assert.AreEqual("using System;", source);
+
+            Assert.AreEqual(2, c.Params.Input.Count);
+            Assert.AreEqual(1, c.Params.Output.Count);
+
+            GHP.Parameters.ScriptVariableParam vp;
+
+            vp = (GHP.Parameters.ScriptVariableParam)c.Params.Input[0];
+            Assert.AreEqual("first", vp.VariableName);
+
+            vp = (GHP.Parameters.ScriptVariableParam)c.Params.Input[1];
+            Assert.AreEqual("second", vp.VariableName);
+
+            vp = (GHP.Parameters.ScriptVariableParam)c.Params.Output[0];
+            Assert.AreEqual("output", vp.VariableName);
+        }
+
+        [Test]
+        public void TestGH1_Component_CreateAPI_CustomScriptAndParamsFromScript_CSharp()
+        {
+            GHP.Components.CSharpComponent c = GHP.Components.CSharpComponent.Create("Test", @"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(double x, Point3d z, ref object result)
+    {
+    }
+}
+", emptyParams: true);
+
+            c.SetParametersFromScript();
+
+            Assert.AreEqual(2, c.Params.Input.Count);
+            Assert.AreEqual(1, c.Params.Output.Count);
+
+            GHP.Parameters.ScriptVariableParam vp;
+
+            vp = (GHP.Parameters.ScriptVariableParam)c.Params.Input[0];
+            Assert.AreEqual("x", vp.VariableName);
+            Assert.AreEqual("double", vp.TypeHints.GetSelected().TypeName);
+
+            vp = (GHP.Parameters.ScriptVariableParam)c.Params.Input[1];
+            Assert.AreEqual("z", vp.VariableName);
+            Assert.AreEqual("Point3d", vp.TypeHints.GetSelected().TypeName);
+
+            vp = (GHP.Parameters.ScriptVariableParam)c.Params.Output[0];
+            Assert.AreEqual("result", vp.VariableName);
+            Assert.AreEqual("No Type Hint", vp.TypeHints.GetSelected().TypeName);
+        }
+
+        [Test]
+        public void TestGH1_Component_CreateAPI_CustomScriptAndParamsToScript_CSharp()
+        {
+            GHP.Components.CSharpComponent c = GHP.Components.CSharpComponent.Create("Test", @"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(double x, Point3d z, ref object result)
+    {
+    }
+}
+", emptyParams: true);
+
+            GHP.Parameters.ScriptVariableParam p;
+
+            p = new GHP.Parameters.ScriptVariableParam("first")
+            {
+                PrettyName = "First Input",
+                ToolTip = "This is the first input",
+                Optional = true,
+                AllowTreeAccess = true,
+                Access = GH_ParamAccess.list,
+            };
+            p.TypeHints.Select(typeof(double));
+            p.CreateAttributes();
+            c.Params.RegisterInputParam(p);
+
+            p = new GHP.Parameters.ScriptVariableParam("second")
+            {
+                PrettyName = "Second Input",
+                ToolTip = "This is the second input",
+                Optional = true,
+                AllowTreeAccess = true,
+            };
+            p.TypeHints.Select("Point3dList");
+            p.CreateAttributes();
+            c.Params.RegisterInputParam(p);
+
+            p = new GHP.Parameters.ScriptVariableParam("output")
+            {
+                Hidden = true
+            };
+            p.CreateAttributes();
+            c.Params.RegisterOutputParam(p);
+
+            c.VariableParameterMaintenance();
+            c.UsingScriptOutputParam = true;
+            c.SetParametersToScript();
+
+            Assert.IsTrue(c.TryGetSource(out string source));
+            Assert.AreEqual(@"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(
+		List<double> first,
+		Rhino.Collections.Point3dList second,
+		ref object output)
+    {
+    }
+}
+", EnsureCRLF(source));
+        }
+
+        [Test]
+        public void TestGH1_Component_CreateAPI_CustomScriptAndParamsToScript_Python3()
+        {
+            GHP.Components.Python3Component c = GHP.Components.Python3Component.Create("Test", @"import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self, x, y):
+        return
+", emptyParams: true);
+
+            GHP.Parameters.ScriptVariableParam p;
+
+            p = new GHP.Parameters.ScriptVariableParam("first")
+            {
+                PrettyName = "First Input",
+                ToolTip = "This is the first input",
+                Optional = true,
+                AllowTreeAccess = true,
+                Access = GH_ParamAccess.list,
+            };
+            p.TypeHints.Select(typeof(double));
+            p.CreateAttributes();
+            c.Params.RegisterInputParam(p);
+
+            p = new GHP.Parameters.ScriptVariableParam("second")
+            {
+                PrettyName = "Second Input",
+                ToolTip = "This is the second input",
+                Optional = true,
+                AllowTreeAccess = true,
+            };
+            p.TypeHints.Select("Point3dList");
+            p.CreateAttributes();
+            c.Params.RegisterInputParam(p);
+
+            p = new GHP.Parameters.ScriptVariableParam("output")
+            {
+                Hidden = true
+            };
+            p.CreateAttributes();
+            c.Params.RegisterOutputParam(p);
+
+            c.VariableParameterMaintenance();
+            c.UsingScriptOutputParam = true;
+            c.SetParametersToScript();
+
+            Assert.IsTrue(c.TryGetSource(out string source));
+            Assert.AreEqual(@"import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self,
+            first: System.Collections.Generic.List[float],
+            second: Rhino.Collections.Point3dList):
+        return
+", EnsureCRLF(source));
+        }
+
+        [Test]
+        public void TestGH1_Component_CreateAPI_CustomScriptAndParamsToScript_Python3_MarshInputs()
+        {
+            GHP.Components.Python3Component c = GHP.Components.Python3Component.Create("Test", @"import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self, x, y):
+        return
+", emptyParams: true);
+
+            GHP.Parameters.ScriptVariableParam p;
+
+            p = new GHP.Parameters.ScriptVariableParam("first")
+            {
+                PrettyName = "First Input",
+                ToolTip = "This is the first input",
+                Optional = true,
+                AllowTreeAccess = true,
+                Access = GH_ParamAccess.list,
+            };
+            p.TypeHints.Select(typeof(double));
+            p.CreateAttributes();
+            c.Params.RegisterInputParam(p);
+
+            p = new GHP.Parameters.ScriptVariableParam("second")
+            {
+                PrettyName = "Second Input",
+                ToolTip = "This is the second input",
+                Optional = true,
+                AllowTreeAccess = true,
+            };
+            p.TypeHints.Select("Point3dList");
+            p.CreateAttributes();
+            c.Params.RegisterInputParam(p);
+
+            p = new GHP.Parameters.ScriptVariableParam("output")
+            {
+                Hidden = true
+            };
+            p.CreateAttributes();
+            c.Params.RegisterOutputParam(p);
+
+            c.VariableParameterMaintenance();
+            c.UsingScriptOutputParam = true;
+            c.MarshInputs = true;
+            c.SetParametersToScript();
+
+            Assert.IsTrue(c.TryGetSource(out string source));
+            Assert.AreEqual(@"import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self, first: list[float], second: Rhino.Collections.Point3dList):
+        return
+", EnsureCRLF(source));
+        }
+
+        [Test]
+        public void TestGH1_Component_CreateAPI_CustomScriptAndParamsToScript_Python2()
+        {
+            GHP.Components.IronPython2Component c = GHP.Components.IronPython2Component.Create("Test", @"import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self, x, y):
+        return
+", emptyParams: true);
+
+            GHP.Parameters.ScriptVariableParam p;
+
+            p = new GHP.Parameters.ScriptVariableParam("first")
+            {
+                PrettyName = "First Input",
+                ToolTip = "This is the first input",
+                Optional = true,
+                AllowTreeAccess = true,
+                Access = GH_ParamAccess.list,
+            };
+            p.TypeHints.Select(typeof(double));
+            p.CreateAttributes();
+            c.Params.RegisterInputParam(p);
+
+            p = new GHP.Parameters.ScriptVariableParam("second")
+            {
+                PrettyName = "Second Input",
+                ToolTip = "This is the second input",
+                Optional = true,
+                AllowTreeAccess = true,
+            };
+            p.TypeHints.Select("Point3dList");
+            p.CreateAttributes();
+            c.Params.RegisterInputParam(p);
+
+            p = new GHP.Parameters.ScriptVariableParam("output")
+            {
+                Hidden = true
+            };
+            p.CreateAttributes();
+            c.Params.RegisterOutputParam(p);
+
+            c.VariableParameterMaintenance();
+            c.UsingScriptOutputParam = true;
+            c.SetParametersToScript();
+
+            Assert.IsTrue(c.TryGetSource(out string source));
+            Assert.AreEqual(@"import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self, first, second):
+        return
+", EnsureCRLF(source));
+        }
+
+        [Test]
+        public void TestGH1_Component_CreateAPI_IsSDKMode_CSharp()
+        {
+            GHP.Components.CSharpComponent c = GHP.Components.CSharpComponent.Create("Test", @"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(double x, Point3d z, ref object result)
+    {
+    }
+}
+", emptyParams: true);
+
+            Assert.IsTrue(c.IsSDKMode);
+        }
+
+        [Test]
+        public void TestGH1_Component_CreateAPI_IsNotSDKMode_CSharp()
+        {
+            GHP.Components.CSharpComponent c = GHP.Components.CSharpComponent.Create("Test", "using System;", emptyParams: true);
+
+            Assert.IsFalse(c.IsSDKMode);
+        }
+
+        [Test]
+        public void TestGH1_Component_CreateAPI_IsSDKMode_Python3()
+        {
+            GHP.Components.Python3Component c = GHP.Components.Python3Component.Create("Test", @"import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self, x, y):
+        return
+", emptyParams: true);
+
+            Assert.IsTrue(c.IsSDKMode);
+        }
+
+        [Test]
+        public void TestGH1_Component_CreateAPI_IsNotSDKMode_Python3()
+        {
+            GHP.Components.Python3Component c = GHP.Components.Python3Component.Create("Test", "import System", emptyParams: true);
+
+            Assert.IsFalse(c.IsSDKMode);
+        }
+
+        [Test]
+        public void TestGH1_Component_CreateAPI_IsSDKMode_Python2()
+        {
+            GHP.Components.IronPython2Component c = GHP.Components.IronPython2Component.Create("Test", @"import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self, x, y):
+        return
+", emptyParams: true);
+
+            Assert.IsTrue(c.IsSDKMode);
+        }
+
+        [Test]
+        public void TestGH1_Component_CreateAPI_IsNotSDKMode_Python2()
+        {
+            GHP.Components.IronPython2Component c = GHP.Components.IronPython2Component.Create("Test", "import System", emptyParams: true);
+
+            Assert.IsFalse(c.IsSDKMode);
+        }
+
+        static IEnumerable<TestCaseData> GetConflictingNamespaceTestCases()
+        {
+            yield return new(@"
+using System;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(System.Drawing.Color u, double v)
+    {
+    }
+}
+",
+@"
+using System;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(System.Drawing.Color u, double v)
+    {
+    }
+}
+")
+            { TestName = "TestGH1_Component_ParamsCollect_CSharp_ConflictingNamespaces_SystemDrawingColor_Long" };
+
+            yield return new(@"
+using System;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(System.Drawing.Color u, double v)
+    {
+    }
+}
+",
+@"
+using System;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(Color u, double v)
+    {
+    }
+}
+")
+            { TestName = "TestGH1_Component_ParamsCollect_CSharp_ConflictingNamespaces_SystemDrawingColor_Short" };
+
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86380
+            yield return new(@"
+using System;
+using System.Drawing;
+using Eto.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(System.Drawing.Color u, double v)
+    {
+    }
+}
+",
+@"
+using System;
+using System.Drawing;
+using Eto.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private async void RunScript(System.Drawing.Color u, double v)
+    {
+    }
+}
+")
+            { TestName = "TestGH1_Component_ParamsCollect_CSharp_ConflictingNamespaces_SystemDrawingColor_LongEto" };
+        }
+
+        [Test, TestCaseSource(nameof(GetConflictingNamespaceTestCases))]
+        public void TestGH1_Component_ParamsCollect_CSharp_ConflictingNamespaces(string source, string expected)
+        {
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test", source);
+
+            // collect parameters from RunScript and apply to component
+            script.ParamsCollect();
+            Assert.AreEqual(expected, script.Text);
         }
 #endif
 
