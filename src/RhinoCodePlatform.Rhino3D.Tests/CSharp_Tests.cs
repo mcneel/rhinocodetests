@@ -1662,6 +1662,15 @@ import os
             Assert.True(opts.Get("csharp.compiler.unsafe", false));
         }
 
+#if RC8_19
+        static IEnumerable<CompletionInfo> CompleteAtPosition(Code code, int position)
+        {
+            code.Language.Support.BeginSupport(code);
+            IEnumerable<CompletionInfo> completions = Task.Run(() => code.Language.Support.Complete(SupportRequest.Empty, code, position, CompleteOptions.Empty)).GetAwaiter().GetResult();
+            code.Language.Support.EndSupport(code);
+            return completions;
+        }
+#else
         static IEnumerable<Ed.Common.CompletionItem> CompleteAtEndingPeriod(Code code, string textUptoPeriod)
         {
             if (code.Text.TryGetPosition(textUptoPeriod.Length, out TextPosition position))
@@ -1681,6 +1690,7 @@ import os
 
             return Array.Empty<Ed.Common.CompletionItem>();
         }
+#endif
 
         static CSharpCompletionProvider.CompletionProvider GetCompletionProvider(Code code)
         {
@@ -1753,11 +1763,16 @@ unsafe
             string s = "using System.";
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
 
+#if RC8_19
+            IEnumerable<CompletionInfo> completions = CompleteAtPosition(code, s.Length);
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
 
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains(nameof(System.Reflection), names);
             Assert.Contains(nameof(System.Collections), names);
         }
@@ -1782,11 +1797,16 @@ public class Script_Instance : GH_ScriptInstance
 
             Code code = script.CreateCode();
 
+#if RC8_19
+            IEnumerable<CompletionInfo> completions = CompleteAtPosition(code, s.Length);
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
 
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains("Component", names);
             Assert.Contains("GrasshopperDocument", names);
             Assert.Contains("Iteration", names);
@@ -1813,11 +1833,16 @@ public class Script_Instance : GH_ScriptInstance
 
             Code code = script.CreateCode();
 
+#if RC8_19
+            IEnumerable<CompletionInfo> completions = CompleteAtPosition(code, s.Length);
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
 
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains("ActiveCommandId", names);
             Assert.Contains("Objects", names);
         }
@@ -1845,11 +1870,16 @@ public class Script_Instance : GH_ScriptInstance
 
             Code code = script.CreateCode();
 
+#if RC8_19
+            IEnumerable<CompletionInfo> completions = CompleteAtPosition(code, s.Length);
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
 
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains("CurveFeature", names);
             Assert.Contains("MeshFeature", names);
         }
@@ -1913,11 +1943,16 @@ Console.WriteLine(__is_interactive__);
 
             code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
 
+#if RC8_19
+            IEnumerable<CompletionInfo> completions = CompleteAtPosition(code, s.Length);
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
 
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains(nameof(Rhino.Commands.Command.Id), names);
             Assert.Contains(nameof(Rhino.Commands.Command.EnglishName), names);
             Assert.Contains(nameof(Rhino.Commands.Command.LocalName), names);
@@ -1938,11 +1973,16 @@ Console.WriteLine(__is_interactive__);
 
             code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
 
+#if RC8_19
+            IEnumerable<CompletionInfo> completions = CompleteAtPosition(code, s.Length);
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
 
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains(nameof(Rhino.RhinoDoc.Bitmaps), names);
             Assert.Contains(nameof(Rhino.RhinoDoc.HatchPatterns), names);
         }
@@ -1962,14 +2002,24 @@ Console.WriteLine(__is_interactive__);
 
             code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
 
-            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+#if RC8_19
+            IEnumerable<CompletionInfo> completions = CompleteAtPosition(code, s.Length);
+            string[] names = completions.Select(c => c.Text).ToArray();
 
             Assert.IsNotEmpty(completions);
 
+            Assert.Contains(nameof(Enum.HasFlag), names);
+#else
+            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
             string[] names = completions.Select(c => c.label).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
             Assert.Contains("byte", names);
             Assert.Contains("char", names);
             Assert.Contains(nameof(Enum.HasFlag), names);
+#endif
+
         }
 
         [Test]
@@ -1987,11 +2037,15 @@ Console.WriteLine(__is_interactive__.";
 
             code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
 
+#if RC8_19
+            IEnumerable<CompletionInfo> completions = CompleteAtPosition(code, s.Length);
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
-
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains(nameof(bool.TryFormat), names);
         }
 
@@ -2019,11 +2073,16 @@ Console.WriteLine(Thread.CurrentThread.CurrentUICulture);
 
             code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
 
+#if RC8_19
+            IEnumerable<CompletionInfo> completions = CompleteAtPosition(code, s.Length);
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
 
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains(nameof(System.Threading), names);
             Assert.Contains(nameof(System.Globalization), names);
         }
@@ -2266,11 +2325,16 @@ public class Script_Instance : GH_ScriptInstance
 }
 ").CreateCode();
 
+#if RC8_19
+            IEnumerable<CompletionInfo> completions = CompleteAtPosition(code, s.Length);
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
 
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains(nameof(Rhino.Geometry), names);
             Assert.Contains(nameof(Rhino.Display), names);
             Assert.Contains(nameof(Rhino.Runtime), names);
@@ -4704,6 +4768,10 @@ TRACE(5,0);TRACE(5,1);int total = 0;
 
 ", tracedSource);
         }
+#endif
+
+#if RC8_19
+
 #endif
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
