@@ -1672,6 +1672,42 @@ import os
             Assert.True(opts.Get("csharp.compiler.unsafe", false));
         }
 
+#if RC8_19
+        // class SortTextComparer : IComparer<CompletionInfo>
+        // {
+        //     public int Compare(CompletionInfo x, CompletionInfo y)
+        //     {
+        //         string xs = x.SortText;
+        //         string ys = y.SortText;
+
+        //         if (char.IsUpper(xs[0]) && char.IsLower(ys[0]))
+        //             return -1; // Uppercase first
+        //         if (char.IsLower(xs[0]) && char.IsUpper(ys[0]))
+        //             return 1;  // Lowercase later
+
+        //         return string.Compare(xs, ys, StringComparison.Ordinal);  // Regular comparison
+        //     }
+        // }
+
+        static IEnumerable<CompletionInfo> CompleteAtPosition(Code code, int position, CompleteOptions? options = default)
+        {
+            code.Language.Support.BeginSupport(code);
+            IEnumerable<CompletionInfo> completions = code.Language.Support.Complete(SupportRequest.Empty, code, position, options ?? CompleteOptions.Empty);
+            code.Language.Support.EndSupport(code);
+
+            // NOTE:
+            // using sortText to order completions to match Monaco behaviour
+            return completions.OrderBy(c => c.SortText);
+        }
+
+        static IEnumerable<SignatureInfo> CompleteSignatureAtPosition(Code code, int position, CompleteSignatureOptions? options = default)
+        {
+            code.Language.Support.BeginSupport(code);
+            IEnumerable<SignatureInfo> completions = code.Language.Support.CompleteSignature(SupportRequest.Empty, code, position, options ?? CompleteSignatureOptions.Empty);
+            code.Language.Support.EndSupport(code);
+            return completions;
+        }
+#else
         static IEnumerable<Ed.Common.CompletionItem> CompleteAtEndingPeriod(Code code, string textUptoPeriod)
         {
             if (code.Text.TryGetPosition(textUptoPeriod.Length, out TextPosition position))
@@ -1691,6 +1727,7 @@ import os
 
             return Array.Empty<Ed.Common.CompletionItem>();
         }
+#endif
 
         static CSharpCompletionProvider.CompletionProvider GetCompletionProvider(Code code)
         {
@@ -1763,11 +1800,16 @@ unsafe
             string s = "using System.";
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
 
+#if RC8_19
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
 
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains(nameof(System.Reflection), names);
             Assert.Contains(nameof(System.Collections), names);
         }
@@ -1792,11 +1834,16 @@ public class Script_Instance : GH_ScriptInstance
 
             Code code = script.CreateCode();
 
+#if RC8_19
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
 
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains("Component", names);
             Assert.Contains("GrasshopperDocument", names);
             Assert.Contains("Iteration", names);
@@ -1823,11 +1870,16 @@ public class Script_Instance : GH_ScriptInstance
 
             Code code = script.CreateCode();
 
+#if RC8_19
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
 
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains("ActiveCommandId", names);
             Assert.Contains("Objects", names);
         }
@@ -1855,11 +1907,16 @@ public class Script_Instance : GH_ScriptInstance
 
             Code code = script.CreateCode();
 
+#if RC8_19
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
 
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains("CurveFeature", names);
             Assert.Contains("MeshFeature", names);
         }
@@ -1923,11 +1980,16 @@ Console.WriteLine(__is_interactive__);
 
             code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
 
+#if RC8_19
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
 
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains(nameof(Rhino.Commands.Command.Id), names);
             Assert.Contains(nameof(Rhino.Commands.Command.EnglishName), names);
             Assert.Contains(nameof(Rhino.Commands.Command.LocalName), names);
@@ -1948,11 +2010,16 @@ Console.WriteLine(__is_interactive__);
 
             code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
 
+#if RC8_19
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
 
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains(nameof(Rhino.RhinoDoc.Bitmaps), names);
             Assert.Contains(nameof(Rhino.RhinoDoc.HatchPatterns), names);
         }
@@ -1972,14 +2039,24 @@ Console.WriteLine(__is_interactive__);
 
             code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
 
-            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+#if RC8_19
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
 
             Assert.IsNotEmpty(completions);
 
+            Assert.Contains(nameof(Enum.HasFlag), names);
+#else
+            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
             string[] names = completions.Select(c => c.label).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
             Assert.Contains("byte", names);
             Assert.Contains("char", names);
             Assert.Contains(nameof(Enum.HasFlag), names);
+#endif
+
         }
 
         [Test]
@@ -1997,11 +2074,15 @@ Console.WriteLine(__is_interactive__.";
 
             code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
 
+#if RC8_19
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
-
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains(nameof(bool.TryFormat), names);
         }
 
@@ -2029,11 +2110,16 @@ Console.WriteLine(Thread.CurrentThread.CurrentUICulture);
 
             code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
 
+#if RC8_19
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
 
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains(nameof(System.Threading), names);
             Assert.Contains(nameof(System.Globalization), names);
         }
@@ -2276,11 +2362,16 @@ public class Script_Instance : GH_ScriptInstance
 }
 ").CreateCode();
 
+#if RC8_19
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+#else
             IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
+            string[] names = completions.Select(c => c.label).ToArray();
+#endif
 
             Assert.IsNotEmpty(completions);
 
-            string[] names = completions.Select(c => c.label).ToArray();
             Assert.Contains(nameof(Rhino.Geometry), names);
             Assert.Contains(nameof(Rhino.Display), names);
             Assert.Contains(nameof(Rhino.Runtime), names);
@@ -4713,6 +4804,1120 @@ TRACE(5,0);TRACE(5,1);int total = 0;
 }
 
 ", tracedSource);
+        }
+#endif
+
+#if RC8_19
+        [Test]
+        public void TestCSharp_Complete_NoProgram()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            string[] names = completions.Select(c => c.Text).ToArray();
+
+            Assert.False(names.Contains("Program"));
+            Assert.False(names.Contains("string[] args"));
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Methods()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using Rhino.Geometry;
+
+Plane p;
+
+p.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            HashSet<CompletionKind> kinds = completions.Select(c => c.Kind).ToHashSet();
+
+            Assert.True(kinds.Contains(CompletionKind.Method));
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NoMethods()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            HashSet<CompletionKind> kinds = completions.Select(c => c.Kind).ToHashSet();
+
+            Assert.False(kinds.Contains(CompletionKind.Method));
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NoComment()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using Rhino.Geometry;
+// some comment (leading trivia)
+Line m = new ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"
+// some other comment after (trailing trivia)
+");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 1);
+
+            CompletionInfo ci = completions[0];
+            Assert.AreEqual("Line", ci.Text);
+            Assert.AreEqual(CompletionKind.Struct, ci.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Usings_Order()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            string[] names = completions.Select(c => c.Text).ToArray();
+
+            Assert.GreaterOrEqual(completions.Count(), 7);
+
+            Assert.AreEqual(nameof(System), names.ElementAt(0));
+            Assert.AreEqual(nameof(Rhino), names.ElementAt(1));
+            Assert.AreEqual(nameof(Grasshopper), names.ElementAt(2));
+            Assert.AreEqual(nameof(GH_IO), names.ElementAt(3));
+            Assert.AreEqual("Eto", names.ElementAt(4));
+            Assert.AreEqual(nameof(RhinoCodePlatform), names.ElementAt(5));
+            Assert.AreEqual(nameof(Microsoft), names.ElementAt(6));
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Usings_Excluded()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            string[] names = completions.Select(c => c.Text).ToArray();
+
+            Assert.False(names.Contains("Clipper"));
+            Assert.False(names.Contains("ClipperLib"));
+            Assert.False(names.Contains("Mono"));
+            Assert.False(names.Contains("MonoMac"));
+            Assert.False(names.Contains("MonomacTestConversion"));
+            Assert.False(names.Contains("Internal"));
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Usings_OnlyNamespaces()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System;
+using Rhino;
+using ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            Assert.True(completions.All(c => c.Kind == CompletionKind.Module));
+        }
+
+        static IEnumerable<TestCaseData> GetUsingsOnlyImportedCases()
+        {
+            yield return new(@"// #! csharp
+using Rhino.Geometry;
+")
+            { TestName = nameof(TestCSharp_Complete_Usings_OnlyImported) + $"_Column1" };
+
+            yield return new(@"// #! csharp
+using Rhino.Geometry;
+ ")
+            { TestName = nameof(TestCSharp_Complete_Usings_OnlyImported) + $"_Column2" };
+        }
+
+        [Test, TestCaseSource(nameof(GetUsingsOnlyImportedCases))]
+        public void TestCSharp_Complete_Usings_OnlyImported(string s)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            Assert.Contains("Arc", names);
+            Assert.Contains("ArcCurve", names);
+
+            Assert.Contains("if", names);
+            Assert.Contains("foreach", names);
+            Assert.Contains("while", names);
+
+            Assert.False(names.Contains("Action"));
+            Assert.False(names.Contains("Console"));
+        }
+
+        static IEnumerable<TestCaseData> GetCompleteObjectCreationCases()
+        {
+            yield return new(@"// #! csharp
+using Rhino.Geometry;
+Line m = new ", "Line", CompletionKind.Struct)
+            { TestName = nameof(TestCSharp_Complete_ObjectCreation_One) + $"_OneAssignment" };
+
+            yield return new(@"// #! csharp
+using Rhino.Geometry;
+int f = 12; Line m = new ", "Line", CompletionKind.Struct)
+            { TestName = nameof(TestCSharp_Complete_ObjectCreation_One) + $"_TwoAssignments" };
+
+            yield return new(@"// #! csharp
+using Rhino.Geometry;
+System.Console.Write(); Line m = new ", "Line", CompletionKind.Struct)
+            { TestName = nameof(TestCSharp_Complete_ObjectCreation_One) + $"_CallAndOneAssignment" };
+
+            yield return new(@"// #! csharp
+using Rhino.Geometry;
+Plane p = new ", "Plane", CompletionKind.Struct)
+            { TestName = nameof(TestCSharp_Complete_ObjectCreation_One) + $"_OneAssignment_Plane" };
+        }
+
+        [Test, TestCaseSource(nameof(GetCompleteObjectCreationCases))]
+        public void TestCSharp_Complete_ObjectCreation_One(string s, string expectedText, CompletionKind expectedKind)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 1);
+
+            CompletionInfo ci = completions[0];
+            Assert.AreEqual(expectedText, ci.Text);
+            Assert.AreEqual(expectedKind, ci.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_ObjectCreation_NotImported_List()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using Rhino.Geometry;
+List<int> f = new ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.False(completions.Select(c => c.Text).Contains("List"));
+        }
+
+        [Test]
+        public void TestCSharp_Complete_ObjectCreation_Imported_List()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System.Collections.Generic;
+using Rhino.Geometry;
+List<int> f = new ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 1);
+
+            CompletionInfo ci = completions[0];
+            Assert.AreEqual("List<T>", ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            Assert.AreEqual("List", ci.CommitText);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_ObjectCreation_Imported_IList()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System.Collections;
+using System.Collections.Generic;
+using Rhino.Geometry;
+IList t = new ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 5);
+
+            CompletionInfo ci;
+
+            ci = completions[0];
+            Assert.AreEqual(nameof(System.Collections.ArrayList), ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+
+            ci = completions[1];
+            Assert.AreEqual(nameof(System.Collections.CollectionBase), ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+
+            ci = completions[2];
+            Assert.AreEqual(nameof(Rhino.Geometry.Interpolator), ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+
+            ci = completions[3];
+            Assert.AreEqual("List<T>", ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            Assert.AreEqual("List", ci.CommitText);
+
+            ci = completions[4];
+            Assert.AreEqual(nameof(Rhino.Geometry.Polyline), ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_ObjectCreation_Imported_Var()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System.Collections;
+using System.Collections.Generic;
+using Rhino.Geometry;
+var m = new ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            CompletionInfo ci;
+
+            ci = completions.First(c => c.Text == "BitArray");
+            Assert.AreEqual(nameof(System.Collections.BitArray), ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            Assert.AreEqual(nameof(System.Collections.BitArray), ci.CommitText);
+
+            ci = completions.First(c => c.Text == "KeyValuePair");
+            Assert.AreEqual(nameof(System.Collections.Generic.KeyValuePair), ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            Assert.AreEqual(nameof(System.Collections.Generic.KeyValuePair), ci.CommitText);
+
+            ci = completions.First(c => c.Text == "ArcCurve");
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.CommitText);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_ObjectCreation_AcceptedKinds()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System.Collections;
+using System.Collections.Generic;
+using Rhino.Geometry;
+var m = new ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            CompletionKind[] kinds = completions.Select(c => c.Kind).ToHashSet().ToArray();
+
+            Assert.Contains(CompletionKind.Class, kinds);
+            Assert.Contains(CompletionKind.Struct, kinds);
+            Assert.Contains(CompletionKind.Module, kinds);
+
+            Assert.False(kinds.Contains(CompletionKind.Method));
+            Assert.False(kinds.Contains(CompletionKind.Interface));
+            Assert.False(kinds.Contains(CompletionKind.Enum));
+            Assert.False(kinds.Contains(CompletionKind.Constant));
+            Assert.False(kinds.Contains(CompletionKind.Variable));
+            Assert.False(kinds.Contains(CompletionKind.Value));
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Assignment_Imported_IList()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System.Collections;
+using System.Collections.Generic;
+using Rhino.Geometry;
+IList t = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 7);
+
+            CompletionInfo ci;
+
+            ci = completions[0];
+            Assert.AreEqual(nameof(System.Collections.ArrayList), ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+
+            ci = completions[1];
+            Assert.AreEqual(nameof(System.Collections.CollectionBase), ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+
+            ci = completions[2];
+            Assert.AreEqual(nameof(System.Collections.IList), ci.Text);
+            Assert.AreEqual(CompletionKind.Interface, ci.Kind);
+
+            ci = completions[3];
+            Assert.AreEqual(nameof(System.Collections.IList) + "<T>", ci.Text);
+            Assert.AreEqual(CompletionKind.Interface, ci.Kind);
+            Assert.AreEqual(nameof(System.Collections.IList), ci.CommitText);
+
+            ci = completions[4];
+            Assert.AreEqual(nameof(Rhino.Geometry.Interpolator), ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+
+            ci = completions[5];
+            Assert.AreEqual("List<T>", ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            Assert.AreEqual("List", ci.CommitText);
+
+            ci = completions[6];
+            Assert.AreEqual(nameof(Rhino.Geometry.Polyline), ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Assignment_Imported_ImmutableDictionary()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System.Collections.Immutable;
+using Rhino.Geometry;
+ImmutableDictionary<int, int> d = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 2);
+
+            CompletionInfo ci;
+
+            ci = completions[0];
+            Assert.AreEqual(nameof(System.Collections.Immutable.ImmutableDictionary), ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            Assert.AreEqual(nameof(System.Collections.Immutable.ImmutableDictionary), ci.CommitText);
+
+            ci = completions[1];
+            Assert.AreEqual(nameof(System.Collections.Immutable.ImmutableDictionary) + "<TKey, TValue>", ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            Assert.AreEqual(nameof(System.Collections.Immutable.ImmutableDictionary), ci.CommitText);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Assignment_Imported_Enum()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System.Collections;
+using System.Collections.Generic;
+using Rhino.Geometry;
+Continuity c = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 14);
+
+            string n;
+            CompletionInfo ci;
+
+            n = nameof(Rhino.Geometry.Continuity);
+            ci = completions[0];
+            Assert.AreEqual(n, ci.Text);
+            Assert.AreEqual(CompletionKind.Enum, ci.Kind);
+            Assert.AreEqual(n, ci.CommitText);
+
+            n = nameof(Rhino.Geometry.Continuity) + '.' + nameof(Rhino.Geometry.Continuity.C1_continuous);
+            ci = completions.First(c => c.Text == n);
+            Assert.AreEqual(n, ci.Text);
+            Assert.AreEqual(CompletionKind.EnumMember, ci.Kind);
+            Assert.AreEqual(n, ci.CommitText);
+
+            n = nameof(Rhino.Geometry.Continuity) + '.' + nameof(Rhino.Geometry.Continuity.C2_locus_continuous);
+            ci = completions.First(c => c.Text == n);
+            Assert.AreEqual(n, ci.Text);
+            Assert.AreEqual(CompletionKind.EnumMember, ci.Kind);
+            Assert.AreEqual(n, ci.CommitText);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Assignment_FieldDeclaration()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using Rhino.Geometry;
+
+class MyClass
+{
+    Plane a =";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 1);
+
+            CompletionInfo ci;
+
+            ci = completions[0];
+            Assert.AreEqual(nameof(Rhino.Geometry.Plane), ci.Text);
+            Assert.AreEqual(CompletionKind.Struct, ci.Kind);
+            Assert.AreEqual(nameof(Rhino.Geometry.Plane), ci.CommitText);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Assignment_PropertyDeclaration()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using Rhino.Geometry;
+
+class MyClass
+{
+    public ArcCurve M { get; set; }  = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 1);
+
+            CompletionInfo ci;
+
+            ci = completions[0];
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.CommitText);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Assignment_Using()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using Rhino.Geometry;
+
+using(ArcCurve f = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 1);
+
+            CompletionInfo ci;
+
+            ci = completions[0];
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.CommitText);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Assignment_Detect()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using Rhino.Geometry;
+
+ArcCurve m;
+
+m = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 1);
+
+            CompletionInfo ci;
+
+            ci = completions[0];
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.CommitText);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Assignment_Detect_Qualified()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using Rhino.Geometry;
+
+Rhino.Geometry.ArcCurve m;
+
+m = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 1);
+
+            CompletionInfo ci;
+
+            ci = completions[0];
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.Text);
+            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.CommitText);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Enum()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System.Collections;
+using System.Collections.Generic;
+using Rhino.Geometry;
+Continuity c = Continuity.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.AreEqual(13, completions.Length);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_AbstractType_ObjectDeclaration()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using Rhino.Geometry;
+System.Drawing.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            CompletionInfo c = completions.First(c => c.Text == "Brush");
+            Assert.AreEqual("Brush", c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_AbstractType_ObjectAssignment()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System.Drawing;
+using Rhino.Geometry;
+System.Drawing.Brush b = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            CompletionInfo c = completions.First(c => c.Text == "Brush");
+            Assert.AreEqual("Brush", c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+        }
+
+        static IEnumerable<TestCaseData> GetCompleteKeywordsCases()
+        {
+            yield return new(@"// #! csharp
+using Rhino.Geometry;
+")
+            { TestName = nameof(TestCSharp_Complete_Keywords) + "_Any" };
+
+            yield return new(@"// #! csharp
+using Rhino.Geometry;
+
+class D {
+    public void Test()
+    { ")
+            { TestName = nameof(TestCSharp_Complete_Keywords) + "_Class" };
+        }
+
+        [Test, TestCaseSource(nameof(GetCompleteKeywordsCases))]
+        public void TestCSharp_Complete_Keywords(string s)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 1);
+
+            CompletionInfo ci;
+
+            ci = completions.First(c => c.Text == "this");
+            Assert.AreEqual("this", ci.Text);
+            Assert.AreEqual(CompletionKind.Keyword, ci.Kind);
+
+            ci = completions.First(c => c.Text == "catch");
+            Assert.AreEqual("catch", ci.Text);
+            Assert.AreEqual(CompletionKind.Keyword, ci.Kind);
+
+            ci = completions.First(c => c.Text == "unmanaged");
+            Assert.AreEqual("unmanaged", ci.Text);
+            Assert.AreEqual(CompletionKind.Keyword, ci.Kind);
+
+            ci = completions.First(c => c.Text == "yield");
+            Assert.AreEqual("yield", ci.Text);
+            Assert.AreEqual(CompletionKind.Keyword, ci.Kind);
+        }
+
+        static IEnumerable<TestCaseData> GetCompleteNotKeywordsCases()
+        {
+            yield return new(@"// #! csharp
+using ")
+            { TestName = nameof(TestCSharp_Complete_Keywords) + "_Using" };
+
+            yield return new(@"// #! csharp
+using Rhino.Geometry;
+
+Plane p = new ")
+            { TestName = nameof(TestCSharp_Complete_Keywords) + "_ObjectCreation" };
+        }
+
+        [Test, TestCaseSource(nameof(GetCompleteNotKeywordsCases))]
+        public void TestCSharp_Complete_NoKeywords(string s)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 1);
+
+            Assert.False(names.Contains("this"));
+            Assert.False(names.Contains("catch"));
+            Assert.False(names.Contains("unmanaged"));
+            Assert.False(names.Contains("yield"));
+        }
+
+        [Test]
+        public void TestCSharp_Complete_LocalSymbols()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using Rhino.Geometry;
+
+Plane p;
+
+";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompleteOptions options = new() { Snippets = true };
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, options).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            CompletionInfo c;
+
+            c = completions.First(c => c.Text == "p");
+            Assert.AreEqual("p", c.Text);
+            Assert.AreEqual(CompletionKind.Variable, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_LocalSymbols_Function()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using Rhino.Geometry;
+
+Plane p;
+
+void Test(int argument)
+{
+    ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompleteOptions options = new() { Snippets = true };
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, options).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            CompletionInfo c;
+
+            c = completions.First(c => c.Text == "argument");
+            Assert.AreEqual("argument", c.Text);
+            Assert.AreEqual(CompletionKind.Variable, c.Kind);
+        }
+
+        protected const string KEYWORD_SORT_PREFIX = "zzkw_";
+
+        [Test]
+        public void TestCSharp_Complete_Snippet_On()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System;
+using Rhino;
+
+i";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompleteOptions options = new() { Snippets = true };
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, options).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            CompletionInfo c;
+
+            c = completions.First(c => c.Text == "if");
+            Assert.AreEqual("if", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
+            c = completions.First(c => c.SortText == KEYWORD_SORT_PREFIX + "if2");
+            Assert.AreEqual("if", c.Text);
+            Assert.AreEqual(CompletionKind.Snippet, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Snippet_Off()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System;
+using Rhino;
+
+i";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompleteOptions options = new() { Snippets = false };
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, options).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            // NOTE:
+            // monaco sorts completions and brings 'if' to the top.
+            // we just find that completion to assert its kind as keyword
+            CompletionInfo c = completions.First(c => c.Text == "if");
+            Assert.AreEqual("if", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Snippet_On_For_ForEach()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System;
+using Rhino;
+
+f";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompleteOptions options = new() { Snippets = true };
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, options).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            CompletionInfo c;
+
+            c = completions.First(c => c.Text == "for");
+            Assert.AreEqual("for", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
+            c = completions.First(c => c.SortText == KEYWORD_SORT_PREFIX + "for2");
+            Assert.AreEqual("for", c.Text);
+            Assert.AreEqual(CompletionKind.Snippet, c.Kind);
+
+            c = completions.First(c => c.Text == "foreach");
+            Assert.AreEqual("foreach", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
+            c = completions.First(c => c.SortText == KEYWORD_SORT_PREFIX + "foreach2");
+            Assert.AreEqual("foreach", c.Text);
+            Assert.AreEqual(CompletionKind.Snippet, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Snippet_On_While()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System;
+using Rhino;
+
+w";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompleteOptions options = new() { Snippets = true };
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, options).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            CompletionInfo c;
+
+            c = completions.First(c => c.Text == "while");
+            Assert.AreEqual("while", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
+            c = completions.First(c => c.SortText == KEYWORD_SORT_PREFIX + "while2");
+            Assert.AreEqual("while", c.Text);
+            Assert.AreEqual(CompletionKind.Snippet, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Snippet_On_DoWhile()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System;
+using Rhino;
+
+d";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompleteOptions options = new() { Snippets = true };
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, options).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            CompletionInfo c;
+
+            c = completions.First(c => c.Text == "do");
+            Assert.AreEqual("do", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
+            c = completions.First(c => c.SortText == KEYWORD_SORT_PREFIX + "do2");
+            Assert.AreEqual("do", c.Text);
+            Assert.AreEqual(CompletionKind.Snippet, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Snippet_On_Switch()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System;
+using Rhino;
+
+s";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompleteOptions options = new() { Snippets = true };
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, options).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            CompletionInfo c;
+
+            c = completions.First(c => c.Text == "switch");
+            Assert.AreEqual("switch", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
+            c = completions.First(c => c.SortText == KEYWORD_SORT_PREFIX + "switch2");
+            Assert.AreEqual("switch", c.Text);
+            Assert.AreEqual(CompletionKind.Snippet, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Signature_New()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System;
+using Rhino;
+
+new Rhino.Geometry.Mesh(";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @")");
+
+            SignatureInfo[] signatures = CompleteSignatureAtPosition(code, s.Length).ToArray();
+
+            Assert.IsNotEmpty(signatures);
+
+            SignatureInfo si;
+
+            si = signatures.ElementAt(0);
+
+            Assert.AreEqual("Mesh()", si.Text);
+            Assert.AreEqual(0, si.Parameters.Length);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Signature_NoNew()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System;
+using Rhino;
+
+Rhino.Geometry.Mesh(";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @")");
+
+            SignatureInfo[] signatures = CompleteSignatureAtPosition(code, s.Length).ToArray();
+
+            Assert.IsEmpty(signatures);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Signature_NewPlane()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System;
+using Rhino;
+
+new Rhino.Geometry.Plane(";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @")");
+
+            SignatureInfo[] signatures = CompleteSignatureAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(signatures.Length, 6);
+
+            SignatureInfo si;
+
+            si = signatures.ElementAt(0);
+            Assert.AreEqual("Plane()", si.Text);
+            Assert.AreEqual(0, si.Parameters.Length);
+
+            si = signatures.ElementAt(1);
+            Assert.AreEqual(1, si.Parameters.Length);
+
+            si = signatures.ElementAt(2);
+            Assert.AreEqual(2, si.Parameters.Length);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Signature_ScriptInstance_This_RhinoDocument()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86458
+            string s = @"// #! csharp
+using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(object x, object y, ref object a)
+    {
+        this.RhinoDocument.ReadFileVersion(";
+            var script = new Grasshopper1Script(s + @")
+    }
+}
+");
+
+            Code code = script.CreateCode();
+
+            SignatureInfo[] signatures = CompleteSignatureAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(signatures.Length, 1);
+
+            SignatureInfo si;
+
+            si = signatures.ElementAt(0);
+            Assert.AreEqual("Int32 ReadFileVersion()", si.Text);
+            Assert.True(!string.IsNullOrWhiteSpace(si.Description));
+            Assert.AreEqual(0, si.Parameters.Length);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Signature_ScriptInstance_This_RhinoDocument_ObjectFindId()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86458
+            string s = @"// #! csharp
+using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(object x, object y, ref object a)
+    {
+        this.RhinoDocument.Objects.Find(";
+            var script = new Grasshopper1Script(s + @")
+    }
+}
+");
+
+            Code code = script.CreateCode();
+
+            SignatureInfo[] signatures = CompleteSignatureAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(signatures.Length, 2);
+
+            SignatureInfo si;
+
+            si = signatures.ElementAt(0);
+            Assert.True(si.Text.Contains("Find(Guid objectId)"));
+            Assert.True(!string.IsNullOrWhiteSpace(si.Description));
+            Assert.AreEqual(1, si.Parameters.Length);
+
+            si = signatures.ElementAt(1);
+            Assert.True(si.Text.Contains("Find(UInt32 runtimeSerialNumber)"));
+            Assert.True(!string.IsNullOrWhiteSpace(si.Description));
+            Assert.AreEqual(1, si.Parameters.Length);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Signature_ScriptInstance_This_Component_AddedToDocument()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86458
+            string s = @"// #! csharp
+using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(object x, object y, ref object a)
+    {
+        this.Component.AddedToDocument(";
+            var script = new Grasshopper1Script(s + @")
+    }
+}
+");
+            Code code = script.CreateCode();
+
+            SignatureInfo[] signatures = CompleteSignatureAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(signatures.Length, 1);
+
+            SignatureInfo si;
+
+            si = signatures.ElementAt(0);
+            Assert.True(si.Text.Contains("void AddedToDocument(GH_Document document)"));
+            Assert.True(!string.IsNullOrWhiteSpace(si.Description));
+            Assert.AreEqual(1, si.Parameters.Length);
         }
 #endif
 
