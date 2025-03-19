@@ -4870,6 +4870,21 @@ Line m = new ";
         }
 
         [Test]
+        public void TestCSharp_Complete_NoAnalytics()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            string[] names = completions.Select(c => c.Text).ToArray();
+
+            Assert.False(names.Contains("Analytics"));
+        }
+
+        [Test]
         public void TestCSharp_Complete_Usings_Order()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
