@@ -6306,7 +6306,7 @@ public class Script_Instance : GH_ScriptInstance
 
             CompletionInfo[] completions = CompleteAtPosition(code, position).ToArray();
 
-            Assert.GreaterOrEqual(completions.Length, 17);
+            Assert.GreaterOrEqual(completions.Length, 16);
 
             CompletionInfo c;
 
@@ -6314,122 +6314,131 @@ public class Script_Instance : GH_ScriptInstance
 
             c = completions.ElementAt(0);
             Assert.AreEqual("ClippingBox", c.Text);
-            Assert.AreEqual($@"BoundingBox ClippingBox
+            Assert.AreEqual($@"public override BoundingBox ClippingBox
 {{
 {TAB}get => base.ClippingBox;
 }}", c.CommitText);
+            Assert.AreNotEqual(TextRange.Empty, c.Range);
 
             c = completions.ElementAt(1);
             Assert.AreEqual("AfterRunScript()", c.Text);
-            Assert.AreEqual($@"void AfterRunScript()
+            Assert.AreEqual($@"public override void AfterRunScript()
 {{
 {TAB}base.AfterRunScript();
 }}", c.CommitText);
+            Assert.AreNotEqual(TextRange.Empty, c.Range);
 
             c = completions.ElementAt(2);
             Assert.AreEqual("AppendAdditionalMenuItems(ToolStripDropDown menu)", c.Text);
-            Assert.AreEqual($@"void AppendAdditionalMenuItems(ToolStripDropDown menu)
+            Assert.AreEqual($@"public override void AppendAdditionalMenuItems(ToolStripDropDown menu)
 {{
 {TAB}base.AppendAdditionalMenuItems(menu);
 }}", c.CommitText);
+            Assert.AreNotEqual(TextRange.Empty, c.Range);
 
             c = completions.ElementAt(3);
             Assert.AreEqual("BeforeRunScript()", c.Text);
-            Assert.AreEqual($@"void BeforeRunScript()
+            Assert.AreEqual($@"public override void BeforeRunScript()
 {{
 {TAB}base.BeforeRunScript();
 }}", c.CommitText);
+            Assert.AreNotEqual(TextRange.Empty, c.Range);
 
             c = completions.ElementAt(4);
             Assert.AreEqual("DrawViewportMeshes(IGH_PreviewArgs args)", c.Text);
-            Assert.AreEqual($@"void DrawViewportMeshes(IGH_PreviewArgs args)
+            Assert.AreEqual($@"public override void DrawViewportMeshes(IGH_PreviewArgs args)
 {{
 {TAB}base.DrawViewportMeshes(args);
 }}", c.CommitText);
+            Assert.AreNotEqual(TextRange.Empty, c.Range);
 
             c = completions.ElementAt(5);
             Assert.AreEqual("DrawViewportWires(IGH_PreviewArgs args)", c.Text);
-            Assert.AreEqual($@"void DrawViewportWires(IGH_PreviewArgs args)
+            Assert.AreEqual($@"public override void DrawViewportWires(IGH_PreviewArgs args)
 {{
 {TAB}base.DrawViewportWires(args);
 }}", c.CommitText);
+            Assert.AreNotEqual(TextRange.Empty, c.Range);
 
             c = completions.ElementAt(6);
             Assert.AreEqual("Initialize()", c.Text);
-            Assert.AreEqual($@"void Initialize()
+            Assert.AreEqual($@"protected override void Initialize()
 {{
 {TAB}base.Initialize();
 }}", c.CommitText);
+            Assert.AreNotEqual(TextRange.Empty, c.Range);
 
             c = completions.ElementAt(7);
             Assert.AreEqual("InvokeRunScript(RunContext context, Code code)", c.Text);
-            Assert.AreEqual($@"void InvokeRunScript(RunContext context, Code code)
+            Assert.AreEqual($@"public override void InvokeRunScript(RunContext context, Code code)
 {{
 {TAB}base.InvokeRunScript(context, code);
 }}", c.CommitText);
+            Assert.AreNotEqual(TextRange.Empty, c.Range);
 
             c = completions.ElementAt(8);
-            Assert.AreEqual("InvokeRunScript(IGH_Component owner, object rhinoDocument, int iteration, List<object> inputs, IGH_DataAccess DA)", c.Text);
-            Assert.AreEqual($@"void InvokeRunScript(IGH_Component owner, object rhinoDocument, int iteration, List<object> inputs, IGH_DataAccess DA)
-{{
-{TAB}throw new NotImplementedException();
-}}", c.CommitText);
-
-            c = completions.ElementAt(9);
             Assert.AreEqual("Print(string text)", c.Text);
-            Assert.AreEqual($@"void Print(string text)
+            Assert.AreEqual($@"public override void Print(string text)
 {{
 {TAB}base.Print(text);
 }}", c.CommitText);
+            Assert.AreNotEqual(TextRange.Empty, c.Range);
 
-            c = completions.ElementAt(10);
+            c = completions.ElementAt(9);
             Assert.AreEqual("Print(string format, params object[] args)", c.Text);
-            Assert.AreEqual($@"void Print(string format, params object[] args)
+            Assert.AreEqual($@"public override void Print(string format, params object[] args)
 {{
 {TAB}base.Print(format, args);
 }}", c.CommitText);
+            Assert.AreNotEqual(TextRange.Empty, c.Range);
 
-            c = completions.ElementAt(11);
+            c = completions.ElementAt(10);
             Assert.AreEqual("Reflect(object obj)", c.Text);
-            Assert.AreEqual($@"void Reflect(object obj)
+            Assert.AreEqual($@"public override void Reflect(object obj)
 {{
 {TAB}base.Reflect(obj);
 }}", c.CommitText);
+            Assert.AreNotEqual(TextRange.Empty, c.Range);
 
-            c = completions.ElementAt(12);
+            c = completions.ElementAt(11);
             Assert.AreEqual("Reflect(object obj, string method_name)", c.Text);
-            Assert.AreEqual($@"void Reflect(object obj, string method_name)
+            Assert.AreEqual($@"public override void Reflect(object obj, string method_name)
 {{
 {TAB}base.Reflect(obj, method_name);
 }}", c.CommitText);
+            Assert.AreNotEqual(TextRange.Empty, c.Range);
 
-            c = completions.ElementAt(13);
+            c = completions.ElementAt(12);
             Assert.AreEqual("Dispose()", c.Text);
-            Assert.AreEqual($@"void Dispose()
+            Assert.AreEqual($@"protected override void Dispose()
 {{
 {TAB}base.Dispose();
 }}", c.CommitText);
+            Assert.AreNotEqual(TextRange.Empty, c.Range);
 
-            c = completions.ElementAt(14);
+            c = completions.ElementAt(13);
             Assert.AreEqual("Equals(object obj)", c.Text);
-            Assert.AreEqual($@"bool Equals(object obj)
+            Assert.AreEqual($@"public override bool Equals(object obj)
 {{
 {TAB}return base.Equals(obj);
 }}", c.CommitText);
+            Assert.AreNotEqual(TextRange.Empty, c.Range);
 
-            c = completions.ElementAt(15);
+            c = completions.ElementAt(14);
             Assert.AreEqual("GetHashCode()", c.Text);
-            Assert.AreEqual($@"int GetHashCode()
+            Assert.AreEqual($@"public override int GetHashCode()
 {{
 {TAB}return base.GetHashCode();
 }}", c.CommitText);
+            Assert.AreNotEqual(TextRange.Empty, c.Range);
 
-            c = completions.ElementAt(16);
+            c = completions.ElementAt(15);
             Assert.AreEqual("ToString()", c.Text);
-            Assert.AreEqual($@"string ToString()
+            Assert.AreEqual($@"public override string ToString()
 {{
 {TAB}return base.ToString();
 }}", c.CommitText);
+            Assert.AreNotEqual(TextRange.Empty, c.Range);
         }
 
         [Test]
@@ -6648,6 +6657,102 @@ var v = Rhino.Geometry.Intersect.Intersection.BrepBrep(b, b, tolerance, out Curv
         }
 
         [Test]
+        public void TestCSharp_Complete_Arguments_TrueFalse_On_Bool()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86659
+            string s = @"// #! csharp
+using System;
+using Rhino;
+
+RhinoApp.RunScript(0, "", "", ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            string[] names = completions.Select(c => c.Text).ToArray();
+
+            Assert.Contains("true", names);
+            Assert.Contains("false", names);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Arguments_Empty_Last()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86659
+            string s = @"// #! csharp
+using System;
+using Rhino;
+
+RhinoApp.RunScript(0, """", """", false,";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.IsEmpty(completions);
+        }
+
+        static IEnumerable<TestCaseData> TestCSharpCompleteArgumentsEmptyLastScriptInstanceCases()
+        {
+            string s;
+
+            s = @"// #! csharp
+using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(object x, object y, ref object a)
+    {
+        this.RhinoDocument.Objects.Add(GeometryBase.FromJSON("""",";
+            yield return new(s) { TestName = nameof(TestCSharp_Complete_Arguments_Empty_Last_ScriptInstance) + "_FromJSON" };
+
+            s = @"// #! csharp
+using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(object x, object y, ref object a)
+    {
+        this.AddRuntimeMessage(GH_RuntimeMessageLevel.Blank, """",";
+            yield return new(s) { TestName = nameof(TestCSharp_Complete_Arguments_Empty_Last_ScriptInstance) + "_FromJSON" };
+        }
+
+        [Test, TestCaseSource(nameof(TestCSharpCompleteArgumentsEmptyLastScriptInstanceCases))]
+        public void TestCSharp_Complete_Arguments_Empty_Last_ScriptInstance(string s)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86659
+            var script = new Grasshopper1Script(s);
+            Code code = script.CreateCode();
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.IsEmpty(completions);
+        }
+
+        [Test]
         public void TestCSharp_Complete_Members_Eto()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
@@ -6677,6 +6782,34 @@ class TexCell : TextBoxCell
             c = completions[19];
             Assert.AreEqual("TextAlignment", c.Text);
             Assert.AreEqual(CompletionKind.Property, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Members_Namespaces_EtoDrawing_SystemDrawing()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86658
+            string s = @"
+using System.Drawing;
+using Eto.Drawing;
+
+Color c = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.Greater(completions.Length, 1);
+
+            CompletionInfo c;
+
+            c = completions[0];
+            Assert.AreEqual("Color", c.Text);
+            Assert.AreEqual(CompletionKind.Struct, c.Kind);
+            Assert.AreEqual("Eto.Drawing", c.Description);
+
+            c = completions[1];
+            Assert.AreEqual("Color", c.Text);
+            Assert.AreEqual(CompletionKind.Struct, c.Kind);
+            Assert.AreEqual("System.Drawing", c.Description);
         }
 
 #endif
