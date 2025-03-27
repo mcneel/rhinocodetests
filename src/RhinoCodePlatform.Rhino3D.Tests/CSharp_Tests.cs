@@ -4908,9 +4908,9 @@ Line m = new ";
 
             Assert.GreaterOrEqual(completions.Length, 1);
 
-            CompletionInfo ci = completions[0];
-            Assert.AreEqual("Line", ci.Text);
-            Assert.AreEqual(CompletionKind.Struct, ci.Kind);
+            CompletionInfo c = completions[0];
+            Assert.AreEqual("Line", c.Text);
+            Assert.AreEqual(CompletionKind.Struct, c.Kind);
         }
 
         [Test]
@@ -5240,9 +5240,9 @@ Plane p = new ", "Plane", CompletionKind.Struct)
 
             Assert.GreaterOrEqual(completions.Length, 1);
 
-            CompletionInfo ci = completions[0];
-            Assert.AreEqual(expectedText, ci.Text);
-            Assert.AreEqual(expectedKind, ci.Kind);
+            CompletionInfo c = completions[0];
+            Assert.AreEqual(expectedText, c.Text);
+            Assert.AreEqual(expectedKind, c.Kind);
         }
 
         [Test]
@@ -5273,10 +5273,10 @@ List<int> f = new ";
 
             Assert.GreaterOrEqual(completions.Length, 1);
 
-            CompletionInfo ci = completions[0];
-            Assert.AreEqual("List<T>", ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
-            Assert.AreEqual("List", ci.CommitText);
+            CompletionInfo c = completions[0];
+            Assert.AreEqual("List<T>", c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            Assert.AreEqual("List", c.CommitText);
         }
 
         [Test]
@@ -5294,28 +5294,28 @@ IList t = new ";
 
             Assert.GreaterOrEqual(completions.Length, 5);
 
-            CompletionInfo ci;
+            CompletionInfo c;
 
-            ci = completions[0];
-            Assert.AreEqual(nameof(System.Collections.ArrayList), ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            c = completions[0];
+            Assert.AreEqual(nameof(System.Collections.ArrayList), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
 
-            ci = completions[1];
-            Assert.AreEqual(nameof(System.Collections.CollectionBase), ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            c = completions[1];
+            Assert.AreEqual(nameof(System.Collections.CollectionBase), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
 
-            ci = completions[2];
-            Assert.AreEqual(nameof(Rhino.Geometry.Interpolator), ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            c = completions[2];
+            Assert.AreEqual("List<T>", c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            Assert.AreEqual("List", c.CommitText);
 
-            ci = completions[3];
-            Assert.AreEqual("List<T>", ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
-            Assert.AreEqual("List", ci.CommitText);
+            c = completions[3];
+            Assert.AreEqual(nameof(Rhino.Geometry.Polyline), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
 
-            ci = completions[4];
-            Assert.AreEqual(nameof(Rhino.Geometry.Polyline), ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            c = completions[4];
+            Assert.AreEqual(nameof(Rhino.Geometry.Interpolator), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
         }
 
         [Test]
@@ -5333,22 +5333,22 @@ var m = new ";
 
             Assert.IsNotEmpty(completions);
 
-            CompletionInfo ci;
+            CompletionInfo c;
 
-            ci = completions.First(c => c.Text == "BitArray");
-            Assert.AreEqual(nameof(System.Collections.BitArray), ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
-            Assert.AreEqual(nameof(System.Collections.BitArray), ci.CommitText);
+            c = completions.First(c => c.Text == "BitArray");
+            Assert.AreEqual(nameof(System.Collections.BitArray), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            Assert.AreEqual(nameof(System.Collections.BitArray), c.CommitText);
 
-            ci = completions.First(c => c.Text == "KeyValuePair");
-            Assert.AreEqual(nameof(System.Collections.Generic.KeyValuePair), ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
-            Assert.AreEqual(nameof(System.Collections.Generic.KeyValuePair), ci.CommitText);
+            c = completions.First(c => c.Text == "KeyValuePair");
+            Assert.AreEqual(nameof(System.Collections.Generic.KeyValuePair), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            Assert.AreEqual(nameof(System.Collections.Generic.KeyValuePair), c.CommitText);
 
-            ci = completions.First(c => c.Text == "ArcCurve");
-            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
-            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.CommitText);
+            c = completions.First(c => c.Text == "ArcCurve");
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), c.CommitText);
         }
 
         [Test]
@@ -5390,39 +5390,48 @@ IList t = ";
 
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
 
-            Assert.GreaterOrEqual(completions.Length, 7);
+            Assert.GreaterOrEqual(completions.Length, 9);
 
-            CompletionInfo ci;
+            CompletionInfo c;
 
-            ci = completions[0];
-            Assert.AreEqual(nameof(System.Collections.ArrayList), ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            c = completions[0];
+            Assert.AreEqual(nameof(System.Collections.ArrayList), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
 
-            ci = completions[1];
-            Assert.AreEqual(nameof(System.Collections.CollectionBase), ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            c = completions[1];
+            Assert.AreEqual(nameof(System.Collections.IList), c.Text);
+            Assert.AreEqual(CompletionKind.Interface, c.Kind);
 
-            ci = completions[2];
-            Assert.AreEqual(nameof(System.Collections.IList), ci.Text);
-            Assert.AreEqual(CompletionKind.Interface, ci.Kind);
+            c = completions[2];
+            Assert.AreEqual(nameof(System.Collections.IList) + "<T>", c.Text);
+            Assert.AreEqual(CompletionKind.Interface, c.Kind);
+            Assert.AreEqual(nameof(System.Collections.IList), c.CommitText);
 
-            ci = completions[3];
-            Assert.AreEqual(nameof(System.Collections.IList) + "<T>", ci.Text);
-            Assert.AreEqual(CompletionKind.Interface, ci.Kind);
-            Assert.AreEqual(nameof(System.Collections.IList), ci.CommitText);
+            c = completions[3];
+            Assert.AreEqual(nameof(System.Collections.CollectionBase), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
 
-            ci = completions[4];
-            Assert.AreEqual(nameof(Rhino.Geometry.Interpolator), ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            c = completions[4];
+            Assert.AreEqual("List<T>", c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            Assert.AreEqual("List", c.CommitText);
 
-            ci = completions[5];
-            Assert.AreEqual("List<T>", ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
-            Assert.AreEqual("List", ci.CommitText);
+            c = completions[5];
+            Assert.AreEqual(nameof(Rhino.Geometry.Polyline), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
 
-            ci = completions[6];
-            Assert.AreEqual(nameof(Rhino.Geometry.Polyline), ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
+            c = completions[6];
+            Assert.AreEqual(nameof(Rhino.Geometry.Interpolator), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+
+            c = completions[7];
+            Assert.AreEqual("new", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
+            c = completions[8];
+            Assert.AreEqual("default", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
         }
 
         [Test]
@@ -5437,19 +5446,27 @@ ImmutableDictionary<int, int> d = ";
 
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
 
-            Assert.GreaterOrEqual(completions.Length, 2);
+            Assert.GreaterOrEqual(completions.Length, 4);
 
-            CompletionInfo ci;
+            CompletionInfo c;
 
-            ci = completions[0];
-            Assert.AreEqual(nameof(System.Collections.Immutable.ImmutableDictionary), ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
-            Assert.AreEqual(nameof(System.Collections.Immutable.ImmutableDictionary), ci.CommitText);
+            c = completions[0];
+            Assert.AreEqual(nameof(System.Collections.Immutable.ImmutableDictionary), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            Assert.AreEqual(nameof(System.Collections.Immutable.ImmutableDictionary), c.CommitText);
 
-            ci = completions[1];
-            Assert.AreEqual(nameof(System.Collections.Immutable.ImmutableDictionary) + "<TKey, TValue>", ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
-            Assert.AreEqual(nameof(System.Collections.Immutable.ImmutableDictionary), ci.CommitText);
+            c = completions[1];
+            Assert.AreEqual(nameof(System.Collections.Immutable.ImmutableDictionary) + "<TKey, TValue>", c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            Assert.AreEqual(nameof(System.Collections.Immutable.ImmutableDictionary), c.CommitText);
+
+            c = completions[2];
+            Assert.AreEqual("new", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
+            c = completions[3];
+            Assert.AreEqual("default", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
         }
 
         [Test]
@@ -5468,25 +5485,25 @@ Continuity c = ";
             Assert.GreaterOrEqual(completions.Length, 14);
 
             string n;
-            CompletionInfo ci;
+            CompletionInfo c;
 
             n = nameof(Rhino.Geometry.Continuity);
-            ci = completions[0];
-            Assert.AreEqual(n, ci.Text);
-            Assert.AreEqual(CompletionKind.Enum, ci.Kind);
-            Assert.AreEqual(n, ci.CommitText);
+            c = completions[0];
+            Assert.AreEqual(n, c.Text);
+            Assert.AreEqual(CompletionKind.Enum, c.Kind);
+            Assert.AreEqual(n, c.CommitText);
 
             n = nameof(Rhino.Geometry.Continuity) + '.' + nameof(Rhino.Geometry.Continuity.C1_continuous);
-            ci = completions.First(c => c.Text == n);
-            Assert.AreEqual(n, ci.Text);
-            Assert.AreEqual(CompletionKind.EnumMember, ci.Kind);
-            Assert.AreEqual(n, ci.CommitText);
+            c = completions.First(c => c.Text == n);
+            Assert.AreEqual(n, c.Text);
+            Assert.AreEqual(CompletionKind.EnumMember, c.Kind);
+            Assert.AreEqual(n, c.CommitText);
 
             n = nameof(Rhino.Geometry.Continuity) + '.' + nameof(Rhino.Geometry.Continuity.C2_locus_continuous);
-            ci = completions.First(c => c.Text == n);
-            Assert.AreEqual(n, ci.Text);
-            Assert.AreEqual(CompletionKind.EnumMember, ci.Kind);
-            Assert.AreEqual(n, ci.CommitText);
+            c = completions.First(c => c.Text == n);
+            Assert.AreEqual(n, c.Text);
+            Assert.AreEqual(CompletionKind.EnumMember, c.Kind);
+            Assert.AreEqual(n, c.CommitText);
         }
 
         [Test]
@@ -5503,14 +5520,22 @@ class MyClass
 
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
 
-            Assert.GreaterOrEqual(completions.Length, 1);
+            Assert.GreaterOrEqual(completions.Length, 3);
 
-            CompletionInfo ci;
+            CompletionInfo c;
 
-            ci = completions[0];
-            Assert.AreEqual(nameof(Rhino.Geometry.Plane), ci.Text);
-            Assert.AreEqual(CompletionKind.Struct, ci.Kind);
-            Assert.AreEqual(nameof(Rhino.Geometry.Plane), ci.CommitText);
+            c = completions[0];
+            Assert.AreEqual(nameof(Rhino.Geometry.Plane), c.Text);
+            Assert.AreEqual(CompletionKind.Struct, c.Kind);
+            Assert.AreEqual(nameof(Rhino.Geometry.Plane), c.CommitText);
+
+            c = completions[1];
+            Assert.AreEqual("new", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
+            c = completions[2];
+            Assert.AreEqual("default", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
         }
 
         [Test]
@@ -5527,14 +5552,22 @@ class MyClass
 
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
 
-            Assert.GreaterOrEqual(completions.Length, 1);
+            Assert.GreaterOrEqual(completions.Length, 3);
 
-            CompletionInfo ci;
+            CompletionInfo c;
 
-            ci = completions[0];
-            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
-            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.CommitText);
+            c = completions[0];
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), c.CommitText);
+
+            c = completions[1];
+            Assert.AreEqual("new", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
+            c = completions[2];
+            Assert.AreEqual("default", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
         }
 
         [Test]
@@ -5549,14 +5582,22 @@ using(ArcCurve f = ";
 
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
 
-            Assert.GreaterOrEqual(completions.Length, 1);
+            Assert.GreaterOrEqual(completions.Length, 3);
 
-            CompletionInfo ci;
+            CompletionInfo c;
 
-            ci = completions[0];
-            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
-            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.CommitText);
+            c = completions[0];
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), c.CommitText);
+
+            c = completions[1];
+            Assert.AreEqual("new", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
+            c = completions[2];
+            Assert.AreEqual("default", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
         }
 
         [Test]
@@ -5575,12 +5616,20 @@ m = ";
 
             Assert.GreaterOrEqual(completions.Length, 1);
 
-            CompletionInfo ci;
+            CompletionInfo c;
 
-            ci = completions[0];
-            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
-            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.CommitText);
+            c = completions[0];
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), c.CommitText);
+
+            c = completions[1];
+            Assert.AreEqual("new", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
+            c = completions[2];
+            Assert.AreEqual("default", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
         }
 
         [Test]
@@ -5599,12 +5648,20 @@ m = ";
 
             Assert.GreaterOrEqual(completions.Length, 1);
 
-            CompletionInfo ci;
+            CompletionInfo c;
 
-            ci = completions[0];
-            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.Text);
-            Assert.AreEqual(CompletionKind.Class, ci.Kind);
-            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), ci.CommitText);
+            c = completions[0];
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            Assert.AreEqual(nameof(Rhino.Geometry.ArcCurve), c.CommitText);
+
+            c = completions[1];
+            Assert.AreEqual("new", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
+            c = completions[2];
+            Assert.AreEqual("default", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
         }
 
         [Test]
@@ -5670,7 +5727,8 @@ using Rhino.Geometry;
 
 class D {
     public void Test()
-    { ")
+    {
+        ")
             { TestName = nameof(TestCSharp_Complete_Keywords) + "_Class" };
         }
 
@@ -5684,23 +5742,23 @@ class D {
 
             Assert.GreaterOrEqual(completions.Length, 1);
 
-            CompletionInfo ci;
+            CompletionInfo c;
 
-            ci = completions.First(c => c.Text == "this");
-            Assert.AreEqual("this", ci.Text);
-            Assert.AreEqual(CompletionKind.Keyword, ci.Kind);
+            c = completions.First(c => c.Text == "this");
+            Assert.AreEqual("this", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
 
-            ci = completions.First(c => c.Text == "catch");
-            Assert.AreEqual("catch", ci.Text);
-            Assert.AreEqual(CompletionKind.Keyword, ci.Kind);
+            c = completions.First(c => c.Text == "catch");
+            Assert.AreEqual("catch", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
 
-            ci = completions.First(c => c.Text == "unmanaged");
-            Assert.AreEqual("unmanaged", ci.Text);
-            Assert.AreEqual(CompletionKind.Keyword, ci.Kind);
+            c = completions.First(c => c.Text == "unmanaged");
+            Assert.AreEqual("unmanaged", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
 
-            ci = completions.First(c => c.Text == "yield");
-            Assert.AreEqual("yield", ci.Text);
-            Assert.AreEqual(CompletionKind.Keyword, ci.Kind);
+            c = completions.First(c => c.Text == "yield");
+            Assert.AreEqual("yield", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
         }
 
         static IEnumerable<TestCaseData> GetCompleteNotKeywordsCases()
@@ -6575,25 +6633,25 @@ var m = Test(";
             Assert.GreaterOrEqual(completions.Length, 14);
 
             string n;
-            CompletionInfo ci;
+            CompletionInfo c;
 
             n = nameof(Rhino.Geometry.Continuity);
-            ci = completions[0];
-            Assert.AreEqual(n, ci.Text);
-            Assert.AreEqual(CompletionKind.Enum, ci.Kind);
-            Assert.AreEqual(n, ci.CommitText);
+            c = completions[0];
+            Assert.AreEqual(n, c.Text);
+            Assert.AreEqual(CompletionKind.Enum, c.Kind);
+            Assert.AreEqual(n, c.CommitText);
 
             n = nameof(Rhino.Geometry.Continuity) + '.' + nameof(Rhino.Geometry.Continuity.C1_continuous);
-            ci = completions.First(c => c.Text == n);
-            Assert.AreEqual(n, ci.Text);
-            Assert.AreEqual(CompletionKind.EnumMember, ci.Kind);
-            Assert.AreEqual(n, ci.CommitText);
+            c = completions.First(c => c.Text == n);
+            Assert.AreEqual(n, c.Text);
+            Assert.AreEqual(CompletionKind.EnumMember, c.Kind);
+            Assert.AreEqual(n, c.CommitText);
 
             n = nameof(Rhino.Geometry.Continuity) + '.' + nameof(Rhino.Geometry.Continuity.C2_locus_continuous);
-            ci = completions.First(c => c.Text == n);
-            Assert.AreEqual(n, ci.Text);
-            Assert.AreEqual(CompletionKind.EnumMember, ci.Kind);
-            Assert.AreEqual(n, ci.CommitText);
+            c = completions.First(c => c.Text == n);
+            Assert.AreEqual(n, c.Text);
+            Assert.AreEqual(CompletionKind.EnumMember, c.Kind);
+            Assert.AreEqual(n, c.CommitText);
         }
 
         [Test]
@@ -6755,6 +6813,10 @@ var v = Rhino.Geometry.Intersect.Intersection.BrepBrep(b, b, tolerance, out Curv
             Assert.AreEqual(CompletionKind.Keyword, c.Kind);
 
             c = completions[1];
+            Assert.AreEqual("out Point3d[] ", c.Text);
+            Assert.AreEqual(CompletionKind.Snippet, c.Kind);
+
+            c = completions[2];
             Assert.AreEqual("curves", c.Text);
             Assert.AreEqual(CompletionKind.Variable, c.Kind);
         }
@@ -6900,7 +6962,7 @@ Color c = ";
 
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
 
-            Assert.Greater(completions.Length, 1);
+            Assert.Greater(completions.Length, 4);
 
             CompletionInfo c;
 
@@ -6913,6 +6975,14 @@ Color c = ";
             Assert.AreEqual("Color", c.Text);
             Assert.AreEqual(CompletionKind.Struct, c.Kind);
             Assert.AreEqual("System.Drawing", c.Description);
+
+            c = completions[2];
+            Assert.AreEqual("new", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
+            c = completions[3];
+            Assert.AreEqual("default", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
         }
 
         [Test]
@@ -6989,13 +7059,13 @@ class D : Rhino.Input.Custom.GetString
             Assert.AreEqual(CompletionKind.Keyword, c.Kind);
 
             c = completions[1];
+            Assert.AreEqual("true", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
+            c = completions[2];
             Assert.AreEqual("result", c.Text);
             Assert.AreEqual(CompletionKind.Variable, c.Kind);
             Assert.AreEqual(string.Empty, c.Description);
-
-            c = completions[2];
-            Assert.AreEqual("true", c.Text);
-            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
 
             c = completions[3];
             Assert.AreEqual("bool", c.Text);
@@ -7033,6 +7103,155 @@ Brep LocalFunc()
             Assert.AreEqual("Brep", c.Text);
             Assert.AreEqual(CompletionKind.Class, c.Kind);
             Assert.AreEqual("Rhino.Geometry", c.Description);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Complex_TypeArg()
+        {
+            string s = @"
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Globalization;
+
+using Rhino.Runtime.Code.Text;
+using Rhino.Runtime.Code.Diagnostics;
+using Rhino.Runtime.Code.Environments;
+using Rhino.Runtime.Code.Execution;
+
+using Rhino.Runtime.Code.Languages.Roslyn.Core;
+
+namespace Rhino.Runtime.Code.Languages.Roslyn.Core
+{
+    interface IRoslynLanguageSource
+    {
+        void BeginSupport();
+        void EndSupport();
+        IEnumerable<Diagnostic> GetDiagnostics();
+        IEnumerable<HoverInfo> GetHovers(SupportRequest request, int position, HoverOptions options);
+        IEnumerable<CompletionInfo> GetCompletions(SupportRequest request, int position, CompleteOptions options);
+        IEnumerable<Signature";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"Info> GetSignatures(SupportRequest request, int position, CompleteSignatureOptions options);
+    }
+");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 2);
+
+            CompletionInfo c;
+
+            c = completions.First(c => c.Text == "SignatureInfo");
+            Assert.AreEqual(CompletionKind.Struct, c.Kind);
+            Assert.AreEqual("Rhino.Runtime.Code.Languages", c.Description);
+
+            c = completions.First(c => c.Text == "SignatureParamInfo");
+            Assert.AreEqual(CompletionKind.Struct, c.Kind);
+            Assert.AreEqual("Rhino.Runtime.Code.Languages", c.Description);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Complex_NormalArg()
+        {
+            string s = @"
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Globalization;
+
+using Rhino.Runtime.Code.Text;
+using Rhino.Runtime.Code.Diagnostics;
+using Rhino.Runtime.Code.Environments;
+using Rhino.Runtime.Code.Execution;
+
+using Rhino.Runtime.Code.Languages.Roslyn.Core;
+
+namespace Rhino.Runtime.Code.Languages.Roslyn.Core
+{
+    interface IRoslynLanguageSource
+    {
+        void BeginSupport();
+        void EndSupport();
+        IEnumerable<Diagnostic> GetDiagnostics();
+        IEnumerable<HoverInfo> GetHovers(SupportRequest request, int position, HoverOptions options);
+        IEnumerable<CompletionInfo> GetCompletions(SupportRequest request, int position, CompleteOptions options);
+        IEnumerable<SignatureInfo> GetSignatures(SupportRequest request, int position, ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @" options);
+    }
+");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 2);
+
+            CompletionInfo c;
+
+            c = completions.First(c => c.Text == "CompleteOptions");
+            Assert.AreEqual(CompletionKind.Struct, c.Kind);
+            Assert.AreEqual("Rhino.Runtime.Code.Languages", c.Description);
+
+            c = completions.First(c => c.Text == "CompleteSignatureOptions");
+            Assert.AreEqual(CompletionKind.Struct, c.Kind);
+            Assert.AreEqual("Rhino.Runtime.Code.Languages", c.Description);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Complex_SwitchCase_Enum()
+        {
+            string s = @"
+using Rhino.Runtime.Code;
+using Rhino.Runtime.Code.Execution;
+
+public abstract class RoslynCode<TLangVerison> : Code
+{
+    protected override void EndStreams(ResetStreamPolicy resetPolicy)
+    {
+        lock(s_iolock)
+        {
+            if (!s_hasStreams)
+                return;
+
+            TextWriter outstream;
+            TextWriter errstream;
+
+            switch(resetPolicy)
+            {
+                case ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 2);
+
+            CompletionInfo c;
+
+            c = completions[0];
+            Assert.AreEqual(nameof(ResetStreamPolicy), c.Text);
+            Assert.AreEqual(CompletionKind.Enum, c.Kind);
+            Assert.AreEqual("Rhino.Runtime.Code.Execution", c.Description);
+
+            c = completions[1];
+            Assert.AreEqual(nameof(ResetStreamPolicy) + '.' + nameof(ResetStreamPolicy.ResetToPlatformStream), c.Text);
+            Assert.AreEqual(CompletionKind.EnumMember, c.Kind);
+            Assert.AreEqual(string.Empty, c.Description);
+
+            c = completions[2];
+            Assert.AreEqual(nameof(ResetStreamPolicy) + '.' + nameof(ResetStreamPolicy.ResetToStandardStream), c.Text);
+            Assert.AreEqual(CompletionKind.EnumMember, c.Kind);
+            Assert.AreEqual(string.Empty, c.Description);
+
+            c = completions[3];
+            Assert.AreEqual(nameof(ResetStreamPolicy) + '.' + nameof(ResetStreamPolicy.ResetToPreviousStream), c.Text);
+            Assert.AreEqual(CompletionKind.EnumMember, c.Kind);
+            Assert.AreEqual(string.Empty, c.Description);
         }
 #endif
 
