@@ -5461,6 +5461,36 @@ class D : ";
         }
 
         [Test]
+        public void TestCSharp_Complete_Assignment_Bool()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+using System;
+bool k;
+void Test() {}
+k = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 9);
+
+            CompletionInfo c;
+
+            c = completions[0];
+            Assert.AreEqual("false", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
+            c = completions[1];
+            Assert.AreEqual("true", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+
+            c = completions[2];
+            Assert.AreEqual("bool", c.Text);
+            Assert.AreEqual(CompletionKind.Struct, c.Kind);
+        }
+
+        [Test]
         public void TestCSharp_Complete_Assignment_Imported_IList()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
