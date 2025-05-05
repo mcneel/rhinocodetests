@@ -1964,7 +1964,11 @@ public class Script_Instance : GH_ScriptInstance
             TryGetTestFilesPath(out string fileDir);
             ILanguageLibrary library = csharp.CreateLibrary(new Uri(Path.Combine(fileDir, "cs", "test_library_compileguard")));
 
+#if RC8_20
+            Assert.IsTrue(library.TryBuild(new LibraryBuildContext(), out CompileReference cred, out Diagnosis _));
+#else
             Assert.IsTrue(library.TryBuild(new LibraryBuildOptions(), out CompileReference cred, out Diagnosis _));
+#endif
 
             byte[] data = File.ReadAllBytes(cred.Path);
             Assembly a = Assembly.Load(data);
@@ -1986,10 +1990,15 @@ public class Script_Instance : GH_ScriptInstance
 
             // NOTE:
             // using BuildOptions does not add LIBRARY compile guard
+#if RC8_20
+            var context = new LibraryBuildContext();
+            context.CompileGuards.Remove(LibraryBuildOptions.DEFINE_LIBRARY.Identifier);
+            Assert.IsTrue(library.TryBuild(context, out CompileReference cred, out Diagnosis _));
+#else
             var opts = new LibraryBuildOptions();
             opts.CompileGuards.Remove(LibraryBuildOptions.DEFINE_LIBRARY.Identifier);
             Assert.IsTrue(library.TryBuild(opts, out CompileReference cred, out Diagnosis _));
-
+#endif
             byte[] data = File.ReadAllBytes(cred.Path);
             Assembly a = Assembly.Load(data);
 
