@@ -1964,7 +1964,11 @@ public class Script_Instance : GH_ScriptInstance
             TryGetTestFilesPath(out string fileDir);
             ILanguageLibrary library = csharp.CreateLibrary(new Uri(Path.Combine(fileDir, "cs", "test_library_compileguard")));
 
+#if RC8_20
+            Assert.IsTrue(library.TryBuild(new LibraryBuildContext(), out CompileReference cred, out Diagnosis _));
+#else
             Assert.IsTrue(library.TryBuild(new LibraryBuildOptions(), out CompileReference cred, out Diagnosis _));
+#endif
 
             byte[] data = File.ReadAllBytes(cred.Path);
             Assembly a = Assembly.Load(data);
@@ -1986,10 +1990,15 @@ public class Script_Instance : GH_ScriptInstance
 
             // NOTE:
             // using BuildOptions does not add LIBRARY compile guard
+#if RC8_20
+            var context = new LibraryBuildContext();
+            context.CompileGuards.Remove(LibraryBuildOptions.DEFINE_LIBRARY.Identifier);
+            Assert.IsTrue(library.TryBuild(context, out CompileReference cred, out Diagnosis _));
+#else
             var opts = new LibraryBuildOptions();
             opts.CompileGuards.Remove(LibraryBuildOptions.DEFINE_LIBRARY.Identifier);
             Assert.IsTrue(library.TryBuild(opts, out CompileReference cred, out Diagnosis _));
-
+#endif
             byte[] data = File.ReadAllBytes(cred.Path);
             Assembly a = Assembly.Load(data);
 
@@ -7650,6 +7659,80 @@ namespace Rhino.Runtime.Code.Languages.Roslyn.Core
 
             c = completions.First(c => c.Text == "RoslynTracer");
             Assert.AreEqual(CompletionKind.Class, c.Kind);
+        }
+#endif
+
+#if RC8_20
+        [Test]
+        public void TestCSharp_Load_Without_Space()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-87073
+            string fpath = string.Empty;
+            Assert.True(TryGetTestFile(@"cs\load\space.cs", out fpath));
+
+            string s = @"
+// csharp
+#load """ + fpath + @"""
+
+using ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            CompletionInfo c;
+
+            c = completions.First(c => c.Text == "Tools");
+            Assert.AreEqual(CompletionKind.Module, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Load_With_Space()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-87073
+            string fpath = string.Empty;
+            Assert.True(TryGetTestFile(@"cs\load\space.cs", out fpath));
+
+            string s = @"
+// csharp
+# load """ + fpath + @"""
+
+using ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            CompletionInfo c;
+
+            c = completions.First(c => c.Text == "Tools");
+            Assert.AreEqual(CompletionKind.Module, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Load_Completion()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-87073
+            string fpath = string.Empty;
+            Assert.True(TryGetTestFile(@"cs\load\space.cs", out fpath));
+
+            string s = @"
+// csharp
+#load """ + fpath + @"""
+
+using Tools;
+
+var m = new Test(";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            SignatureInfo[] signatures = CompleteSignatureAtPosition(code, s.Length).Where(cs => cs.Text.StartsWith("Test(")).ToArray();
+
+            Assert.AreEqual(3, signatures.Length);
+
+            SignatureInfo cs = signatures[2];
+            Assert.True(cs.Description.Contains("Test description"));
         }
 #endif
 
