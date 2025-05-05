@@ -3,6 +3,9 @@
   <RhinoSystemDirectory>..\..\..\..\..\..\..\..\bin\Release</RhinoSystemDirectory>
   <LoadLegacyIronPython>true</LoadLegacyIronPython>
   <LoadGrasshopper>true</LoadGrasshopper>
-
+  <LoadPlugins>
+    <Plugin Location="Plug-ins\Commands.rhp" />
+    <Plugin Location="Plug-ins\RhinoCode\RhinoCodePlugin.rhp" />
+  </LoadPlugins>
   <TestFilesDirectory>..\..\..\..\..\files\</TestFilesDirectory>
 </Settings>
