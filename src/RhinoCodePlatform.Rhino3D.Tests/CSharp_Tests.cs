@@ -7662,6 +7662,80 @@ namespace Rhino.Runtime.Code.Languages.Roslyn.Core
         }
 #endif
 
+#if RC8_20
+        [Test]
+        public void TestCSharp_Load_Without_Space()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-87073
+            string fpath = string.Empty;
+            Assert.True(TryGetTestFile(@"cs\load\space.cs", out fpath));
+
+            string s = @"
+// csharp
+#load """ + fpath + @"""
+
+using ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            CompletionInfo c;
+
+            c = completions.First(c => c.Text == "Tools");
+            Assert.AreEqual(CompletionKind.Module, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Load_With_Space()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-87073
+            string fpath = string.Empty;
+            Assert.True(TryGetTestFile(@"cs\load\space.cs", out fpath));
+
+            string s = @"
+// csharp
+# load """ + fpath + @"""
+
+using ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            CompletionInfo c;
+
+            c = completions.First(c => c.Text == "Tools");
+            Assert.AreEqual(CompletionKind.Module, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Load_Completion()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-87073
+            string fpath = string.Empty;
+            Assert.True(TryGetTestFile(@"cs\load\space.cs", out fpath));
+
+            string s = @"
+// csharp
+#load """ + fpath + @"""
+
+using Tools;
+
+var m = new Test(";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            SignatureInfo[] signatures = CompleteSignatureAtPosition(code, s.Length).Where(cs => cs.Text.StartsWith("Test(")).ToArray();
+
+            Assert.AreEqual(3, signatures.Length);
+
+            SignatureInfo cs = signatures[2];
+            Assert.True(cs.Description.Contains("Test description"));
+        }
+#endif
+
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
     }
 }
