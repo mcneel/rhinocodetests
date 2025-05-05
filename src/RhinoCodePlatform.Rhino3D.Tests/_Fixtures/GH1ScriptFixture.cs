@@ -58,7 +58,13 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             GH_Document ghDoc = ctx.Outputs.Get<GH_Document>(GHDOC_PARAM);
             foreach (IGH_ActiveObject activeObj in ghDoc.Objects.OfType<IGH_ActiveObject>())
             {
-                hasErrors |= activeObj.RuntimeMessages(GH_RuntimeMessageLevel.Error).Any();
+                string[] errors = activeObj.RuntimeMessages(GH_RuntimeMessageLevel.Error).ToArray();
+                if (errors.Any())
+                {
+                    hasErrors = true;
+                    foreach (string err in errors)
+                        TestContext.Progress.WriteLine($"GH Error ({activeObj.InstanceGuid}): {err}");
+                }
             }
 
             Assert.IsFalse(hasErrors);
