@@ -330,7 +330,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 settings = File.ReadAllText(ghsettings);
                 settings = settings.Replace(
                     "<item name=\"Hops:Servers\" type_name=\"gh_string\" type_code=\"10\"></item>",
-                    "<item name=\"Hops:Servers\" type_name=\"gh_string\" type_code=\"10\">http:\\\\localhost:5000</item>"
+                    "<item name=\"Hops:Servers\" type_name=\"gh_string\" type_code=\"10\">http://127.0.0.1:5000</item>"
                     );
             }
             else
