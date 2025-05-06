@@ -322,7 +322,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         static void PatchHopsConfigs()
         {
             string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string ghsettings = Path.Combine(appdata, "Grasshopper", "grasshopper_kernel.xml");
+            string ghappdata = Path.Combine(appdata, "Grasshopper");
+            string ghsettings = Path.Combine(ghappdata, "grasshopper_kernel.xml");
 
             string settings;
             if (File.Exists(ghsettings))
@@ -338,11 +339,16 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 const string ghSettingsWithHops = @"
 <Fragment name=""Settings"">
   <items count=""1"">
-    <item name=""Hops:Servers"" type_name=""gh_string"" type_code=""10"">http://localhost:5000</item>
+    <item name=""Hops:Servers"" type_name=""gh_string"" type_code=""10"">http://127.0.0.1:5000</item>
   </items>
 </Fragment>
 ";
                 settings = ghSettingsWithHops;
+            }
+
+            if (!Directory.Exists(ghappdata))
+            {
+                Directory.CreateDirectory(ghappdata);
             }
 
             File.WriteAllText(ghsettings, settings);
