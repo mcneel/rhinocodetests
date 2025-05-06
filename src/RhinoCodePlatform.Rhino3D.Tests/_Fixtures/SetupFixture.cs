@@ -322,38 +322,44 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         static void PatchHopsConfigs()
         {
-            string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string ghappdata = Path.Combine(appdata, "Grasshopper");
-            string ghsettings = Path.Combine(ghappdata, "grasshopper_kernel.xml");
+            string userAppdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string ghAppdata = Path.Combine(userAppdata, "Grasshopper");
+            string ghKernelCfgFile = Path.Combine(ghAppdata, "grasshopper_kernel.xml");
 
             const string HOPS_SERVER = "http://localhost:5000";
             const string HOPS_SERVER_CFG = $"<item name=\"Hops:Servers\" type_name=\"gh_string\" type_code=\"10\">{HOPS_SERVER}</item>";
 
-            string settings;
-            if (File.Exists(ghsettings))
+            string ghKernelCfg;
+
+            // if there is a setting file that contains an existing server config
+            // lets override that (this is for local tests)
+            Regex cfgFinder = new(@"\<item\s+name\s*=\s*""Hops:Servers""\s+type_name\s*=\s*""gh_string""\s+type_code\s*=\s*""10""\>.+\<\/item\>");
+            if (File.Exists(ghKernelCfgFile)
+                    && File.ReadAllText(ghKernelCfgFile) is string existingGhKernelCfg
+                    && cfgFinder.IsMatch(existingGhKernelCfg))
             {
-                settings = File.ReadAllText(ghsettings);
-                var r = new Regex(@"\<item\s+name\s*=\s*""Hops:Servers""\s+type_name\s*=\s*""gh_string""\s+type_code\s*=\s*""10""\>.+\<\/item\>");
-                settings = r.Replace(settings, HOPS_SERVER_CFG);
+                ghKernelCfg = cfgFinder.Replace(existingGhKernelCfg, HOPS_SERVER_CFG);
             }
+
+            // otherwise create a new settings file (this is for CI/CD test build)
             else
             {
-                if (!Directory.Exists(ghappdata))
+                if (!Directory.Exists(ghAppdata))
                 {
-                    Directory.CreateDirectory(ghappdata);
+                    Directory.CreateDirectory(ghAppdata);
                 }
 
-                const string ghSettingsWithHops = $@"
+                const string ghKernelCfgWithHops = $@"
 <Fragment name=""Settings"">
   <items count=""1"">
     {HOPS_SERVER_CFG}
   </items>
 </Fragment>
 ";
-                settings = ghSettingsWithHops;
+                ghKernelCfg = ghKernelCfgWithHops;
             }
 
-            File.WriteAllText(ghsettings, settings);
+            File.WriteAllText(ghKernelCfgFile, ghKernelCfg);
         }
 #endif
 
