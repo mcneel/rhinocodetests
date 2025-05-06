@@ -1,6 +1,7 @@
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Net;
+using System.Collections.Generic;
 
 using NUnit.Framework;
 
@@ -9,6 +10,19 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     [TestFixture]
     public class Grasshopper1_Tests_Hops : GH1ScriptFixture
     {
+        [Test]
+        public void TestGH1_Script_Hops_Configurations()
+        {
+            string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string ghappdata = Path.Combine(appdata, "Grasshopper");
+            string ghsettings = Path.Combine(ghappdata, "grasshopper_kernel.xml");
+
+            Assert.True(File.Exists(ghsettings));
+            string settings = File.ReadAllText(ghsettings);
+            TestContext.Write(settings);
+            Assert.True(settings.Contains("http://localhost:5000"));
+        }
+
         [Test]
         public void TestGH1_Script_Hops_HealthCheck()
         {

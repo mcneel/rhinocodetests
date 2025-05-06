@@ -326,7 +326,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             string ghappdata = Path.Combine(appdata, "Grasshopper");
             string ghsettings = Path.Combine(ghappdata, "grasshopper_kernel.xml");
 
-            const string HOPS_SERVER = "http://127.0.0.1:5000";
+            const string HOPS_SERVER = "http://localhost:5000";
             const string HOPS_SERVER_CFG = $"<item name=\"Hops:Servers\" type_name=\"gh_string\" type_code=\"10\">{HOPS_SERVER}</item>";
 
             string settings;
