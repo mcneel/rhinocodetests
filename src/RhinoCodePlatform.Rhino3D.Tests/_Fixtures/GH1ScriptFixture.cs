@@ -63,7 +63,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 {
                     hasErrors = true;
                     foreach (string err in errors)
-                        TestContext.Progress.WriteLine($"GH Error ({activeObj.InstanceGuid}): {err}");
+                        TestContext.WriteLine($"GH Error ({activeObj.InstanceGuid}): {err}");
                 }
             }
 
