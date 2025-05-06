@@ -9,6 +9,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     [TestFixture]
     public class Grasshopper1_Tests_Hops : GH1ScriptFixture
     {
+        [Test]
+        public void TestGH1_Script_Hops_HealthCheck()
+        {
+            TestSkipHops();
+        }
+
         [Test, TestCaseSource(nameof(GetTestDefinitions))]
         public void TestGH1_Script_Hops(ScriptInfo scriptInfo)
         {
