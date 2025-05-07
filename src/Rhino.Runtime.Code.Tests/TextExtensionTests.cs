@@ -18,6 +18,18 @@ namespace Rhino.Runtime.Code.Tests
         [TestCase("#! python3\r\nimport rhinoscriptsyntax as rs\r\nrs.", 1, 2, true, 1)]
         [TestCase("#! python3\r\nimport rhinoscriptsyntax as rs\r\nrs.", 3, 100, false, -1)]
 #endif
+
+#if RC8_20
+        [TestCase("#! python3\nimport rhinoscriptsyntax as rs\nrs.", 0, 0, true, 0)]
+        [TestCase("#! python3\nimport rhinoscriptsyntax as rs\nrs.", 1, 1, true, 0)]
+        [TestCase("#! python3\nimport rhinoscriptsyntax as rs\nrs.", 1, 2, true, 1)]
+        [TestCase("#! python3\nimport rhinoscriptsyntax as rs\nrs.", 3, 100, false, -1)]
+        [TestCase("// #! csharp\nusing System;\n\n", 4, 1, false, -1)]
+        [TestCase("// #! csharp\nusing System;\n\n\n", 4, 1, true, 28)]
+        [TestCase("// #! csharp\r\nusing System;\r\n\r\n", 4, 1, false, -1)]
+        [TestCase("// #! csharp\r\nusing System;\r\n\r\n\r\n", 4, 1, true, 31)]
+        [TestCase("// #! csharp\r\r\n\rusing System;\r\r\n\r\n\r\n", 4, 1, true, 34)]
+#endif
         public void TestGetIndexFromPosition(string text, int line, int column, bool expected, int expectedIndex)
         {
             bool res = text.TryGetIndex(new TextPosition(line, column), out int index);

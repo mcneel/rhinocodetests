@@ -7664,6 +7664,226 @@ namespace Rhino.Runtime.Code.Languages.Roslyn.Core
 
 #if RC8_20
         [Test]
+        public void TestCSharp_Complete_InString_Interpolated()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-87258
+            string s = @"// #! csharp
+using System;
+TimeSpan t = TimeSpan.FromSeconds(5);
+string msg = $""Processing took {t";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            // NOTE:
+            // monaco sorts 't' at the top since 't' is already typed
+            CompletionInfo c = completions.Where(c => c.Text.StartsWith("t")).First();
+            Assert.AreEqual("t", c.Text);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_InString_Interpolated_Member()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-87258
+            string s = @"// #! csharp
+using System;
+TimeSpan t = TimeSpan.FromSeconds(5);
+string msg = $""Processing took {t.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            CompletionInfo c = completions[0];
+
+            Assert.AreEqual("Add", c.Text);
+            Assert.AreEqual(CompletionKind.Method, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_InString_Interpolated_Member_Completed()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-87258
+            string s = @"// #! csharp
+using System;
+TimeSpan t = TimeSpan.FromSeconds(5);
+string msg = $""Processing took {t.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"} some other text"";
+");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            CompletionInfo c = completions[0];
+
+            Assert.AreEqual("Add", c.Text);
+            Assert.AreEqual(CompletionKind.Method, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_InString_Interpolated_TextPart()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-87258
+            string s = @"// #! csharp
+using System;
+TimeSpan t = TimeSpan.FromSeconds(5);
+string msg = $""Processing ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"took {t.");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.IsEmpty(completions);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_InString_Multiline_Interpolated()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-87258
+            string s = @"// #! csharp
+using System;
+TimeSpan t = TimeSpan.FromSeconds(5);
+string f = $@""
+using {t";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            // NOTE:
+            // monaco sorts 't' at the top since 't' is already typed
+            CompletionInfo c = completions.Where(c => c.Text.StartsWith("t")).First();
+            Assert.AreEqual("t", c.Text);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_InString_Multiline_Interpolated_Member()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-87258
+            string s = @"// #! csharp
+using System;
+TimeSpan t = TimeSpan.FromSeconds(5);
+string f = $@""
+using {t.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            CompletionInfo c = completions[0];
+
+            Assert.AreEqual("Add", c.Text);
+            Assert.AreEqual(CompletionKind.Method, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_InString_Multiline_Interpolated_Member_Completed()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-87258
+            string s = @"// #! csharp
+using System;
+TimeSpan t = TimeSpan.FromSeconds(5);
+string f = $@""
+using {t.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"} some other text"";
+");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.IsNotEmpty(completions);
+
+            CompletionInfo c = completions[0];
+
+            Assert.AreEqual("Add", c.Text);
+            Assert.AreEqual(CompletionKind.Method, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_InString_Multiline_Interpolated_TextPart()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-87258
+            string s = @"// #! csharp
+using System;
+TimeSpan t = TimeSpan.FromSeconds(5);
+string f = $@""
+using ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"{t.");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.IsEmpty(completions);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NoDuplicateLocals()
+        {
+            string s = @"// #! csharp
+using System;
+void Foo(int input)
+{
+}
+
+";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            Assert.IsNotEmpty(completions);
+            Assert.AreEqual(1, completions.Where(c => c.Text == "Foo").Count());
+        }
+
+        static IEnumerable<TestCaseData> TestCSharpCompleteBuiltinParams()
+        {
+            string s;
+
+            s = @"// #! csharp
+using System;
+
+";
+            yield return new(s) { TestName = nameof(TestCSharp_Complete_Builtin_Params) + "_Empty" };
+
+            s = @"// #! csharp
+using System;
+__is_interactive__;
+__rhino_command__;
+
+";
+
+            yield return new(s) { TestName = nameof(TestCSharp_Complete_Builtin_Params) + "_WithMany" };
+        }
+
+        [Test, TestCaseSource(nameof(TestCSharpCompleteBuiltinParams))]
+        public void TestCSharp_Complete_Builtin_Params(string s)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85076
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            var context = new RunContext();
+            RhinoCode.ProjectServers.TryPrepareContext(LanguageSpec.CSharp, context);
+            code.Inputs.Set(context.Inputs.Parameters);
+            code.Outputs.Set(context.Outputs.Parameters);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            Assert.IsNotEmpty(completions);
+
+            foreach (var input in context.Inputs.Parameters)
+            {
+                CompletionInfo c = completions.First(c => c.Text == input);
+                Assert.AreEqual(CompletionKind.Variable, c.Kind);
+            }
+
+            foreach (var output in context.Outputs.Parameters)
+            {
+                CompletionInfo c = completions.First(c => c.Text == output);
+                Assert.AreEqual(CompletionKind.Variable, c.Kind);
+            }
+        }
+
+        [Test]
         public void TestCSharp_Load_Without_Space()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-87073
