@@ -5341,11 +5341,21 @@ IList t = new ";
             Assert.AreEqual(CompletionKind.Class, c.Kind);
             Assert.AreEqual("List", c.CommitText);
 
-            c = completions[3];
+            int index = 3;
+
+#if RC9_0
+            c = completions[index];
+            Assert.AreEqual("OrderedDictionary<TKey, TValue>", c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
+#endif
+
+            c = completions[index];
             Assert.AreEqual(nameof(Rhino.Geometry.Polyline), c.Text);
             Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
 
-            c = completions[4];
+            c = completions[index];
             Assert.AreEqual(nameof(Rhino.Geometry.Interpolator), c.Text);
             Assert.AreEqual(CompletionKind.Class, c.Kind);
         }
@@ -5538,22 +5548,33 @@ IList t = ";
             Assert.AreEqual(CompletionKind.Class, c.Kind);
             Assert.AreEqual("List", c.CommitText);
 
-            c = completions[5];
+            int index = 5;
+
+#if RC9_0
+            c = completions[index];
+            Assert.AreEqual("OrderedDictionary<TKey, TValue>", c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
+#endif
+
+            c = completions[index];
             Assert.AreEqual(nameof(Rhino.Geometry.Polyline), c.Text);
             Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
 
-            c = completions[6];
+            c = completions[index];
             Assert.AreEqual(nameof(Rhino.Geometry.Interpolator), c.Text);
             Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
 
-            c = completions[7];
+            c = completions[index];
             Assert.AreEqual("new", c.Text);
             Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+            index++;
 
-            c = completions[8];
+            c = completions[index];
             Assert.AreEqual("default", c.Text);
             Assert.AreEqual(CompletionKind.Keyword, c.Kind);
-
         }
 
         [Test]
