@@ -39,6 +39,11 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         static void TestSkipHops()
         {
+            if (!SetupFixture.LOAD_COMPUTE)
+            {
+                Assert.Fail("Compute is not loaded");
+            }
+
             try
             {
                 var req = (HttpWebRequest)WebRequest.Create("http://localhost:5000/healthcheck");

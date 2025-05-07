@@ -23,7 +23,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         public const string RHINOCODE_LOG_LEVEL_ENVVAR = "RHINOCODE_LOG_LEVEL";
         public const string RHINOCODE_PYTHON_VENV_PREFIX = "test_";
 
-        public static bool LOAD_COMPUTE { get; set; } = true;
+        public static bool LOAD_COMPUTE { get; set; } = false;
 
         static readonly TestSettings s_settings;
 
