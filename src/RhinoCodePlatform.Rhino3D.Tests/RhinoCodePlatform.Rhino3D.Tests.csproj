@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('Windows'))">net9.0-windows</TargetFrameworks>
     <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('OSX'))">net9.0</TargetFrameworks>
+    <NoWarn>SYSLIB0014</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
