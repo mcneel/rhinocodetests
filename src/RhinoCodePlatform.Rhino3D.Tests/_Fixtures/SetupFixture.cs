@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using System.Diagnostics;
 using System.Threading;
@@ -321,31 +322,44 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         static void PatchHopsConfigs()
         {
-            string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string ghsettings = Path.Combine(appdata, "Grasshopper", "grasshopper_kernel.xml");
+            string userAppdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string ghAppdata = Path.Combine(userAppdata, "Grasshopper");
+            string ghKernelCfgFile = Path.Combine(ghAppdata, "grasshopper_kernel.xml");
 
-            string settings;
-            if (File.Exists(ghsettings))
+            const string HOPS_SERVER = "http://localhost:5000";
+            const string HOPS_SERVER_CFG = $"<item name=\"Hops:Servers\" type_name=\"gh_string\" type_code=\"10\">{HOPS_SERVER}</item>";
+
+            string ghKernelCfg;
+
+            // if there is a setting file that contains an existing server config
+            // lets override that (this is for local tests)
+            Regex cfgFinder = new(@"\<item\s+name\s*=\s*""Hops:Servers""\s+type_name\s*=\s*""gh_string""\s+type_code\s*=\s*""10""\>.+\<\/item\>");
+            if (File.Exists(ghKernelCfgFile)
+                    && File.ReadAllText(ghKernelCfgFile) is string existingGhKernelCfg
+                    && cfgFinder.IsMatch(existingGhKernelCfg))
             {
-                settings = File.ReadAllText(ghsettings);
-                settings = settings.Replace(
-                    "<item name=\"Hops:Servers\" type_name=\"gh_string\" type_code=\"10\"></item>",
-                    "<item name=\"Hops:Servers\" type_name=\"gh_string\" type_code=\"10\">http:\\\\localhost:5000</item>"
-                    );
+                ghKernelCfg = cfgFinder.Replace(existingGhKernelCfg, HOPS_SERVER_CFG);
             }
+
+            // otherwise create a new settings file (this is for CI/CD test build)
             else
             {
-                const string ghSettingsWithHops = @"
+                if (!Directory.Exists(ghAppdata))
+                {
+                    Directory.CreateDirectory(ghAppdata);
+                }
+
+                const string ghKernelCfgWithHops = $@"
 <Fragment name=""Settings"">
   <items count=""1"">
-    <item name=""Hops:Servers"" type_name=""gh_string"" type_code=""10"">http://localhost:5000</item>
+    {HOPS_SERVER_CFG}
   </items>
 </Fragment>
 ";
-                settings = ghSettingsWithHops;
+                ghKernelCfg = ghKernelCfgWithHops;
             }
 
-            File.WriteAllText(ghsettings, settings);
+            File.WriteAllText(ghKernelCfgFile, ghKernelCfg);
         }
 #endif
 

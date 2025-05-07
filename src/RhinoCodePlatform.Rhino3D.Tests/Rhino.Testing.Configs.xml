@@ -3,6 +3,11 @@
   <RhinoSystemDirectory>C:\Users\ein\gits\rhino-wip\src4\bin\Debug</RhinoSystemDirectory>
   <LoadLegacyIronPython>true</LoadLegacyIronPython>
   <LoadGrasshopper>true</LoadGrasshopper>
-
+  <!-- Ensure commands and rhinocode plugins are loaded -->
+  <!-- This pre-registers the plugin so compute can load these as well -->
+  <LoadPlugins>
+    <Plugin Location="Plug-ins\Commands.rhp" />
+    <Plugin Location="Plug-ins\RhinoCode\RhinoCodePlugin.rhp" />
+  </LoadPlugins>
   <TestFilesDirectory>..\..\..\..\..\files\</TestFilesDirectory>
 </Settings>
