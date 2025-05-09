@@ -8,7 +8,7 @@
     <LangVersion>10</LangVersion>
     <IsPackable>false</IsPackable>
     <Nullable>disable</Nullable>
-    <NoWarn>NU1701;MSB3277</NoWarn>
+    <NoWarn>$(NoWarn);NETSDK1138;NU1701;MSB3277</NoWarn>
 
     <RhinoSystemDirectory>C:\Users\ein\gits\rhino-wip\src4\bin\Debug</RhinoSystemDirectory>
     <RhinoPluginsDirectory>C:\Users\ein\gits\rhino-wip\src4\bin\Debug\Plug-ins</RhinoPluginsDirectory>
