@@ -4,11 +4,11 @@
     <!--<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('Windows'))">net48;net7.0-windows</TargetFrameworks>-->
     <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('Windows'))">net7.0-windows</TargetFrameworks>
     <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('OSX'))">net7.0</TargetFrameworks>
-    <NoWarn>SYSLIB0014</NoWarn>
+    <NoWarn>$(NoWarn);SYSLIB0014</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Mono.Cecil" Version="0.11.4" ExcludeAssets="runtime" PrivateAssets="all" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.6" ExcludeAssets="runtime" PrivateAssets="all" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
     <PackageReference Include="NUnit" Version="3.14.0" />
