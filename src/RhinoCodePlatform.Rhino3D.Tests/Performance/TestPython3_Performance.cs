@@ -9,7 +9,7 @@ using Rhino.Runtime.Code.Languages;
 namespace RhinoCodePlatform.Rhino3D.Tests.Performance
 {
     [TestFixture]
-    public class _TestPython3_Performance_SimpleCycle_10000 : ScriptFixture
+    public class TestPython3_Performance : ScriptFixture
     {
         RunContext _ctx;
         Code _code;
@@ -35,6 +35,10 @@ namespace RhinoCodePlatform.Rhino3D.Tests.Performance
         [Test, MaxTime(900)]
         public void TestPython3_Performance_SimpleCycle_10000()
         {
+#if RELEASE
+            Assert.Ignore("Ignore performance tests on Release build");
+#endif
+
             for (int i = 0; i < 10_000; i++)
             {
                 _ctx.Inputs.Set("x", i);

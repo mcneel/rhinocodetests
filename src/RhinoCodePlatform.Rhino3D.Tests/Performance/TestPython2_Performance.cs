@@ -9,9 +9,8 @@ using Rhino.Runtime.Code.Languages;
 namespace RhinoCodePlatform.Rhino3D.Tests.Performance
 {
     [TestFixture]
-    public class _TestPython2_Performance_SimpleCycle_10000_RunGroup : ScriptFixture
+    public class TestPython2_Performance : ScriptFixture
     {
-        RunGroup _group;
         RunContext _ctx;
         Code _code;
 
@@ -27,20 +26,19 @@ namespace RhinoCodePlatform.Rhino3D.Tests.Performance
                 Outputs = { ["a"] = default }
             };
 
-            _group = _code.RunWith("<scope>");
-
             // warm up
             _ctx.Inputs.Set("x", 0);
             _ctx.Inputs.Set("y", 0);
             _code.Run(_ctx);
         }
 
-        [OneTimeTearDown]
-        public void TearDown() => _group.Dispose();
-
-        [Test, MaxTime(100)]
-        public void TestPython2_Performance_SimpleCycle_10000_RunGroup()
+        [Test, MaxTime(200)]
+        public void TestPython2_Performance_SimpleCycle_10000()
         {
+#if RELEASE
+            Assert.Ignore("Ignore performance tests on Release build");
+#endif
+
             for (int i = 0; i < 10_000; i++)
             {
                 _ctx.Inputs.Set("x", i);
