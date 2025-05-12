@@ -68,12 +68,19 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 // definition with no errors, either need to have a 'result' collector
                 if (ctx.Outputs.TryGet("result", out IGH_Structure data))
                 {
-                    foreach (GH_Path p in data.Paths)
-                    {
-                        foreach (var d in data.get_Branch(p))
-                            if (d is GH_Boolean result)
-                                Assert.True(result.Value);
-                    }
+                    if (data.DataCount > 0)
+                        foreach (GH_Path p in data.Paths)
+                        {
+                            foreach (var d in data.get_Branch(p))
+                                if (d is GH_Boolean result)
+                                    Assert.True(result.Value);
+                                else if (d is null)
+                                    Assert.Fail($"Test result has null data");
+                                else
+                                    Assert.Fail($"Test result has non-boolean data");
+                        }
+                    else
+                        Assert.Fail("Test result has no data");
                 }
                 // or have at least one assert component
                 else
@@ -88,7 +95,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                     Assert.True(hasAssertComponent);
                 }
             }
-            else
+            else if (!string.IsNullOrWhiteSpace(errorMessage))
             {
                 foreach (var line in errorMessage.ToLinesLazy())
                 {
@@ -98,7 +105,10 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                     Assert.True(scriptInfo.MatchesError(line));
                 }
             }
-
+            else
+            {
+                Assert.Fail("Test failed with no error messages");
+            }
         }
 
 #if RC8_15
