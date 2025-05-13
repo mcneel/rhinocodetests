@@ -16,10 +16,12 @@
 
   <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
     <GrasshopperPluginDirectory>$(RhinoPluginsDirectory)\Grasshopper</GrasshopperPluginDirectory>
+    <Grasshopper2PluginDirectory>$(RhinoPluginsDirectory)\Grasshopper2\net8.0</Grasshopper2PluginDirectory>
   </PropertyGroup>
 
   <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
     <GrasshopperPluginDirectory>$(RhinoPluginsDirectory)\GrasshopperPlugin.rhp</GrasshopperPluginDirectory>
+    <Grasshopper2PluginDirectory>$(RhinoPluginsDirectory)\Grasshopper2Plugin.rhp</Grasshopper2PluginDirectory>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
