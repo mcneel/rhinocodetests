@@ -76,6 +76,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             LoadLanguages();
             LoadRhinoPlugins();
             LoadGrasshopperPlugins();
+            LoadGrasshopper2Plugins();
 
 #if RC8_14
             StartComputeInstance();
@@ -193,6 +194,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                     throw new Exception($"Language init error | {RhinoCode.Logger.Text}");
                 }
 
+                TestContext.Progress.WriteLine($"Successfully Loaded {language.Id}");
+
                 // cleanup all python 3 environments before running tests
                 if (LanguageSpec.Python3.Matches(language.Id))
                 {
@@ -213,6 +216,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         static void LoadRhinoPlugins()
         {
             string testPluginsPath = Path.Combine(s_settings.TestFilesDirectory, "rhinoPlugins");
@@ -239,6 +243,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         static void LoadGrasshopperPlugins()
         {
             string testPluginsPath = Path.Combine(s_settings.TestFilesDirectory, "gh1Plugins");
@@ -256,6 +261,14 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                     TestContext.Progress.WriteLine($"Loading GH1 plugin: {ghaFile}");
                 LoadGHA(ghaFiles);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+        static void LoadGrasshopper2Plugins()
+        {
+            // force load all grasshopper 2 plugins. This is instead of
+            // running the G2 command and avoid loading the editor
+            Grasshopper2.Framework.PluginServer.LoadAllScopedPlugins();
         }
 
 #if RC8_14
