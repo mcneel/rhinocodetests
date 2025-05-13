@@ -1175,6 +1175,11 @@ Rhino.Input.RhinoGet.GetOneObject(");
 
             SignatureInfo sig;
 
+#if RC9_0
+            // for some reason in Rhino 9, the list order is different
+            signatures = signatures.Reverse();
+#endif
+
             sig = signatures.ElementAt(0);
             Assert.AreEqual(0, sig.ParameterIndex);
             Assert.AreEqual(
