@@ -3,12 +3,12 @@
   <RhinoSystemDirectory>C:\Users\ein\gits\rhino-wip\src4\bin\Debug</RhinoSystemDirectory>
   <LoadLegacyIronPython>true</LoadLegacyIronPython>
   <LoadGrasshopper>true</LoadGrasshopper>
+  <LoadGrasshopper2>true</LoadGrasshopper2>
   <!-- Ensure commands and rhinocode plugins are loaded -->
   <!-- This pre-registers the plugin so compute can load these as well -->
   <LoadPlugins>
     <Plugin Location="Plug-ins\Commands.rhp" />
     <Plugin Location="Plug-ins\RhinoCode\RhinoCodePlugin.rhp" />
-    <Plugin Location="Plug-ins\Grasshopper2\net8.0\Grasshopper2Plugin.rhp" />
   </LoadPlugins>
   <TestFilesDirectory>..\..\..\..\..\files\</TestFilesDirectory>
 </Settings>

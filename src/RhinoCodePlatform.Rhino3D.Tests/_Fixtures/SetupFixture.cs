@@ -266,9 +266,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         static void LoadGrasshopper2Plugins()
         {
-            // force load all grasshopper 2 plugins. This is instead of
-            // running the G2 command and avoid loading the editor
-            Grasshopper2.Framework.PluginServer.LoadAllScopedPlugins();
         }
 
 #if RC8_14
