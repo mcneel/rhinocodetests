@@ -27,7 +27,7 @@ namespace Rhino.Runtime.Code.Tests
 
       public override SupportCapabilities Capabilities { get; } = SupportCapabilities.Completion;
 
-      public S() : base(new PythonLanuageSupportConfigs())
+      public S() : base(new PythonLanguageSupportConfigs())
       {
       }
 
