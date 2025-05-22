@@ -26,7 +26,7 @@ using RhinoCodePlatform.Rhino3D.Languages;
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
-    public class Python_Tests : ScriptFixture
+    public class Python_Tests : PythonScriptFixture
     {
         static IEnumerable<TestCaseData> GetPythons()
         {
@@ -370,13 +370,13 @@ for {INDEX_VAR} in range(0, 3): # line 3
                 new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Return, 2)
             };
 
-            yield return new(LanguageSpec.Python2, shared)
+            yield return new(new Version(2, 7), new Version(2, 7), shared)
             { TestName = nameof(TestPython_DebugTracing_StackWatch_L1_Single) + "_Python2" };
 
-            yield return new(new LanguageSpec("*.python", "3.9.*"), shared)
+            yield return new(new Version(3, 9), new Version(3, 9), shared)
             { TestName = nameof(TestPython_DebugTracing_StackWatch_L1_Single) + "_Python3.9" };
 
-            yield return new(new LanguageSpec("*.python", "3.12.*"), new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
+            yield return new(new Version(3, 12), default, new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
             {
                 // start
                 // NOTE:
@@ -389,15 +389,9 @@ for {INDEX_VAR} in range(0, 3): # line 3
         }
 
         [Test, TestCaseSource(nameof(GetTestPythonDebugTracingStackWatchL1SingleCases))]
-        public void TestPython_DebugTracing_StackWatch_L1_Single(LanguageSpec spec, DebugStackActionsWatcher controls)
+        public void TestPython_DebugTracing_StackWatch_L1_Single(Version min, Version max, DebugStackActionsWatcher controls)
         {
-            ILanguage python = GetLanguage(spec);
-            if (python is null)
-            {
-                Assert.Ignore($"Expected {spec} and not found. Skipping");
-            }
-
-            Code code = python.CreateCode(
+            Code code = GetPythonInRangeOrSkip(min, max).CreateCode(
 $@"
 import os
 ");

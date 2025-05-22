@@ -42,7 +42,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         protected static readonly Dispatcher s_dispatcher = new();
 
-        protected static ILanguage GetLanguage(LanguageSpec languageSpec) => RhinoCode.Languages.QueryLatest(languageSpec);
+        protected static ILanguage GetLanguage(LanguageSpec spec) => RhinoCode.Languages.QueryLatest(spec);
 
         protected static bool TryGetTestFilesPath(out string fileDir)
         {

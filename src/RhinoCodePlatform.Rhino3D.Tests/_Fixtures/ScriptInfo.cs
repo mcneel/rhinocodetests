@@ -16,22 +16,63 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         static readonly Regex s_rhinoVersionFinder = new Regex(@"(rc|rh|gh)(?<major>\d)\.(?<minor>\d{1,2})");
         static readonly Regex s_pythonVersionFinder = new Regex(@"(py|python)(?<major>\d)\.(?<minor>\d{1,2})");
 
-        sealed class IsSkipped
+        public class IsSkipped
         {
             public static IsSkipped No { get; } = new IsSkipped();
 
             readonly bool _skipped = false;
             readonly string _skippedMessage = string.Empty;
-            IsSkipped() { }
+
+            protected IsSkipped() { }
+
             public IsSkipped(string reason)
             {
                 _skipped = true;
                 _skippedMessage = reason;
             }
-            public void TestSkip()
+
+            public virtual void TestSkip()
             {
                 if (_skipped)
                     Assert.Ignore(_skippedMessage);
+            }
+        }
+
+        public class IsSkippedByPython : IsSkipped
+        {
+            readonly Version _min;
+            readonly Version _max;
+
+            public IsSkippedByPython(Version min) : this(min, new Version()) { }
+            public IsSkippedByPython(Version min, Version max)
+            {
+                _min = min;
+                _max = max;
+            }
+
+            public override void TestSkip() => TestSkip(out ILanguage _);
+
+            public void TestSkip(out ILanguage python)
+            {
+                var expectedMajor = new LanguageSpec("*.python", $"{_min.Major}.*");
+                python = RhinoCode.Languages.QueryLatest(expectedMajor);
+                Version pyVersion = new Version(python.Id.Version.Major, python.Id.Version.Minor);
+
+                bool hasPython = RhinoCode.Languages.WherePasses(expectedMajor).Any();
+                if (hasPython)
+                {
+                    if (pyVersion < _min)
+                    {
+                        Assert.Ignore($"Python {pyVersion} is too young for this test");
+                    }
+
+                    if (_max.Major != 0 && pyVersion > _max)
+                    {
+                        Assert.Ignore($"Python {pyVersion} is too matured for this test");
+                    }
+                }
+                else
+                    Assert.Fail($"Python {_min.Major}.* was not found");
             }
         }
 
@@ -91,7 +132,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
                 if (apiVersion < minVersion)
                 {
-                    _isSkipped = new IsSkipped($"Rhino {minVersion} is too young for this test");
+                    _isSkipped = new IsSkipped($"Rhino {apiVersion} is too young for this test");
                 }
 
                 rh = rh.NextMatch();
@@ -103,7 +144,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
                     if (apiVersion > maxVersion)
                     {
-                        _isSkipped = new IsSkipped($"Rhino {minVersion} is too matured for this test");
+                        _isSkipped = new IsSkipped($"Rhino {apiVersion} is too matured for this test");
                     }
                 }
             }
@@ -113,10 +154,19 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             {
                 int major = int.Parse(py.Groups["major"].Value);
                 int minor = int.Parse(py.Groups["minor"].Value);
-                Version pyVersion = new Version(major, minor);
+                Version minVersion = new Version(major, minor);
 
-                bool hasRequiredPython = RhinoCode.Languages.WherePasses(new LanguageSpec("*.python", pyVersion)).Any();
-                _isSkipped = !hasRequiredPython ? new IsSkipped($"Required python {pyVersion} is not available") : _isSkipped;
+                py = py.NextMatch();
+                if (py.Success)
+                {
+                    major = int.Parse(py.Groups["major"].Value);
+                    minor = int.Parse(py.Groups["minor"].Value);
+                    Version maxVersion = new Version(major, minor);
+                    _isSkipped = new IsSkippedByPython(minVersion, maxVersion);
+                }
+                else
+                    _isSkipped = new IsSkippedByPython(minVersion);
+
             }
 
 #if RELEASE

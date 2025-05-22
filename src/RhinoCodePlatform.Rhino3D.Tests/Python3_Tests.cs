@@ -31,7 +31,7 @@ using RhinoCodePlatform.Rhino3D.Languages;
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
-    public class Python3_Tests : ScriptFixture
+    public class Python3_Tests : PythonScriptFixture
     {
         [Test, TestCaseSource(nameof(GetTestScripts))]
         public void TestPython3_Script(ScriptInfo scriptInfo)
@@ -1231,14 +1231,14 @@ Rhino.Input.RhinoGet.GetOneObject(prompt, ");
 
         static IEnumerable<TestCaseData> GetFormatSimpleCases()
         {
-            yield return new(3, 9,
+            yield return new(new Version(3, 9), new Version(3, 9),
 @"class Test:
     def __init__(self):
         pass
 ")
             { TestName = nameof(TestPython3_Format_Simple) + "Python3.9" };
 
-            yield return new(3, 12,
+            yield return new(new Version(3, 12), default,
 @"class Test:
 
     def __init__(self):
@@ -1248,10 +1248,9 @@ Rhino.Input.RhinoGet.GetOneObject(prompt, ");
         }
 
         [Test, TestCaseSource(nameof(GetFormatSimpleCases))]
-        public void TestPython3_Format_Simple(int major, int minor, string expected)
+        public void TestPython3_Format_Simple(Version min, Version max, string expected)
         {
-            AssertPython(major, minor, out ILanguage python);
-            Code code = python.CreateCode(
+            Code code = GetPythonInRangeOrSkip(min, max).CreateCode(
 @"
 class Test:
 
@@ -2831,7 +2830,7 @@ for m in range({THREAD_CHECK_COUNT}):
 
         static IEnumerable<TestCaseData> GetDebugTracingStackWatchFunctionL2Cases()
         {
-            yield return new(3, 9, new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
+            yield return new(new Version(3, 9), new Version(3, 9), new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
             {
                 // start
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
@@ -2848,7 +2847,7 @@ for m in range({THREAD_CHECK_COUNT}):
             })
             { TestName = nameof(TestPython3_DebugTracing_StackWatch_Function_L2) + "_Python3.9" };
 
-            yield return new(3, 12, new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
+            yield return new(new Version(3, 12), default, new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
             {
                 // start
                 // NOTE:
@@ -2870,10 +2869,9 @@ for m in range({THREAD_CHECK_COUNT}):
         }
 
         [Test, TestCaseSource(nameof(GetDebugTracingStackWatchFunctionL2Cases))]
-        public void TestPython3_DebugTracing_StackWatch_Function_L2(int major, int minor, DebugStackActionsWatcher controls)
+        public void TestPython3_DebugTracing_StackWatch_Function_L2(Version min, Version max, DebugStackActionsWatcher controls)
         {
-            AssertPython(major, minor, out ILanguage python);
-            Code code = python.CreateCode(
+            Code code = GetPythonInRangeOrSkip(min, max).CreateCode(
             $@"
 def L1():
     pass
@@ -2887,7 +2885,7 @@ L1()
 
         static IEnumerable<TestCaseData> GetDebugTracingStackWatchFunctionL2ClassCases()
         {
-            yield return new(3, 9, new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
+            yield return new(new Version(3, 9), new Version(3, 9), new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
             {
                 // start
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
@@ -2910,7 +2908,7 @@ L1()
             })
             { TestName = nameof(TestPython3_DebugTracing_StackWatch_Function_L2_Class) + "_Python3.9" };
 
-            yield return new(3, 12, new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
+            yield return new(new Version(3, 12), default, new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
             {
                 // start
                 // NOTE:
@@ -2934,10 +2932,9 @@ L1()
         }
 
         [Test, TestCaseSource(nameof(GetDebugTracingStackWatchFunctionL2ClassCases))]
-        public void TestPython3_DebugTracing_StackWatch_Function_L2_Class(int major, int minor, DebugStackActionsWatcher controls)
+        public void TestPython3_DebugTracing_StackWatch_Function_L2_Class(Version min, Version max, DebugStackActionsWatcher controls)
         {
-            AssertPython(major, minor, out ILanguage python);
-            Code code = python.CreateCode(
+            Code code = GetPythonInRangeOrSkip(min, max).CreateCode(
             $@"
 class D:
     pass
@@ -2953,7 +2950,7 @@ L1()
 
         static IEnumerable<TestCaseData> GetDebugTracingStackWatchFunctionL3Cases()
         {
-            yield return new(3, 9, new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
+            yield return new(new Version(3, 9), new Version(3, 9), new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
             {
                 // start
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
@@ -2977,7 +2974,7 @@ L1()
             })
             { TestName = nameof(TestPython3_DebugTracing_StackWatch_Function_L3) + "_Python3.9" };
 
-            yield return new(3, 12, new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
+            yield return new(new Version(3, 12), default, new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
             {
                 // start
                 // NOTE:
@@ -3001,10 +2998,9 @@ L1()
         }
 
         [Test, TestCaseSource(nameof(GetDebugTracingStackWatchFunctionL3Cases))]
-        public void TestPython3_DebugTracing_StackWatch_Function_L3(int major, int minor, DebugStackActionsWatcher controls)
+        public void TestPython3_DebugTracing_StackWatch_Function_L3(Version min, Version max, DebugStackActionsWatcher controls)
         {
-            AssertPython(major, minor, out ILanguage python);
-            Code code = python.CreateCode(
+            Code code = GetPythonInRangeOrSkip(min, max).CreateCode(
             $@"
 def L2():
     pass
@@ -3020,7 +3016,7 @@ L1()
 
         static IEnumerable<TestCaseData> GetDebugTracingPassMiddleCases()
         {
-            yield return new(3, 9, $@"
+            yield return new(new Version(3, 9), new Version(3, 9), $@"
 import sys
 def Foo():
     pass
@@ -3039,7 +3035,7 @@ pass_in_middle()            # LINE 9
             })
             { TestName = nameof(TestPython3_DebugTracing_Pass_Middle) + "_Python3.9" };
 
-            yield return new(3, 12, $@"
+            yield return new(new Version(3, 12), default, $@"
 import sys
 def Foo():
     pass
@@ -3062,10 +3058,9 @@ pass_in_middle()            # LINE 9
         }
 
         [Test, TestCaseSource(nameof(GetDebugTracingPassMiddleCases))]
-        public void TestPython3_DebugTracing_Pass_Middle(int major, int minor, string script, DebugPauseDetectorControls<ExpectedPauseEventStep> controls)
+        public void TestPython3_DebugTracing_Pass_Middle(Version min, Version max, string script, DebugPauseDetectorControls<ExpectedPauseEventStep> controls)
         {
-            AssertPython(major, minor, out ILanguage python);
-            Code code = python.CreateCode(script);
+            Code code = GetPythonInRangeOrSkip(min, max).CreateCode(script);
 
             controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 9));
             controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
@@ -3108,18 +3103,5 @@ from system.Collection.Generic import ");
 
         static DiagnoseOptions s_errorsOnly = new() { Errors = true, Hints = false, Infos = false, Warnings = false };
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py3\", "test_*.py");
-
-        static bool AssertPython(int major, int minor, out ILanguage python)
-        {
-            python = GetLanguage(LanguageSpec.Python3);
-            int pymajor = python.Id.Version.Major;
-            int pyminor = python.Id.Version.Minor;
-            if (pymajor != major || pyminor != minor)
-            {
-                Assert.Ignore($"Expected python {major}.{minor} but has {pymajor}.{pyminor}. Skip");
-            }
-
-            return true;
-        }
     }
 }
