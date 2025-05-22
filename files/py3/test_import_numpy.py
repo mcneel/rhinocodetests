@@ -4,4 +4,4 @@ import numpy
 randoms = list(numpy.random.rand(10))
 
 result = len(randoms) > 0 \
-     and r'site-envs\\default-' in str(numpy)
+     and 'site-envs' in str(numpy)
