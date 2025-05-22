@@ -361,19 +361,46 @@ for {INDEX_VAR} in range(0, 3): # line 3
             Assert.AreEqual(3, bp4Counter);
         }
 
-        [Test, TestCaseSource(nameof(GetPythons))]
-        public void TestPython_DebugTracing_StackWatch_L1_Single(LanguageSpec spec)
+        static IEnumerable<TestCaseData> GetTestPythonDebugTracingStackWatchL1SingleCases()
         {
-            Code code = GetLanguage(spec).CreateCode(
-$@"
-import os
-");
-            var controls = new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
+            var shared = new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
             {
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
                 new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
                 new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Return, 2)
             };
+
+            yield return new(LanguageSpec.Python2, shared)
+            { TestName = nameof(TestPython_DebugTracing_StackWatch_L1_Single) + "_Python2" };
+
+            yield return new(new LanguageSpec("*.python", "3.9.*"), shared)
+            { TestName = nameof(TestPython_DebugTracing_StackWatch_L1_Single) + "_Python3.9" };
+
+            yield return new(new LanguageSpec("*.python", "3.12.*"), new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
+            {
+                // start
+                // NOTE:
+                // python 3.12 gets an extra call on the first empty line
+                new (StackActionKind.Pushed, ExecEvent.Call, 1, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 1, ExecEvent.Line, 2),
+                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Return, 2),
+            })
+            { TestName = nameof(TestPython_DebugTracing_StackWatch_L1_Single) + "_Python3.12" };
+        }
+
+        [Test, TestCaseSource(nameof(GetTestPythonDebugTracingStackWatchL1SingleCases))]
+        public void TestPython_DebugTracing_StackWatch_L1_Single(LanguageSpec spec, DebugStackActionsWatcher controls)
+        {
+            ILanguage python = GetLanguage(spec);
+            if (python is null)
+            {
+                Assert.Ignore($"Expected {spec} and not found. Skipping");
+            }
+
+            Code code = python.CreateCode(
+$@"
+import os
+");
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));

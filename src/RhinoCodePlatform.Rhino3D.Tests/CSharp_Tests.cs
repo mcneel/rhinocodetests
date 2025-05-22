@@ -36,7 +36,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         [Test, TestCaseSource(nameof(GetTestScripts))]
         public void TestCSharp_Script(ScriptInfo scriptInfo)
         {
-            TestSkip(scriptInfo);
+            scriptInfo.TestSkip();
 
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(scriptInfo.Uri);
 

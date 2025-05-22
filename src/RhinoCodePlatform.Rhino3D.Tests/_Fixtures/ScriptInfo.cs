@@ -2,9 +2,11 @@
 #pragma warning disable IDE0090 // Use 'new(...)'
 using System;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
-
+using NUnit.Framework;
 using Rhino.Runtime.Code;
+using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Storage;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
@@ -12,7 +14,28 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     public sealed class ScriptInfo
     {
         static readonly Regex s_rhinoVersionFinder = new Regex(@"(rc|rh|gh)(?<major>\d)\.(?<minor>\d{1,2})");
-        static readonly Regex s_rhinoLocalOnlyFinder = new Regex(@"_onlylocal");
+        static readonly Regex s_pythonVersionFinder = new Regex(@"(py|python)(?<major>\d)\.(?<minor>\d{1,2})");
+
+        sealed class IsSkipped
+        {
+            public static IsSkipped No { get; } = new IsSkipped();
+
+            readonly bool _skipped = false;
+            readonly string _skippedMessage = string.Empty;
+            IsSkipped() { }
+            public IsSkipped(string reason)
+            {
+                _skipped = true;
+                _skippedMessage = reason;
+            }
+            public void TestSkip()
+            {
+                if (_skipped)
+                    Assert.Ignore(_skippedMessage);
+            }
+        }
+
+        readonly IsSkipped _isSkipped = IsSkipped.No;
 
         public Uri Uri { get; }
 
@@ -23,8 +46,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         public bool IsDebug { get; } = false;
 
         public bool IsProfile { get; } = false;
-
-        public bool IsSkipped { get; } = false;
 
         public bool ExpectsError { get; } = false;
 
@@ -46,8 +67,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         public ScriptInfo(Uri scriptPath)
         {
-            if (scriptPath is null)
-                throw new ArgumentNullException(nameof(scriptPath));
+            ArgumentNullException.ThrowIfNull(scriptPath);
 
             string uriStr = scriptPath.ToString().ToLower();
 
@@ -56,44 +76,57 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             IsAsync = uriStr.Contains("_async");
             IsDebug = uriStr.Contains("_debug");
             IsProfile = uriStr.Contains("_profile");
-            IsSkipped = uriStr.Contains("_skip");
             ExpectsError = uriStr.Contains("_error");
             ExpectsWarning = uriStr.Contains("_warning");
+            _isSkipped = uriStr.Contains("_skip") ? new IsSkipped("Specifically skipped by '_skip' in file name") : _isSkipped;
 
             Version apiVersion = typeof(Code).Assembly.GetName().Version;
 
-            Match m = s_rhinoVersionFinder.Match(uriStr);
-            if (m.Success)
+            Match rh = s_rhinoVersionFinder.Match(uriStr);
+            if (rh.Success)
             {
-                int major = int.Parse(m.Groups["major"].Value);
-                int minor = int.Parse(m.Groups["minor"].Value);
+                int major = int.Parse(rh.Groups["major"].Value);
+                int minor = int.Parse(rh.Groups["minor"].Value);
                 Version minVersion = new Version(major, minor);
 
                 if (apiVersion < minVersion)
                 {
-                    IsSkipped = true;
+                    _isSkipped = new IsSkipped($"Rhino {minVersion} is too young for this test");
                 }
 
-                m = m.NextMatch();
-                if (m.Success)
+                rh = rh.NextMatch();
+                if (rh.Success)
                 {
-                    major = int.Parse(m.Groups["major"].Value);
-                    minor = int.Parse(m.Groups["minor"].Value);
+                    major = int.Parse(rh.Groups["major"].Value);
+                    minor = int.Parse(rh.Groups["minor"].Value);
                     Version maxVersion = new Version(major, minor);
 
                     if (apiVersion > maxVersion)
                     {
-                        IsSkipped = true;
+                        _isSkipped = new IsSkipped($"Rhino {minVersion} is too matured for this test");
                     }
                 }
             }
 
+            Match py = s_pythonVersionFinder.Match(uriStr);
+            if (py.Success)
+            {
+                int major = int.Parse(py.Groups["major"].Value);
+                int minor = int.Parse(py.Groups["minor"].Value);
+                Version pyVersion = new Version(major, minor);
+
+                bool hasRequiredPython = RhinoCode.Languages.WherePasses(new LanguageSpec("*.python", pyVersion)).Any();
+                _isSkipped = !hasRequiredPython ? new IsSkipped($"Required python {pyVersion} is not available") : _isSkipped;
+            }
+
 #if RELEASE
-            IsSkipped |= s_rhinoLocalOnlyFinder.IsMatch(uriStr);
+            _isSkipped = uriStr.Contains("_onlylocal") ? new IsSkipped($"Test is meant to be only run locally") : _isSkipped;
 #endif
 
             ExpectsRhinoDocument = File.Exists(GetRhinoFile());
         }
+
+        public void TestSkip() => _isSkipped.TestSkip();
 
         public string GetRhinoFile() => Path.ChangeExtension(Uri.ToPath(), ".3dm");
 

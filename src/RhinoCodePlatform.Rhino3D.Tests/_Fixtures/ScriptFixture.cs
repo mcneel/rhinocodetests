@@ -212,12 +212,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
         }
 
-        protected static void TestSkip(ScriptInfo scriptInfo)
-        {
-            if (scriptInfo.IsSkipped)
-                Assert.Ignore();
-        }
-
         static RunContext GetRunContext(RunContext ctx, bool captureStdout)
         {
 #if RC8_12
