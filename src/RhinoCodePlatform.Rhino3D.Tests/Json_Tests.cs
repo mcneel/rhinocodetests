@@ -15,7 +15,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         [Test, TestCaseSource(nameof(GetTestScripts))]
         public void TestJSON_Script(ScriptInfo scriptInfo)
         {
-            TestSkip(scriptInfo);
+            scriptInfo.TestSkip();
 
             // no exec for json. just make sure code can be created
             Code _ = GetLanguage(LanguageSpec.JSON).CreateCode(scriptInfo.Uri);

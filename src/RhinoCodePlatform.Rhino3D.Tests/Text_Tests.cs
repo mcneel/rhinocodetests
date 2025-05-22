@@ -15,7 +15,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         [Test, TestCaseSource(nameof(GetTestScripts))]
         public void TestText_Script(ScriptInfo scriptInfo)
         {
-            TestSkip(scriptInfo);
+            scriptInfo.TestSkip();
 
             // no exec for text. just make sure code can be created
             Code _ = GetLanguage(LanguageSpec.PlainText).CreateCode(scriptInfo.Uri);

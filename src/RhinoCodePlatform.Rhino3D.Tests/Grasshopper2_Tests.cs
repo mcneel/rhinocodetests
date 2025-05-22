@@ -23,7 +23,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     [Test, TestCaseSource(nameof(GetTestDefinitions))]
     public async Task TestGH2_Script(ScriptInfo scriptInfo)
     {
-      TestSkip(scriptInfo);
+      scriptInfo.TestSkip();
 
       // NOTE:
       // somehow if this is 'Document doc', then test host

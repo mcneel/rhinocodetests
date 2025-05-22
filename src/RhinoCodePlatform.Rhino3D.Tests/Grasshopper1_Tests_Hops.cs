@@ -33,7 +33,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         public void TestGH1_Script_Hops(ScriptInfo scriptInfo)
         {
             TestSkipHops();
-            TestSkip(scriptInfo);
+            scriptInfo.TestSkip();
             Test_ScriptWithWait(scriptInfo.Uri, 3);
         }
 
