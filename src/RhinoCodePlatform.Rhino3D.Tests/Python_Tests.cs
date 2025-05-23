@@ -363,17 +363,20 @@ for {INDEX_VAR} in range(0, 3): # line 3
 
         static IEnumerable<TestCaseData> GetTestPythonDebugTracingStackWatchL1SingleCases()
         {
-            var shared = new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
+            yield return new(new Version(2, 7), new Version(2, 7), new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
             {
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
                 new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
                 new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Return, 2)
-            };
-
-            yield return new(new Version(2, 7), new Version(2, 7), shared)
+            })
             { TestName = nameof(TestPython_DebugTracing_StackWatch_L1_Single) + "_Python2" };
 
-            yield return new(new Version(3, 9), new Version(3, 9), shared)
+            yield return new(new Version(3, 9), new Version(3, 9), new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
+            {
+                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
+                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Return, 2)
+            })
             { TestName = nameof(TestPython_DebugTracing_StackWatch_L1_Single) + "_Python3.9" };
 
             yield return new(new Version(3, 12), default, new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
