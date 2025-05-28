@@ -52,7 +52,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 Assert.True(data);
             }
             else
-                Assert.True(scriptInfo.MatchesError(errorMessage));
+                scriptInfo.AssertError(errorMessage);
         }
 
         [Test]
