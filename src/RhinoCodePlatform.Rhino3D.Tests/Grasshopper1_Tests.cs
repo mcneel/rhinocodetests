@@ -102,7 +102,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                     if (string.IsNullOrEmpty(line))
                         continue;
 
-                    Assert.True(scriptInfo.MatchesError(line));
+                    scriptInfo.AssertError(line);
                 }
             }
             else

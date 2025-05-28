@@ -182,7 +182,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         public string GetErrorsFile() => Path.ChangeExtension(Uri.ToPath(), ".txt");
 
-        public bool MatchesError(string errorMessage)
+        public void AssertError(string errorMessage)
         {
             string errorsFile = GetErrorsFile();
 
@@ -191,11 +191,11 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 foreach (string line in File.ReadAllLines(errorsFile))
                 {
                     if (new Regex(line).IsMatch(errorMessage))
-                        return true;
+                        return;
                 }
             }
 
-            return false;
+            Assert.Fail($"Unexpected error message: {errorMessage}");
         }
 
         public override string ToString() => Name;
