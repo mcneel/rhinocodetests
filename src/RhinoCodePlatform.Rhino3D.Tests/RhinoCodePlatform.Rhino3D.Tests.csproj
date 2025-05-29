@@ -32,6 +32,7 @@
     <Reference Include="Grasshopper" HintPath="$(GrasshopperPluginDirectory)\Grasshopper.dll" Private="False" />
     <Reference Include="GH_IO" HintPath="$(GrasshopperPluginDirectory)\GH_IO.dll" Private="False" />
     <Reference Include="RhinoCodePluginGH" HintPath="$(GrasshopperPluginDirectory)\Components\RhinoCodePluginGH.gha" Private="False" />
+    <Reference Include="Yak.Core" HintPath="$(RhinoSystemDirectory)\Yak.Core.dll" Private="False" />
   </ItemGroup>
 
   <ItemGroup>
