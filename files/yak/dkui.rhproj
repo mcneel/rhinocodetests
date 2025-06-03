@@ -1,0 +1,49 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.21.25149\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "72828843-1a76-491e-8347-ccf3ca107cb9",
+  "identity": {
+    "name": "DKUI",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    },
+    "description": "https://mcneel.myjetbrains.com/youtrack/issue/RH-87682",
+    "url": "https://mcneel.myjetbrains.com/youtrack/issue/RH-87682"
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "8"
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "type": "components",
+      "id": "51ac5ca4-a955-460e-8f3b-b0dba4dad9b4",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "dkui_components.gh",
+      "uri": "dkui_components.gh"
+    }
+  ]
+}
