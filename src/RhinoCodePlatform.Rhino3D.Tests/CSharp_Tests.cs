@@ -7556,7 +7556,11 @@ public abstract class RoslynCode<TLangVerison> : Code
             c = completions.First(c => c.Text == "MemberwiseClone");
             Assert.AreEqual(CompletionKind.Method, c.Kind);
 
+#if RC9_0
+            c = completions.First(c => c.Text == nameof(Code.CanBuild));
+#else
             c = completions.First(c => c.Text == "CanCompile");
+#endif
             Assert.AreEqual(CompletionKind.Property, c.Kind);
 
             c = completions.First(c => c.Text == "DebugControls");
