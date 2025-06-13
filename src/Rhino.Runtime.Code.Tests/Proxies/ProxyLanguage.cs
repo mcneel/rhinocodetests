@@ -19,8 +19,11 @@ namespace RhinoCodePlatform.Projects.Proxies
         public override void ExpireCache() { }
 
         protected override void BeginStreams(RunContext context) { }
+#if RC9_0
+        protected override void EndStreams(RunContext context) { }
+#else
         protected override void EndStreams(ResetStreamPolicy resetPolicy) { }
-
+#endif
         protected override void BeginTrace(IExecTracer tracer) { }
         protected override void EndTrace() { }
 
