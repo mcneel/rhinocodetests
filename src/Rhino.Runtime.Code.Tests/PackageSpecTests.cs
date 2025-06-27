@@ -10,11 +10,11 @@ namespace Rhino.Runtime.Code.Tests
     [TestFixture]
     public class PackageSpecTests
     {
-#if RC8_8
+#if RC8_8 && !RC9_0
         [Test]
-        public void TestPythonPackageSpecNormalizedIdMatch()
+        public void TestPackageSpecNormalizedIdMatch()
         {
-            var spec = new PythonPackageSpec("wood-nano", PackageVersionSpec.Any);
+            var spec = new PackageSpec("wood-nano", PackageVersionSpec.Any);
 
             PythonPackage package;
 
@@ -345,7 +345,7 @@ namespace Rhino.Runtime.Code.Tests
             foreach (string version in gen.GetPostVersions())
                 yield return new(gen.Name, gen.VersionRule, version, false) { TestName = nameof(TestPackageSpec_VersionCompare) + $"<=!_{version}<={gen.Version}" };
 
-            rule = PackageSpec.VersionCompareRule.Any;
+            rule = PackageSpec.VersionCompareRule.Exact;
 
             gen = new VersionGenerator("compas");
             yield return new(gen.Name, gen.VersionRule, gen.Version, true) { TestName = nameof(TestPackageSpec_VersionCompare) + $"*_{gen.Version}" };
