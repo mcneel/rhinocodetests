@@ -28,6 +28,10 @@ using RhinoCodePlatform.Rhino3D.Languages.GH1;
 using RhinoCodePlatform.Rhino3D.Languages;
 #endif
 
+#if RC9_0
+using Rhino.Runtime.Code.Languages.PythonNet;
+#endif
+
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
     [TestFixture]
@@ -1309,8 +1313,19 @@ import OpenEXR
 
             IEnviron environ = py3.Environs.CreateEnviron($"{SetupFixture.RHINOCODE_PYTHON_VENV_PREFIX}install_requests");
 
-            IPackage pkg = environ.AddPackage(new PackageSpec("requests", "2.31.0"));
+            var spec = new PackageSpec("requests", "2.31.0");
+#if RC9_0
+            IPackage pkg = environ.AddPackages(new PackageSpec[] { spec }).First(p => spec.Matches(p));
+#else
+            IPackage pkg = environ.AddPackage(spec);
+#endif
+
+#if RC9_0
+            Assert.AreEqual("requests==2.31.0", pkg.ToString());
+#else
             Assert.AreEqual("requests==2.31.0 (Any)", pkg.ToString());
+#endif
+
             Assert.AreEqual("requests", pkg.Id);
             Assert.AreEqual("2.31.0", pkg.Version.ToString());
         }
@@ -1977,7 +1992,14 @@ Rhino.Input.RhinoGet.GetOneObject(op.dirname(""test""),");
 
             IEnviron environ = py3.Environs.CreateEnviron($"{SetupFixture.RHINOCODE_PYTHON_VENV_PREFIX}install_jaxcpu");
 
-            IPackage pkg = environ.AddPackage(new PackageSpec("jax[cpu]"));
+            var spec = new PackageSpec("jax[cpu]");
+
+#if RC9_0
+            IPackage pkg = environ.AddPackages(new PackageSpec[] { spec }).First();
+#else
+            IPackage pkg = environ.AddPackage(spec);
+#endif
+
             Assert.AreEqual("jax", pkg.Id);
             Assert.IsTrue(environ.Contains(new PackageSpec("jax")));
         }
@@ -3089,6 +3111,29 @@ from system.Collection.Generic import ");
 
             Assert.IsNotEmpty(completions);
             Assert.IsEmpty(completions.Where(c => c.Text.Contains('`')));
+        }
+#endif
+
+
+#if RC9_0
+        [Test]
+        public void TestPython3_PackageSpec_NormalizedId_Match()
+        {
+            CPythonPackageSpec spec = CPythonPackageSpec.CreateFromArguments("wood-nano").First();
+
+            CPythonPackageSpec normSpec;
+
+            normSpec = CPythonPackageSpec.CreateFromArguments("wood_nano==0.0.1").First();
+            Assert.IsTrue(spec.Matches(normSpec));
+
+            normSpec = CPythonPackageSpec.CreateFromArguments("wood--nano==0.0.1").First();
+            Assert.IsTrue(spec.Matches(normSpec));
+
+            normSpec = CPythonPackageSpec.CreateFromArguments("wood__nano==0.0.1").First();
+            Assert.IsTrue(spec.Matches(normSpec));
+
+            normSpec = CPythonPackageSpec.CreateFromArguments("wood.-nano==0.0.1").First();
+            Assert.IsTrue(spec.Matches(normSpec));
         }
 #endif
 

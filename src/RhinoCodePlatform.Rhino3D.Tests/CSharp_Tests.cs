@@ -12,6 +12,7 @@ using NUnit.Framework.Internal;
 
 using Rhino;
 using Rhino.Runtime.Code;
+using Rhino.Runtime.Code.Environments;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Execution.Debugging;
 using Rhino.Runtime.Code.Execution.Profiling;
@@ -1785,8 +1786,13 @@ import os
             AddCSharpReferences(provider, RhinoCode.Platforms.GetReferences());
             AddCSharpReferences(provider, code.References);
 
+#if RC9_0
+            if (code.QueryPackages()
+                    .TryGetReferences(out IEnumerable<CompileReference> references))
+#else
             if (code.Text.GetPackageSpecs()
                     .Packages.TryResolveReferences(code, out IEnumerable<CompileReference> references, out Diagnosis _))
+#endif
             {
                 AddCSharpReferences(provider, references);
             }
