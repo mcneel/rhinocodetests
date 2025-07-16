@@ -2405,7 +2405,6 @@ import os
         }
 #endif
 
-
 #if RC8_14
         [Test]
         public void TestPython3_CompleteSignature_GH_CurveXCurve()
@@ -3114,7 +3113,6 @@ from system.Collection.Generic import ");
         }
 #endif
 
-
 #if RC9_0
         [Test]
         public void TestPython3_Environs_PackageSpec_NormalizedId_Match()
@@ -3219,7 +3217,7 @@ from system.Collection.Generic import ");
             {
                 PackageSpec dspec = dspecs[i];
                 PackageSpec spec = specs[i];
-                Assert.AreEqual(dspec, spec);
+                Assert.That(dspec.Equals(spec));
             }
         }
 

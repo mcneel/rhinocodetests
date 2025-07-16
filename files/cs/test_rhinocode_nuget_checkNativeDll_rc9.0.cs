@@ -1,5 +1,4 @@
 # r "nuget: Activiz.NET.x64, 5.8.0"
-# r "nuget: NUnit, 4.3.2"
 using System;
 using System.IO;
 using System.Linq;
@@ -11,4 +10,4 @@ using NUnit.Framework;
 
 string home = Path.GetFullPath(Environment.ExpandEnvironmentVariables("%USERPROFILE%"));
 var lib = $@"{home}\.nuget\packages\activiz.net.x64\5.8.0\lib\net20\msvcr90.dll";
-Assert.That(!EnvironExtensions.IsManagedAssembly(lib, out string _, out Version _));
+result = !EnvironExtensions.IsManagedAssembly(lib, out string _, out Version _);

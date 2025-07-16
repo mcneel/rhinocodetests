@@ -97,7 +97,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     {
       bool assertedTrue = false;
 
-      IDocumentObject[] objects = document.Objects.AllObjects.ToArray();
+      IDocumentObject[] objects = document.Objects.ActiveObjects.ToArray();
       foreach (IDocumentObject obj in objects)
       {
         if (IO.TryGetIoId(obj.GetType(), out Guid objId)
