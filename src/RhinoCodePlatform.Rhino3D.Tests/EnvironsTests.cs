@@ -371,22 +371,22 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       index++;
       entry = entries.ElementAt(index);
       Assert.AreEqual(1, entry.Directive.SpecSet.Count);
-      Assert.Contains(new PackageSpec("Newtonsoft.Json", "13.0.3"), entry.Directive.SpecSet.ToArray());
+      Assert.Contains(new PackageSpec("Newtonsoft.Json", "13.0.3", PackageSpec.VersionCompareRule.NewerThanOrEqual), entry.Directive.SpecSet.ToArray());
 
       index++;
       entry = entries.ElementAt(index);
       Assert.AreEqual(1, entry.Directive.SpecSet.Count);
-      Assert.Contains(new PackageSpec("Newtonsoft.Json", "13.0.3"), entry.Directive.SpecSet.ToArray());
+      Assert.Contains(new PackageSpec("Newtonsoft.Json>=13.0.3"), entry.Directive.SpecSet.ToArray());
 
       index++;
       entry = entries.ElementAt(index);
       Assert.AreEqual(1, entry.Directive.SpecSet.Count);
-      Assert.Contains(new PackageSpec("LunchBox", "2025.5.5.0"), entry.Directive.SpecSet.ToArray());
+      Assert.Contains(new PackageSpec("LunchBox", "2025.5.5.0", PackageSpec.VersionCompareRule.NewerThanOrEqual), entry.Directive.SpecSet.ToArray());
 
       index++;
       entry = entries.ElementAt(index);
       Assert.AreEqual(1, entry.Directive.SpecSet.Count);
-      Assert.Contains(new PackageSpec("LunchBox", "2025.5.5+0"), entry.Directive.SpecSet.ToArray());
+      Assert.Contains(new PackageSpec("LunchBox>=2025.5.5+0"), entry.Directive.SpecSet.ToArray());
 
       index++;
       entry = entries.ElementAt(index);
@@ -411,7 +411,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       index++;
       entry = entries.ElementAt(index);
       Assert.AreEqual(1, entry.Directive.SpecSet.Count);
-      Assert.Contains(new PackageSpec("Newtonsoft.Json", "13.0.3"), entry.Directive.SpecSet.ToArray());
+      Assert.Contains(new PackageSpec("Newtonsoft.Json>=13.0.3"), entry.Directive.SpecSet.ToArray());
 
       Diagnostic[] diags = code.Diagnose(new DiagnoseOptions()).ToArray();
 
@@ -454,11 +454,11 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
       // Yak
       IEnvirons yak = RhinoCode.PackageEnvirons.WherePasses(new EnvironsSpec("*.*.yak")).First();
-      yak.AddPackages(new PackageSpec[] { new PackageSpec("BFS") });
+      yak.AddPackages(new PackageSpec[] { new("BitmapPlus"), new("BFS") });
       using IEnvironConnection yakcn = yak.Connect(ctx);
       p = yakcn.QueryLocal(token).First();
       Assert.That(p.Availability, Is.EqualTo(PackageAvailability.Available));
-      ps = yakcn.Query(new PackageSpec[] { new PackageSpec("LunchBox") }, opts, token).First();
+      ps = yakcn.Query(new PackageSpec[] { new("BitmapPlus") }, opts, token).First();
       Assert.That(ps.Availability, Is.EqualTo(PackageAvailability.AvailableOnProvider));
 
       // Wheel
@@ -473,19 +473,21 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       Assert.That(p.Availability, Is.EqualTo(PackageAvailability.AvailableOnPlatform));
     }
 
-    [Test]
-    public void TestEnvirons_Python3_Specs_PEP723()
+    static IEnumerable<TestCaseData> GetTestEnvironsPython3SpecsPEP723Cases()
+    {
+      yield return new("# /// script\r\n# requires-python = \">=3\"\r\n# dependencies = [\r\n#   \"requests<3\",\r\n#   \"rich\",\r\n# ]\r\n# ///\r\n# r \"nuget: Rhino.Scripting\"\r\n");
+      yield return new("# /// script\n# requires-python = \">=3\"\n# dependencies = [\n#   \"requests<3\",\n#   \"rich\",\n# ]\n# ///\n# r \"nuget: Rhino.Scripting\"\n");
+      yield return new("#/// script\r\n# requires-python = \">=3\"\r\n# dependencies = [\r\n#   \"requests<3\",\r\n#   \"rich\",\r\n# ]\r\n# ///\r\n# r \"nuget: Rhino.Scripting\"\r\n");
+      yield return new("#/// script\n# requires-python = \">=3\"\n# dependencies = [\n#   \"requests<3\",\n#   \"rich\",\n# ]\n# ///\n# r \"nuget: Rhino.Scripting\"\n");
+      yield return new("# /// script\r\n# requires-python = \">=3\"\r\n# dependencies = [\r\n#   \"requests<3\",\r\n#\"rich\",\r\n# ]\r\n# ///\r\n# r \"nuget: Rhino.Scripting\"\r\n");
+      yield return new("# /// script\n# requires-python = \">=3\"\n# dependencies = [\n#   \"requests<3\",\n#\"rich\",\n# ]\n# ///\n# r \"nuget: Rhino.Scripting\"\n");
+    }
+
+    [Test, TestCaseSource(nameof(GetTestEnvironsPython3SpecsPEP723Cases))]
+    public void TestEnvirons_Python3_Specs_PEP723(string script)
     {
       ILanguage py3 = RhinoCode.Languages.QueryLatest(LanguageSpec.Python3);
-      Code code = py3.CreateCode(@"# /// script
-# requires-python = "">=3""
-# dependencies = [
-#   ""requests<3"",
-#   ""rich"",
-# ]
-# ///
-# r ""nuget: Rhino.Scripting""
-");
+      Code code = py3.CreateCode(script);
 
       PackageSpecEntry[] entries = code.Text.QueryPackageSpecs().Entries.ToArray();
 
@@ -683,15 +685,15 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
       code = py3.CreateCode(script);
       code.Text.Set(NuGetEnvirons.User.GetDirectives("RestSharp, 1.2.3"));
-      Assert.That((string)code.Text, Is.EqualTo($"{script}\n# r \"nuget: RestSharp, 1.2.3\""));
+      Assert.That((string)code.Text, Is.EqualTo($"{script}\r\n# r \"nuget: RestSharp, 1.2.3\""));
 
-      code = py3.CreateCode(script + "\n");
+      code = py3.CreateCode(script + "\r\n");
       code.Text.Set(NuGetEnvirons.User.GetDirectives("RestSharp, 1.2.3"));
-      Assert.That((string)code.Text, Is.EqualTo($"{script}\n# r \"nuget: RestSharp, 1.2.3\"\n"));
+      Assert.That((string)code.Text, Is.EqualTo($"{script}\r\n# r \"nuget: RestSharp, 1.2.3\"\r\n"));
 
-      code = py3.CreateCode(script + "\n");
+      code = py3.CreateCode(script + "\r\n");
       code.Text.Set(NuGetEnvirons.User.GetDirectives("RestSharp, 1.2.3+0"));
-      Assert.That((string)code.Text, Is.EqualTo($"{script}\n# r \"nuget: RestSharp, 1.2.3\"\n"));
+      Assert.That((string)code.Text, Is.EqualTo($"{script}\r\n# r \"nuget: RestSharp, 1.2.3\"\r\n"));
     }
 
     [Test]

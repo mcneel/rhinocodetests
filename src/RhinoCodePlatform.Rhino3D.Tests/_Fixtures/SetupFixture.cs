@@ -214,6 +214,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 Directory.Delete(libsCache, true);
                 Directory.CreateDirectory(libsCache);
             }
+
+            string yaklibsCache = Path.Combine(RhinoCode.Directory, "libs-yak");
+            if (Directory.Exists(yaklibsCache))
+            {
+                Directory.Delete(yaklibsCache, true);
+            }
         }
 
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
