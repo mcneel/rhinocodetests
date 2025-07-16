@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using NUnit.Framework;
@@ -395,5 +396,84 @@ namespace Rhino.Runtime.Code.Tests
             Assert.IsTrue(s.Matches(p));
         }
 #endif
+
+        [Test]
+        public void TestPackageSpec_Order()
+        {
+            // this used to be test_rhinocode_packageSpec.cs test file
+            var packages = new PackageSpec[] {
+                new("Name==8"),
+                new("Name==7.1"),
+                new("Name==7"),
+                new("Name>=7"),
+                new("Name<6"),
+                new("Name<=6.3"),
+            };
+
+            string[] ordered = new string[]
+            {
+                "Name<6.*",
+                "Name<=6.3.*",
+                "Name==7.*",
+                "Name>=7.*",
+                "Name==7.1.*",
+                "Name==8.*",
+            };
+
+            int index = 0;
+            foreach (PackageSpec pkg in packages.OrderBy(p => p))
+            {
+                // Console.WriteLine(pkg);
+                Assert.That(pkg.ToString() == ordered[index]);
+                index++;
+            }
+        }
+
+        [Test]
+        public void TestPackageSpec_Versions()
+        {
+            // this used to be test_rhinocode_packageSpecVersion.cs test file
+            var versions = new PackageVersion[] {
+                new (6, 0),
+                new (6, 1),
+                new (6, 3),
+                new (6, 10, 12),
+                new (7, 1),
+                new (7, 0),
+                new (7, 0, 100),
+                new (7, 2, 200),
+                new (7, 4, 300),
+                new (8, 0),
+                new (8, 1),
+                new (8, 3),
+            };
+
+            PackageSpec pkg;
+
+            // Finding Older than 7 (<)
+            pkg = new PackageSpec("Name<7");
+            foreach (PackageVersion ver in versions.Where(v => pkg.Matches(v)))
+                Assert.That(ver.Major == 6);
+
+            // Finding Older or Equal than 7.* (<=)
+            pkg = new PackageSpec("Name<=7");
+            foreach (PackageVersion ver in versions.Where(v => pkg.Matches(v)))
+                Assert.That(ver.Major <= 7);
+
+            // Finding 7.* (==)
+            pkg = new PackageSpec("Name==7");
+            foreach (PackageVersion ver in versions.Where(v => pkg.Matches(v)))
+                Assert.That(ver.Major == 7);
+
+            // Finding Newer or Equal than 7.* (>=)
+            pkg = new PackageSpec("Name>=7");
+            foreach (PackageVersion ver in versions.Where(v => pkg.Matches(v)))
+                Assert.That(ver.Major >= 7);
+
+            // Finding Newer than 7.2 (>=)
+            pkg = new PackageSpec("Name>=7.2");
+            foreach (PackageVersion ver in versions.Where(v => pkg.Matches(v)))
+                Assert.That((ver.Major == 7 && ver.Minor >= 2) || ver.Major == 8);
+        }
     }
 }

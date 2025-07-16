@@ -76,27 +76,23 @@ namespace Rhino.Runtime.Code.Tests
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 1, 1, 1, 1, "---", true, "---using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");")]
         /* add: after start */
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 1, 2, 1, 2, "---", true, "u---sing System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");")]
-        /* add: end before last */
-        [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 32, 3, 32, "---", true, "using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\")---;")]
         /* add: end last */
+        [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 32, 3, 32, "---", true, "using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\")---;")]
+        /* add: end one after last */
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 33, 3, 33, "---", true, "using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");---")]
-        /* add: end beyond last */
-        [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 33, 3, 100, "---", true, "using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");---")]
         /* add: reverse range */
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 32, 3, 1, "---", true, "using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\")---;")]
-        /* remove: beyond start */
+        /* rem beyond start */
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 0, 0, 0, 0, "", true, "using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");")]
-        /* remove: start */
+        /* rem: start */
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 1, 1, 1, 13, "", true, ";\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");")]
-        /* remove: after start */
+        /* rem: after start */
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 1, 2, 1, 13, "", true, "u;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");")]
-        /* remove: end before last */
+        /* rem: end last */
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 1, 3, 32, "", true, "using System;\nusing Rhino;\n;")]
-        /* remove: end last */
+        /* rem: end one after last */
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 1, 3, 33, "", true, "using System;\nusing Rhino;\n")]
-        /* remove: end beyond last */
-        [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 1, 3, 100, "", true, "using System;\nusing Rhino;\n")]
-        /* remove->insert: reverse range */
+        /* rem->insert: reverse range */
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 32, 3, 1, "", true, "using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");")]
         /* replace: beyond start */
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 0, 0, 0, 10, "---", true, "---tem;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");")]
@@ -106,17 +102,36 @@ namespace Rhino.Runtime.Code.Tests
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 1, 1, 1, 13, "---", true, "---;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");")]
         /* replace: after start */
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 1, 2, 1, 13, "---", true, "u---;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");")]
-        /* replace: end before last */
-        [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 1, 3, 32, "---", true, "using System;\nusing Rhino;\n---;")]
         /* replace: end last */
+        [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 1, 3, 32, "---", true, "using System;\nusing Rhino;\n---;")]
+        /* replace: end one after last */
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 1, 3, 33, "---", true, "using System;\nusing Rhino;\n---")]
-        /* replace: end beyond last */
-        [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 1, 3, 100, "---", true, "using System;\nusing Rhino;\n---")]
         /* replace->insert: reverse range */
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 32, 3, 1, "---", true, "using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\")---;")]
+
+#if RC9_0
+        /* add: end beyond last */
+        [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 33, 3, 100, "", false, "")]
+        /* rem: end beyond last */
+        [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 1, 3, 100, "", false, "")]
+        /* replace: end beyond last */
+        [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 1, 3, 100, "", false, "")]
+#else
+        /* add: end beyond last */
+        [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 33, 3, 100, "---", true, "using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");---")]
+        /* rem: end beyond last */
+        [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 1, 3, 100, "", true, "using System;\nusing Rhino;\n")]
+        /* replace: end beyond last */
+        [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 1, 3, 100, "---", true, "using System;\nusing Rhino;\n---")]
+#endif
+
         public void TestPatch(string text, int fromLine, int fromColumn, int toLine, int toColumn, string patch, bool expected, string expectedPatched)
         {
+#if RC9_0
+            bool res = text.TryPatch(TextPatch.Replace(new TextRange(fromLine, fromColumn, toLine, toColumn), patch), out string patched);
+#else
             bool res = text.TryPatch(new TextPatch(new TextRange(fromLine, fromColumn, toLine, toColumn), patch), out string patched);
+#endif
             Assert.AreEqual(expected, res);
             if (expected)
             {
@@ -124,5 +139,59 @@ namespace Rhino.Runtime.Code.Tests
             }
         }
 #endif
+
+
+        [Test]
+        public void TestPatch_Grasshopper()
+        {
+            // this used to be test_rhinocode_textpatch.cs
+            string source = @"// Grasshopper Script Instance
+//#! csharp
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+  /* 
+    Members:
+      RhinoDoc RhinoDocument
+      GH_Document GrasshopperDocument
+      IGH_Component Component
+      int Iteration
+
+    Methods (Virtual & overridable):
+      Print(string text)
+      Print(string format, params object[] args)
+      Reflect(object obj)
+      Reflect(object obj, string method_name)
+  */
+  
+  private void RunScript(object x, object y, out object a)
+  {
+    // Write your logic here
+    a = null;
+  }
+}
+";
+
+            // removing null in a=null assignment
+#if RC9_0
+            TextPatch patch = TextPatch.Remove(new TextRange(35, 9, 35, 13));
+#else
+            TextPatch patch = new TextPatch(new TextRange(35, 9, 35, 13), string.Empty);
+#endif
+            source.TryPatch(patch, out string res);
+            Assert.That(!res.Contains("null"));
+        }
     }
 }

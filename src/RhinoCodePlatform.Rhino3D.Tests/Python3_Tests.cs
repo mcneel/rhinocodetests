@@ -3117,23 +3117,171 @@ from system.Collection.Generic import ");
 
 #if RC9_0
         [Test]
-        public void TestPython3_PackageSpec_NormalizedId_Match()
+        public void TestPython3_Environs_PackageSpec_NormalizedId_Match()
         {
-            CPythonPackageSpec spec = CPythonPackageSpec.CreateFromArguments("wood-nano").First();
+            CPythonPackageSpec spec = CPythonPackageSpec.Parse("wood-nano").First();
 
             CPythonPackageSpec normSpec;
 
-            normSpec = CPythonPackageSpec.CreateFromArguments("wood_nano==0.0.1").First();
+            normSpec = CPythonPackageSpec.Parse("wood_nano==0.0.1").First();
             Assert.IsTrue(spec.Matches(normSpec));
 
-            normSpec = CPythonPackageSpec.CreateFromArguments("wood--nano==0.0.1").First();
+            normSpec = CPythonPackageSpec.Parse("wood--nano==0.0.1").First();
             Assert.IsTrue(spec.Matches(normSpec));
 
-            normSpec = CPythonPackageSpec.CreateFromArguments("wood__nano==0.0.1").First();
+            normSpec = CPythonPackageSpec.Parse("wood__nano==0.0.1").First();
             Assert.IsTrue(spec.Matches(normSpec));
 
-            normSpec = CPythonPackageSpec.CreateFromArguments("wood.-nano==0.0.1").First();
+            normSpec = CPythonPackageSpec.Parse("wood.-nano==0.0.1").First();
             Assert.IsTrue(spec.Matches(normSpec));
+        }
+
+        [Test]
+        public void TestPython3_Environs_VersionSpec_FromString_1_0()
+        {
+            var v = new CPythonPackageVersion("1.0");
+            Assert.AreEqual(1, v.Major);
+            Assert.AreEqual(0, v.Minor);
+        }
+
+        [Test]
+        public void TestPython3_Environs_VersionSpec_FromString_3_10_6()
+        {
+            var v = new CPythonPackageVersion("3.10.6");
+            Assert.AreEqual(3, v.Major);
+            Assert.AreEqual(10, v.Minor);
+            Assert.AreEqual(6, v.Patch);
+        }
+
+        [Test]
+        public void TestPython3_Environs_VersionSpec_FromString_0_9_dev1()
+        {
+            var v = new CPythonPackageVersion("0.9.dev1");
+            Assert.AreEqual(0, v.Major);
+            Assert.AreEqual(9, v.Minor);
+            Assert.AreEqual(1, v.DevNumber);
+        }
+
+        [Test]
+        public void TestPython3_Environs_VersionSpec_FromString_1_2_3a1()
+        {
+            var v = new CPythonPackageVersion("1.2.3a1");
+            Assert.AreEqual(1, v.Major);
+            Assert.AreEqual(2, v.Minor);
+            Assert.AreEqual(3, v.Patch);
+            Assert.AreEqual("a", v.PreLabel);
+            Assert.AreEqual(1, v.PreNumber);
+        }
+
+        [Test]
+        public void TestPython3_Environs_VersionSpec_FromString_1_2_3_post1()
+        {
+            var v = new CPythonPackageVersion("1.2.3.post1");
+            Assert.AreEqual(1, v.Major);
+            Assert.AreEqual(2, v.Minor);
+            Assert.AreEqual(3, v.Patch);
+            Assert.AreEqual(1, v.PostNumber);
+        }
+
+        [Test]
+        public void TestPython3_Environs_VersionSpec_FromString_1_0rc1_abc123()
+        {
+            var v = new CPythonPackageVersion("1.0rc1+abc123");
+            Assert.AreEqual(1, v.Major);
+            Assert.AreEqual(0, v.Minor);
+            Assert.AreEqual("rc", v.PreLabel);
+            Assert.AreEqual(1, v.PreNumber);
+            Assert.AreEqual("abc123", v.Local);
+        }
+
+        static IEnumerable<TestCaseData> GetTestEnvironsTextToSpecCases()
+        {
+            yield return new("# r \"pip: numpy\"", "numpy", new PackageSpec[] { new("numpy") });
+            yield return new("# r \"pip: numpy>=1.2.3\"", "numpy>=1.2.3", new PackageSpec[] { new("numpy", "1.2.3", PackageSpec.VersionCompareRule.NewerThanOrEqual) });
+
+            yield return new("# r \"pip: git+https://github.com/huggingface/transformers.git\"", "git+https://github.com/huggingface/transformers.git", new PackageSpec[] { new("git+https://github.com/huggingface/transformers.git") });
+            yield return new("# r \"pip: git+https://github.com/huggingface/transformers.git@096f25ae1f501a084d8ff2dcaf25fbc2bd60eba4\"", "git+https://github.com/huggingface/transformers.git@096f25ae1f501a084d8ff2dcaf25fbc2bd60eba4", new PackageSpec[] { new("git+https://github.com/huggingface/transformers.git@096f25ae1f501a084d8ff2dcaf25fbc2bd60eba4") });
+        }
+
+        [Test, TestCaseSource(nameof(GetTestEnvironsTextToSpecCases))]
+        public void TestPython3_Environs_TextToSpec(string directiveText, string spectext, PackageSpec[] specs)
+        {
+            ILanguage py3 = GetLanguage(LanguageSpec.Python3);
+            PackageSpecDirective[] directives = py3.Environs.GetDirectives(spectext).ToArray();
+
+            PackageSpecDirective d = directives[0];
+            Assert.AreEqual(d.Text, directiveText);
+
+            PackageSpec[] dspecs = d.SpecSet.ToArray();
+            Assert.AreEqual(specs.Length, dspecs.Length);
+
+            for (int i = 0; i < specs.Length; i++)
+            {
+                PackageSpec dspec = dspecs[i];
+                PackageSpec spec = specs[i];
+                Assert.AreEqual(dspec, spec);
+            }
+        }
+
+        static IEnumerable<TestCaseData> GetTestEnvironsTextToSpecCPythonArgsCases()
+        {
+            yield return new("numpy scipy --index-url https://custom.pypi.org/simple", new PackageSpec[] { new("numpy"), new("scipy") });
+            yield return new("numpy scipy<=1.2.3 --index-url https://custom.pypi.org/simple", new PackageSpec[] { new("numpy"), new("scipy", "1.2.3", PackageSpec.VersionCompareRule.OlderThanOrEqual) });
+        }
+
+        [Test, TestCaseSource(nameof(GetTestEnvironsTextToSpecCPythonArgsCases))]
+        public void TestPython3_Environs_TextToSpec_CPythonArgs(string args, PackageSpec[] specs)
+        {
+            ILanguage py3 = GetLanguage(LanguageSpec.Python3);
+            PackageSpecDirective[] directives = py3.Environs.GetDirectives(args).ToArray();
+            Assert.AreEqual(1, directives.Length);
+
+            PackageSpecDirective d = directives[0];
+            PackageSpec[] dspecs = d.SpecSet.ToArray();
+            Assert.AreEqual(1, dspecs.Length);
+
+            PackageSpec dspec = dspecs[0];
+            Assert.IsInstanceOf<CPythonPackageArgsSpec>(dspec);
+
+            CPythonPackageArgsSpec argSpec = (CPythonPackageArgsSpec)dspec;
+            Assert.AreEqual(args, argSpec.Id);
+            Assert.AreEqual(args, argSpec.GetArguments());
+
+            PackageSpec[] argspecs = argSpec.GetPackageSpecs().ToArray();
+            Assert.AreEqual(specs.Length, argspecs.Length);
+
+            for (int i = 0; i < specs.Length; i++)
+            {
+                PackageSpec aspec = argspecs[i];
+                PackageSpec spec = specs[i];
+                Assert.AreEqual(aspec, spec);
+            }
+        }
+
+        static IEnumerable<TestCaseData> GetPython3EnvironsTextToSpecBadSpecCases()
+        {
+            yield return new("numpy>=");
+            yield return new("cipy<=1.2.");
+            yield return new("git+");
+            yield return new("git+");
+            yield return new("git+http://");
+        }
+
+        [Test, TestCaseSource(nameof(GetPython3EnvironsTextToSpecBadSpecCases))]
+        public void TestPython3_Environs_TextToSpec_BadSpec(string args)
+        {
+            ILanguage py3 = GetLanguage(LanguageSpec.Python3);
+            Assert.Throws<ArgumentException>(() => py3.Environs.GetDirectives(args).ToArray());
+        }
+
+        [Test]
+        public void TestPython3_Environs_Match_CA_Certificates()
+        {
+            var spec = new PackageSpec("ca-certificates");
+            ILanguage py3 = GetLanguage(LanguageSpec.Python3);
+            IEnvironConnection cxn = py3.Environs.Connect(new ConnectionContext());
+            HashSet<IPackageInfo> pinfos = cxn.Query(new PackageSpec[] { spec }, new EnvironQueryOptions(), CancellationToken.None).ToHashSet();
+            Assert.IsTrue(pinfos.Any(p => p.Id == "certificates"));
         }
 #endif
 
