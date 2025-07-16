@@ -24,6 +24,7 @@ using Rhino.Runtime.Code.Testing;
 
 #if RC8_11
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
+
 #else
 using RhinoCodePlatform.Rhino3D.Languages;
 #endif
@@ -31,6 +32,8 @@ using RhinoCodePlatform.Rhino3D.Languages;
 #if RC9_0
 using Rhino.Runtime.Code.Languages.PythonNet;
 #endif
+
+using RhinoCodePlatform.Rhino3D.Testing;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -2405,6 +2408,7 @@ import os
         }
 #endif
 
+
 #if RC8_14
         [Test]
         public void TestPython3_CompleteSignature_GH_CurveXCurve()
@@ -3113,6 +3117,7 @@ from system.Collection.Generic import ");
         }
 #endif
 
+
 #if RC9_0
         [Test]
         public void TestPython3_Environs_PackageSpec_NormalizedId_Match()
@@ -3217,7 +3222,7 @@ from system.Collection.Generic import ");
             {
                 PackageSpec dspec = dspecs[i];
                 PackageSpec spec = specs[i];
-                Assert.That(dspec.Equals(spec));
+                Assert.AreEqual(dspec, spec);
             }
         }
 
@@ -3280,6 +3285,208 @@ from system.Collection.Generic import ");
             IEnvironConnection cxn = py3.Environs.Connect(new ConnectionContext());
             HashSet<IPackageInfo> pinfos = cxn.Query(new PackageSpec[] { spec }, new EnvironQueryOptions(), CancellationToken.None).ToHashSet();
             Assert.IsTrue(pinfos.Any(p => p.Id == "certificates"));
+        }
+
+        [Test]
+        public void TestPython3_Environs_Specs()
+        {
+            var testCases = new List<(CPythonPackageVersion spec, string expected)>
+            {
+                (new CPythonPackageVersion("1.0"),                  "1.0"),
+                (new CPythonPackageVersion("1.0.0"),                "1.0.0"),
+                (new CPythonPackageVersion("2.7.18"),               "2.7.18"),
+                (new CPythonPackageVersion("3.10.6"),               "3.10.6"),
+                (new CPythonPackageVersion("0.9.dev1"),             "0.9.dev1"),
+                (new CPythonPackageVersion("1.2.3a1"),              "1.2.3a1"),
+                (new CPythonPackageVersion("1.2.3b2"),              "1.2.3b2"),
+                (new CPythonPackageVersion("1.2.3rc3"),             "1.2.3rc3"),
+                (new CPythonPackageVersion("1.2.3.post1"),          "1.2.3.post1"),
+                (new CPythonPackageVersion("1.2.3+local"),          "1.2.3+local"),
+                (new CPythonPackageVersion("2020.4.5"),             "2020.4.5"),
+                (new CPythonPackageVersion("1.0.dev456"),           "1.0.dev456"),
+                (new CPythonPackageVersion("1.0a5.post2"),          "1.0a5.post2"),
+                (new CPythonPackageVersion("1.0b1.dev3"),           "1.0b1.dev3"),
+                (new CPythonPackageVersion("1.0rc1+abc123"),        "1.0rc1+abc123"),
+                (new CPythonPackageVersion("1!1.0.0"),              "1!1.0.0"),
+                (new CPythonPackageVersion("2!0.1.0"),              "2!0.1.0"),
+                (new CPythonPackageVersion("1.0.0.post0"),          "1.0.0.post0"),
+                (new CPythonPackageVersion("3.11.0rc2"),            "3.11.0rc2"),
+                (new CPythonPackageVersion("3.9.13+ubuntu.1"),      "3.9.13+ubuntu.1"),
+            };
+
+            foreach ((CPythonPackageVersion spec, string expected) in testCases)
+            {
+                Assert.That(spec.ToString(), Is.EqualTo(expected));
+            }
+        }
+
+        [Test]
+        public void TestPython3_Environs_Specs_ParseExtras()
+        {
+            CPythonPackageSpec[] specs;
+            CPythonPackageSpec spec;
+
+            specs = CPythonPackageSpec.Parse("jax").ToArray();
+            Assert.That(specs.Length, Is.EqualTo(1));
+            spec = specs[0];
+            Assert.That(spec.ToPackageString(), Is.EqualTo("jax"));
+
+            specs = CPythonPackageSpec.Parse("jax[tpu]").ToArray();
+            Assert.That(specs.Length, Is.EqualTo(1));
+            spec = specs[0];
+            Assert.That(spec.ToPackageString(), Is.EqualTo("jax[tpu]"));
+
+            specs = CPythonPackageSpec.Parse("requests[security] uvicorn[standard]>=1.2").ToArray();
+            Assert.That(specs.Length, Is.EqualTo(2));
+            spec = specs[0];
+            Assert.That(spec.ToPackageString(), Is.EqualTo("requests[security]"));
+            spec = specs[1];
+            Assert.That(spec.ToPackageString(), Is.EqualTo("uvicorn[standard]>=1.2"));
+
+            PythonPackageSpec ps;
+
+            ps = new PythonPackageSpec("jax[tpu]");
+            Assert.That(ps.ToPackageString(), Is.EqualTo("jax[tpu]"));
+
+            ps = new PythonPackageSpec("jax[tpu]", "1.2.3");
+            Assert.That(ps.ToPackageString(), Is.EqualTo("jax[tpu]==1.2.3"));
+
+            var p = new PythonPackage("jax[tpu]", "1.2.3");
+            Assert.That(p.ToString(), Is.EqualTo("jax[tpu]==1.2.3"));
+        }
+
+        static IEnumerable<TestCaseData> GetTestEnvironsPython3SpecsPEP723Cases()
+        {
+            yield return new("# /// script\r\n# requires-python = \">=3\"\r\n# dependencies = [\r\n#   \"requests<3\",\r\n#   \"rich\",\r\n# ]\r\n# ///\r\n# r \"nuget: Rhino.Scripting\"\r\n");
+            yield return new("# /// script\n# requires-python = \">=3\"\n# dependencies = [\n#   \"requests<3\",\n#   \"rich\",\n# ]\n# ///\n# r \"nuget: Rhino.Scripting\"\n");
+            yield return new("#/// script\r\n# requires-python = \">=3\"\r\n# dependencies = [\r\n#   \"requests<3\",\r\n#   \"rich\",\r\n# ]\r\n# ///\r\n# r \"nuget: Rhino.Scripting\"\r\n");
+            yield return new("#/// script\n# requires-python = \">=3\"\n# dependencies = [\n#   \"requests<3\",\n#   \"rich\",\n# ]\n# ///\n# r \"nuget: Rhino.Scripting\"\n");
+            yield return new("# /// script\r\n# requires-python = \">=3\"\r\n# dependencies = [\r\n#   \"requests<3\",\r\n#\"rich\",\r\n# ]\r\n# ///\r\n# r \"nuget: Rhino.Scripting\"\r\n");
+            yield return new("# /// script\n# requires-python = \">=3\"\n# dependencies = [\n#   \"requests<3\",\n#\"rich\",\n# ]\n# ///\n# r \"nuget: Rhino.Scripting\"\n");
+        }
+
+        [Test, TestCaseSource(nameof(GetTestEnvironsPython3SpecsPEP723Cases))]
+        public void TestPython3_Environs_Specs_PEP723(string script)
+        {
+            ILanguage py3 = RhinoCode.Languages.QueryLatest(LanguageSpec.Python3);
+            Code code = py3.CreateCode(script);
+
+            PackageSpecEntry[] entries = code.Text.QueryPackageSpecs().Entries.ToArray();
+
+            PackageSpecEntry entry;
+            PackageSpec[] specs;
+            PackageSpec s;
+
+            Assert.That(2 == entries.Length);
+
+            entry = entries[0];
+            specs = entry.Directive.SpecSet.ToArray();
+            Assert.That(2 == specs.Length);
+
+            s = specs[0];
+            Assert.That(s.Equals(new PackageSpec("requests<3")));
+            s = specs[1];
+            Assert.That(s.Equals(new PackageSpec("rich")));
+
+            entry = entries[1];
+            specs = entry.Directive.SpecSet.ToArray();
+            Assert.That(1 == specs.Length);
+            s = specs[0];
+            Assert.That(s.Equals(new PackageSpec("Rhino.Scripting")));
+        }
+
+        [Test]
+        public void TestPython3_Environs_SpecsWithMeta()
+        {
+            CPythonPackageSpec s1 = CPythonPackageSpec.Parse("-e git+https://github.com/uiri/toml.git#egg=toml").First();
+            CPythonPackageSpec s2 = CPythonPackageSpec.Parse("--editable git+https://github.com/uiri/toml.git#egg=toml").First();
+
+            Assert.That(s1, Is.InstanceOf<CPythonPackageArgsSpec>());
+            Assert.That(s2, Is.InstanceOf<CPythonPackageArgsSpec>());
+
+            Assert.That(s1.ToPackageSpecString(), Is.EqualTo(s2.ToPackageSpecString()));
+            Assert.That(s1.ToPackageSpecString(), Is.EqualTo(s2.ToPackageString()));
+            Assert.That(s1.ToPackageString(), Is.EqualTo(s2.ToPackageSpecString()));
+            Assert.That(s1.ToPackageString(), Is.EqualTo(s2.ToPackageString()));
+        }
+
+        [Test]
+        public void TestPython3_Environs_SpecEntryCache()
+        {
+            ILanguage py3 = GetLanguage(LanguageSpec.Python3);
+            Code code = py3.CreateCode(@"
+#r ""pip: git+https://github.com/uiri/toml.git""
+      ");
+
+            code.Environ = py3.Environs.CreateEnviron("test_pkgcache");
+
+            var rpw = new RestoreProgressWatcher();
+            code.RestorePackages(rpw);
+            Assert.IsTrue(rpw.HasReports);
+
+            code.Text.Set(@"
+#r ""pip: git+https://github.com/uiri/toml.git""
+
+
+      ");
+
+            rpw.Reset();
+            code.RestorePackages(rpw);
+            Assert.IsFalse(rpw.HasReports);
+
+            code.Text.Set(@"
+#r ""pip: git+https://github.com/uiri/toml.git@f6e1e4c65b513544367fe88576ef1895eccded74""
+
+
+      ");
+
+            rpw.Reset();
+            code.RestorePackages(rpw);
+            Assert.IsTrue(rpw.HasReports);
+        }
+
+        [Test]
+        public void TestPython3_Environs_SpecEntryCache_Editable()
+        {
+            ILanguage py3 = GetLanguage(LanguageSpec.Python3);
+            Code code = py3.CreateCode(@"
+#r ""pip: -e git+https://github.com/uiri/toml.git#egg=toml""
+      ");
+
+            code.Environ = py3.Environs.CreateEnviron("test_pkgcache_editable");
+
+            var rpw = new RestoreProgressWatcher();
+            code.RestorePackages(rpw);
+            Assert.IsTrue(rpw.HasReports);
+
+            code.Text.Set(@"
+#r ""pip: -e git+https://github.com/uiri/toml.git#egg=toml""
+
+      ");
+
+            rpw.Reset();
+            code.RestorePackages(rpw);
+            Assert.IsFalse(rpw.HasReports);
+
+            code.Text.Set(@"
+#r ""pip: --editable git+https://github.com/uiri/toml.git#egg=toml""
+
+
+      ");
+
+            rpw.Reset();
+            code.RestorePackages(rpw);
+            Assert.IsFalse(rpw.HasReports);
+
+            code.Text.Set(@"
+#r ""pip: -e git+https://github.com/uiri/toml.git#egg=toml@f6e1e4c65b513544367fe88576ef1895eccded74""
+
+
+      ");
+
+            rpw.Reset();
+            code.RestorePackages(rpw);
+            Assert.IsTrue(rpw.HasReports);
         }
 #endif
 
