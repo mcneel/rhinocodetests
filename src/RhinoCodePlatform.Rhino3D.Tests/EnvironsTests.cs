@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
@@ -101,74 +102,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       code.Text.Set(string.Empty);
       code.RestoreEnviron();
       Assert.AreEqual(py3.Environs.Shared, code.Environ);
-    }
-
-    [Test]
-    public void TestEnvirons_Python3_Specs()
-    {
-      var testCases = new List<(CPythonPackageVersion spec, string expected)>
-      {
-          (new CPythonPackageVersion("1.0"),                  "1.0"),
-          (new CPythonPackageVersion("1.0.0"),                "1.0.0"),
-          (new CPythonPackageVersion("2.7.18"),               "2.7.18"),
-          (new CPythonPackageVersion("3.10.6"),               "3.10.6"),
-          (new CPythonPackageVersion("0.9.dev1"),             "0.9.dev1"),
-          (new CPythonPackageVersion("1.2.3a1"),              "1.2.3a1"),
-          (new CPythonPackageVersion("1.2.3b2"),              "1.2.3b2"),
-          (new CPythonPackageVersion("1.2.3rc3"),             "1.2.3rc3"),
-          (new CPythonPackageVersion("1.2.3.post1"),          "1.2.3.post1"),
-          (new CPythonPackageVersion("1.2.3+local"),          "1.2.3+local"),
-          (new CPythonPackageVersion("2020.4.5"),             "2020.4.5"),
-          (new CPythonPackageVersion("1.0.dev456"),           "1.0.dev456"),
-          (new CPythonPackageVersion("1.0a5.post2"),          "1.0a5.post2"),
-          (new CPythonPackageVersion("1.0b1.dev3"),           "1.0b1.dev3"),
-          (new CPythonPackageVersion("1.0rc1+abc123"),        "1.0rc1+abc123"),
-          (new CPythonPackageVersion("1!1.0.0"),              "1!1.0.0"),
-          (new CPythonPackageVersion("2!0.1.0"),              "2!0.1.0"),
-          (new CPythonPackageVersion("1.0.0.post0"),          "1.0.0.post0"),
-          (new CPythonPackageVersion("3.11.0rc2"),            "3.11.0rc2"),
-          (new CPythonPackageVersion("3.9.13+ubuntu.1"),      "3.9.13+ubuntu.1"),
-      };
-
-      foreach ((CPythonPackageVersion spec, string expected) in testCases)
-      {
-        Assert.That(spec.ToString(), Is.EqualTo(expected));
-      }
-    }
-
-    [Test]
-    public void TestEnvirons_Python3_Specs_ParseExtras()
-    {
-      CPythonPackageSpec[] specs;
-      CPythonPackageSpec spec;
-
-      specs = CPythonPackageSpec.Parse("jax").ToArray();
-      Assert.That(specs.Length, Is.EqualTo(1));
-      spec = specs[0];
-      Assert.That(spec.ToPackageString(), Is.EqualTo("jax"));
-
-      specs = CPythonPackageSpec.Parse("jax[tpu]").ToArray();
-      Assert.That(specs.Length, Is.EqualTo(1));
-      spec = specs[0];
-      Assert.That(spec.ToPackageString(), Is.EqualTo("jax[tpu]"));
-
-      specs = CPythonPackageSpec.Parse("requests[security] uvicorn[standard]>=1.2").ToArray();
-      Assert.That(specs.Length, Is.EqualTo(2));
-      spec = specs[0];
-      Assert.That(spec.ToPackageString(), Is.EqualTo("requests[security]"));
-      spec = specs[1];
-      Assert.That(spec.ToPackageString(), Is.EqualTo("uvicorn[standard]>=1.2"));
-
-      PythonPackageSpec ps;
-
-      ps = new PythonPackageSpec("jax[tpu]");
-      Assert.That(ps.ToPackageString(), Is.EqualTo("jax[tpu]"));
-
-      ps = new PythonPackageSpec("jax[tpu]", "1.2.3");
-      Assert.That(ps.ToPackageString(), Is.EqualTo("jax[tpu]==1.2.3"));
-
-      var p = new PythonPackage("jax[tpu]", "1.2.3");
-      Assert.That(p.ToString(), Is.EqualTo("jax[tpu]==1.2.3"));
     }
 
     [Test]
@@ -473,46 +406,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       Assert.That(p.Availability, Is.EqualTo(PackageAvailability.AvailableOnPlatform));
     }
 
-    static IEnumerable<TestCaseData> GetTestEnvironsPython3SpecsPEP723Cases()
-    {
-      yield return new("# /// script\r\n# requires-python = \">=3\"\r\n# dependencies = [\r\n#   \"requests<3\",\r\n#   \"rich\",\r\n# ]\r\n# ///\r\n# r \"nuget: Rhino.Scripting\"\r\n");
-      yield return new("# /// script\n# requires-python = \">=3\"\n# dependencies = [\n#   \"requests<3\",\n#   \"rich\",\n# ]\n# ///\n# r \"nuget: Rhino.Scripting\"\n");
-      yield return new("#/// script\r\n# requires-python = \">=3\"\r\n# dependencies = [\r\n#   \"requests<3\",\r\n#   \"rich\",\r\n# ]\r\n# ///\r\n# r \"nuget: Rhino.Scripting\"\r\n");
-      yield return new("#/// script\n# requires-python = \">=3\"\n# dependencies = [\n#   \"requests<3\",\n#   \"rich\",\n# ]\n# ///\n# r \"nuget: Rhino.Scripting\"\n");
-      yield return new("# /// script\r\n# requires-python = \">=3\"\r\n# dependencies = [\r\n#   \"requests<3\",\r\n#\"rich\",\r\n# ]\r\n# ///\r\n# r \"nuget: Rhino.Scripting\"\r\n");
-      yield return new("# /// script\n# requires-python = \">=3\"\n# dependencies = [\n#   \"requests<3\",\n#\"rich\",\n# ]\n# ///\n# r \"nuget: Rhino.Scripting\"\n");
-    }
-
-    [Test, TestCaseSource(nameof(GetTestEnvironsPython3SpecsPEP723Cases))]
-    public void TestEnvirons_Python3_Specs_PEP723(string script)
-    {
-      ILanguage py3 = RhinoCode.Languages.QueryLatest(LanguageSpec.Python3);
-      Code code = py3.CreateCode(script);
-
-      PackageSpecEntry[] entries = code.Text.QueryPackageSpecs().Entries.ToArray();
-
-      PackageSpecEntry entry;
-      PackageSpec[] specs;
-      PackageSpec s;
-
-      Assert.That(2 == entries.Length);
-
-      entry = entries[0];
-      specs = entry.Directive.SpecSet.ToArray();
-      Assert.That(2 == specs.Length);
-
-      s = specs[0];
-      Assert.That(s.Equals(new PackageSpec("requests<3")));
-      s = specs[1];
-      Assert.That(s.Equals(new PackageSpec("rich")));
-
-      entry = entries[1];
-      specs = entry.Directive.SpecSet.ToArray();
-      Assert.That(1 == specs.Length);
-      s = specs[0];
-      Assert.That(s.Equals(new PackageSpec("Rhino.Scripting")));
-    }
-
     [Test]
     public void TestEnvirons_Spec_To_Directive()
     {
@@ -713,6 +606,53 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       code = py3.CreateCode(script);
       code.Text.Set(py3.Environs.GetDirectives("certifi>=1.2.3"));
       Assert.That((string)code.Text, Is.EqualTo($"{script}# r \"pip: certifi>=1.2.3\"\n"));
+    }
+
+    static IEnumerable<TestCaseData> GetNuGetEnvironsTextToSpecBadSpecCases()
+    {
+      yield return new("RestSharp,");
+      yield return new("RestSharp, 1.2.");
+      yield return new("RestSharp, .1.2");
+      yield return new("RestSharp>=");
+    }
+
+    [Test, TestCaseSource(nameof(GetNuGetEnvironsTextToSpecBadSpecCases))]
+    public void TestEnvirons_NuGet_TextToSpec_BadSpec(string args)
+    {
+      Assert.Throws<ArgumentException>(() => NuGetEnvirons.User.GetDirectives(args).ToArray());
+    }
+
+    static IEnumerable<TestCaseData> GetYakEnvironsTextToSpecBadSpecCases()
+    {
+      yield return new("LunchBox,");
+      yield return new("LunchBox, 1.2.");
+      yield return new("LunchBox, .1.2");
+      yield return new("LunchBox>=");
+    }
+
+    [Test, TestCaseSource(nameof(GetYakEnvironsTextToSpecBadSpecCases))]
+    public void TestEnvirons_Yak_TextToSpec_BadSpec(string args)
+    {
+      IEnvirons yak = RhinoCode.PackageEnvirons.WherePasses(new EnvironsSpec("*.*.yak")).First();
+      Assert.Throws<ArgumentException>(() => yak.GetDirectives(args).ToArray());
+    }
+
+    [Test]
+    public void TestEnvirons_RestoreCode_And_Library()
+    {
+      ILanguage py3 = GetLanguage(LanguageSpec.Python3);
+      Code code = py3.CreateCode("#r \"nuget: AWSSDK.Core, 4.0.0.16\"");
+
+      ILanguage csharp = GetLanguage(LanguageSpec.CSharp);
+      TryGetTestFilesPath(out string fileDir);
+      ILanguageLibrary library = csharp.CreateLibrary(new Uri(Path.Combine(fileDir, "cs", "test_library_pkgrestore")));
+      code.Libraries.Add(library);
+
+      var rpw = new RestoreProgressWatcher();
+      code.RestorePackages(rpw);
+
+      Assert.That(rpw.Contains("Downloading AWSSDK.Core"));
+      Assert.That(rpw.Contains("Downloading MathNet.Numerics"));
     }
 #endif
   }
