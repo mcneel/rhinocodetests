@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 
 using Rhino.Runtime.Code.Languages;
+using Rhino.Runtime.Code.Registry;
 
 namespace Rhino.Runtime.Code.Tests
 {
@@ -210,13 +211,35 @@ namespace Rhino.Runtime.Code.Tests
             Assert.AreEqual(new LanguageSpec("python", "3"), spec);
         }
 
+        [Test]
+        public void TestLanguageSpecParse_Misc()
+        {
+            Assert.Throws<RegistryException>(() => new LanguageSpec("python", "3.*.10"));
+            Assert.Throws<RegistryException>(() => new LanguageSpec("dev.mcneel.pythonnet.python", "3.9.10"));
+            Assert.Throws<RegistryException>(() => new LanguageSpec("pythonnet.python_dev-3.9.*-devjames"));
+
+            Assert.That(LanguageSpec.TryParse("python", out LanguageSpec _));
+            Assert.That(LanguageSpec.TryParse("python3", out LanguageSpec _));
+            Assert.That(LanguageSpec.TryParse("python@3", out LanguageSpec _));
+            Assert.That(LanguageSpec.TryParse("python 3.*", out LanguageSpec _));
+            Assert.That(LanguageSpec.TryParse("python-3", out LanguageSpec _));
+            Assert.That(LanguageSpec.TryParse("python: 3.2", out LanguageSpec _));
+            Assert.That(LanguageSpec.TryParse("python-3_vray", out LanguageSpec _));
+            Assert.That(LanguageSpec.TryParse("pythonnet.python3.9.*_devjames", out LanguageSpec _));
+
+            Assert.That(new LanguageSpec("mcneel.python"), Is.GreaterThan(new LanguageSpec("python")));
+            Assert.That(new LanguageSpec("python", "3"), Is.GreaterThan(new LanguageSpec("python", "2")));
+            Assert.That(new LanguageSpec("mcneel.python", "3.2"), Is.GreaterThan(new LanguageSpec("python", "3")));
+            Assert.That(new LanguageSpec("mcneel.python", "3.9.10"), Is.GreaterThan(new LanguageSpec("python", "3.8.11")));
+        }
+
 #if RC8_16
         public enum ExpectedCompare : int
         {
-            AreEqual        = 0,
-            LeftIsSmaller   = -1,
-            LeftIsBigger    = 1,
-            AreNotEqual     = -2,
+            AreEqual = 0,
+            LeftIsSmaller = -1,
+            LeftIsBigger = 1,
+            AreNotEqual = -2,
         }
 
         [Test, TestCaseSource(nameof(GetTestLanguageSpecEqualityCases))]
@@ -231,7 +254,7 @@ namespace Rhino.Runtime.Code.Tests
         static IEnumerable<TestCaseData> GetTestLanguageSpecEqualityCases()
         {
             foreach (TestCaseData caseData in GetTestLanguageSpecComparisonCases()
-                                             .Where(cd => ExpectedCompare.AreEqual    == (ExpectedCompare)cd.Arguments[2]
+                                             .Where(cd => ExpectedCompare.AreEqual == (ExpectedCompare)cd.Arguments[2]
                                                        || ExpectedCompare.AreNotEqual == (ExpectedCompare)cd.Arguments[2]))
             {
                 yield return new(caseData.Arguments[0], caseData.Arguments[1], caseData.Arguments[2]);
@@ -250,52 +273,52 @@ namespace Rhino.Runtime.Code.Tests
         static IEnumerable<TestCaseData> GetTestLanguageSpecComparisonCases()
         {
             // AreEqual
-            yield return new(new LanguageSpec("*.*.python"),                new LanguageSpec("*.*.Python"),                 ExpectedCompare.AreEqual);
-            yield return new(new LanguageSpec("*.*.Python"),                new LanguageSpec("*.*.python"),                 ExpectedCompare.AreEqual);
-            yield return new(new LanguageSpec("*.pythonnet.Python"),        new LanguageSpec("*.pythonnet.python"),         ExpectedCompare.AreEqual);
-            yield return new(new LanguageSpec("*.pythonnet.python"),        new LanguageSpec("*.pythonnet.Python"),         ExpectedCompare.AreEqual);
-            yield return new(new LanguageSpec("mcneel.pythonnet.python"),   new LanguageSpec("mcneel.pythonnet.Python"),    ExpectedCompare.AreEqual);
-            yield return new(new LanguageSpec("mcneel.pythonnet.Python"),   new LanguageSpec("mcneel.pythonnet.python"),    ExpectedCompare.AreEqual);
-            yield return new(new LanguageSpec("mcneel.pythonnet.Python"),   new LanguageSpec("mcneel.Pythonnet.python"),    ExpectedCompare.AreEqual);
-            yield return new(new LanguageSpec("mcneel.Pythonnet.Python"),   new LanguageSpec("mcneel.pythonnet.python"),    ExpectedCompare.AreEqual);
-            yield return new(new LanguageSpec("mcneel.Pythonnet.Python"),   new LanguageSpec("McNeel.pythonnet.python"),    ExpectedCompare.AreEqual);
-            yield return new(new LanguageSpec("McNeel.Pythonnet.Python"),   new LanguageSpec("mcneel.pythonnet.python"),    ExpectedCompare.AreEqual);
+            yield return new(new LanguageSpec("*.*.python"), new LanguageSpec("*.*.Python"), ExpectedCompare.AreEqual);
+            yield return new(new LanguageSpec("*.*.Python"), new LanguageSpec("*.*.python"), ExpectedCompare.AreEqual);
+            yield return new(new LanguageSpec("*.pythonnet.Python"), new LanguageSpec("*.pythonnet.python"), ExpectedCompare.AreEqual);
+            yield return new(new LanguageSpec("*.pythonnet.python"), new LanguageSpec("*.pythonnet.Python"), ExpectedCompare.AreEqual);
+            yield return new(new LanguageSpec("mcneel.pythonnet.python"), new LanguageSpec("mcneel.pythonnet.Python"), ExpectedCompare.AreEqual);
+            yield return new(new LanguageSpec("mcneel.pythonnet.Python"), new LanguageSpec("mcneel.pythonnet.python"), ExpectedCompare.AreEqual);
+            yield return new(new LanguageSpec("mcneel.pythonnet.Python"), new LanguageSpec("mcneel.Pythonnet.python"), ExpectedCompare.AreEqual);
+            yield return new(new LanguageSpec("mcneel.Pythonnet.Python"), new LanguageSpec("mcneel.pythonnet.python"), ExpectedCompare.AreEqual);
+            yield return new(new LanguageSpec("mcneel.Pythonnet.Python"), new LanguageSpec("McNeel.pythonnet.python"), ExpectedCompare.AreEqual);
+            yield return new(new LanguageSpec("McNeel.Pythonnet.Python"), new LanguageSpec("mcneel.pythonnet.python"), ExpectedCompare.AreEqual);
 
             // AreNotEqual
-            yield return new(new LanguageSpec("*.*.python"),                new LanguageSpec("*.pythonnet.python"),         ExpectedCompare.AreNotEqual);
-            yield return new(new LanguageSpec("*.pythonnet.python"),        new LanguageSpec("*.*.python"),                 ExpectedCompare.AreNotEqual);
-            yield return new(new LanguageSpec("*.*.python"),                new LanguageSpec("mcneel.pythonnet.python"),    ExpectedCompare.AreNotEqual);
-            yield return new(new LanguageSpec("mcneel.pythonnet.python"),   new LanguageSpec("*.*.python"),                 ExpectedCompare.AreNotEqual);
-            yield return new(new LanguageSpec("*.pythonnet.python"),        new LanguageSpec("mcneel.pythonnet.python"),    ExpectedCompare.AreNotEqual);
-            yield return new(new LanguageSpec("mcneel.pythonnet.python"),   new LanguageSpec("*.pythonnet.python"),         ExpectedCompare.AreNotEqual);
-            yield return new(new LanguageSpec("*.*.python"),                new LanguageSpec("*.*.csharp"),                 ExpectedCompare.AreNotEqual);
-            yield return new(new LanguageSpec("*.*.python"),                new LanguageSpec("*.*.CSharp"),                 ExpectedCompare.AreNotEqual);
-            yield return new(new LanguageSpec("*.*.csharp"),                new LanguageSpec("*.*.python"),                 ExpectedCompare.AreNotEqual);
-            yield return new(new LanguageSpec("*.*.CSharp"),                new LanguageSpec("*.*.python"),                 ExpectedCompare.AreNotEqual);
-            yield return new(new LanguageSpec("*.pythonnet.python"),        new LanguageSpec("*.ironpython.python"),        ExpectedCompare.AreNotEqual);
-            yield return new(new LanguageSpec("*.ironpython.python"),       new LanguageSpec("*.pythonnet.python"),         ExpectedCompare.AreNotEqual);
-            yield return new(new LanguageSpec("mcneel.ironpython.python"),  new LanguageSpec("ehsan.pythonnet.python"),     ExpectedCompare.AreNotEqual);
-            yield return new(new LanguageSpec("ehsan.ironpython.python"),   new LanguageSpec("mcneel.pythonnet.python"),    ExpectedCompare.AreNotEqual);
-            yield return new(new LanguageSpec("mcneel.pythonnet.python"),   new LanguageSpec("ehsan.pythonnet.python"),     ExpectedCompare.AreNotEqual);
-            yield return new(new LanguageSpec("ehsan.pythonnet.python"),    new LanguageSpec("mcneel.pythonnet.python"),    ExpectedCompare.AreNotEqual);
+            yield return new(new LanguageSpec("*.*.python"), new LanguageSpec("*.pythonnet.python"), ExpectedCompare.AreNotEqual);
+            yield return new(new LanguageSpec("*.pythonnet.python"), new LanguageSpec("*.*.python"), ExpectedCompare.AreNotEqual);
+            yield return new(new LanguageSpec("*.*.python"), new LanguageSpec("mcneel.pythonnet.python"), ExpectedCompare.AreNotEqual);
+            yield return new(new LanguageSpec("mcneel.pythonnet.python"), new LanguageSpec("*.*.python"), ExpectedCompare.AreNotEqual);
+            yield return new(new LanguageSpec("*.pythonnet.python"), new LanguageSpec("mcneel.pythonnet.python"), ExpectedCompare.AreNotEqual);
+            yield return new(new LanguageSpec("mcneel.pythonnet.python"), new LanguageSpec("*.pythonnet.python"), ExpectedCompare.AreNotEqual);
+            yield return new(new LanguageSpec("*.*.python"), new LanguageSpec("*.*.csharp"), ExpectedCompare.AreNotEqual);
+            yield return new(new LanguageSpec("*.*.python"), new LanguageSpec("*.*.CSharp"), ExpectedCompare.AreNotEqual);
+            yield return new(new LanguageSpec("*.*.csharp"), new LanguageSpec("*.*.python"), ExpectedCompare.AreNotEqual);
+            yield return new(new LanguageSpec("*.*.CSharp"), new LanguageSpec("*.*.python"), ExpectedCompare.AreNotEqual);
+            yield return new(new LanguageSpec("*.pythonnet.python"), new LanguageSpec("*.ironpython.python"), ExpectedCompare.AreNotEqual);
+            yield return new(new LanguageSpec("*.ironpython.python"), new LanguageSpec("*.pythonnet.python"), ExpectedCompare.AreNotEqual);
+            yield return new(new LanguageSpec("mcneel.ironpython.python"), new LanguageSpec("ehsan.pythonnet.python"), ExpectedCompare.AreNotEqual);
+            yield return new(new LanguageSpec("ehsan.ironpython.python"), new LanguageSpec("mcneel.pythonnet.python"), ExpectedCompare.AreNotEqual);
+            yield return new(new LanguageSpec("mcneel.pythonnet.python"), new LanguageSpec("ehsan.pythonnet.python"), ExpectedCompare.AreNotEqual);
+            yield return new(new LanguageSpec("ehsan.pythonnet.python"), new LanguageSpec("mcneel.pythonnet.python"), ExpectedCompare.AreNotEqual);
 
             // LeftIsBigger or LeftIsSmaller
-            yield return new(new LanguageSpec("*.pythonnet.Python"),        new LanguageSpec("*.*.python"),                 ExpectedCompare.LeftIsBigger);
-            yield return new(new LanguageSpec("*.*.python"),                new LanguageSpec("*.pythonnet.Python"),         ExpectedCompare.LeftIsSmaller);
-            yield return new(new LanguageSpec("*.*.python"),                new LanguageSpec("mcneel.pythonnet.python"),    (ExpectedCompare)"*".CompareTo("pythonnet"));
-            yield return new(new LanguageSpec("mcneel.pythonnet.python"),   new LanguageSpec("*.*.python"),                 (ExpectedCompare)"pythonnet".CompareTo("*"));
-            yield return new(new LanguageSpec("*.pythonnet.python"),        new LanguageSpec("mcneel.pythonnet.python"),    (ExpectedCompare)"*".CompareTo("mcneel"));
-            yield return new(new LanguageSpec("mcneel.pythonnet.python"),   new LanguageSpec("*.pythonnet.python"),         (ExpectedCompare)"mcneel".CompareTo("*"));
-            yield return new(new LanguageSpec("*.*.python"),                new LanguageSpec("*.*.csharp"),                 (ExpectedCompare)"python".CompareTo("csharp"));
-            yield return new(new LanguageSpec("*.*.python"),                new LanguageSpec("*.*.CSharp"),                 (ExpectedCompare)"python".CompareTo("CSharp"));
-            yield return new(new LanguageSpec("*.*.csharp"),                new LanguageSpec("*.*.python"),                 (ExpectedCompare)"csharp".CompareTo("python"));
-            yield return new(new LanguageSpec("*.*.CSharp"),                new LanguageSpec("*.*.python"),                 (ExpectedCompare)"CSharp".CompareTo("python"));
-            yield return new(new LanguageSpec("*.pythonnet.python"),        new LanguageSpec("*.ironpython.python"),        (ExpectedCompare)"pythonnet".CompareTo("ironpython"));
-            yield return new(new LanguageSpec("*.ironpython.python"),       new LanguageSpec("*.pythonnet.python"),         (ExpectedCompare)"ironpython".CompareTo("pythonnet"));
-            yield return new(new LanguageSpec("mcneel.ironpython.python"),  new LanguageSpec("ehsan.pythonnet.python"),     (ExpectedCompare)"ironpython".CompareTo("pythonnet"));
-            yield return new(new LanguageSpec("ehsan.ironpython.python"),   new LanguageSpec("mcneel.pythonnet.python"),    (ExpectedCompare)"ironpython".CompareTo("pythonnet"));
-            yield return new(new LanguageSpec("mcneel.pythonnet.python"),   new LanguageSpec("ehsan.pythonnet.python"),     (ExpectedCompare)"mcneel".CompareTo("ehsan"));
-            yield return new(new LanguageSpec("ehsan.pythonnet.python"),    new LanguageSpec("mcneel.pythonnet.python"),    (ExpectedCompare)"ehsan".CompareTo("mcneel"));
+            yield return new(new LanguageSpec("*.pythonnet.Python"), new LanguageSpec("*.*.python"), ExpectedCompare.LeftIsBigger);
+            yield return new(new LanguageSpec("*.*.python"), new LanguageSpec("*.pythonnet.Python"), ExpectedCompare.LeftIsSmaller);
+            yield return new(new LanguageSpec("*.*.python"), new LanguageSpec("mcneel.pythonnet.python"), (ExpectedCompare)"*".CompareTo("pythonnet"));
+            yield return new(new LanguageSpec("mcneel.pythonnet.python"), new LanguageSpec("*.*.python"), (ExpectedCompare)"pythonnet".CompareTo("*"));
+            yield return new(new LanguageSpec("*.pythonnet.python"), new LanguageSpec("mcneel.pythonnet.python"), (ExpectedCompare)"*".CompareTo("mcneel"));
+            yield return new(new LanguageSpec("mcneel.pythonnet.python"), new LanguageSpec("*.pythonnet.python"), (ExpectedCompare)"mcneel".CompareTo("*"));
+            yield return new(new LanguageSpec("*.*.python"), new LanguageSpec("*.*.csharp"), (ExpectedCompare)"python".CompareTo("csharp"));
+            yield return new(new LanguageSpec("*.*.python"), new LanguageSpec("*.*.CSharp"), (ExpectedCompare)"python".CompareTo("CSharp"));
+            yield return new(new LanguageSpec("*.*.csharp"), new LanguageSpec("*.*.python"), (ExpectedCompare)"csharp".CompareTo("python"));
+            yield return new(new LanguageSpec("*.*.CSharp"), new LanguageSpec("*.*.python"), (ExpectedCompare)"CSharp".CompareTo("python"));
+            yield return new(new LanguageSpec("*.pythonnet.python"), new LanguageSpec("*.ironpython.python"), (ExpectedCompare)"pythonnet".CompareTo("ironpython"));
+            yield return new(new LanguageSpec("*.ironpython.python"), new LanguageSpec("*.pythonnet.python"), (ExpectedCompare)"ironpython".CompareTo("pythonnet"));
+            yield return new(new LanguageSpec("mcneel.ironpython.python"), new LanguageSpec("ehsan.pythonnet.python"), (ExpectedCompare)"ironpython".CompareTo("pythonnet"));
+            yield return new(new LanguageSpec("ehsan.ironpython.python"), new LanguageSpec("mcneel.pythonnet.python"), (ExpectedCompare)"ironpython".CompareTo("pythonnet"));
+            yield return new(new LanguageSpec("mcneel.pythonnet.python"), new LanguageSpec("ehsan.pythonnet.python"), (ExpectedCompare)"mcneel".CompareTo("ehsan"));
+            yield return new(new LanguageSpec("ehsan.pythonnet.python"), new LanguageSpec("mcneel.pythonnet.python"), (ExpectedCompare)"ehsan".CompareTo("mcneel"));
         }
 #endif
     }
