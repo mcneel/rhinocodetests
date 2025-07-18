@@ -194,6 +194,24 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       Assert.AreEqual(PackageAvailability.Available, pi.Availability);
     }
 
+
+    [Test]
+    public void TestEnvirons_NuGet_Installed_Rhino_DOT_Scripting()
+    {
+      NuGetEnvirons.User.AddPackage(new PackageSpec("Rhino.Scripting"));
+      NuGetEnvironConnection cxn = NuGetEnvirons.User.Connect(new ConnectionContext());
+
+      IPackageInfo pi = cxn.QueryLocal(new PackageSpec[] { new("RhinoScript") }, CancellationToken.None).FirstOrDefault();
+      Assert.NotNull(pi);
+      Assert.That(pi.Id, Is.EqualTo("Rhino.Scripting"));
+      Assert.That(pi.Availability, Is.EqualTo(PackageAvailability.Available));
+
+      IPackageInfo rpi = cxn.Query(new PackageSpec[] { new("RhinoScript") }, new EnvironQueryOptions(), CancellationToken.None).FirstOrDefault();
+      Assert.NotNull(rpi);
+      Assert.That(rpi.Id, Is.EqualTo("Rhino3dm"));
+      Assert.That(rpi.Availability, Is.EqualTo(PackageAvailability.AvailableOnProvider));
+    }
+
     [Test]
     public void TestEnvirons_LibFile_Installed()
     {
