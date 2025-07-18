@@ -7981,6 +7981,46 @@ var m = new Test(";
         }
 #endif
 
+#if RC8_22
+        [Test]
+        public void TestCSharp_Complete_Before_Refernce()
+        {
+            string s = @"
+using System;
+using Rhino.Runtime.Code;
+
+RhinoCode.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"
+# r ""Rhino.Runtime.Code.Languages.Roslyn.dll""
+string s = @""
+# r ""Rhino.Runtime.Code.Languages.Roslyn.dll""
+"";
+");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            Assert.That(completions.Any(c => c.Text == "Languages"));
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Before_Load()
+        {
+            string s = @"
+using System;
+using Rhino.Runtime.Code;
+
+RhinoCode.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"
+# load test.cs
+string s = @""
+# load test.cs
+"";
+");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+            Assert.That(completions.Any(c => c.Text == "Languages"));
+        }
+#endif
+
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
     }
 }
