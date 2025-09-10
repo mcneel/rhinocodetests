@@ -9,6 +9,10 @@ using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Platform;
 using Rhino.Runtime.Code.Projects;
 
+#if RC9_0
+using Rhino.Runtime.Code.Testing;
+#endif
+
 namespace RhinoCodePlatform.Rhino3D.Testing
 {
     public sealed class ProjectReaderServer : RhinoCodePlatform.Projects.BaseRhino3DProjectServer
@@ -21,6 +25,10 @@ namespace RhinoCodePlatform.Rhino3D.Testing
         public override bool TryPrepareContext(LanguageSpec languageSpec, RunContext context) => false;
 
         public override bool TryPrepareContext(IProject project, Code code, RunContext context) => false;
+
+#if RC9_0
+        public override bool TryPrepareContext(StoredTestsLibrary tests, StoredTest test, RunContext context) => false;
+#endif
 #endif
 
         public override bool TryInvoke(string endpoint, InvokeContext context) => throw new NotImplementedException();
