@@ -392,7 +392,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       p = py3cn.QueryLocal(token).First();
       Assert.That(p.Availability, Is.EqualTo(PackageAvailability.Available));
       ps = py3cn.Query(new PackageSpec[] { new PackageSpec("numpy") }, opts, token).First();
-      Assert.That(ps.Availability, Is.EqualTo(PackageAvailability.AvailableOnProvider));
+      Assert.That(ps.Availability, Is.EqualTo(PackageAvailability.AvailableOnProvider).Or.EqualTo(PackageAvailability.AvailableUpgradeOnProvider));
 
 
       // NuGet

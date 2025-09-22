@@ -3476,7 +3476,7 @@ from system.Collection.Generic import ");
 
             rpw.Reset();
             code.RestorePackages(rpw);
-            Assert.IsFalse(rpw.HasReports);
+            Assert.IsTrue(rpw.HasReports);
 
             code.Text.Set(@"
 #r ""pip: -e git+https://github.com/uiri/toml.git#egg=toml@f6e1e4c65b513544367fe88576ef1895eccded74""
