@@ -48,61 +48,103 @@ namespace Rhino.Runtime.Code.Tests
             c = new TextSearchCriteria("#!");
             yield return new(s, c, new TextSearchMatch[]
             {
+#if RC9_0
+                new (new TextRange(1, 1, 1, 3), c, "#!"),
+#else
                 new (1, 1, c, "#!"),
+#endif
             });
 
             c = new TextSearchCriteria("rs");
             yield return new(s, c, new TextSearchMatch[]
             {
+#if RC9_0
+                new (new TextRange(2, 29, 2, 31), c, "rs"),
+                new (new TextRange(3, 07, 3, 09), c, "rs")
+#else
                 new (2, 29, c, "rs"),
                 new (3, 07, c, "rs")
+#endif
             });
 
             s = "#! python3\r\nimport rhinoscriptsyntax as rs\r\n\r\n# print_statement\r\nprint(rs)";
             c = new TextSearchCriteria("print");
             yield return new(s, c, new TextSearchMatch[]
             {
+#if RC9_0
+                new (new TextRange(4, 3, 4, 8), c, "print"),
+                new (new TextRange(5, 1, 5, 6), c, "print"),
+#else
                 new (4, 3, c, "print"),
                 new (5, 1, c, "print"),
+#endif
             });
 
             c = new TextSearchCriteria(new Regex(@"\bprint\b"));
             yield return new(s, c, new TextSearchMatch[]
             {
+#if RC9_0
+                new (new TextRange(5, 1, 5, 6), c, "print"),
+#else
                 new (5, 1, c, "print"),
+#endif
             });
 
             s = "# print_statement\r\nprint()\r\n\r\n# PRInt_statement\r\nPRInt()\r\n\r\n# PRINT_statement\r\nPRINT()\r\n";
             c = new TextSearchCriteria("print");
             yield return new(s, c, new TextSearchMatch[]
             {
+#if RC9_0
+                new (new TextRange(1, 3, 1, 8), c, "print"),
+                new (new TextRange(2, 1, 2, 6), c, "print"),
+                new (new TextRange(4, 3, 4, 8), c, "PRInt"),
+                new (new TextRange(5, 1, 5, 6), c, "PRInt"),
+                new (new TextRange(7, 3, 7, 8), c, "PRINT"),
+                new (new TextRange(8, 1, 8, 6), c, "PRINT"),
+#else
                 new (1, 3, c, "print"),
                 new (2, 1, c, "print"),
                 new (4, 3, c, "PRInt"),
                 new (5, 1, c, "PRInt"),
                 new (7, 3, c, "PRINT"),
                 new (8, 1, c, "PRINT"),
+#endif
             });
 
             c = new TextSearchCriteria("print", isCaseSensitive: true);
             yield return new(s, c, new TextSearchMatch[]
             {
-                new (1, 3,c, "print"),
-                new (2, 1,c, "print"),
+#if RC9_0
+                new (new TextRange(1, 3, 1, 8), c, "print"),
+                new (new TextRange(2, 1, 2, 6), c, "print"),
+#else
+                new (1, 3, c, "print"),
+                new (2, 1, c, "print"),
+#endif
             });
 
             c = new TextSearchCriteria(new Regex(@"\bprint\b"));
             yield return new(s, c, new TextSearchMatch[]
             {
+#if RC9_0
+                new (new TextRange(2, 1, 2, 6), c, "print"),
+                new (new TextRange(5, 1, 5, 6), c, "PRInt"),
+                new (new TextRange(8, 1, 8, 6), c, "PRINT"),
+#else
                 new (2, 1, c, "print"),
                 new (5, 1, c, "PRInt"),
                 new (8, 1, c, "PRINT"),
+#endif
             });
 
             c = new TextSearchCriteria(new Regex(@"\bprint\b"), isCaseSensitive: true);
             yield return new(s, c, new TextSearchMatch[]
             {
+#if RC9_0
+                new (new TextRange(2, 1, 2, 6), c, "print"),
+#else
                 new (2, 1, c, "print"),
+#endif
             });
         }
 
@@ -142,7 +184,11 @@ namespace Rhino.Runtime.Code.Tests
             var t = new Text();
             t.Set(text);
 
+#if RC9_0
+            Assert.IsTrue(t.Replace(criteria));
+#else
             Assert.IsTrue(t.ReplaceAny(criteria));
+#endif
             Assert.AreEqual(replaced, (string)t);
         }
         static IEnumerable<TestCaseData> GetTestReplaceAnyCases()
@@ -158,7 +204,11 @@ namespace Rhino.Runtime.Code.Tests
 
             TextSearchMatch[] matches = t.Search(criteria).ToArray();
             Assert.AreEqual(expected, matches.Length);
+#if RC9_0
+            Assert.IsTrue(t.Replace(matches));
+#else
             Assert.IsTrue(t.Replace(criteria, matches));
+#endif
             Assert.AreEqual(replaced, (string)t);
         }
         static IEnumerable<TestCaseData> GetTestReplaceCases()
@@ -174,7 +224,11 @@ namespace Rhino.Runtime.Code.Tests
 
             TextSearchMatch[] matches = t.Search(criteria).ToArray();
             Assert.AreEqual(expected, matches.Length);
+#if RC9_0
+            Assert.IsTrue(t.Replace(matches.Last()));
+#else
             Assert.IsTrue(t.Replace(criteria, matches.Last()));
+#endif
             Assert.AreEqual(replaced, (string)t);
         }
         static IEnumerable<TestCaseData> GetTestReplaceLastCases()
