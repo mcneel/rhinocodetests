@@ -7610,12 +7610,24 @@ Console.SetOut(new StreamWriter() { ";
 
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
 
+#if RC8_25
+            Assert.AreEqual(2, completions.Length);
+#else
             Assert.AreEqual(1, completions.Length);
+#endif
 
             CompletionInfo c;
 
+#if RC8_25
+            c = completions.First(c => c.Text == "AutoFlush = ");
+            Assert.AreEqual(CompletionKind.Property, c.Kind);
+
+            c = completions.First(c => c.Text == "NewLine = ");
+            Assert.AreEqual(CompletionKind.Property, c.Kind);
+#else
             c = completions.First(c => c.Text == "AutoFlush");
             Assert.AreEqual(CompletionKind.Property, c.Kind);
+#endif
         }
 
         [Test]
@@ -7631,12 +7643,24 @@ Console.SetOut(new StreamWriter() {
 
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
 
+#if RC8_25
+            Assert.AreEqual(2, completions.Length);
+#else
             Assert.AreEqual(1, completions.Length);
+#endif
 
             CompletionInfo c;
 
+#if RC8_25
+            c = completions.First(c => c.Text == "AutoFlush = ");
+            Assert.AreEqual(CompletionKind.Property, c.Kind);
+
+            c = completions.First(c => c.Text == "NewLine = ");
+            Assert.AreEqual(CompletionKind.Property, c.Kind);
+#else
             c = completions.First(c => c.Text == "AutoFlush");
             Assert.AreEqual(CompletionKind.Property, c.Kind);
+#endif
         }
 
         [Test]
