@@ -7619,10 +7619,10 @@ Console.SetOut(new StreamWriter() { ";
             CompletionInfo c;
 
 #if RC8_25
-            c = completions.First(c => c.Text == "AutoFlush = ");
+            c = completions.First(c => c.Text == "AutoFlush =");
             Assert.AreEqual(CompletionKind.Property, c.Kind);
 
-            c = completions.First(c => c.Text == "NewLine = ");
+            c = completions.First(c => c.Text == "NewLine =");
             Assert.AreEqual(CompletionKind.Property, c.Kind);
 #else
             c = completions.First(c => c.Text == "AutoFlush");
@@ -7652,10 +7652,10 @@ Console.SetOut(new StreamWriter() {
             CompletionInfo c;
 
 #if RC8_25
-            c = completions.First(c => c.Text == "AutoFlush = ");
+            c = completions.First(c => c.Text == "AutoFlush =");
             Assert.AreEqual(CompletionKind.Property, c.Kind);
 
-            c = completions.First(c => c.Text == "NewLine = ");
+            c = completions.First(c => c.Text == "NewLine =");
             Assert.AreEqual(CompletionKind.Property, c.Kind);
 #else
             c = completions.First(c => c.Text == "AutoFlush");
@@ -8042,6 +8042,115 @@ string s = @""
 
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
             Assert.That(completions.Any(c => c.Text == "Languages"));
+        }
+#endif
+
+#if RC8_25
+        [Test]
+        public void TestCSharp_Complete_Complex_ObjectInitExpression_BaseProperties()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-89648
+            string s = @"
+using Eto.Forms;
+PixelLayout p = new () { ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.That(completions.Length, Is.GreaterThan(2));
+
+            CompletionInfo c;
+
+            c = completions.First(c => c.Text == "AllowDrop =");
+            Assert.AreEqual(CompletionKind.Property, c.Kind);
+
+            c = completions.First(c => c.Text == "Contents = {");
+            Assert.AreEqual(CompletionKind.Property, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Complex_ObjectInitExpression_Adder()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-89648
+            string s = @"
+using Eto.Forms;
+GridView gv = new () { ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.That(completions.Length, Is.GreaterThan(2));
+
+            CompletionInfo c;
+
+            c = completions.First(c => c.Text == "Bindings = {");
+            Assert.AreEqual(CompletionKind.Property, c.Kind);
+
+            c = completions.First(c => c.Text == "Columns = {");
+            Assert.AreEqual(CompletionKind.Property, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Complex_ObjectInitExpression_NewLine_Empty()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-89648
+            string s = @"
+using Eto.Forms;
+GridView gv = new() {
+    ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length)
+                                          .Where(c => c.Text.Contains(" ="))
+                                          .ToArray();
+
+            Assert.That(completions.Length, Is.Zero);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Complex_ObjectInitExpression_NoDuplicates()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-89648
+            string s = @"
+using Eto.Forms;
+GridView gv = new() {
+    AllowColumnReordering = false,
+    ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"
+};");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.That(completions.Length, Is.GreaterThan(2));
+            Assert.That(completions.Any(c => c.Text == "AllowColumnReordering ="), Is.False);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Complex_ObjectInitExpression_Assign()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-89648
+            string s = @"
+using Eto.Forms;
+Label d = new() {
+    TextAlignment = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"
+};");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            CompletionInfo c;
+
+            c = completions[0];
+            Assert.AreEqual("TextAlignment", c.Text);
+            Assert.AreEqual(CompletionKind.Enum, c.Kind);
+
+            c = completions[1];
+            Assert.AreEqual("TextAlignment.Left", c.Text);
+            Assert.AreEqual(CompletionKind.EnumMember, c.Kind);
+
+            c = completions[2];
+            Assert.AreEqual("TextAlignment.Center", c.Text);
+            Assert.AreEqual(CompletionKind.EnumMember, c.Kind);
         }
 #endif
 
