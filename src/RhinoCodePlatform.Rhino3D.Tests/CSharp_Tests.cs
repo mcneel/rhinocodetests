@@ -8152,6 +8152,76 @@ Label d = new() {
             Assert.AreEqual("TextAlignment.Center", c.Text);
             Assert.AreEqual(CompletionKind.EnumMember, c.Kind);
         }
+
+        [Test]
+        public void TestCSharp_Complete_Complex_ObjectInitExpression_Assign_Collection()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-89648
+            string s = @"
+using Eto.Forms;
+
+StackLayout s = new StackLayout()
+{
+    AllowDrop = false,
+    Items = {
+        ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"
+    },
+};");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length)
+                                          .Where(c => c.Text.Contains(" ="))
+                                          .ToArray();
+
+            Assert.That(completions.Length, Is.Zero);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Complex_ObjectInitExpression_SuggestAssigns()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-89648
+            string s = @"
+using Eto.Forms;
+
+StackLayout s = new StackLayout()
+{";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"
+    AllowDrop = false,
+    Items = {
+        
+    },
+};");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length)
+                                          .Where(c => c.Text.Contains(" ="))
+                                          .ToArray();
+
+            Assert.That(completions.Length, Is.GreaterThan(0));
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Complex_ObjectInitExpression_DoesNotSuggestAssigns()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-89648
+            string s = @"
+using Eto.Forms;
+
+StackLayout s = new StackLayout()
+{
+    ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"
+    AllowDrop = false,
+    Items = {
+        
+    },
+};");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length)
+                                          .Where(c => c.Text.Contains(" ="))
+                                          .ToArray();
+
+            Assert.That(completions.Length, Is.Zero);
+        }
 #endif
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
