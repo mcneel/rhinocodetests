@@ -17,6 +17,8 @@ using Rhino.Runtime.Code.Storage;
 
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System.Resources;
+using System.Collections;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -602,6 +604,44 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         static readonly Host s_host = new("Rhino3D_TESTs", new Version(0, 1));
 
+#if RC8_25
+        static bool TryExtractProjectFromRHP(string rhpFile, out IProject project)
+        {
+            project = default;
+
+            using ModuleDefinition rhp = ModuleDefinition.ReadModule(rhpFile);
+
+            EmbeddedResource embedded = rhp.Resources.OfType<EmbeddedResource>()
+                                                     .FirstOrDefault(r => r.Name == "Plugin.Data.resources");
+
+            if (embedded == null)
+            {
+                return false;
+            }
+
+            using var ms = new MemoryStream(embedded.GetResourceData());
+            using var reader = new ResourceReader(ms);
+
+            string encrypted = null;
+            foreach (DictionaryEntry entry in reader)
+            {
+                if (entry.Key is string key && key == "PROJECT-DATA")
+                {
+                    encrypted = entry.Value as string;
+                    break;
+                }
+            }
+
+            if (string.IsNullOrEmpty(encrypted))
+            {
+                return false;
+            }
+
+            project = RhinoCodePlatform.Projects.Rhino3DProject.DecryptProject<RhinoCodePlatform.Projects.Rhino3DProject>(encrypted);
+
+            return true;
+        }
+#else
         static bool TryExtractProjectFromRHP(string rhpFile, out IProject project)
         {
             project = default;
@@ -624,6 +664,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             return false;
         }
+#endif
 
         static void DeleteDirectory(string rhprojfile, Uri uri)
         {
