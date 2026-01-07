@@ -12,6 +12,25 @@
 
 using System;
 using Rhino.Runtime.Code.Storage;
+using Rhino.Runtime.Code.Testing;
+
+[TestCase]
+void dddd()
+{
+
+}
+
+[TestCase]
+void FFFF()
+{
+
+}
+
+[TestCase]
+void JJJJ()
+{
+
+}
 
 bool test = true;
 
