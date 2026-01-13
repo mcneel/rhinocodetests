@@ -17,7 +17,10 @@
       "address": "Pacific Northwest",
       "country": "USA"
     },
+    "description": "Description of this test project",
+    "copyright": "Copyright \u00A9 2026 Ehsan Iran-Nejad",
     "license": "MIT",
+    "url": "https://www.rhino3d.com/",
     "image": {
       "light": {
         "type": "svg",
@@ -56,10 +59,11 @@
   },
   "settings": {
     "buildPath": "build/",
+    "testsPath": "file:///Users/ein/gits/rhinocodetests/files-ui/test_testsPanel/test_asyncFolder",
     "buildTarget": {
       "host": {
         "name": "Rhino3D",
-        "version": "8"
+        "version": "8.*"
       },
       "title": "Rhino3D (8.*)",
       "slug": "rh8"
@@ -213,6 +217,52 @@
       },
       "title": "MustBeMissing",
       "uri": "MustBeMissing.py"
+    }
+  ],
+  "libraries": [
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///Users/ein/gits/rhinocodetests/files/rhproj/libraries/TestAssembly/",
+        "language": {
+          "id": "*.*.csharp",
+          "version": "*.*.*"
+        }
+      }
+    },
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///Users/ein/gits/rhinocodetests/files/rhproj/libraries/testmodule/",
+        "language": {
+          "id": "*.*.python",
+          "version": "3.*.*"
+        }
+      }
+    },
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///missing/testipymodule/",
+        "language": {
+          "id": "*.*.*",
+          "version": "*.*.*"
+        }
+      }
+    }
+  ],
+  "resources": [
+    {
+      "id": "74324463-da92-489b-a92f-a1e9e7ca69f3",
+      "uri": "file:///Users/ein/gits/rhinocodetests/files/rhproj/files/data.txt"
+    },
+    {
+      "id": "353dda41-5cfd-497e-b82a-a1c6094d7a9c",
+      "uri": "files/rhproj/files/Rock.3dm"
+    },
+    {
+      "id": "616a5c26-9d11-4be8-a029-ce23620e62d5",
+      "uri": "files/Missing.ico"
     }
   ]
 }
