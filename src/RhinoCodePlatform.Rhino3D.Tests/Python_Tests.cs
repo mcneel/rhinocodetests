@@ -17,11 +17,7 @@ using Rhino.Runtime.Code.Execution.Profiling;
 using Rhino.Runtime.Code.Platform;
 using Rhino.Runtime.Code.Testing;
 
-#if RC8_11
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
-#else
-using RhinoCodePlatform.Rhino3D.Languages;
-#endif
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -34,7 +30,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             yield return new(LanguageSpec.Python3);
         }
 
-#if RC8_16
         [Test, TestCaseSource(nameof(GetPythons))]
         public void TestPython_CompileGuard_Specific(LanguageSpec spec)
         {
@@ -220,14 +215,14 @@ for {INDEX_VAR} in range(0, 3): # line 3
     {SUM_VAR} += {INDEX_VAR}    # line 4
 ");
 
-            DebugExpressionExecVariableResult getIndex(ExecFrame frame)
+            ExecSlot getIndex(ExecFrame frame)
             {
-                return frame.Evaluate().OfType<DebugExpressionExecVariableResult>().FirstOrDefault(r => r.Result.Id.Identifier == INDEX_VAR);
+                return frame.GetSlots().FirstOrDefault(r => r.Id.Identifier == INDEX_VAR);
             }
 
-            DebugExpressionExecVariableResult getSum(ExecFrame frame)
+            ExecSlot getSum(ExecFrame frame)
             {
-                return frame.Evaluate().OfType<DebugExpressionExecVariableResult>().FirstOrDefault(r => r.Result.Id.Identifier == SUM_VAR);
+                return frame.GetSlots().FirstOrDefault(r => r.Id.Identifier == SUM_VAR);
             }
 
             int bp3Counter = -1;
@@ -251,43 +246,43 @@ for {INDEX_VAR} in range(0, 3): # line 3
                             // first arrive at line 3
                             // i does not exist
                             case -1:
-                                DebugExpressionExecVariableResult er = getIndex(frame);
+                                ExecSlot er = getIndex(frame);
                                 Assert.IsNull(er);
                                 break;
 
                             // i = 0
                             case 0:
-                                DebugExpressionExecVariableResult er0 = getIndex(frame);
-                                Assert.IsInstanceOf<DebugExpressionExecVariableResult>(er0);
+                                ExecSlot er0 = getIndex(frame);
+                                Assert.IsInstanceOf<ExecSlot>(er0);
                                 // i does not exist in previous frame
-                                Assert.IsFalse(frame.HasModifiedResult(er0, prevFrame));
-                                Assert.IsTrue(er0.Result.TryGetValue(out int v0));
+                                Assert.IsFalse(frame.HasModified(er0, prevFrame));
+                                Assert.IsTrue(er0.TryGetValue(out int v0));
                                 Assert.AreEqual(0, v0);
                                 break;
 
                             // i = 1
                             case 1:
-                                DebugExpressionExecVariableResult er1 = getIndex(frame);
-                                Assert.IsFalse(frame.HasModifiedResult(er1, prevFrame));
-                                Assert.IsTrue(er1.Result.TryGetValue(out int v1));
+                                ExecSlot er1 = getIndex(frame);
+                                Assert.IsFalse(frame.HasModified(er1, prevFrame));
+                                Assert.IsTrue(er1.TryGetValue(out int v1));
                                 Assert.AreEqual(1, v1);
 
-                                DebugExpressionExecVariableResult ers1 = getSum(frame);
-                                Assert.IsTrue(frame.HasModifiedResult(ers1, prevFrame));      // sum is modified!
-                                Assert.IsTrue(ers1.Result.TryGetValue(out int sum1));
+                                ExecSlot ers1 = getSum(frame);
+                                Assert.IsTrue(frame.HasModified(ers1, prevFrame));      // sum is modified!
+                                Assert.IsTrue(ers1.TryGetValue(out int sum1));
                                 Assert.AreEqual(1, sum1);
                                 break;
 
                             // i = 2
                             case 2:
-                                DebugExpressionExecVariableResult er2 = getIndex(frame);
-                                Assert.IsFalse(frame.HasModifiedResult(er2, prevFrame));
-                                Assert.IsTrue(er2.Result.TryGetValue(out int v2));
+                                ExecSlot er2 = getIndex(frame);
+                                Assert.IsFalse(frame.HasModified(er2, prevFrame));
+                                Assert.IsTrue(er2.TryGetValue(out int v2));
                                 Assert.AreEqual(2, v2);
 
-                                DebugExpressionExecVariableResult ers2 = getSum(frame);
-                                Assert.IsTrue(frame.HasModifiedResult(ers2, prevFrame));      // sum is modified!
-                                Assert.IsTrue(ers2.Result.TryGetValue(out int sum2));
+                                ExecSlot ers2 = getSum(frame);
+                                Assert.IsTrue(frame.HasModified(ers2, prevFrame));      // sum is modified!
+                                Assert.IsTrue(ers2.TryGetValue(out int sum2));
                                 Assert.AreEqual(3, sum2);
                                 break;
 
@@ -307,39 +302,39 @@ for {INDEX_VAR} in range(0, 3): # line 3
                             // first arrive at line 4
                             // i = 0
                             case 0:
-                                DebugExpressionExecVariableResult er0 = getIndex(frame);
+                                ExecSlot er0 = getIndex(frame);
                                 // python does not stop twice on for loop so
                                 // i is not available in frame previous to this
-                                Assert.IsFalse(frame.HasModifiedResult(er0, prevFrame));
-                                Assert.IsTrue(er0.Result.TryGetValue(out int v0));
+                                Assert.IsFalse(frame.HasModified(er0, prevFrame));
+                                Assert.IsTrue(er0.TryGetValue(out int v0));
                                 Assert.AreEqual(0, v0);
                                 break;
 
                             // i = 1
                             case 1:
-                                DebugExpressionExecVariableResult er1 = getIndex(frame);
-                                Assert.IsTrue(frame.HasModifiedResult(er1, prevFrame));      // i is modified!
-                                Assert.IsTrue(er1.Result.TryGetValue(out int v1));
+                                ExecSlot er1 = getIndex(frame);
+                                Assert.IsTrue(frame.HasModified(er1, prevFrame));      // i is modified!
+                                Assert.IsTrue(er1.TryGetValue(out int v1));
                                 Assert.AreEqual(1, v1);
 
-                                DebugExpressionExecVariableResult ers0 = getSum(frame);
-                                Assert.IsInstanceOf<DebugExpressionExecVariableResult>(ers0);
-                                Assert.IsFalse(frame.HasModifiedResult(ers0, prevFrame));
-                                Assert.IsTrue(ers0.Result.TryGetValue(out int sum0));
+                                ExecSlot ers0 = getSum(frame);
+                                Assert.IsInstanceOf<ExecSlot>(ers0);
+                                Assert.IsFalse(frame.HasModified(ers0, prevFrame));
+                                Assert.IsTrue(ers0.TryGetValue(out int sum0));
                                 Assert.AreEqual(0, sum0);
                                 break;
 
                             // i = 2
                             case 2:
-                                DebugExpressionExecVariableResult er2 = getIndex(frame);
-                                Assert.IsTrue(frame.HasModifiedResult(er2, prevFrame));      // i is modified!
-                                Assert.IsTrue(er2.Result.TryGetValue(out int v2));
+                                ExecSlot er2 = getIndex(frame);
+                                Assert.IsTrue(frame.HasModified(er2, prevFrame));      // i is modified!
+                                Assert.IsTrue(er2.TryGetValue(out int v2));
                                 Assert.AreEqual(2, v2);
 
-                                DebugExpressionExecVariableResult ers1 = getSum(frame);
+                                ExecSlot ers1 = getSum(frame);
                                 // sum is not modified since it was 1 on entering loop on previous pause
-                                Assert.IsFalse(frame.HasModifiedResult(ers1, prevFrame));
-                                Assert.IsTrue(ers1.Result.TryGetValue(out int sum1));
+                                Assert.IsFalse(frame.HasModified(ers1, prevFrame));
+                                Assert.IsTrue(ers1.TryGetValue(out int sum1));
                                 Assert.AreEqual(1, sum1);
                                 break;
 
@@ -1518,6 +1513,5 @@ Foo()           # LINE 5
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
         }
-#endif
     }
 }

@@ -6,7 +6,6 @@ using Rhino.Runtime.Code.Languages;
 
 using RhinoCodePlatform.Projects.Proxies;
 
-#if RC8_18
 namespace Rhino.Runtime.Code.Tests
 {
   [TestFixture]
@@ -27,11 +26,7 @@ namespace Rhino.Runtime.Code.Tests
 
       public override SupportCapabilities Capabilities { get; } = SupportCapabilities.Completion;
 
-#if RC8_20
       public S() : base(new PythonLanguageSupportConfigs())
-#else
-      public S() : base(new PythonLanuageSupportConfigs())
-#endif
       {
       }
 
@@ -64,4 +59,3 @@ namespace Rhino.Runtime.Code.Tests
     }
   }
 }
-#endif

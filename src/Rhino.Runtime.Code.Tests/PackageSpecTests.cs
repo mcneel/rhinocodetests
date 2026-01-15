@@ -11,29 +11,6 @@ namespace Rhino.Runtime.Code.Tests
     [TestFixture]
     public class PackageSpecTests
     {
-#if RC8_8 && !RC9_0
-        [Test]
-        public void TestPackageSpecNormalizedIdMatch()
-        {
-            var spec = new PackageSpec("wood-nano", PackageVersionSpec.Any);
-
-            PythonPackage package;
-
-            package = new PythonPackage("wood_nano", new PackageVersion(0, 1, 1));
-            Assert.IsTrue(spec.Matches(package));
-
-            package = new PythonPackage("wood--nano", new PackageVersion(0, 1, 1));
-            Assert.IsTrue(spec.Matches(package));
-
-            package = new PythonPackage("wood__nano", new PackageVersion(0, 1, 1));
-            Assert.IsTrue(spec.Matches(package));
-
-            package = new PythonPackage("wood.-nano", new PackageVersion(0, 1, 1));
-            Assert.IsTrue(spec.Matches(package));
-        }
-#endif
-
-#if RC8_19
         class VersionGenerator
         {
             protected readonly PackageVersionSpec m_vs;
@@ -395,7 +372,6 @@ namespace Rhino.Runtime.Code.Tests
             var p = new PackageSpec("compas", "2.*");
             Assert.IsTrue(s.Matches(p));
         }
-#endif
 
         [Test]
         public void TestPackageSpec_Order()

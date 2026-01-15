@@ -15,7 +15,6 @@ using RhinoCodePlatform.Rhino3D.Languages;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
-#if RC9_0
     [TestFixture]
     public class PythonScript_Tests : ScriptFixture
     {
@@ -26,5 +25,4 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             script.ExecuteScript(@"");
         }
     }
-#endif
 }

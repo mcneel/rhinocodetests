@@ -12,7 +12,6 @@ namespace Rhino.Runtime.Code.Tests
   [TestFixture]
   public class PackageVersionSpecTests
   {
-#if RC9_0
     [Test]
     public void TestPackageVersionSpec_Create_And_ToString()
     {
@@ -121,6 +120,5 @@ namespace Rhino.Runtime.Code.Tests
       Assert.That(new PackageVersionSpec("1.2").Matches(new PackageVersionSpec("1.3"), PackageSpec.VersionCompareRule.NewerThan));
       Assert.That(new PackageVersionSpec("1.2").Matches(new PackageVersionSpec("1.3"), PackageSpec.VersionCompareRule.NewerThanOrEqual));
     }
-#endif
   }
 }

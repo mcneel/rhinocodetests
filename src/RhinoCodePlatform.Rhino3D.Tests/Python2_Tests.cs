@@ -17,11 +17,7 @@ using Rhino.Runtime.Code.Execution.Profiling;
 using Rhino.Runtime.Code.Platform;
 using Rhino.Runtime.Code.Testing;
 
-#if RC8_11
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
-#else
-using RhinoCodePlatform.Rhino3D.Languages;
-#endif
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -114,7 +110,6 @@ print(sys)  # line 3
             Assert.Throws<DebugStopException>(() => code.Debug(ctx));
         }
 
-#if RC8_9
         [Test]
         public void TestPython2_DebugPauses_Script_StepOver()
         {
@@ -169,11 +164,7 @@ rs.");
 
             string text = code.Text;
             IEnumerable<CompletionInfo> completions =
-#if RC8_9
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#else
-                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
-#endif
 
             CompletionInfo cinfo;
             bool result = true;
@@ -197,11 +188,7 @@ Rhino.");
 
             string text = code.Text;
             IEnumerable<CompletionInfo> completions =
-#if RC8_9
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#else
-                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
-#endif
 
             CompletionInfo cinfo;
             bool result = true;
@@ -225,11 +212,7 @@ os.");
 
             string text = code.Text;
             IEnumerable<CompletionInfo> completions =
-#if RC8_9
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#else
-                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
-#endif
 
             CompletionInfo cinfo;
             bool result = true;
@@ -253,11 +236,7 @@ op.");
 
             string text = code.Text;
             IEnumerable<CompletionInfo> completions =
-#if RC8_9
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#else
-                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
-#endif
 
             CompletionInfo cinfo;
             bool result = true;
@@ -584,11 +563,7 @@ Rhino.Input.RhinoGet.GetOneObject(");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
-#if RC8_15
                 code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteSignatureOptions.Empty);
-#else
-                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#endif
 
             Assert.AreEqual(2, signatures.Count());
 
@@ -625,11 +600,7 @@ Rhino.Input.RhinoGet.GetOneObject(prompt, ");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
-#if RC8_15
                 code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteSignatureOptions.Empty);
-#else
-                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#endif
 
             Assert.AreEqual(2, signatures.Count());
 
@@ -957,9 +928,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         pass
 ", script.Text);
         }
-#endif
 
-#if RC8_10
         [Test]
         public void TestPython2_Complete_SkipBlockComments()
         {
@@ -1051,11 +1020,7 @@ Rhino.Input.RhinoGet.GetOneObject( (1,2,3), ");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
-#if RC8_15
                 code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteSignatureOptions.Empty);
-#else
-                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#endif
 
             Assert.AreEqual(2, signatures.Count());
 
@@ -1067,9 +1032,7 @@ Rhino.Input.RhinoGet.GetOneObject( (1,2,3), ");
             sig = signatures.ElementAt(1);
             Assert.AreEqual(1, sig.ParameterIndex);
         }
-#endif
 
-#if RC8_11
         [Test]
         public void TestPython2_Library()
         {
@@ -1338,9 +1301,7 @@ import os
             Assert.IsTrue(ctx.Options.Get("python.keepScope", false));
             Assert.IsTrue(ctx.Options.Get("grasshopper.inputs.marshaller.asStructs", false));
         }
-#endif
 
-#if RC8_12
         [Test]
         public void TestPython2_Threaded_ExclusiveStreams()
         {
@@ -1357,9 +1318,7 @@ import os
             Assert.AreEqual("22 22\n", outputs[1]);
             Assert.AreEqual("23 23\n", outputs[2]);
         }
-#endif
 
-#if RC8_14
         [Test]
         public void TestPython2_CompleteSignature_GH_CurveXCurve()
         {
@@ -1372,11 +1331,7 @@ comps.CurveXCurve(");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
-#if RC8_15
                 code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteSignatureOptions.Empty);
-#else
-                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#endif
 
             Assert.AreEqual(1, signatures.Count());
 
@@ -1410,11 +1365,7 @@ comps.CurveXCurve(arg,");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
-#if RC8_15
                 code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteSignatureOptions.Empty);
-#else
-                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#endif
 
             Assert.AreEqual(1, signatures.Count());
 
@@ -1436,10 +1387,7 @@ Returns:
 	params_b [Number] - Parameters on second curve".Replace(Environment.NewLine, "\n"), sig.Description);
 
         }
-#endif
 
-
-#if RC8_15
         [Test]
         public void TestPython2_ExecSpec_Platform_First()
         {
@@ -1484,13 +1432,8 @@ import os
 
             ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
 
-#if RC9_0
             Assert.True(execSpec.TryGetAsync(out bool isAsync));
             Assert.True(isAsync);
-#else
-            Assert.True(execSpec.TryGetAsync(out bool? isAsync));
-            Assert.True(isAsync ?? false);
-#endif
         }
 
         [Test]
@@ -1505,13 +1448,8 @@ import os
 
             ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
 
-#if RC9_0
             Assert.True(execSpec.TryGetAsync(out bool isAsync));
             Assert.True(isAsync);
-#else
-            Assert.True(execSpec.TryGetAsync(out bool? isAsync));
-            Assert.True(isAsync ?? false);
-#endif
         }
 
         [Test]
@@ -1574,9 +1512,7 @@ import os
             Assert.True(opts.Get("python.reloadEngine", false));
             Assert.True(opts.Get("python.keepScope", false));
         }
-#endif
 
-#if RC8_16
         [Test]
         public void TestPython2_ThreadSafeScope()
         {
@@ -1789,7 +1725,6 @@ pass_in_middle()            # LINE 9
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
         }
-#endif
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py2\", "test_*.py");
     }

@@ -23,11 +23,7 @@ using Rhino.Runtime.Code.Testing;
 using Rhino.Runtime.Code.Text;
 using System.Text.RegularExpressions;
 
-#if RC8_11
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
-#else
-using RhinoCodePlatform.Rhino3D.Languages;
-#endif
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -85,11 +81,7 @@ void DoStuff(int s)
             }
             catch (CompileException ex)
             {
-#if RC8_11
                 if (ex.Diagnosis.First().Reference.Position.LineNumber != 4)
-#else
-                if (ex.Diagnostics.First().Reference.Position.LineNumber != 4)
-#endif
                     throw;
             }
         }
@@ -319,11 +311,7 @@ public class Script_Instance
 
             using (DebugContext ctx = new())
             {
-#if RC8_11
                 using DebugGroup g = code.DebugWith(ctx);
-#else
-                using DebugGroup g = code.DebugWith(ctx, invokes: true);
-#endif
                 object a = default;
                 instance.RunScript(21, 21, ref a);
             }
@@ -405,7 +393,6 @@ public class Script_Instance
             Assert.True(controls.Pass);
         }
 
-#if RC8_9
         [Test]
         public void TestCSharp_DebugPauses_Script_StepOver()
         {
@@ -1010,9 +997,7 @@ public class Script_Instance : GH_ScriptInstance
 }
 ", script.Text);
         }
-#endif
 
-#if RC8_11
         [Test]
         public void TestCSharp_Library()
         {
@@ -1089,9 +1074,7 @@ using System;
 
             Assert.IsTrue(ctx.Options.Get("grasshopper.inputs.marshaller.asStructs", false));
         }
-#endif
 
-#if RC8_12
         [Test]
         public void TestCSharp_AwaitPass()
         {
@@ -1244,9 +1227,7 @@ public static void TestConsole(int a, int b)
             Assert.AreEqual(string.Empty, outputs[1]);
             Assert.AreEqual(string.Empty, outputs[2]);
         }
-#endif
 
-#if RC8_13
         [Test]
         public void TestCSharp_DebugReturn_FromCtor()
         {
@@ -1507,9 +1488,7 @@ switch (test)
 
             Assert.True(controls.Pass);
         }
-#endif
 
-#if RC8_15
         [Test]
         public void TestCSharp_DebugThis_ClassMethod()
         {
@@ -1582,13 +1561,8 @@ using System;
 
             ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
 
-#if RC9_0
             Assert.True(execSpec.TryGetAsync(out bool isAsync));
             Assert.True(isAsync);
-#else
-            Assert.True(execSpec.TryGetAsync(out bool? isAsync));
-            Assert.True(isAsync ?? false);
-#endif
         }
 
         [Test]
@@ -1603,13 +1577,8 @@ using System;
 
             ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
 
-#if RC9_0
             Assert.True(execSpec.TryGetAsync(out bool isAsync));
             Assert.True(isAsync);
-#else
-            Assert.True(execSpec.TryGetAsync(out bool? isAsync));
-            Assert.True(isAsync ?? false);
-#endif
         }
 
         [Test]
@@ -1673,7 +1642,6 @@ import os
             Assert.True(opts.Get("csharp.compiler.unsafe", false));
         }
 
-#if RC8_19
         class CompletionInfoComparer : IComparer<CompletionInfo>
         {
             // '0_' > '1_' > '_zzz' > 'Name' > 'name'
@@ -1752,27 +1720,6 @@ import os
             code.Language.Support.EndSupport(code);
             return completions;
         }
-#else
-        static IEnumerable<Ed.Common.CompletionItem> CompleteAtEndingPeriod(Code code, string textUptoPeriod)
-        {
-            if (code.Text.TryGetPosition(textUptoPeriod.Length, out TextPosition position))
-            {
-                if (!code.Text.TryGetTransformed(textUptoPeriod.Length, CompleteOptions.Empty, out string xformedCode, out int xformedPosition))
-                {
-                    xformedCode = code.Text;
-                    xformedPosition = textUptoPeriod.Length;
-                }
-
-                return s_dispatcher.InvokeAsync(() =>
-                {
-                    CSharpCompletionProvider.CompletionProvider provider = GetCompletionProvider(code);
-                    return provider.GetCompletionItems(xformedCode, xformedPosition, position.LineNumber, position.ColumnNumber, '.');
-                }).GetAwaiter().GetResult();
-            }
-
-            return Array.Empty<Ed.Common.CompletionItem>();
-        }
-#endif
 
         static CSharpCompletionProvider.CompletionProvider GetCompletionProvider(Code code)
         {
@@ -1786,13 +1733,8 @@ import os
             AddCSharpReferences(provider, RhinoCode.Platforms.GetReferences());
             AddCSharpReferences(provider, code.References);
 
-#if RC9_0
             if (code.QueryPackages()
                     .TryGetReferences(out IEnumerable<CompileReference> references))
-#else
-            if (code.Text.GetPackageSpecs()
-                    .Packages.TryResolveReferences(code, out IEnumerable<CompileReference> references, out Diagnosis _))
-#endif
             {
                 AddCSharpReferences(provider, references);
             }
@@ -1850,13 +1792,8 @@ unsafe
             string s = "using System.";
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
 
-#if RC8_19
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
             string[] names = completions.Select(c => c.Text).ToArray();
-#else
-            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
-            string[] names = completions.Select(c => c.label).ToArray();
-#endif
 
             Assert.IsNotEmpty(completions);
 
@@ -1884,13 +1821,8 @@ public class Script_Instance : GH_ScriptInstance
 
             Code code = script.CreateCode();
 
-#if RC8_19
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
             string[] names = completions.Select(c => c.Text).ToArray();
-#else
-            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
-            string[] names = completions.Select(c => c.label).ToArray();
-#endif
 
             Assert.IsNotEmpty(completions);
 
@@ -1920,13 +1852,8 @@ public class Script_Instance : GH_ScriptInstance
 
             Code code = script.CreateCode();
 
-#if RC8_19
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
             string[] names = completions.Select(c => c.Text).ToArray();
-#else
-            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
-            string[] names = completions.Select(c => c.label).ToArray();
-#endif
 
             Assert.IsNotEmpty(completions);
 
@@ -1957,13 +1884,8 @@ public class Script_Instance : GH_ScriptInstance
 
             Code code = script.CreateCode();
 
-#if RC8_19
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
             string[] names = completions.Select(c => c.Text).ToArray();
-#else
-            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
-            string[] names = completions.Select(c => c.label).ToArray();
-#endif
 
             Assert.IsNotEmpty(completions);
 
@@ -1980,11 +1902,7 @@ public class Script_Instance : GH_ScriptInstance
             TryGetTestFilesPath(out string fileDir);
             ILanguageLibrary library = csharp.CreateLibrary(new Uri(Path.Combine(fileDir, "cs", "test_library_compileguard")));
 
-#if RC8_20
             Assert.IsTrue(library.TryBuild(new LibraryBuildContext(), out CompileReference cred, out Diagnosis _));
-#else
-            Assert.IsTrue(library.TryBuild(new LibraryBuildOptions(), out CompileReference cred, out Diagnosis _));
-#endif
 
             byte[] data = File.ReadAllBytes(cred.Path);
             Assembly a = Assembly.Load(data);
@@ -2006,15 +1924,10 @@ public class Script_Instance : GH_ScriptInstance
 
             // NOTE:
             // using BuildOptions does not add LIBRARY compile guard
-#if RC8_20
             var context = new LibraryBuildContext();
             context.CompileGuards.Remove(LibraryBuildOptions.DEFINE_LIBRARY.Identifier);
             Assert.IsTrue(library.TryBuild(context, out CompileReference cred, out Diagnosis _));
-#else
-            var opts = new LibraryBuildOptions();
-            opts.CompileGuards.Remove(LibraryBuildOptions.DEFINE_LIBRARY.Identifier);
-            Assert.IsTrue(library.TryBuild(opts, out CompileReference cred, out Diagnosis _));
-#endif
+
             byte[] data = File.ReadAllBytes(cred.Path);
             Assembly a = Assembly.Load(data);
 
@@ -2039,13 +1952,8 @@ Console.WriteLine(__is_interactive__);
 
             code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
 
-#if RC8_19
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
             string[] names = completions.Select(c => c.Text).ToArray();
-#else
-            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
-            string[] names = completions.Select(c => c.label).ToArray();
-#endif
 
             Assert.IsNotEmpty(completions);
 
@@ -2069,13 +1977,8 @@ Console.WriteLine(__is_interactive__);
 
             code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
 
-#if RC8_19
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
             string[] names = completions.Select(c => c.Text).ToArray();
-#else
-            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
-            string[] names = completions.Select(c => c.label).ToArray();
-#endif
 
             Assert.IsNotEmpty(completions);
 
@@ -2098,24 +2001,12 @@ Console.WriteLine(__is_interactive__);
 
             code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
 
-#if RC8_19
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
             string[] names = completions.Select(c => c.Text).ToArray();
 
             Assert.IsNotEmpty(completions);
 
             Assert.Contains(nameof(Enum.HasFlag), names);
-#else
-            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
-            string[] names = completions.Select(c => c.label).ToArray();
-
-            Assert.IsNotEmpty(completions);
-
-            Assert.Contains("byte", names);
-            Assert.Contains("char", names);
-            Assert.Contains(nameof(Enum.HasFlag), names);
-#endif
-
         }
 
         [Test]
@@ -2133,13 +2024,8 @@ Console.WriteLine(__is_interactive__.";
 
             code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
 
-#if RC8_19
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
             string[] names = completions.Select(c => c.Text).ToArray();
-#else
-            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
-            string[] names = completions.Select(c => c.label).ToArray();
-#endif
 
             Assert.IsNotEmpty(completions);
             Assert.Contains(nameof(bool.TryFormat), names);
@@ -2169,13 +2055,8 @@ Console.WriteLine(Thread.CurrentThread.CurrentUICulture);
 
             code.Inputs.Set(RhinoCode.ProjectServers.GetArguments(LanguageSpec.CSharp));
 
-#if RC8_19
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
             string[] names = completions.Select(c => c.Text).ToArray();
-#else
-            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
-            string[] names = completions.Select(c => c.label).ToArray();
-#endif
 
             Assert.IsNotEmpty(completions);
 
@@ -2258,9 +2139,7 @@ Console.WriteLine(Thread.CurrentThread.CurrentUICulture);
             Assert.IsTrue(ctx.Outputs.TryGet(nameof(_solve_), out _solve_));
             Assert.AreEqual(42, _solve_);
         }
-#endif
 
-#if RC8_16
         [Test]
         public void TestCSharp_DebugCompile_ScriptInstance()
         {
@@ -2421,13 +2300,8 @@ public class Script_Instance : GH_ScriptInstance
 }
 ").CreateCode();
 
-#if RC8_19
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
             string[] names = completions.Select(c => c.Text).ToArray();
-#else
-            IEnumerable<Ed.Common.CompletionItem> completions = CompleteAtEndingPeriod(code, s);
-            string[] names = completions.Select(c => c.label).ToArray();
-#endif
 
             Assert.IsNotEmpty(completions);
 
@@ -2791,14 +2665,14 @@ foreach (int {INDEX_VAR} in Enumerable.Range(0, 3)) // line 6
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-85276
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(source);
 
-            DebugExpressionExecVariableResult getIndex(ExecFrame frame)
+            ExecSlot getIndex(ExecFrame frame)
             {
-                return frame.Evaluate().OfType<DebugExpressionExecVariableResult>().FirstOrDefault(r => r.Result.Id.Identifier == index);
+                return frame.GetSlots().FirstOrDefault(r => r.Id.Identifier == index);
             }
 
-            DebugExpressionExecVariableResult getSum(ExecFrame frame)
+            ExecSlot getSum(ExecFrame frame)
             {
-                return frame.Evaluate().OfType<DebugExpressionExecVariableResult>().FirstOrDefault(r => r.Result.Id.Identifier == sum);
+                return frame.GetSlots().FirstOrDefault(r => r.Id.Identifier == sum);
             }
 
             int bp6Counter = -1;
@@ -2822,43 +2696,43 @@ foreach (int {INDEX_VAR} in Enumerable.Range(0, 3)) // line 6
                             // first arrive at line 6
                             // i does not exist
                             case -1:
-                                DebugExpressionExecVariableResult er = getIndex(frame);
+                                ExecSlot er = getIndex(frame);
                                 Assert.IsNull(er);
                                 break;
 
                             // i = 0
                             case 0:
-                                DebugExpressionExecVariableResult er0 = getIndex(frame);
-                                Assert.IsInstanceOf<DebugExpressionExecVariableResult>(er0);
+                                ExecSlot er0 = getIndex(frame);
+                                Assert.IsInstanceOf<ExecSlot>(er0);
                                 // i does not exist in previous frame
-                                Assert.IsFalse(frame.HasModifiedResult(er0, prevFrame));
-                                Assert.IsTrue(er0.Result.TryGetValue(out int v0));
+                                Assert.IsFalse(frame.HasModified(er0, prevFrame));
+                                Assert.IsTrue(er0.TryGetValue(out int v0));
                                 Assert.AreEqual(0, v0);
                                 break;
 
                             // i = 1
                             case 1:
-                                DebugExpressionExecVariableResult er1 = getIndex(frame);
-                                Assert.IsFalse(frame.HasModifiedResult(er1, prevFrame));
-                                Assert.IsTrue(er1.Result.TryGetValue(out int v1));
+                                ExecSlot er1 = getIndex(frame);
+                                Assert.IsFalse(frame.HasModified(er1, prevFrame));
+                                Assert.IsTrue(er1.TryGetValue(out int v1));
                                 Assert.AreEqual(1, v1);
 
-                                DebugExpressionExecVariableResult ers1 = getSum(frame);
-                                Assert.IsTrue(frame.HasModifiedResult(ers1, prevFrame));      // sum is modified!
-                                Assert.IsTrue(ers1.Result.TryGetValue(out int sum1));
+                                ExecSlot ers1 = getSum(frame);
+                                Assert.IsTrue(frame.HasModified(ers1, prevFrame));      // sum is modified!
+                                Assert.IsTrue(ers1.TryGetValue(out int sum1));
                                 Assert.AreEqual(1, sum1);
                                 break;
 
                             // i = 2
                             case 2:
-                                DebugExpressionExecVariableResult er2 = getIndex(frame);
-                                Assert.IsFalse(frame.HasModifiedResult(er2, prevFrame));
-                                Assert.IsTrue(er2.Result.TryGetValue(out int v2));
+                                ExecSlot er2 = getIndex(frame);
+                                Assert.IsFalse(frame.HasModified(er2, prevFrame));
+                                Assert.IsTrue(er2.TryGetValue(out int v2));
                                 Assert.AreEqual(2, v2);
 
-                                DebugExpressionExecVariableResult ers2 = getSum(frame);
-                                Assert.IsTrue(frame.HasModifiedResult(ers2, prevFrame));      // sum is modified!
-                                Assert.IsTrue(ers2.Result.TryGetValue(out int sum2));
+                                ExecSlot ers2 = getSum(frame);
+                                Assert.IsTrue(frame.HasModified(ers2, prevFrame));      // sum is modified!
+                                Assert.IsTrue(ers2.TryGetValue(out int sum2));
                                 Assert.AreEqual(3, sum2);
                                 break;
 
@@ -2878,39 +2752,39 @@ foreach (int {INDEX_VAR} in Enumerable.Range(0, 3)) // line 6
                             // first arrive at line 8
                             // i = 0
                             case 0:
-                                DebugExpressionExecVariableResult er0 = getIndex(frame);
+                                ExecSlot er0 = getIndex(frame);
                                 // csharp does not stop twice on for loop so
                                 // i is not available in frame previous to this
-                                Assert.IsFalse(frame.HasModifiedResult(er0, prevFrame));
-                                Assert.IsTrue(er0.Result.TryGetValue(out int v0));
+                                Assert.IsFalse(frame.HasModified(er0, prevFrame));
+                                Assert.IsTrue(er0.TryGetValue(out int v0));
                                 Assert.AreEqual(0, v0);
                                 break;
 
                             // i = 1
                             case 1:
-                                DebugExpressionExecVariableResult er1 = getIndex(frame);
-                                Assert.IsTrue(frame.HasModifiedResult(er1, prevFrame));      // i is modified!
-                                Assert.IsTrue(er1.Result.TryGetValue(out int v1));
+                                ExecSlot er1 = getIndex(frame);
+                                Assert.IsTrue(frame.HasModified(er1, prevFrame));      // i is modified!
+                                Assert.IsTrue(er1.TryGetValue(out int v1));
                                 Assert.AreEqual(1, v1);
 
-                                DebugExpressionExecVariableResult ers0 = getSum(frame);
-                                Assert.IsInstanceOf<DebugExpressionExecVariableResult>(ers0);
-                                Assert.IsFalse(frame.HasModifiedResult(ers0, prevFrame));
-                                Assert.IsTrue(ers0.Result.TryGetValue(out int sum0));
+                                ExecSlot ers0 = getSum(frame);
+                                Assert.IsInstanceOf<ExecSlot>(ers0);
+                                Assert.IsFalse(frame.HasModified(ers0, prevFrame));
+                                Assert.IsTrue(ers0.TryGetValue(out int sum0));
                                 Assert.AreEqual(0, sum0);
                                 break;
 
                             // i = 2
                             case 2:
-                                DebugExpressionExecVariableResult er2 = getIndex(frame);
-                                Assert.IsTrue(frame.HasModifiedResult(er2, prevFrame));      // i is modified!
-                                Assert.IsTrue(er2.Result.TryGetValue(out int v2));
+                                ExecSlot er2 = getIndex(frame);
+                                Assert.IsTrue(frame.HasModified(er2, prevFrame));      // i is modified!
+                                Assert.IsTrue(er2.TryGetValue(out int v2));
                                 Assert.AreEqual(2, v2);
 
-                                DebugExpressionExecVariableResult ers1 = getSum(frame);
+                                ExecSlot ers1 = getSum(frame);
                                 // sum is not modified since it was 1 on entering loop on previous pause
-                                Assert.IsFalse(frame.HasModifiedResult(ers1, prevFrame));
-                                Assert.IsTrue(ers1.Result.TryGetValue(out int sum1));
+                                Assert.IsFalse(frame.HasModified(ers1, prevFrame));
+                                Assert.IsTrue(ers1.TryGetValue(out int sum1));
                                 Assert.AreEqual(1, sum1);
                                 break;
 
@@ -4864,9 +4738,7 @@ TRACE(5,0);TRACE(5,1);int total = 0;
 
 ", tracedSource);
         }
-#endif
 
-#if RC8_19
         [Test]
         public void TestCSharp_Complete_NoProgram()
         {
@@ -5359,12 +5231,10 @@ IList t = new ";
 
             int index = 3;
 
-#if RC9_0
             c = completions[index];
             Assert.AreEqual("OrderedDictionary<TKey, TValue>", c.Text);
             Assert.AreEqual(CompletionKind.Class, c.Kind);
             index++;
-#endif
 
             c = completions[index];
             Assert.AreEqual(nameof(Rhino.Geometry.Polyline), c.Text);
@@ -5566,12 +5436,10 @@ IList t = ";
 
             int index = 5;
 
-#if RC9_0
             c = completions[index];
             Assert.AreEqual("OrderedDictionary<TKey, TValue>", c.Text);
             Assert.AreEqual(CompletionKind.Class, c.Kind);
             index++;
-#endif
 
             c = completions[index];
             Assert.AreEqual(nameof(Rhino.Geometry.Polyline), c.Text);
@@ -7562,11 +7430,7 @@ public abstract class RoslynCode<TLangVerison> : Code
             c = completions.First(c => c.Text == "MemberwiseClone");
             Assert.AreEqual(CompletionKind.Method, c.Kind);
 
-#if RC9_0
             c = completions.First(c => c.Text == nameof(Code.CanBuild));
-#else
-            c = completions.First(c => c.Text == "CanCompile");
-#endif
             Assert.AreEqual(CompletionKind.Property, c.Kind);
 
             c = completions.First(c => c.Text == "DebugControls");
@@ -7626,24 +7490,15 @@ Console.SetOut(new StreamWriter() { ";
 
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
 
-#if RC8_25
             Assert.AreEqual(2, completions.Length);
-#else
-            Assert.AreEqual(1, completions.Length);
-#endif
 
             CompletionInfo c;
 
-#if RC8_25
             c = completions.First(c => c.Text == "AutoFlush =");
             Assert.AreEqual(CompletionKind.Property, c.Kind);
 
             c = completions.First(c => c.Text == "NewLine =");
             Assert.AreEqual(CompletionKind.Property, c.Kind);
-#else
-            c = completions.First(c => c.Text == "AutoFlush");
-            Assert.AreEqual(CompletionKind.Property, c.Kind);
-#endif
         }
 
         [Test]
@@ -7659,24 +7514,15 @@ Console.SetOut(new StreamWriter() {
 
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
 
-#if RC8_25
             Assert.AreEqual(2, completions.Length);
-#else
-            Assert.AreEqual(1, completions.Length);
-#endif
 
             CompletionInfo c;
 
-#if RC8_25
             c = completions.First(c => c.Text == "AutoFlush =");
             Assert.AreEqual(CompletionKind.Property, c.Kind);
 
             c = completions.First(c => c.Text == "NewLine =");
             Assert.AreEqual(CompletionKind.Property, c.Kind);
-#else
-            c = completions.First(c => c.Text == "AutoFlush");
-            Assert.AreEqual(CompletionKind.Property, c.Kind);
-#endif
         }
 
         [Test]
@@ -7725,9 +7571,7 @@ namespace Rhino.Runtime.Code.Languages.Roslyn.Core
             c = completions.First(c => c.Text == "RoslynTracer");
             Assert.AreEqual(CompletionKind.Class, c.Kind);
         }
-#endif
 
-#if RC8_20
         [Test]
         public void TestCSharp_Complete_InString_Interpolated()
         {
@@ -8019,9 +7863,7 @@ var m = new Test(";
             SignatureInfo cs = signatures[2];
             Assert.True(cs.Description.Contains("Test description"));
         }
-#endif
 
-#if RC8_22
         [Test]
         public void TestCSharp_Complete_Before_Refernce()
         {
@@ -8059,9 +7901,7 @@ string s = @""
             CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
             Assert.That(completions.Any(c => c.Text == "Languages"));
         }
-#endif
 
-#if RC8_25
         [Test]
         public void TestCSharp_Complete_Complex_ObjectInitExpression_BaseProperties()
         {
@@ -8238,7 +8078,6 @@ StackLayout s = new StackLayout()
 
             Assert.That(completions.Length, Is.Zero);
         }
-#endif
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
     }

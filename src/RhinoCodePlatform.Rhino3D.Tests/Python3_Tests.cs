@@ -22,16 +22,8 @@ using Rhino.Runtime.Code.Platform;
 using Rhino.Runtime.Code.Testing;
 
 
-#if RC8_11
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
-
-#else
-using RhinoCodePlatform.Rhino3D.Languages;
-#endif
-
-#if RC9_0
 using Rhino.Runtime.Code.Languages.PythonNet;
-#endif
 
 using RhinoCodePlatform.Rhino3D.Testing;
 
@@ -78,11 +70,7 @@ return
             }
             catch (CompileException ex)
             {
-#if RC8_11
                 if (ex.Diagnosis.First().Reference.Position.LineNumber != 6)
-#else
-                if (ex.Diagnostics.First().Reference.Position.LineNumber != 6)
-#endif
                     throw;
             }
         }
@@ -280,11 +268,7 @@ rs.");
 
             string text = code.Text;
             IEnumerable<CompletionInfo> completions =
-#if RC8_9
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#else
-                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
-#endif
 
             CompletionInfo cinfo;
             bool result = true;
@@ -314,11 +298,7 @@ Rhino.");
 
             string text = code.Text;
             IEnumerable<CompletionInfo> completions =
-#if RC8_9
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#else
-                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
-#endif
 
             CompletionInfo cinfo;
             bool result = true;
@@ -343,12 +323,7 @@ p.");
 
             string text = code.Text;
             IEnumerable<CompletionInfo> completions =
-#if RC8_9
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#else
-                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
-#endif
-
             CompletionInfo cinfo;
             bool result = true;
 
@@ -372,11 +347,7 @@ Rhino.Render.ProxyTypes.");
 
             string text = code.Text;
             IEnumerable<CompletionInfo> completions =
-#if RC8_9
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#else
-                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
-#endif
 
             CompletionInfo cinfo;
             bool result = true;
@@ -397,11 +368,7 @@ os.");
 
             string text = code.Text;
             IEnumerable<CompletionInfo> completions =
-#if RC8_9
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#else
-                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
-#endif
 
             CompletionInfo cinfo;
             bool result = true;
@@ -425,11 +392,7 @@ op.");
 
             string text = code.Text;
             IEnumerable<CompletionInfo> completions =
-#if RC8_9
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#else
-                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
-#endif
 
             CompletionInfo cinfo;
             bool result = true;
@@ -453,11 +416,7 @@ a[0].");
 
             string text = code.Text;
             IEnumerable<CompletionInfo> completions =
-#if RC8_9
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#else
-                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
-#endif
 
             CompletionInfo cinfo;
             bool result = true;
@@ -492,11 +451,7 @@ m = TestEnum.");
 
             string text = code.Text;
             IEnumerable<CompletionInfo> completions =
-#if RC8_9
                 code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#else
-                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length);
-#endif
 
             Assert.True(completions.Any(c => c.Text == "test_class_method"));
         }
@@ -559,7 +514,6 @@ import fpdf
             Assert.True(new Regex(@"[Ll]ib[\\/]site-packages[\\/]").IsMatch(pkgPath));
         }
 
-#if RC8_8
         [Test]
         public void TestPython3_Debug_Variables_Enum_CheckValue()
         {
@@ -641,41 +595,42 @@ stop = brep_obj # line 8
                 {
                     if (GetIdentifier(v) == "brep_obj")
                     {
-                        ExecVariable[] members = v.Expand().ToArray();
-
+                        v.TryExpand(out ExecSlot[] members);
                         Assert.IsTrue(members.Any(m => GetIdentifier(m) == "Geometry"));
 
                         // Guid is not exapandable
-                        ExecVariable id = members.First(m => GetIdentifier(m) == "Id");
+                        ExecSlot id = members.First(m => GetIdentifier(m) == "Id");
                         Assert.IsFalse(id.CanExpand);
 
                         // bool is not exapandable
-                        ExecVariable isHidden = members.First(m => GetIdentifier(m) == "IsHidden");
+                        ExecSlot isHidden = members.First(m => GetIdentifier(m) == "IsHidden");
                         Assert.IsFalse(isHidden.CanExpand);
 
                         // None is not exapandable
-                        ExecVariable renderMaterial = members.First(m => GetIdentifier(m) == "RenderMaterial");
+                        ExecSlot renderMaterial = members.First(m => GetIdentifier(m) == "RenderMaterial");
                         Assert.IsFalse(isHidden.CanExpand);
 
-                        ExecVariable[] expanded;
+                        ExecSlot[] expanded;
 
                         // assert enumerable with one item has [0] and Count
-                        ExecVariable geom = members.First(m => GetIdentifier(m) == "Geometry");
-                        ExecVariable edges = geom.Expand().First(m => GetIdentifier(m) == "Edges");
-                        expanded = edges.Expand().ToArray();
+                        ExecSlot geom = members.First(m => GetIdentifier(m) == "Geometry");
+                        geom.TryExpand(out ExecSlot[] geomMembers);
+                        ExecSlot edges = geomMembers.First(m => GetIdentifier(m) == "Edges");
+                        edges.TryExpand(out expanded);
                         Assert.Greater(expanded.Length, 2);
                         Assert.Contains("[0]", expanded.Select(e => GetIdentifier(e)).ToList());
                         Assert.Contains("Count", expanded.Select(e => GetIdentifier(e)).ToList());
 
                         // assert array only has one Length member
-                        ExecVariable subobjMat = members.First(m => GetIdentifier(m) == "SubobjectMaterialComponents");
-                        expanded = subobjMat.Expand().ToArray();
+                        ExecSlot subobjMat = members.First(m => GetIdentifier(m) == "SubobjectMaterialComponents");
+                        subobjMat.TryExpand(out expanded);
                         Assert.AreEqual(1, expanded.Length);
                         Assert.AreEqual("Length", GetIdentifier(expanded[0]));
 
                         // assert color is expandable
-                        ExecVariable attribs = members.First(m => GetIdentifier(m) == "Attributes");
-                        ExecVariable objColor = attribs.Expand().First(m => GetIdentifier(m) == "ObjectColor");
+                        ExecSlot attribs = members.First(m => GetIdentifier(m) == "Attributes");
+                        attribs.TryExpand(out ExecSlot[] attribsMembers);
+                        ExecSlot objColor = attribsMembers.First(m => GetIdentifier(m) == "ObjectColor");
                         Assert.IsTrue(objColor.CanExpand);
                     }
 
@@ -689,9 +644,7 @@ stop = brep_obj # line 8
 
             Assert.True(controls.Pass);
         }
-#endif
 
-#if RC8_9
         [Test]
         public void TestPython3_StdErr()
         {
@@ -702,11 +655,7 @@ import sys
 result = sys.stderr is not None
 ");
 
-#if RC8_12
             var ctx = new RunContext(defaultErrorStream: true)
-#else
-            var ctx = new RunContext(defaultStderr: true)
-#endif
             {
                 AutoApplyParams = true,
                 Outputs = { ["result"] = false }
@@ -1173,20 +1122,14 @@ Rhino.Input.RhinoGet.GetOneObject(");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
-#if RC8_15
                 code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteSignatureOptions.Empty);
-#else
-                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#endif
 
             Assert.AreEqual(2, signatures.Count());
 
             SignatureInfo sig;
 
-#if RC9_0
             // for some reason in Rhino 9, the list order is different
             signatures = signatures.Reverse();
-#endif
 
             sig = signatures.ElementAt(0);
             Assert.AreEqual(0, sig.ParameterIndex);
@@ -1219,11 +1162,7 @@ Rhino.Input.RhinoGet.GetOneObject(prompt, ");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
-#if RC8_15
                 code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteSignatureOptions.Empty);
-#else
-                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#endif
 
             Assert.AreEqual(2, signatures.Count());
 
@@ -1317,17 +1256,9 @@ import OpenEXR
             IEnviron environ = py3.Environs.CreateEnviron($"{SetupFixture.RHINOCODE_PYTHON_VENV_PREFIX}install_requests");
 
             var spec = new PackageSpec("requests", "2.31.0");
-#if RC9_0
             IPackage pkg = environ.AddPackages(new PackageSpec[] { spec }).First(p => spec.Matches(p));
-#else
-            IPackage pkg = environ.AddPackage(spec);
-#endif
 
-#if RC9_0
             Assert.AreEqual("requests==2.31.0", pkg.ToString());
-#else
-            Assert.AreEqual("requests==2.31.0 (Any)", pkg.ToString());
-#endif
 
             Assert.AreEqual("requests", pkg.Id);
             Assert.AreEqual("2.31.0", pkg.Version.ToString());
@@ -1538,7 +1469,6 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 
             script.ConvertToScriptInstance(addSolve: false, addPreview: true);
 
-#if RC8_18
             Assert.AreEqual($@"#! python 3
 import System
 import Rhino
@@ -1558,28 +1488,6 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def DrawViewportMeshes(self, args):
         pass
 ", script.Text);
-#else
-            Assert.AreEqual($@"#! python 3
-import System
-import Rhino
-import Grasshopper
-
-class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
-    def RunScript(self):
-        return
-
-    {P} Preview overrides 
-    @property
-    def ClippingBox(self):
-        return Rhino.Geometry.BoundingBox.Empty
-
-    def DrawViewportWires(self, args):
-        pass
-
-    def DrawViewportMeshes(self, args):
-        pass
-", script.Text);
-#endif
         }
 
         [Test]
@@ -1598,7 +1506,6 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 
             script.ConvertToScriptInstance(addSolve: true, addPreview: true);
 
-#if RC8_18
             Assert.AreEqual($@"#! python 3
 import System
 import Rhino
@@ -1625,35 +1532,6 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def DrawViewportMeshes(self, args):
         pass
 ", script.Text);
-#else
-            Assert.AreEqual($@"#! python 3
-import System
-import Rhino
-import Grasshopper
-
-class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
-    def RunScript(self):
-        return
-
-    {P} Solve overrides 
-    def BeforeRunScript(self):
-        pass
-
-    def AfterRunScript(self):
-        pass
-
-    {P} Preview overrides 
-    @property
-    def ClippingBox(self):
-        return Rhino.Geometry.BoundingBox.Empty
-
-    def DrawViewportWires(self, args):
-        pass
-
-    def DrawViewportMeshes(self, args):
-        pass
-", script.Text);
-#endif
         }
 
         [Test]
@@ -1673,7 +1551,6 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
             script.ConvertToScriptInstance(addSolve: true, addPreview: false);
             script.ConvertToScriptInstance(addSolve: false, addPreview: true);
 
-#if RC8_18
             Assert.AreEqual($@"#! python 3
 import System
 import Rhino
@@ -1700,35 +1577,6 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def DrawViewportMeshes(self, args):
         pass
 ", script.Text);
-#else
-            Assert.AreEqual($@"#! python 3
-import System
-import Rhino
-import Grasshopper
-
-class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
-    def RunScript(self):
-        return
-
-    {P} Solve overrides 
-    def BeforeRunScript(self):
-        pass
-
-    def AfterRunScript(self):
-        pass
-
-    {P} Preview overrides 
-    @property
-    def ClippingBox(self):
-        return Rhino.Geometry.BoundingBox.Empty
-
-    def DrawViewportWires(self, args):
-        pass
-
-    def DrawViewportMeshes(self, args):
-        pass
-", script.Text);
-#endif
         }
 
         [Test]
@@ -1819,9 +1667,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 
             Assert.True(result);
         }
-#endif
 
-#if RC8_10
         [Test]
         public void TestPython3_Diagnose_SuperInit_RhinoCommon_GetObject()
         {
@@ -1940,11 +1786,7 @@ Rhino.Input.RhinoGet.GetOneObject( (1,2,3), ");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
-#if RC8_15
                 code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteSignatureOptions.Empty);
-#else
-                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#endif
 
             Assert.AreEqual(2, signatures.Count());
 
@@ -1970,11 +1812,7 @@ Rhino.Input.RhinoGet.GetOneObject(op.dirname(""test""),");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
-#if RC8_15
                 code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteSignatureOptions.Empty);
-#else
-                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#endif
 
             Assert.AreEqual(2, signatures.Count());
 
@@ -1997,18 +1835,12 @@ Rhino.Input.RhinoGet.GetOneObject(op.dirname(""test""),");
 
             var spec = new PackageSpec("jax[cpu]");
 
-#if RC9_0
             IPackage pkg = environ.AddPackages(new PackageSpec[] { spec }).First();
-#else
-            IPackage pkg = environ.AddPackage(spec);
-#endif
 
             Assert.AreEqual("jax", pkg.Id);
             Assert.IsTrue(environ.Contains(new PackageSpec("jax")));
         }
-#endif
 
-#if RC8_11
         [Test]
         public void TestPython3_Library()
         {
@@ -2317,11 +2149,11 @@ print(m) # line 3
             {
                 new("m"),
             });
-            controls.OnReceivedExpected += (ExecVariable v) =>
+            controls.OnReceivedExpected += (ExecSlot v) =>
             {
                 try
                 {
-                    v.Expand();
+                    v.TryExpand(out ExecSlot[] _);
                 }
                 catch (Exception)
                 {
@@ -2354,11 +2186,11 @@ print(m) # line 3
             {
                 new("m"),
             });
-            controls.OnReceivedExpected += (ExecVariable v) =>
+            controls.OnReceivedExpected += (ExecSlot v) =>
             {
                 try
                 {
-                    v.Expand();
+                    v.TryExpand(out ExecSlot[] _);
                 }
                 catch (Exception ex)
                 {
@@ -2392,9 +2224,7 @@ import os
             Assert.IsTrue(ctx.Options.Get("python.keepScope", false));
             Assert.IsTrue(ctx.Options.Get("grasshopper.inputs.marshaller.asStructs", false));
         }
-#endif
 
-#if RC8_12
         [Test]
         public void TestPython3_Threaded_ExclusiveStreams()
         {
@@ -2406,10 +2236,7 @@ import os
             Assert.AreEqual("22 22\n", outputs[1]);
             Assert.AreEqual("23 23\n", outputs[2]);
         }
-#endif
 
-
-#if RC8_14
         [Test]
         public void TestPython3_CompleteSignature_GH_CurveXCurve()
         {
@@ -2421,11 +2248,7 @@ comps.CurveXCurve(");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
-#if RC8_15
                 code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteSignatureOptions.Empty);
-#else
-                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#endif
 
             Assert.AreEqual(1, signatures.Count());
 
@@ -2459,11 +2282,7 @@ comps.CurveXCurve(arg,");
 
             string text = code.Text;
             IEnumerable<SignatureInfo> signatures =
-#if RC8_15
                 code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteSignatureOptions.Empty);
-#else
-                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
-#endif
 
             Assert.AreEqual(1, signatures.Count());
 
@@ -2485,9 +2304,7 @@ Returns:
 	params_b [Number] - Parameters on second curve".Replace(Environment.NewLine, "\n"), sig.Description);
 
         }
-#endif
 
-#if RC8_15
         [Test]
         public void TestPython3_DebugSelf()
         {
@@ -2540,7 +2357,7 @@ f.Test()
                 {
                     if (GetIdentifier(v) == "self")
                     {
-                        ExecVariable[] members = v.Expand().ToArray();
+                        v.TryExpand(out ExecSlot[] members);
                         Assert.IsTrue(members.Any(m => GetIdentifier(m) == "class_test"));
                     }
 
@@ -2581,7 +2398,7 @@ f.Test()
                 {
                     if (GetIdentifier(v) == "self")
                     {
-                        ExecVariable[] members = v.Expand().ToArray();
+                        v.TryExpand(out ExecSlot[] members);
                         Assert.IsTrue(members.Any(m => GetIdentifier(m) == "test"));
                     }
 
@@ -2594,9 +2411,7 @@ f.Test()
 
             Assert.True(controls.Pass);
         }
-#endif
 
-#if RC8_15
         [Test]
         public void TestPython3_PIP_INI_Exists()
         {
@@ -2652,13 +2467,8 @@ import os
 
             ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
 
-#if RC9_0
             Assert.True(execSpec.TryGetAsync(out bool isAsync));
             Assert.True(isAsync);
-#else
-            Assert.True(execSpec.TryGetAsync(out bool? isAsync));
-            Assert.True(isAsync ?? false);
-#endif
         }
 
         [Test]
@@ -2673,13 +2483,8 @@ import os
 
             ExecSpecifierResult execSpec = code.Text.GetExecSpecs();
 
-#if RC9_0
             Assert.True(execSpec.TryGetAsync(out bool isAsync));
             Assert.True(isAsync);
-#else
-            Assert.True(execSpec.TryGetAsync(out bool? isAsync));
-            Assert.True(isAsync ?? false);
-#endif
         }
 
         [Test]
@@ -2775,9 +2580,7 @@ jac";
             Assert.IsNotEmpty(hovers);
             Assert.AreEqual("int", hovers.First().Text);
         }
-#endif
 
-#if RC8_16
         [Test]
         public void TestPython3_ThreadSafeScope()
         {
@@ -3115,10 +2918,7 @@ from system.Collection.Generic import ");
             Assert.IsNotEmpty(completions);
             Assert.IsEmpty(completions.Where(c => c.Text.Contains('`')));
         }
-#endif
 
-
-#if RC9_0
         [Test]
         public void TestPython3_Environs_PackageSpec_NormalizedId_Match()
         {
@@ -3488,15 +3288,10 @@ from system.Collection.Generic import ");
             code.RestorePackages(rpw);
             Assert.IsTrue(rpw.HasReports);
         }
-#endif
 
-        static string GetIdentifier(ExecVariable variable)
+        static string GetIdentifier(ExecSlot variable)
         {
-#if RC8_16
             return variable.Id.Identifier;
-#else
-            return variable.Id;
-#endif
         }
 
         static DiagnoseOptions s_errorsOnly = new() { Errors = true, Hints = false, Infos = false, Warnings = false };

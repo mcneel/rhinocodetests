@@ -233,7 +233,6 @@ namespace Rhino.Runtime.Code.Tests
             Assert.That(new LanguageSpec("mcneel.python", "3.9.10"), Is.GreaterThan(new LanguageSpec("python", "3.8.11")));
         }
 
-#if RC8_16
         public enum ExpectedCompare : int
         {
             AreEqual = 0,
@@ -320,6 +319,5 @@ namespace Rhino.Runtime.Code.Tests
             yield return new(new LanguageSpec("mcneel.pythonnet.python"), new LanguageSpec("ehsan.pythonnet.python"), (ExpectedCompare)"mcneel".CompareTo("ehsan"));
             yield return new(new LanguageSpec("ehsan.pythonnet.python"), new LanguageSpec("mcneel.pythonnet.python"), (ExpectedCompare)"ehsan".CompareTo("mcneel"));
         }
-#endif
     }
 }

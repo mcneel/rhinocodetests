@@ -18,11 +18,8 @@ namespace Rhino.Runtime.Code.Tests
     public class ExecutionTests
     {
         [OneTimeSetUp]
-#if RC9_0
         public void Setup() => RhinoCode.Languages.Register(new ProxyLanguage());
-#else
-        public void Setup() => RhinoCode.Languages.Register(new ProxyLanguage(), Enumerable.Empty<ILanguageSpecifier>());
-#endif
+
         [Test]
         public void Test_CompileException()
         {
@@ -53,21 +50,12 @@ namespace Rhino.Runtime.Code.Tests
             Assert.Throws<NoDebugControlsException>(() => code.Debug(new DebugContext()));
         }
 
-#if RC8_16
         [Test]
         public void Test_MissingDefaultProfiler()
         {
             Code code = GetProxyLanguage().CreateCode();
             Assert.Throws<NoProfilerException>(() => code.Profile(new ProfileContext()));
         }
-#else
-        [Test]
-        public void Test_HasProfiler()
-        {
-            Code code = GetProxyLanguage().CreateCode();
-            Assert.DoesNotThrow(() => code.Profile(new ProfileContext()));
-        }
-#endif
 
         [Test]
         public void Test_MissingProfiler()
