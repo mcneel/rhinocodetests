@@ -15,15 +15,10 @@ using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
 using GKP = Grasshopper.Kernel.Parameters;
 
-#if RC8_11
 using RhinoCodePlatform.GH;
 using RhinoCodePlatform.GH.Context;
 using LGH1 = RhinoCodePlatform.Rhino3D.Languages.GH1;
 using ComponentConfigs = RhinoCodePlatform.GH.ScriptConfigs;
-#else
-using RhinoCodePlatform.Rhino3D.GH;
-using IScriptParameter = RhinoCodePlatform.Rhino3D.GH.IScriptVariable;
-#endif
 
 using RhinoCodePlatform.Rhino3D.Testing;
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
@@ -35,7 +30,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     [TestFixture]
     public class Grasshopper1_Tests_Component : GH1ScriptFixture
     {
-#if RC8_8
         [Test]
         public void TestGH1_Component_ChangeLanguage()
         {
@@ -720,9 +714,7 @@ public class Script_Instance : GH_ScriptInstance
             IGH_Param assert = ((IGH_Param)ghdoc.Objects.FirstOrDefault(c => c.NickName == "Assert"));
             Assert.IsFalse(assert.RuntimeMessages(GH_RuntimeMessageLevel.Error).Any());
         }
-#endif
 
-#if RC8_9
         [Test]
         public void TestGH1_Component_Python_DoesNotReset_Converter_Goo()
         {
@@ -768,11 +760,8 @@ public class Script_Instance : GH_ScriptInstance
             IParamValueConverter defaultConverter = default;
             if (overrideKind > DefaultOverrideKind.NoOverride)
             {
-#if RC8_11
                 defaultConverter = LGH1.Grasshopper1.GetConfiguredPythonConverter();
-#else
-                defaultConverter = ComponentConfigs.Current.GetDefaultPythonHint();
-#endif
+
                 ComponentConfigs.Current.DefaultPythonHint =
                     overrideKind == DefaultOverrideKind.OverrideToExpected ? expected.Id.Id : converter.Id.Id;
             }
@@ -801,9 +790,7 @@ a = str(type(x))
                 ComponentConfigs.Current.DefaultPythonHint = defaultConverter.Id.Id;
             }
         }
-#endif
 
-#if RC8_10
         [Test, TestCaseSource(nameof(GetTestScript), new object[] { "gh1ui", "test_plugins_package_install_progress_single_rc8.10.ghx" }),
                TestCaseSource(nameof(GetTestScript), new object[] { "gh1ui", "test_plugins_package_install_progress_context_rc8.10.ghx" })]
         public void TestGH1_PublishedComponent_RestoreProgress(string ghfile)
@@ -827,9 +814,7 @@ a = str(type(x))
 
             Assert.IsTrue(watcher.Pass);
         }
-#endif
 
-#if RC8_11
         [Test]
         public void TestGH1_Component_ParamsCollect_CSharp_InputNamedOutLine()
         {
@@ -1005,9 +990,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         return
 ", EnsureCRLF(script.Text));
         }
-#endif
 
-#if RC8_13
         [Test]
         public void TestGH1_Component_ParamsExtract()
         {
@@ -1213,9 +1196,7 @@ public class Script_Instance : GH_ScriptInstance
             Assert.AreEqual("y", inputs[1].Name);
             Assert.AreEqual("List<int>", inputs[1].ValueType.Name);
         }
-#endif
 
-#if RC8_15
         [Test]
         public void TestGH1_Component_ParamsCollect_CSharp_RunScriptIndent()
         {
@@ -1288,9 +1269,7 @@ public class Script_Instance : GH_ScriptInstance
         {
             Test_ScriptWithWait(new Uri(ghfile), 3);
         }
-#endif
 
-#if RC8_16
         [Test]
         public void TestGH1_Component_ParamsCollect_CSharp_AsyncRunScript_CompileError()
         {
@@ -1492,9 +1471,7 @@ public class Script_Instance : GH_ScriptInstance
             Assert.AreEqual(DiagnosticSeverity.Error, d.Severity);
             Assert.IsTrue(d.Message.Contains("Async methods cannot have ref, in or out parameters"));
         }
-#endif
 
-#if RC8_18
         [Test]
         public void TestGH1_Component_CreateAPI_EmptyScriptAndParams_CSharp()
         {
@@ -2160,7 +2137,6 @@ public class Script_Instance : GH_ScriptInstance
             script.ParamsCollect();
             Assert.AreEqual(expected, script.Text);
         }
-#endif
 
         static string EnsureCRLF(string input) => input.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
     }

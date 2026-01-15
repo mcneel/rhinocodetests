@@ -8,34 +8,34 @@ using Rhino.Runtime.Code.Execution.Debugging;
 
 namespace Rhino.Runtime.Code.Testing
 {
-    public delegate bool VerifyExpectedDelegate(ExecVariable expected);
+    public delegate bool VerifyExpectedDelegate(ExecSlot expected);
 
-    public sealed class ExpectedVariable : ExecVariable
+    public sealed class ExpectedVariable : ExecSlot
     {
         public bool ExpectsValue { get; }
 
-        public ExpectedVariable(string id, ExecVariableKind kind = ExecVariableKind.FrameVariable, ExecVariableAttribute attribs = ExecVariableAttribute.Empty)
-            : base(id, default, kind, attribs)
+        public ExpectedVariable(string id, ExecSlotKind kind = ExecSlotKind.FrameSlot, ExecSlotAccess access = ExecSlotAccess.Default)
+            : base(new ExecSlotIdentity(kind, access, id), ExecValue.None(ExecExpression.Empty))
         {
             ExpectsValue = false;
         }
 
-        public ExpectedVariable(string id, object value, ExecVariableKind kind = ExecVariableKind.FrameVariable, ExecVariableAttribute attribs = ExecVariableAttribute.Empty)
-            : base(id, value, kind, attribs)
+        public ExpectedVariable(string id, object value, ExecSlotKind kind = ExecSlotKind.FrameSlot, ExecSlotAccess access = ExecSlotAccess.Default)
+            : base(new ExecSlotIdentity(kind, access, id), new ExecValue(ExecExpression.Empty, value))
         {
             ExpectsValue = true;
         }
     }
 
-    public sealed class UnexpectedVariable : ExecVariable
+    public sealed class UnexpectedVariable : ExecSlot
     {
-        public UnexpectedVariable(string id, ExecVariableKind kind = ExecVariableKind.FrameVariable, ExecVariableAttribute attribs = ExecVariableAttribute.Empty)
-            : base(id, default, kind, attribs)
+        public UnexpectedVariable(string id, ExecSlotKind kind = ExecSlotKind.FrameSlot, ExecSlotAccess access = ExecSlotAccess.Default)
+            : base(new ExecSlotIdentity(kind, access, id), ExecValue.None(ExecExpression.Empty))
         {
         }
 
-        public UnexpectedVariable(string id, object value, ExecVariableKind kind = ExecVariableKind.FrameVariable, ExecVariableAttribute attribs = ExecVariableAttribute.Empty)
-            : base(id, value, kind, attribs)
+        public UnexpectedVariable(string id, object value, ExecSlotKind kind = ExecSlotKind.FrameSlot, ExecSlotAccess access = ExecSlotAccess.Default)
+            : base(new ExecSlotIdentity(kind, access, id), new ExecValue(ExecExpression.Empty, value))
         {
         }
     }
@@ -73,17 +73,7 @@ namespace Rhino.Runtime.Code.Testing
                 if (ExecEvent.Line == frame.Event
                         && _bp.Matches(frame))
                 {
-#if RC8_16
-                    ExecVariable[] vars = frame.Evaluate()
-                                               .OfType<DebugExpressionExecVariableResult>()
-                                               .Select(devr => devr.Result)
-                                               .ToArray();
-#else
-                    ExecVariable[] vars = frame.Evaluate()
-                                               .OfType<DebugExpressionVariableResult>()
-                                               .Select(devr => devr.Value)
-                                               .ToArray();
-#endif
+                    ExecSlot[] vars = frame.GetSlots().ToArray();
                     bool verified = vars.All(v => OnReceivedExpected?.Invoke(v) ?? true);
                     bool all_expected = _expected.All(ev => vars.Any(v => v.Id == ev.Id && ev.ExpectsValue ? v.Equals(ev) : true));
                     bool no_unexpected = !_unexpected.Any(uev => vars.Any(v => v.Id == uev.Id));

@@ -61,9 +61,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         public override void OneTimeSetup()
         {
-#if RC8_14
             PatchHopsConfigs();
-#endif
 
             base.OneTimeSetup();
 
@@ -78,39 +76,27 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             LoadGrasshopperPlugins();
             LoadGrasshopper2Plugins();
 
-#if RC8_14
             StartComputeInstance();
-#endif
 
-#if RC8_15
             PatchPIPConfigs();
-#endif
         }
 
         public override void OneTimeTearDown()
         {
             base.OneTimeTearDown();
 
-#if RC8_14
             s_compute?.Kill();
-#endif
         }
 
-        sealed class TestContextStatusResponder : ProgressStatusResponder
+        sealed class TestContextStatusResponder : LanguageQueryResponder
         {
-#if RC8_13
             public override void LoadProgressChanged(LanguageLoadProgressReport value)
             {
                 if (value.IsComplete)
                     TestContext.Progress.WriteLine($"Loading Languages Complete");
                 else
-#if RC9_0
                     TestContext.Progress.WriteLine($"Loading {value.LanguageSpec} ...");
-#else
-                    TestContext.Progress.WriteLine($"Loading {value.Spec} ...");
-#endif
             }
-#endif
             public override void StatusChanged(ILanguage language, ProgressChangedEventArgs args)
             {
                 // e.g.
@@ -172,20 +158,15 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         static void LoadLanguages()
         {
             Registrar.StartScripting();
-#if RC8_11
             RhinoCode.ReportProgressToConsole = true;
-#else
-            Registrar.SendReportsToConsole = true;
-#endif
 
-#if RC8_14
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-84389
             string netfwRefNuget = Path.Combine(RhinoCode.UserProfile, ".nuget", "packages", "microsoft.netframework.referenceassemblies.net48");
             if (Directory.Exists(netfwRefNuget))
             {
                 Directory.Delete(netfwRefNuget, recursive: true);
             }
-#endif
+
             RhinoCode.Languages.WaitStatusComplete(LanguageSpec.Any, new TestContextStatusResponder());
             foreach (ILanguage language in RhinoCode.Languages)
             {
@@ -274,7 +255,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         {
         }
 
-#if RC8_14
         static Process s_compute;
 
         static void StartComputeInstance()
@@ -377,9 +357,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             File.WriteAllText(ghKernelCfgFile, ghKernelCfg);
         }
-#endif
 
-#if RC8_15
         static void PatchPIPConfigs()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-83985
@@ -394,6 +372,5 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 user = true
 ");
         }
-#endif
     }
 }

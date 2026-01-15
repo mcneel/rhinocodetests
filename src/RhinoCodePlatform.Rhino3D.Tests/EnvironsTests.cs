@@ -52,7 +52,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       Assert.That(GetPackageVersions(new PackageSpec("RhinoCommon==8.5-wip"), 0));
     }
 
-#if RC9_0
     [Test]
     public void TestEnvirons_SpecEntryCache()
     {
@@ -193,7 +192,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
       Assert.AreEqual(PackageAvailability.Available, pi.Availability);
     }
-
 
     [Test]
     public void TestEnvirons_NuGet_Installed_Rhino_DOT_Scripting()
@@ -672,7 +670,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       Assert.That(rpw.Contains("Downloading AWSSDK.Core"));
       Assert.That(rpw.Contains("Downloading MathNet.Numerics"));
     }
-#endif
   }
 }
 

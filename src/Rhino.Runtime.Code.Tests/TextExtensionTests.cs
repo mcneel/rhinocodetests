@@ -12,14 +12,11 @@ namespace Rhino.Runtime.Code.Tests
         [Test]
         /* source length is 47 */
         [TestCase("#! python3\r\nimport rhinoscriptsyntax as rs\r\nrs.", 3, 3, true, 46)]
-#if RC8_15
         [TestCase("#! python3\r\nimport rhinoscriptsyntax as rs\r\nrs.", 0, 0, true, 0)]
         [TestCase("#! python3\r\nimport rhinoscriptsyntax as rs\r\nrs.", 1, 1, true, 0)]
         [TestCase("#! python3\r\nimport rhinoscriptsyntax as rs\r\nrs.", 1, 2, true, 1)]
         [TestCase("#! python3\r\nimport rhinoscriptsyntax as rs\r\nrs.", 3, 100, false, -1)]
-#endif
 
-#if RC8_20
         [TestCase("#! python3\nimport rhinoscriptsyntax as rs\nrs.", 0, 0, true, 0)]
         [TestCase("#! python3\nimport rhinoscriptsyntax as rs\nrs.", 1, 1, true, 0)]
         [TestCase("#! python3\nimport rhinoscriptsyntax as rs\nrs.", 1, 2, true, 1)]
@@ -29,7 +26,6 @@ namespace Rhino.Runtime.Code.Tests
         [TestCase("// #! csharp\r\nusing System;\r\n\r\n", 4, 1, false, -1)]
         [TestCase("// #! csharp\r\nusing System;\r\n\r\n\r\n", 4, 1, true, 31)]
         [TestCase("// #! csharp\r\r\n\rusing System;\r\r\n\r\n\r\n", 4, 1, true, 34)]
-#endif
         public void TestGetIndexFromPosition(string text, int line, int column, bool expected, int expectedIndex)
         {
             bool res = text.TryGetIndex(new TextPosition(line, column), out int index);
@@ -40,7 +36,6 @@ namespace Rhino.Runtime.Code.Tests
             }
         }
 
-#if RC8_15
         [Test]
         [TestCase("doc.", 0, true, 'd')]
         [TestCase("doc.", 3, true, '.')]
@@ -109,37 +104,23 @@ namespace Rhino.Runtime.Code.Tests
         /* replace->insert: reverse range */
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 32, 3, 1, "---", true, "using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\")---;")]
 
-#if RC9_0
         /* add: end beyond last */
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 33, 3, 100, "", false, "")]
         /* rem: end beyond last */
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 1, 3, 100, "", false, "")]
         /* replace: end beyond last */
         [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 1, 3, 100, "", false, "")]
-#else
-        /* add: end beyond last */
-        [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 33, 3, 100, "---", true, "using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");---")]
-        /* rem: end beyond last */
-        [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 1, 3, 100, "", true, "using System;\nusing Rhino;\n")]
-        /* replace: end beyond last */
-        [TestCase("using System;\nusing Rhino;\nConsole.WriteLine(\"Testing CS\");", 3, 1, 3, 100, "---", true, "using System;\nusing Rhino;\n---")]
-#endif
 
         public void TestPatch(string text, int fromLine, int fromColumn, int toLine, int toColumn, string patch, bool expected, string expectedPatched)
         {
-#if RC9_0
             bool res = text.TryPatch(TextPatch.Replace(new TextRange(fromLine, fromColumn, toLine, toColumn), patch), out string patched);
-#else
-            bool res = text.TryPatch(new TextPatch(new TextRange(fromLine, fromColumn, toLine, toColumn), patch), out string patched);
-#endif
+
             Assert.AreEqual(expected, res);
             if (expected)
             {
                 Assert.AreEqual(expectedPatched, patched);
             }
         }
-#endif
-
 
         [Test]
         public void TestPatch_Grasshopper()
@@ -185,11 +166,7 @@ public class Script_Instance : GH_ScriptInstance
 ";
 
             // removing null in a=null assignment
-#if RC9_0
             TextPatch patch = TextPatch.Remove(new TextRange(35, 9, 35, 13));
-#else
-            TextPatch patch = new TextPatch(new TextRange(35, 9, 35, 13), string.Empty);
-#endif
             source.TryPatch(patch, out string res);
             Assert.That(!res.Contains("null"));
         }

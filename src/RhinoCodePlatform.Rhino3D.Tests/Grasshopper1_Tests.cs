@@ -111,7 +111,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
         }
 
-#if RC8_15
         [Test]
         public void TestGrasshopper_Flags_Defaults()
         {
@@ -123,7 +122,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 Assert.False(cdefautls.Get<bool>(key));
             }
         }
-#endif
 
         static IEnumerable<object[]> GetTestDefinitions() => GetTestScripts(@"gh1\", "test_*.gh?");
     }

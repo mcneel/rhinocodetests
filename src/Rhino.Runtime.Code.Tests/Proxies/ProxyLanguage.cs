@@ -19,11 +19,7 @@ namespace RhinoCodePlatform.Projects.Proxies
         public override void ExpireCache() { }
 
         protected override void BeginStreams(RunContext context) { }
-#if RC9_0
         protected override void EndStreams(RunContext context) { }
-#else
-        protected override void EndStreams(ResetStreamPolicy resetPolicy) { }
-#endif
         protected override void BeginTrace(IExecTracer tracer) { }
         protected override void EndTrace() { }
 
@@ -52,13 +48,8 @@ namespace RhinoCodePlatform.Projects.Proxies
 
         #region Not Necessary
         public override Code CreateCode() => new ProxyCode(this);
-#if RC9_0
         public override IEnumerable<ILanguageSpecifier> Specifiers { get; } = Enumerable.Empty<ILanguageSpecifier>();
         public override LanguageStoredLibrary CreateLibrary(Uri uri) => throw new NotImplementedException();
-#else
-        public override IEnumerable<IStorageFilter> StorageFilters { get; } = Enumerable.Empty<IStorageFilter>();
-        public override LanguageLibrary CreateLibrary(Uri uri) => throw new NotImplementedException();
-#endif
         public override LanguageSourceLibrary CreateLibrary(string name) => throw new NotImplementedException();
         #endregion
     }

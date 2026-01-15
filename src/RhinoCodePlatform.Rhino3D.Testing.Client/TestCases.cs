@@ -102,18 +102,14 @@ namespace RhinoCodePlatform.Rhino3D.Testing.Client
             }
         }
 
-        sealed class ConsoleStatusResponder : ProgressStatusResponder
+        sealed class ConsoleStatusResponder : LanguageQueryResponder
         {
             public override void LoadProgressChanged(LanguageLoadProgressReport value)
             {
                 if (value.IsComplete)
                     Console.WriteLine($"Loaded Languages");
                 else
-#if RC9_0
                     Console.WriteLine($"Loading {value.LanguageSpec} ...");
-#else
-                    Console.WriteLine($"Loading {value.Spec} ...");
-#endif
             }
 
             public override void StatusChanged(ILanguage language, ProgressChangedEventArgs args)

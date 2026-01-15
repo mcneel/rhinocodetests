@@ -12,7 +12,6 @@ using Rhino.Commands;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
-#if RC8_11
     [TestFixture]
     public class RhinoTests : ScriptFixture
     {
@@ -103,9 +102,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
             Assert.IsTrue(libfound);
         }
-#endif
 
-#if RC8_14
         [Test]
         public void TestRunScript_TestCommandResult_CancelCommand_CS()
         {
@@ -165,9 +162,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             Assert.AreEqual(Result.Success, RhinoApp.ExecuteCommand(RhinoDoc.ActiveDoc, "-TestCSharpInPython2"));
             Assert.AreEqual("<TestCSharpInPython2.TestClass", GetReportLines(mmf_py2)[0][..30]);
         }
-#endif
 
-#if RC8_15
         [Test]
         public void TestRunScript_TestCommandArgs_GH()
         {
@@ -225,7 +220,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             Assert.IsTrue(RhinoApp.RunScript(RhinoDoc.ActiveDoc.RuntimeSerialNumber, $"-_ScriptEditor _Run \"{scriptfile}\"", echo: false));
             AssertArgsReport(name, mmf, RunMode.Scripted);
         }
-#endif
 
         static readonly Regex s_cmdClassNameMatcher = new("RhinoCodePlatform.Rhino3D.Projects.Plugin.ProjectCommand_.{8}");
 

@@ -13,7 +13,6 @@ namespace Rhino.Runtime.Code.Tests
   [TestFixture]
   public class PackageVersionTests
   {
-#if RC9_0
     [Test]
     public void TestPackageVersion_Create_And_ToString()
     {
@@ -224,6 +223,5 @@ namespace Rhino.Runtime.Code.Tests
       Assert.DoesNotThrow(() => new HostVersion("1.2-beta"));
       Assert.DoesNotThrow(() => new HostVersion("1.2.*-beta"));
     }
-#endif
   }
 }

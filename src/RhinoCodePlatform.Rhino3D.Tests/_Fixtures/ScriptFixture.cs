@@ -117,7 +117,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         protected static bool TryRunCode(ScriptInfo scriptInfo, Code code, RunContext context, out string errorMessage)
         {
-#if RC8_12
             if (scriptInfo.ExpectsRhinoDocument)
             {
                 Rhino.RhinoDoc currentDoc = Rhino.RhinoDoc.ActiveDoc;
@@ -136,7 +135,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 return res;
             }
             else
-#endif
                 // this can throw if script is not 'Expecting' an error.
                 // exceptions will bubble up and fail the test
                 return TrySafeRunCode(scriptInfo, code, context, out errorMessage);
@@ -177,11 +175,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 int id = i;
                 ts.Add(Task.Run(() =>
                 {
-#if RC8_15
                     var inputs = new ContextParams(ConvertDirection.Incoming)
-#else
-                    var inputs = new ContextInputs
-#endif
                     {
                         ["a"] = 21 + id,
                         ["b"] = 21 + id,
@@ -214,9 +208,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         static RunContext GetRunContext(RunContext ctx, bool captureStdout)
         {
-#if RC8_12
             ctx.ResetStreamsPolicy = ResetStreamPolicy.ResetToPlatformStream;
-#endif
             ctx.AutoApplyParams = true;
             ctx.OutputStream = captureStdout ? GetOutputStream() : default;
             ctx.Outputs["result"] = default;
@@ -230,7 +222,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             try
             {
-#if RC8_12
                 if (scriptInfo.IsAsync)
                 {
                     s_dispatcher.InvokeAsync(() => code.RunAsync(context))
@@ -238,7 +229,6 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 }
 
                 else
-#endif
                     code.Run(context);
 
                 if (context.OutputStream is NUnitStream stream)
@@ -259,11 +249,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 if (scriptInfo.ExpectsError || scriptInfo.ExpectsWarning)
                 {
                     if (runEx.InnerException is CompileException compileEx)
-#if RC8_11
                         errorMessage = compileEx.Diagnosis.ToString();
-#else
-                        errorMessage = compileEx.Diagnostics.ToString();
-#endif
                     else
                         errorMessage = runEx.Message;
                 }
