@@ -1,0 +1,38 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "9.0.26026\u002B1000",
+    "os": "macOS",
+    "arch": "arm64"
+  },
+  "id": "bc9890be-b915-4cfa-9514-7cb62dbf9ae4",
+  "identity": {
+    "name": "Best",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    },
+    "description": "My Rhino/Grasshopper Plugin"
+  },
+  "settings": {
+    "buildPath": "build/",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "9.*"
+      },
+      "title": "Rhino3D (9.*)",
+      "slug": "rh9"
+    },
+    "publishTarget": {
+      "id": "mcneel.yak.test",
+      "title": "McNeel Yak Test Server (test.yak.rhino3d.com)"
+    }
+  },
+  "codes": []
+}
