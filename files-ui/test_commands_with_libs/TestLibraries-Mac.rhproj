@@ -1,0 +1,135 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.11.24206\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "e4afaf68-165e-46bb-8763-7069c1da205b",
+  "identity": {
+    "name": "Title.Libraries",
+    "version": "0.4",
+    "publisher": {
+      "email": "callum@mcneel.com",
+      "name": "Callum Sykes",
+      "company": "McNeel",
+      "phone": "\u002B1 (206) 545-7000",
+      "address": "146 N Canal St, Suite 320, Seattle, WA 98103",
+      "country": "USA",
+      "url": "https://www.rhino3d.com/"
+    },
+    "description": "Did we anticipate that Trump would come back to office wanting to rule as a king, consumed by revenge and retribution, and encouraged by sycophants and yes-men who would insure that he faced few of the constraints that hampered him in his first term?",
+    "copyright": "Copyright \u00A9 2026 Callum Sykes",
+    "image": {
+      "light": {
+        "type": "svg",
+        "data": "PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmlld0JveD0iMCAwIDQ4IDQ4IiBmaWxsLWRhcms9IiNGRkYiIHN0cm9rZS1kYXJrPSJub25lIj4KICA8cmVjdCBmaWxsPSJub25lIiBmaWxsLWRhcms9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLWRhcms9IiNGRkYiIHN0cm9rZS13aWR0aD0iMSIgd2lkdGg9IjE4IiBoZWlnaHQ9IjEzIiB4PSIyMy41IiB5PSI4LjUiIC8\u002BCiAgPHJlY3QgZmlsbD0ibm9uZSIgZmlsbC1kYXJrPSJub25lIiBzdHJva2U9IiMwMDAiIHN0cm9rZS1kYXJrPSIjRkZGIiBzdHJva2Utd2lkdGg9IjEiIHdpZHRoPSIyNSIgaGVpZ2h0PSIyMSIgeD0iOS41IiB5PSIxNy41IiAvPgo8L3N2Zz4="
+      },
+      "dark": {
+        "type": "svg",
+        "data": "PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmlld0JveD0iMCAwIDQ4IDQ4IiBmaWxsLWRhcms9IiNGRkYiIHN0cm9rZS1kYXJrPSJub25lIj4KICA8Y2lyY2xlIGZpbGw9Im5vbmUiIGZpbGwtZGFyaz0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBzdHJva2UtZGFyaz0iI0ZGRiIgc3Ryb2tlLXdpZHRoPSIxIiByPSIxMi41Mjk5NjQ0NDcwMjE0ODQiIGN4PSIxOC41IiBjeT0iMTcuNSIgLz4KICA8Y2lyY2xlIGZpbGw9Im5vbmUiIGZpbGwtZGFyaz0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBzdHJva2UtZGFyaz0iI0ZGRiIgc3Ryb2tlLXdpZHRoPSIxIiByPSIxNC44NjYwNjg4NDAwMjY4NTUiIGN4PSIyNi41IiBjeT0iMjEuNSIgLz4KICA8Y2lyY2xlIGZpbGw9Im5vbmUiIGZpbGwtZGFyaz0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBzdHJva2UtZGFyaz0iI0ZGRiIgc3Ryb2tlLXdpZHRoPSIxIiByPSI1LjY1Njg1NDE1MjY3OTQ0MyIgY3g9IjMzLjUiIGN5PSIzMS41IiAvPgo8L3N2Zz4="
+      },
+      "projectIcon": {
+        "light": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAGKADAAQAAAABAAAAGAAAAADiNXWtAAAA/ElEQVRIDWNgGAUEQoCRgDy6NAdQQAJdEI3/A8h/ARNjgTGIpAOB6sSA\u002BCMe9dJAublADLaEVAvYgBo3AvEDIMYF4oESIJ\u002BCAROMQSua5hZgCyI9oG/MgPg3Fl/ZAMVEgPgNkhwrkH0KiC8hicGZ2CwAGX4DiJ/AVSEYIMNPosnJAPnmQEy0BSCXgwx/AMTo4BlQwAiIlZEkQJZqAvEvqBjIQlBSBQNsPoDJYaPXAwXR8wHIQFB\u002BOgjVQFE\u002BAGl\u002BADUImQLFCTZxBpqnolELkOMBK5vmQYQtmYJyJijpEQtAakF6sAJsFoCyPShnqmDVgSkIMhyUu0fBIA0BADFGH\u002BEaieDsAAAAAElFTkSuQmCC",
+          "width": 24,
+          "height": 24
+        },
+        "dark": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAGKADAAQAAAABAAAAGAAAAADiNXWtAAACFElEQVRIDe2Uyy9dURSHD41HPRrxikoRKg0RJBhgYETadEBiJgYYaTqSiET65/BPYEoYEIIY0ApKkDRNm9b7/f1O7r7Wvbnn5hIDAyv5zllr7cdaZ\u002B21j\u002Bc9E0l6bB7xFtazqSiGCziCXVg19gl6XAkK0Muqv7AGB/AG2qEJymAOzuAKFmEeEpYeZlab2c3oX0K\u002BVyH/IO8SKIKPMABByTJ0L59RG\u002B5NrxK9z9hW/YqRHXLk8x6CuEE0WZk6qUHpdEaMtxL5ZPwF6P3G9tVk43iPvm3sDvQpY0ermzjeGecv9EPQOYXFBtAXuK6oQj8AHWSQ/GdAa2xZVrBtiT0b4JLB1yAphR\u002B\u002BFvxIZygFbs2UffQ00JgvNoAyVs9LMuHY14IfbxnShtGiKmQ5pw2wg1PRc\u002BAa3NegxhQ1wXKMEa0/d34bQL5J6IbfoMsVJHUMZICyVTPorkhUMiWn8/HFXRxn6/b\u002BBC0qhHmIFnWJOm4JWmAPdNi6Qwp4Axvgi\u002B0A59O7HEZA57IAOg/VVb\u002BJLfgOrTAOTnQpv8Ew/HHO6BI5vzbRTdVhKyN9tjIdgwmogHWw0oahjSOaIyiAWziKonqrpupxt1i2OyMl0QWzoEZRu4clqEThCSFFG\u002BTCNvwDXcA\u002BUAn1R52BRpiGiC9LNADrPP3QPkAe6MtPoRYU4BbUgRGbYz\u002BJpLLLQxJ9kqAvmyRegTtcaV6ux4k2YQAAAABJRU5ErkJggg==",
+          "width": 24,
+          "height": 24
+        },
+        "icoData": "AAABAAEAGBgAAAEAIACVAQAAFgAAAIlQTkcNChoKAAAADUlIRFIAAAAYAAAAGAgGAAAA4Hc9\u002BAAAAARnQU1BAANbXlz/JngAAABEZVhJZk1NACoAAAAIAAGHaQAEAAAAAQAAABoAAAAAAAOgAQADAAAAAQABAACgAgAEAAAAAQAAABigAwAEAAAAAQAAABgAAAAA4jV1rQAAAPxJREFUSA1jYBgFBEKAkYA8ujQHUEACXRCN/wPIfwETY4ExiKQDgerEgPgjHvXSQLm5QAy2hFQL2IAaNwLxAyDGBeKBEiCfggETjEErmuYWYAsiPaBvzID4NxZf2QDFRID4DZIcK5B9CogvIYnBmdgsABl\u002BA4ifwFUhGCDDT6LJyQD55kBMtAUgl4MMfwDE6OAZUMAIiJWRJECWagLxL6gYyEJQUgUDbD6AyWGj1wMF0fMByEBQfjoI1UBRPgBpfgA1CJkCxQk2cQaap6JRC5DjASub5kGELZmCciYo6RELQGpBerACbBaAsj0oZ6pg1YEpCDIclLtHwSANAQAxRh/hGong7AAAAABJRU5ErkJggg=="
+      },
+      "categoryIcon": {
+        "light": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAEKADAAQAAAABAAAAEAAAAAA0VXHyAAAA5UlEQVQ4Ec2SuQoCMRCG1wsRD1ALsbCx9mjtLX1n38JSBLVRQUHBA8/vX3Ylmz3ESn/4MklmdjKZrOP8WqkPBVTwt\u002BFpxOmbA0y1l9aQoD6\u002BGtzg7qH5AArgZDUk6IpvAlsrpsXaPdxMoNI6UASVLHpQhzUodgkLeMu8QoldJVjBxrN7bA4yUIYhNL252xe7gh3OGfg6M\u002BmC7qvYhreeY08Q6oH9KqpGSHlQwrEWvswr\u002BHtxVldRFYFDvkkQmdhMEMgcEa33D8WYTbwQUIURPMCWGqk/0O2\u002B77QzqlEiTkccquSP9AL6YyUG4mFR/QAAAABJRU5ErkJggg==",
+          "width": 16,
+          "height": 16
+        },
+        "dark": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAEKADAAQAAAABAAAAEAAAAAA0VXHyAAABLUlEQVQ4Ed3SXSsEURzH8WWxIc/ChRIiUYr21qVc7lv0PrwA7ihFyeO6QJ4LIU/f75lzNMbeufOrz54zZ2b\u002B5z8zWyr9MU0N7h9kbRRl3OME7/jArxQLzHLFMOqYwQTacIRL7OEC33GXFG\u002BuYB1T8IY1bGMAu5hGM\u002B7wI\u002B6yElcWGd05n3kO7MiOl2CXIVYz7vCEdvTjEPmccTCCT9iJxUJSgfSSvOgmnssP7vwWF64ZOxEePxVw0d278Ipixlg4jYt2YcK96SW66CPMoQXHSBlnYmd\u002B3knYbQ8OkLXhhDzAIsvoQB8saLsW3UIdNezjHFkbTmJscxXuZjawCZ//Ct1ojXOG7LOESeHHFhfgo/lvrMLcwkIWfkH4ro6N4psfQm886fwZO3iMa/9h\u002BAJB6TitOcLHCAAAAABJRU5ErkJggg==",
+          "width": 16,
+          "height": 16
+        }
+      }
+    }
+  },
+  "settings": {
+    "buildPath": "build",
+    "testsPath": "tests",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "8.*"
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "8593d933-f831-49ca-a575-70e26f81fd91",
+      "language": {
+        "id": "*.*.csharp",
+        "version": "*.*.*"
+      },
+      "title": "TestCLibrary",
+      "uri": "TestC#Library.cs"
+    },
+    {
+      "id": "6ba4d493-b96a-405f-9c0a-59126cc06777",
+      "language": {
+        "id": "*.*.python",
+        "version": "3.*.*"
+      },
+      "title": "TestPython3Library",
+      "uri": "TestPython3Library.py"
+    },
+    {
+      "id": "abd279e8-7672-429c-9033-10dc87f4af2f",
+      "language": {
+        "id": "*.*.python",
+        "version": "2.*.*"
+      },
+      "title": "TestPython2Library",
+      "uri": "TestPython2Library.py"
+    }
+  ],
+  "libraries": [
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///Users/ein/gits/rhinocodetests/files/rhproj/libraries/TestAssembly/",
+        "language": {
+          "id": "*.*.csharp",
+          "version": "*.*.*"
+        }
+      }
+    },
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///Users/ein/gits/rhinocodetests/files/rhproj/libraries/testmodule/",
+        "language": {
+          "id": "*.*.python",
+          "version": "3.*.*"
+        }
+      }
+    },
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///Users/ein/gits/rhinocodetests/files/rhproj/libraries/testipymodule/",
+        "language": {
+          "id": "*.*.python",
+          "version": "2.*.*"
+        }
+      }
+    }
+  ]
+}
