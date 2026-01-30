@@ -128,8 +128,10 @@ namespace Rhino.Runtime.Code.Tests
           (new ProjectVersion(1, 2, 3),                "1.2.3"),
           (new ProjectVersion(1, 2, 3, "beta"),        "1.2.3-beta"),
           (new ProjectVersion(1, 2, 3, "beta", 4),     "1.2.3-beta+4"),
-          (new ProjectVersion("1.*"),                  "1"),
-          (new ProjectVersion("1"),                    "1"),
+          // 2026-01-29 (eirannejad)
+          // This used to be ok in Rhino < 9 - Rhino >= 9 requires major.minor
+          // (new ProjectVersion("1.*"),                  "1"),
+          // (new ProjectVersion("1"),                    "1"),
           (new ProjectVersion("1.2.*"),                "1.2"),
           (new ProjectVersion("1.2"),                  "1.2"),
           (new ProjectVersion("1.2.3.*"),              "1.2.3"),
