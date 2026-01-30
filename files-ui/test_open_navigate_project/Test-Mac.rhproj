@@ -1,0 +1,268 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "8.11.24205\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "id": "8eeb441e-663b-4f22-9ecd-ad674757c517",
+  "identity": {
+    "name": "TestProject",
+    "version": "0.1",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    },
+    "description": "Description of this test project",
+    "copyright": "Copyright \u00A9 2026 Ehsan Iran-Nejad",
+    "license": "MIT",
+    "url": "https://www.rhino3d.com/",
+    "image": {
+      "light": {
+        "type": "svg",
+        "data": "PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgNDggNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0ibm9uZSIgZGFyay1maWxsPSJub25lIiBkYXJrLXN0cm9rZT0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgc3Ryb2tlLXdpZHRoPSIwIj4NCiAgPGNpcmNsZSBmaWxsPSIjQzEwMDAwIiBzdHJva2U9IiNGRkEyMDAiIGRhcmstZmlsbD0ibm9uZSIgZGFyay1zdHJva2U9IiNGRkYiIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIiBzdHJva2Utd2lkdGg9IjEiIHI9IjEzLjkyODM4ODU5NTU4MTA1NSIgY3g9IjIzLjUiIGN5PSIxOC41IiAvPg0KICA8Y2lyY2xlIGZpbGw9IiNBN0RCMDAiIHN0cm9rZT0iI0ZGQTMwMCIgZGFyay1maWxsPSJub25lIiBkYXJrLXN0cm9rZT0iI0ZGRiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiIHN0cm9rZS13aWR0aD0iMiIgcj0iOC45NDQyNzIwNDEzMjA4IiBjeD0iMjkuNSIgY3k9IjMyLjUiIC8\u002BDQo8L3N2Zz4="
+      },
+      "dark": {
+        "type": "svg",
+        "data": "PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgNDggNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0ibm9uZSIgZGFyay1maWxsPSJub25lIiBkYXJrLXN0cm9rZT0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgc3Ryb2tlLXdpZHRoPSIwIj4NCiAgPGNpcmNsZSBmaWxsPSIjRkZFNzAwIiBzdHJva2U9IiNGRkYiIGRhcmstZmlsbD0iI0MxMDAwMCIgZGFyay1zdHJva2U9IiNGRkEyMDAiIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIiBzdHJva2Utd2lkdGg9IjEiIHI9IjEzLjkyODM4ODU5NTU4MTA1NSIgY3g9IjIzLjUiIGN5PSIxOC41IiAvPg0KICA8Y2lyY2xlIGZpbGw9IiNENDNDMDAiIHN0cm9rZT0iI0ZGRiIgZGFyay1maWxsPSIjQTdEQjAwIiBkYXJrLXN0cm9rZT0iI0ZGQTMwMCIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiIHN0cm9rZS13aWR0aD0iMiIgcj0iOC45NDQyNzIwNDEzMjA4IiBjeD0iMjkuNSIgY3k9IjMyLjUiIC8\u002BDQo8L3N2Zz4="
+      },
+      "projectIcon": {
+        "light": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAGKADAAQAAAABAAAAGAAAAADiNXWtAAACrUlEQVRIDdWVXUhTYRjHf2eube7Lr/m1ZomYSJFQEkHeRVBKXUQZhBFokTdCEXQTdBMIXRVEF5EXGYU3BV1EHxdBUBcSJIFoaEVOl5XLzY85N9309B6HbDvnzC2kix4O5zwf/\u002Bf5n/d9n/d94R\u002BLlGt9\u002BTZObNhxEKWVGUlCziU3K4H8gD3\u002BAS5Ep9mxHMC9xUHMUo7XUsyzghqeSO3MbkS0IYH/It3\u002Bfs7Pj1AWm08pYwCrG8qaeG1ycqmyh\u002BGUaJqakWDiLHd/vaEz4kvDawxPC77KkzRZO9BFin/Rysw1OvxvOZ2tuJL5/QVVv1/RKz8Sa6QjGgK5D1dwkI6wVz9BpwZiGg8GR8TS64iGgAj1C19o0MFmdEV\u002BQDzAUVlGM\u002BUaguAQ\u002B2Mh0Yx/IfIKLM/ippcCdZqGIB7BvhJXw7Lb0eDaPrGokRoCRy3DeSY1LLttLecr44TUSKPakV/CkH073vA41eqYYhvMsPUwmOqEMSeeQZj/DMZCxqUrhNU5GgKxM0emuugPfKA6vpgOz6\u002BEvTdgtAq8oimdEbD/hNoxllwV3EtHJywNgeIua\u002BRqaIzGyeco/7kmtm1Qcx0eH1j3wJSypBWwsxSzdYpuYR1LRhOaZg0UtxiF11VAs9ilo0ZbAujphHeNCV39/uSByWL2yb2cUMd0CRRQYR/falo5UtdOn7sZX5EosqjpkWS5kIXymJFDSU9C052idZAyEqG3iWPguN9Oj9BL1mPqryBgyYRL7c84glSgdIanJSGchg1ugFLRoNYl3qfmKXpOBApw1cCdXT5x2WSQ\u002BkkBMXNLHc6ZwNTGZU\u002BQl7sniOatJsvYRKu2fGTOsEqddApxaKSL5nBKD2ut6ENuioXrCtiZLlqgOGpmwBHmnLJ/tOhNeMRV2iDfp3ATJf6T1D\u002BGWLc14PusggAAAABJRU5ErkJggg==",
+          "width": 24,
+          "height": 24
+        },
+        "dark": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAGKADAAQAAAABAAAAGAAAAADiNXWtAAACpUlEQVRIDdVVX0hTURj/nbstdVrLmgtMYdgfhYGyQHppEdFDRS\u002BV9VAvIdRzRQn1UA9hSA/14kMYRNhDBJaCRA/SgyuNHiIJo9RRmi61Gc5Nt7t7d\u002B/pu2FjO/euLaGHPvjYOd/3\u002B3O/nXu4wD8OVqw\u002B53wDYSsoZcpFxhgvhlvQgIT9kHvPQQvtgBauhlSlQqqb1FDTb3MGesgoWoyRJYavPG3Xf7TM83kP57PIShvnER/XlzsGePyBz5JcqMhjnXf5d1\u002BWaLZB1jp66WsikagtpJfT58nBVh7xL\u002BU\u002BdZZozjRUj3W8WD2jHB1jI4kVArqhDrQi/c441OJCfrgfcvCEFdhkQKAGrgw3WoHz1rRxgM8coYczvTRmg\u002BSz3YwvrM8rZtlQAX22mlousW024PEK6AkRV3ivhY2/tFQEmg3s/g\u002BQjPv0l2GvCxEjLrLsYgHr6kdh908iPeI19YwCcwLO81ATXthKFUj6IKAOUd0zRZduReSYJiDQJ5Qcfg22UcQCtnrwTRFE\u002BsoRvtWD\u002BfsfsfhqF9JSdwplJ7vMhDwVehu8erRtLOceRJp4avotH90DU851XeWpSLjfSs40gQGiKSaZq/IQnJfHwCp/8VT1Or5cOGalgYXum4i/7GumBzsuAsxnsIpg7MpnIhyEo7kdynDA5thbm56bEvmZvTI9vkVLxA5Q4UmmSIu8BgbImIR\u002BTpPR0eT74D1ab6a0jNT0BLRY1C02/2jwG0xGvZqSeszsDvA0XSqLKG8KwO6peSO2LM9ABBl7SZE73WeuGR8by6g61aZLknRHbBZtwCpcF137Wp67z96QWUlZRsexdRu2P5pYgiTtpEm1TGOtCzW2eFtTFWV5JPgtnVyRUzOhITqjhrXq5eWRaCOlxW3MS/lPGz8Bsq1IyGOB4B4AAAAASUVORK5CYII=",
+          "width": 24,
+          "height": 24
+        },
+        "icoData": "AAABAAEAGBgAAAEAIABGAwAAFgAAAIlQTkcNChoKAAAADUlIRFIAAAAYAAAAGAgGAAAA4Hc9\u002BAAAAARnQU1BAANbXlz/JngAAABEZVhJZk1NACoAAAAIAAGHaQAEAAAAAQAAABoAAAAAAAOgAQADAAAAAQABAACgAgAEAAAAAQAAABigAwAEAAAAAQAAABgAAAAA4jV1rQAAAq1JREFUSA3VlV1IU2EYx39nrm3uy6/5tWaJmEiRUBJB3kVQSl1EGYQRaJE3QhF0E3QTCF0VRBeRFxmFNwVdRB8XQVAXEiSBaGhFTpeVy82POTfd9PQeh2w758wtpIseDuc8H//n\u002BZ/3fZ/3feEfi5Rrffk2TmzYcRCllRlJQs4lNyuB/IA9/gEuRKfZsRzAvcVBzFKO11LMs4IankjtzG5EtCGB/yLd/n7Oz49QFptPKWMAqxvKmnhtcnKpsofhlGiampFg4ix3f72hM\u002BJLw2sMTwu\u002BypM0WTvQRYp/0crMNTr8bzmdrbiS\u002Bf0FVb9f0Ss/EmukIxoCuQ9XcJCOsFc/QacGYhoPBkfE0uuIhoAI9QtfaNDBZnRFfkA8wFFZRjPlGoLgEPtjIdGMfyHyCizP4qaXAnWahiAewb4SV8Oy29Hg2j6xqJEaAkctw3kmNSy7bS3nK\u002BOE1Eij2pFfwpB9O97wONXqmGIbzLD1MJjqhDEnnkGY/wzGQsalK4TVORoCsTNHprroD3ygOr6YDs\u002BvhL03YLQKvKIpnRGw/4TaMZZcFdxLRycsDYHiLmvkamiMxsnnKP\u002B5JrZtUHMdHh9Y98CUsqQVsLMUs3WKbmEdS0YTmmYNFLcYhddVQLPYpaNGWwLo6YR3jQld/f7kgcli9sm9nFDHdAkUUGEf32paOVLXTp\u002B7GV\u002BRKLKo6ZFkuZCF8piRQ0lPQtOdonWQMhKht4lj4LjfTo/QS9Zj6q8gYMmES\u002B3POIJUoHSGpyUhnIYNboBS0aDWJd6n5il6TgQKcNXAnV0\u002BcdlkkPpJATFzSx3OmcDUxmVPkJe7J4jmrSbL2ESrtnxkzrBKnXQKcWiki\u002BZwSg9rrehDboqF6wrYmS5aoDhqZsAR5pyyf7ToTXjEVdog36dwEyX\u002Bk9Q/hli3NeD7rIIAAAAASUVORK5CYII="
+      },
+      "categoryIcon": {
+        "light": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAEKADAAQAAAABAAAAEAAAAAA0VXHyAAAB30lEQVQ4EbWTz0tUURTHP8/xMc6PmjHH0ZrxxxBEBW1mMSgRuBBbBBEt3LRqI7QIglwIgkmE4MZVBRFBGyFw0aY/IBMEnUTFMsSFhTw35RN1mnHGcW7naW/eG5loIR543Hu\u002B53u/93vvPQ9OGFq19Urh3R0ilTW4pOnkw0k\u002Be/tYQUNV41dg2TFiqzd4PxcjPxtCpetRCxcxf9zhiQjXVpCPJ\u002BoD9cspptMe1CTONyXz9FnU99s8HVbUuNdVJMY497PLdGYP3BQoSZrbgc1FHvePcs1dLQt0ib3cBt2FjLvszK3Dl0z8Oyt0OCjOmRqh5kBRd/yWrNzGVBGKBYJugbKDCdjXA6zprmuyFoZa4UIPNKdAj1DUw3xzCzh0eaLIIK\u002B3v9DrWScomxG/BfmHYMTBn4PEV/aiv/npFig7sMDQM2bOXeeRr5lMNCF2H8D8ZdjwwWoDLHUS3G1k4J8CVqO0v\u002BNN/C43z9/joxkTqryIR56hVsZNL5hBkqqPkC1S4cAGm14yHb7KmH9PkL\u002BMkvSsLpdSV2SbLeRAR1FV4LC0yKcWg6m2guyuQ8ADVwxo2uK5NoGgR1H1X7CL6gUtuSgjv86Q9O2TiZi8Yo232vBhb9m0/4\u002Bqh4C4Fw\u002BnEH8AOiOTXMsLO/cAAAAASUVORK5CYII=",
+          "width": 16,
+          "height": 16
+        },
+        "dark": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAEKADAAQAAAABAAAAEAAAAAA0VXHyAAAB3klEQVQ4EbWSS2gTYRSFz58mbZraQBsqhQq6ECrdBItoFSIUCl121Y24EIN00ZWCO2nT0l2ouGk34gN0pVRXug5dpBR8YEU0UvpIU9NqMjRppkkmMzn\u002BQzvJMJDiog4M5577z/3unTsD/I8rGmUbK8shqs/DLL68SWYuABT/1IsHmR7mb79ltq9MpZvM9pDKgML9iclIhM3HQlIpBqiMxpn3kDsg00f3b6nKaTL3YFpO0tQQwsLsPe511gstgKkm5M9FlVoiaAe46kaOp/8YQlWpp\u002ByRIY17y4dKbMCergHOXIUczfCC9mNnXJFvUDxlz7otk1pCGa7AOkTLILTyYdrce\u002BsVUA9CePJAdc0wjK7vVo2ptQkAUYV75DH03gIsrPcuMu9GsDGxjV\u002BPmlFKTxc1/42sHeCIKZiPhqn07rMUYvbNQ65cAr9eBlf6weStIEvJxAIirDWuBYckQeG//wTtM8PEVKz8YRFCPiHk13f5AHX1C0o/P/U/HUPA6uwAHGE8o/FddXDO030WNLcvF2uqu9WHJn8gl9yGagEaanyLnYXEx8Wd8WtMXHdxdbiDyrNJajrvNCxyHqSLPKftbr7IxV5/O/gcW9bJ8Cse8yc6AZaf32TH\u002BfdssfyJ6l/sLOy5bRbW/QAAAABJRU5ErkJggg==",
+          "width": 16,
+          "height": 16
+        }
+      }
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "testsPath": "file:///Users/ein/gits/rhinocodetests/files-ui/test_testsPanel/test_asyncFolder",
+    "buildTarget": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "8.*"
+      },
+      "title": "Rhino3D (8.*)",
+      "slug": "rh8"
+    },
+    "publishTarget": {
+      "title": "McNeel Yak Server"
+    }
+  },
+  "codes": [
+    {
+      "id": "53cd4811-7ed5-4ee3-8bb8-aa0570677d7a",
+      "language": {
+        "id": "*.*.python",
+        "version": "*.*.*"
+      },
+      "title": "Test",
+      "uri": "Test.py",
+      "image": {
+        "light": {
+          "type": "svg",
+          "data": "PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgNDggNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0ibm9uZSIgZGFyay1maWxsPSJub25lIiBkYXJrLXN0cm9rZT0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgc3Ryb2tlLXdpZHRoPSIwIj4NCiAgPHJlY3QgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBkYXJrLWZpbGw9Im5vbmUiIGRhcmstc3Ryb2tlPSIjRkZGIiBzdHJva2UtbGluZWNhcD0iYnV0dCIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgc3Ryb2tlLXdpZHRoPSIxIiB3aWR0aD0iMjEiIGhlaWdodD0iMTYiIHg9IjMuNSIgeT0iMi41IiByeD0iMCIgcnk9IjAiIC8\u002BDQogIDxyZWN0IGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgZGFyay1maWxsPSJub25lIiBkYXJrLXN0cm9rZT0iI0ZGRiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiIHN0cm9rZS13aWR0aD0iMSIgd2lkdGg9IjIyIiBoZWlnaHQ9IjI4IiB4PSIxNi41IiB5PSIxMS41IiByeD0iMCIgcnk9IjAiIC8\u002BDQogIDxyZWN0IGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgZGFyay1maWxsPSJub25lIiBkYXJrLXN0cm9rZT0iI0ZGRiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiIHN0cm9rZS13aWR0aD0iMSIgd2lkdGg9IjE3IiBoZWlnaHQ9IjE3IiB4PSI5LjUiIHk9IjI1LjUiIHJ4PSIwIiByeT0iMCIgLz4NCjwvc3ZnPg=="
+        },
+        "rendered": {
+          "light": {
+            "bytes": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAGKADAAQAAAABAAAAGAAAAADiNXWtAAABWklEQVRIDe2VPUsDQRCGLxI/OhsRQYsrUmhjGdv8BX\u002BB/jp7WztLLVNZXmEhaGMTAhb6PrgT9ubmshENgvjCy\u002Bx83MzeztzeoPrEjsRBWpfEkwLmpSDzD9PiXHJffDVHj9yV/Vm86vF3zFZgS55rselEtA211EnbtFzbWO7\u002BvnftBeyI\u002BrZK8\u002BkPRwj2xGPxHcVhU/q9OM3tpQJMFs2nP\u002BBIHIi3KA74zsQvFSAHk9WwSHiRbExxcuT0yt6A12MHHtg4ljo50IldGVaAs\u002BP1/A7szCcpI8nv0vpHRK0slytmCmN/ZUxPteOx\u002BCbaEeVjGY6jYkNYD3InyR/ER5Gm\u002BrHE1hlH2UJEBdg5yZv0RDSWo\u002BQrirX34L9AsQdRk/OH\u002BDUeiheZkdE9EfPRxW1/O9YLRAX8vXSj6O3FE1U105qY6Eblf90CM\u002B7Bh8acM64R7D5qXctR4N\u002BwfQAAcCwcvsbbmgAAAABJRU5ErkJggg==",
+            "width": 24,
+            "height": 24
+          },
+          "dark": {
+            "bytes": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAGKADAAQAAAABAAAAGAAAAADiNXWtAAABWklEQVRIDe2VPUsDQRCGLxI/OhsRQYsrUmhjGdv8BX\u002BB/jp7WztLLVNZXmEhaGMTAhb6PrgT9ubmshENgvjCy\u002Bx83MzeztzeoPrEjsRBWpfEkwLmpSDzD9PiXHJffDVHj9yV/Vm86vF3zFZgS55rselEtA211EnbtFzbWO7\u002BvnftBeyI\u002BrZK8\u002BkPRwj2xGPxHcVhU/q9OM3tpQJMFs2nP\u002BBIHIi3KA74zsQvFSAHk9WwSHiRbExxcuT0yt6A12MHHtg4ljo50IldGVaAs\u002BP1/A7szCcpI8nv0vpHRK0slytmCmN/ZUxPteOx\u002BCbaEeVjGY6jYkNYD3InyR/ER5Gm\u002BrHE1hlH2UJEBdg5yZv0RDSWo\u002BQrirX34L9AsQdRk/OH\u002BDUeiheZkdE9EfPRxW1/O9YLRAX8vXSj6O3FE1U105qY6Eblf90CM\u002B7Bh8acM64R7D5qXctR4N\u002BwfQAAcCwcvsbbmgAAAABJRU5ErkJggg==",
+            "width": 24,
+            "height": 24
+          }
+        }
+      }
+    },
+    {
+      "type": "components",
+      "id": "384bf02f-6467-4059-82d6-ef949a426497",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "Test.ghx",
+      "uri": "Test.ghx",
+      "scripts": [
+        {
+          "id": "384bf02f-6467-4059-82d6-ef949a426497",
+          "name": "Test",
+          "nickname": "Py3",
+          "description": "Python 3 scripting component",
+          "subcat": "Curve",
+          "image": {
+            "light": {
+              "type": "svg",
+              "data": "PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgNDggNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0ibm9uZSIgZGFyay1maWxsPSJub25lIiBkYXJrLXN0cm9rZT0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgc3Ryb2tlLXdpZHRoPSIwIj4NCiAgPHJlY3QgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBkYXJrLWZpbGw9Im5vbmUiIGRhcmstc3Ryb2tlPSIjRkZGIiBzdHJva2UtbGluZWNhcD0iYnV0dCIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgc3Ryb2tlLXdpZHRoPSIxIiB3aWR0aD0iMTQiIGhlaWdodD0iMTQiIHg9IjMuNSIgeT0iMi41IiByeD0iMCIgcnk9IjAiIC8\u002BDQogIDxyZWN0IGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgZGFyay1maWxsPSJub25lIiBkYXJrLXN0cm9rZT0iI0ZGRiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiIHN0cm9rZS13aWR0aD0iMSIgd2lkdGg9IjI1IiBoZWlnaHQ9IjE0IiB4PSIxOS41IiB5PSIyLjUiIHJ4PSIwIiByeT0iMCIgLz4NCiAgPHJlY3QgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBkYXJrLWZpbGw9Im5vbmUiIGRhcmstc3Ryb2tlPSIjRkZGIiBzdHJva2UtbGluZWNhcD0iYnV0dCIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgc3Ryb2tlLXdpZHRoPSIxIiB3aWR0aD0iNDEiIGhlaWdodD0iMjYiIHg9IjMuNSIgeT0iMTguNSIgcng9IjAiIHJ5PSIwIiAvPg0KPC9zdmc\u002B"
+            },
+            "dark": {
+              "type": "svg",
+              "data": "PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgNDggNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0ibm9uZSIgZGFyay1maWxsPSJub25lIiBkYXJrLXN0cm9rZT0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgc3Ryb2tlLXdpZHRoPSIwIj4NCiAgPHJlY3QgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBkYXJrLWZpbGw9Im5vbmUiIGRhcmstc3Ryb2tlPSIjRkZGIiBzdHJva2UtbGluZWNhcD0iYnV0dCIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgc3Ryb2tlLXdpZHRoPSIxIiB3aWR0aD0iMTUiIGhlaWdodD0iMjAiIHg9IjIyLjUiIHk9IjUuNSIgcng9IjAiIHJ5PSIwIiAvPg0KICA8cmVjdCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIGRhcmstZmlsbD0ibm9uZSIgZGFyay1zdHJva2U9IiNGRkYiIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIiBzdHJva2Utd2lkdGg9IjEiIHdpZHRoPSIyMSIgaGVpZ2h0PSIyMCIgeD0iOC41IiB5PSIxNy41IiByeD0iMCIgcnk9IjAiIC8\u002BDQo8L3N2Zz4="
+            },
+            "rendered": {
+              "light": {
+                "bytes": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAGKADAAQAAAABAAAAGAAAAADiNXWtAAAA80lEQVRIDWNkgAAOICUBZaNTP4ACH/DIo6uH8V8AGT9YoLxAIC0GxB\u002BhfGRKGsh5B8RsQIxNHlktjM0PZLwG4mUwC0CaNwLxAyBGB/FAAREgXgvED4CYGKAAVOQAUsgEImgJRi0gGLqwSGYFqpTBoRqUIvDJY9MGMgukhwFmwUUg2xmI/4AE0cBvIP86ENsAMTZ5NOVgLsjcvSAWzAIVIPs7EONK54JAOVDGIRaAfK0KxKdhFuDLB8QaiqxOAchxAAmMJlNQKOAFo0GEN3hAkqNBNPBBBCsqSC0tCbkcozQ9BdRhDsSgQo8aAOTgk9QwiKAZAJzOG6qDS29xAAAAAElFTkSuQmCC",
+                "width": 24,
+                "height": 24
+              },
+              "dark": {
+                "bytes": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAGKADAAQAAAABAAAAGAAAAADiNXWtAAAA80lEQVRIDWNkgAAOICUBZaNTP4ACH/DIo6uH8V8AGT9YoLxAIC0GxB\u002BhfGRKGsh5B8RsQIxNHlktjM0PZLwG4mUwC0CaNwLxAyBGB/FAAREgXgvED4CYGKAAVOQAUsgEImgJRi0gGLqwSGYFqpTBoRqUIvDJY9MGMgukhwFmwUUg2xmI/4AE0cBvIP86ENsAMTZ5NOVgLsjcvSAWzAIVIPs7EONK54JAOVDGIRaAfK0KxKdhFuDLB8QaiqxOAchxAAmMJlNQKOAFo0GEN3hAkqNBNPBBBCsqSC0tCbkcozQ9BdRhDsSgQo8aAOTgk9QwiKAZAJzOG6qDS29xAAAAAElFTkSuQmCC",
+                "width": 24,
+                "height": 24
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "components",
+      "id": "ab5b987e-99c7-4121-8726-bf44f16dc961",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "TestCtx.gh",
+      "uri": "TestCtx.gh",
+      "scripts": [
+        {
+          "id": "ab5b987e-99c7-4121-8726-bf44f16dc961",
+          "name": "TestCtx.gh",
+          "subcat": "Default",
+          "image": {
+            "light": {
+              "type": "svg",
+              "data": "PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgNDggNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0ibm9uZSIgZGFyay1maWxsPSJub25lIiBkYXJrLXN0cm9rZT0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgc3Ryb2tlLXdpZHRoPSIwIj4NCiAgPGNpcmNsZSBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIGRhcmstZmlsbD0ibm9uZSIgZGFyay1zdHJva2U9IiNGRkYiIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIiBzdHJva2Utd2lkdGg9IjEiIHI9IjE0LjU2MDIxOTc2NDcwOTQ3MyIgY3g9IjIzLjUiIGN5PSIyMy41IiAvPg0KPC9zdmc\u002B"
+            },
+            "rendered": {
+              "light": {
+                "bytes": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAGKADAAQAAAABAAAAGAAAAADiNXWtAAABPklEQVRIDe2TPUoEQRSEVxdB8QdFQdBI8AIaGAqaGKpX2At4LW9hpInB7oaiYGZkbiLq98EOrG96p7vBwGALivnpqn4zr\u002Bv1enP8cQcWa/dbKDAcoDmGu3B5wjeuL/AefsOZyBW4wrkGx9ANP\u002BAS3IaH8ATeQgtW4xLHUcbVZ/0GbmZ0rWW/PLf5tGnAw870i\u002BY\u002BdWj2fB0OG1HB9Q7NRUqXKuCBjlLijnevrHkuW1GTKmBaPNBaPGHw738hFvDZKJqWWuhZjaZY4AuBBYxiLVYwfEZTLOC6mbaftdjA8B5NqQL23yGqgQO7B5\u002BjKVXA8XdCHaJSnCF8LBWr82uc0BKcIrouEUaN4z\u002BArehNhLblHHZurqgLjr8T6qGbc6NoWpz0fWhbHuBM5Ao0RifUPzHnRtG0tA6Ud3P8ww78AGguJEqEvr1lAAAAAElFTkSuQmCC",
+                "width": 24,
+                "height": 24
+              },
+              "dark": {
+                "bytes": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAGKADAAQAAAABAAAAGAAAAADiNXWtAAABPklEQVRIDe2TPUoEQRSEVxdB8QdFQdBI8AIaGAqaGKpX2At4LW9hpInB7oaiYGZkbiLq98EOrG96p7vBwGALivnpqn4zr\u002Bv1enP8cQcWa/dbKDAcoDmGu3B5wjeuL/AefsOZyBW4wrkGx9ANP\u002BAS3IaH8ATeQgtW4xLHUcbVZ/0GbmZ0rWW/PLf5tGnAw870i\u002BY\u002BdWj2fB0OG1HB9Q7NRUqXKuCBjlLijnevrHkuW1GTKmBaPNBaPGHw738hFvDZKJqWWuhZjaZY4AuBBYxiLVYwfEZTLOC6mbaftdjA8B5NqQL23yGqgQO7B5\u002BjKVXA8XdCHaJSnCF8LBWr82uc0BKcIrouEUaN4z\u002BArehNhLblHHZurqgLjr8T6qGbc6NoWpz0fWhbHuBM5Ao0RifUPzHnRtG0tA6Ud3P8ww78AGguJEqEvr1lAAAAAElFTkSuQmCC",
+                "width": 24,
+                "height": 24
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "components",
+      "id": "9be06454-73bd-45ca-a2b8-aa1adafc9f85",
+      "language": {
+        "id": "*.gh1.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "Test_New.ghx",
+      "uri": "Test_New.ghx",
+      "scripts": [
+        {
+          "id": "384bf02f-6467-4059-82d6-ef949a426497",
+          "name": "NewPy3",
+          "nickname": "Py3",
+          "subcat": "Curve"
+        },
+        {
+          "id": "4202ebc7-a108-47a8-ae7f-9a703ae6e608",
+          "name": "Py3",
+          "nickname": "Py3",
+          "subcat": "Default"
+        }
+      ]
+    },
+    {
+      "id": "b30ad43a-4f58-4dc4-b23b-046c2d1c489a",
+      "language": {
+        "id": "*.*.python",
+        "version": "3.*.*"
+      },
+      "title": "TestAsync",
+      "uri": "TestAsync.py"
+    },
+    {
+      "id": "4404efd4-671a-45f1-8798-ed4d3ecd58ea",
+      "language": {
+        "id": "*.*.python",
+        "version": "3.*.*"
+      },
+      "title": "MustBeMissing",
+      "uri": "MustBeMissing.py"
+    }
+  ],
+  "libraries": [
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///Users/ein/gits/rhinocodetests/files/rhproj/libraries/TestAssembly/",
+        "language": {
+          "id": "*.*.csharp",
+          "version": "*.*.*"
+        }
+      }
+    },
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///Users/ein/gits/rhinocodetests/files/rhproj/libraries/testmodule/",
+        "language": {
+          "id": "*.*.python",
+          "version": "3.*.*"
+        }
+      }
+    },
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///missing/testipymodule/",
+        "language": {
+          "id": "*.*.*",
+          "version": "*.*.*"
+        }
+      }
+    }
+  ],
+  "resources": [
+    {
+      "id": "74324463-da92-489b-a92f-a1e9e7ca69f3",
+      "uri": "file:///Users/ein/gits/rhinocodetests/files/rhproj/files/data.txt"
+    },
+    {
+      "id": "353dda41-5cfd-497e-b82a-a1c6094d7a9c",
+      "uri": "files/rhproj/files/Rock.3dm"
+    },
+    {
+      "id": "616a5c26-9d11-4be8-a029-ce23620e62d5",
+      "uri": "files/Missing.ico"
+    }
+  ]
+}

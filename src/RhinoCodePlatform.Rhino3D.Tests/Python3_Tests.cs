@@ -596,41 +596,40 @@ stop = brep_obj # line 8
                     if (GetIdentifier(v) == "brep_obj")
                     {
                         v.TryExpand(out ExecSlot[] members);
-                        Assert.IsTrue(members.Any(m => GetIdentifier(m) == "Geometry"));
+                        Assert.IsTrue(members.Any(m => GetIdentifier(m) == ".Geometry"));
 
                         // Guid is not exapandable
-                        ExecSlot id = members.First(m => GetIdentifier(m) == "Id");
+                        ExecSlot id = members.First(m => GetIdentifier(m) == ".Id");
                         Assert.IsFalse(id.CanExpand);
 
                         // bool is not exapandable
-                        ExecSlot isHidden = members.First(m => GetIdentifier(m) == "IsHidden");
+                        ExecSlot isHidden = members.First(m => GetIdentifier(m) == ".IsHidden");
                         Assert.IsFalse(isHidden.CanExpand);
 
                         // None is not exapandable
-                        ExecSlot renderMaterial = members.First(m => GetIdentifier(m) == "RenderMaterial");
+                        ExecSlot renderMaterial = members.First(m => GetIdentifier(m) == ".RenderMaterial");
                         Assert.IsFalse(isHidden.CanExpand);
 
                         ExecSlot[] expanded;
 
                         // assert enumerable with one item has [0] and Count
-                        ExecSlot geom = members.First(m => GetIdentifier(m) == "Geometry");
+                        ExecSlot geom = members.First(m => GetIdentifier(m) == ".Geometry");
                         geom.TryExpand(out ExecSlot[] geomMembers);
-                        ExecSlot edges = geomMembers.First(m => GetIdentifier(m) == "Edges");
+                        ExecSlot edges = geomMembers.First(m => GetIdentifier(m) == ".Edges");
                         edges.TryExpand(out expanded);
                         Assert.Greater(expanded.Length, 2);
                         Assert.Contains("[0]", expanded.Select(e => GetIdentifier(e)).ToList());
-                        Assert.Contains("Count", expanded.Select(e => GetIdentifier(e)).ToList());
+                        Assert.Contains(".Count", expanded.Select(e => GetIdentifier(e)).ToList());
 
-                        // assert array only has one Length member
-                        ExecSlot subobjMat = members.First(m => GetIdentifier(m) == "SubobjectMaterialComponents");
+                        // assert array only has no Length member
+                        ExecSlot subobjMat = members.First(m => GetIdentifier(m) == ".SubobjectMaterialComponents");
                         subobjMat.TryExpand(out expanded);
-                        Assert.AreEqual(1, expanded.Length);
-                        Assert.AreEqual("Length", GetIdentifier(expanded[0]));
+                        Assert.AreEqual(0, expanded.Length);
 
                         // assert color is expandable
-                        ExecSlot attribs = members.First(m => GetIdentifier(m) == "Attributes");
+                        ExecSlot attribs = members.First(m => GetIdentifier(m) == ".Attributes");
                         attribs.TryExpand(out ExecSlot[] attribsMembers);
-                        ExecSlot objColor = attribsMembers.First(m => GetIdentifier(m) == "ObjectColor");
+                        ExecSlot objColor = attribsMembers.First(m => GetIdentifier(m) == ".ObjectColor");
                         Assert.IsTrue(objColor.CanExpand);
                     }
 
@@ -1150,6 +1149,28 @@ Rhino.Input.RhinoGet.GetOneObject(");
             Assert.AreEqual("prompt: str", sig.Parameters[0].Name);
             Assert.AreEqual("acceptNothing: bool", sig.Parameters[1].Name);
             Assert.AreEqual("filter_: Custom.GetObjectGeometryFilter", sig.Parameters[2].Name);
+        }
+
+        [Test]
+        public void TestPython3_CompleteSignature_ParameterIndex_First()
+        {
+            string s = @"
+import Rhino
+Rhino.Input.RhinoGet.GetOneObject(";
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(s + ")");
+
+            IEnumerable<SignatureInfo> signatures =
+                code.Language.Support.CompleteSignature(SupportRequest.Empty, code, s.Length, CompleteSignatureOptions.Empty);
+
+            Assert.AreEqual(2, signatures.Count());
+
+            SignatureInfo sig;
+
+            sig = signatures.ElementAt(0);
+            Assert.AreEqual(0, sig.ParameterIndex);
+
+            sig = signatures.ElementAt(1);
+            Assert.AreEqual(0, sig.ParameterIndex);
         }
 
         [Test]
@@ -2149,11 +2170,11 @@ print(m) # line 3
             {
                 new("m"),
             });
-            controls.OnReceivedExpected += (ExecSlot v) =>
+            controls.OnReceivedExpected += v =>
             {
                 try
                 {
-                    v.TryExpand(out ExecSlot[] _);
+                    v.Expand();
                 }
                 catch (Exception)
                 {
@@ -2172,6 +2193,8 @@ print(m) # line 3
         [Test]
         public void TestPython3_DebugExpand_ErrorsLargeInt()
         {
+            // FIXED and no exceptions is expected now
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85876
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-83942
             Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 $@"
@@ -2180,22 +2203,20 @@ print(m) # line 3
 ");
 
             bool exceptThrown = false;
-            bool exceptMatched = false;
             var breakpoint = new CodeReferenceBreakpoint(code, 3);
             var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
             {
                 new("m"),
             });
-            controls.OnReceivedExpected += (ExecSlot v) =>
+            controls.OnReceivedExpected += v =>
             {
                 try
                 {
-                    v.TryExpand(out ExecSlot[] _);
+                    v.Expand();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     exceptThrown = true;
-                    exceptMatched = ex.Message.Contains("Python int too large to convert to C ssize_t in method Void .ctor");
                 }
 
                 return true;
@@ -2203,7 +2224,7 @@ print(m) # line 3
             code.DebugControls = controls;
             code.Debug(new DebugContext());
 
-            Assert.True(exceptThrown && exceptMatched);
+            Assert.False(exceptThrown);
             Assert.True(controls.Pass);
         }
 
@@ -2358,7 +2379,7 @@ f.Test()
                     if (GetIdentifier(v) == "self")
                     {
                         v.TryExpand(out ExecSlot[] members);
-                        Assert.IsTrue(members.Any(m => GetIdentifier(m) == "class_test"));
+                        Assert.IsTrue(members.Any(m => GetIdentifier(m) == ".class_test"));
                     }
 
                     return true;
@@ -2399,7 +2420,7 @@ f.Test()
                     if (GetIdentifier(v) == "self")
                     {
                         v.TryExpand(out ExecSlot[] members);
-                        Assert.IsTrue(members.Any(m => GetIdentifier(m) == "test"));
+                        Assert.IsTrue(members.Any(m => GetIdentifier(m) == ".test"));
                     }
 
                     return true;

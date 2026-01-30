@@ -55,7 +55,11 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             {
                 Assert.AreEqual("testSingle/", project.Settings.BuildPath.ToString());
                 Assert.AreEqual("Rhino3D (8.*)", project.Settings.BuildTarget.Title);
-                Assert.AreEqual("McNeel Yak Server", project.Settings.PublishTarget.Title);
+
+                // NOTE:
+                // should fail to read publish target with only 'Title' and 
+                // keep the default empty target
+                Assert.AreEqual(string.Empty, project.Settings.PublishTarget.Title);
             }
 
             project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
