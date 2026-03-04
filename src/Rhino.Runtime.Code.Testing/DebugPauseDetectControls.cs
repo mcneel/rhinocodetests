@@ -65,7 +65,8 @@ namespace Rhino.Runtime.Code.Testing
             Breakpoints.Add(breakpoint);
         }
 
-        public override DebugAction Pause()
+        protected override bool IsPausingThread() => true;
+        protected override DebugAction Pause()
         {
             if (Results.CurrentThread.CurrentFrame is ExecFrame frame)
             {
