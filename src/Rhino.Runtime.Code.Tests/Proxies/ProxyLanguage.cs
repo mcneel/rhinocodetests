@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Diagnostics;
 using Rhino.Runtime.Code.Languages;
-using Rhino.Runtime.Code.Storage;
 using Rhino.Runtime.Code.Execution;
 
 namespace RhinoCodePlatform.Projects.Proxies
@@ -39,6 +39,17 @@ namespace RhinoCodePlatform.Projects.Proxies
                 case "<execute-exception>":
                     throw new ExecuteException(string.Empty);
             }
+        }
+
+        protected override Task ExecuteAsync(RunContext context)
+        {
+            switch ((string)Text)
+            {
+                case "<execute-exception>":
+                    throw new ExecuteException(string.Empty);
+            }
+
+            return Task.CompletedTask;
         }
     }
 

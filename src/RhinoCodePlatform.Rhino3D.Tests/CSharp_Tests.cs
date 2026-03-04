@@ -8079,6 +8079,28 @@ StackLayout s = new StackLayout()
             Assert.That(completions.Length, Is.Zero);
         }
 
+        [Test]
+        public void TestCSharp_Complete_Locals_In_Assign()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-89992
+            string s = @"
+using System;
+using Rhino.Input;
+using Rhino.Input.Custom;
+
+var gp = new GetPoint();
+GetResult r = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length)
+                                          .ToArray();
+
+            Assert.That(completions.Length, Is.Not.Zero);
+
+            CompletionInfo c = completions.First(c => c.Text == "gp");
+            Assert.AreEqual(CompletionKind.Variable, c.Kind);
+        }
+
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
     }
 }
