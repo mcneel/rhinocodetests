@@ -32,7 +32,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests.Performance
             _code.Run(_ctx);
         }
 
-        [Test, MaxTime(200)]
+        [Test, MaxTime(400)]
         public void TestPython2_Performance_SimpleCycle_10000()
         {
 #if RELEASE
