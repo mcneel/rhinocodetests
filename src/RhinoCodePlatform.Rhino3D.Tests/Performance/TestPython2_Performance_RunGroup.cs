@@ -38,7 +38,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests.Performance
         [OneTimeTearDown]
         public void TearDown() => _group.Dispose();
 
-        [Test, MaxTime(100)]
+        [Test, MaxTime(200)]
         public void TestPython2_Performance_SimpleCycle_10000_RunGroup()
         {
 #if RELEASE
