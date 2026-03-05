@@ -131,7 +131,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "TestSingle.rhp")));
 
-            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testsingle-0.1.1234+8888-rh8-any.yak")));
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testsingle-0.1.1234-rh8-any.yak")));
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
@@ -171,7 +171,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             Assert.IsTrue(rui.Contains("<icon guid=\"a55c3fa8-6202-45c1-8d79-e3641411fc18\">"));
             Assert.IsTrue(rui.Contains("<icon guid=\"21ace57c-eb59-45b2-8e8a-c82b6b128d36\">"));
 
-            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testmultiple-0.1.1234+8888-rh8-any.yak")));
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testmultiple-0.1.1234-rh8-any.yak")));
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
@@ -214,7 +214,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             Assert.IsTrue(rui.Contains("<icon guid=\"a55c3fa8-6202-45c1-8d79-e3641411fc18\">"));
             Assert.IsFalse(rui.Contains("<icon guid=\"21ace57c-eb59-45b2-8e8a-c82b6b128d36\">"));
 
-            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testmultipleexcluded-0.1.1234+8888-rh8-any.yak")));
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testmultipleexcluded-0.1.1234-rh8-any.yak")));
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
@@ -232,7 +232,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "TestSingleComponent.Components.gha")));
 
-            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testsinglecomponent-0.1.1234+8888-rh8-any.yak")));
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testsinglecomponent-0.1.1234-rh8-any.yak")));
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
@@ -295,7 +295,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             Assert.IsTrue(res.Id == new Guid("616a5c26-9d11-4be8-a029-ce23620e62d5"));
             Assert.IsTrue(res.Uri == new Uri("rhinocode:///projects/d8dc2a17-2626-456c-990b-c2b0c46f6174//settings.ico"));
 
-            string yakFile = Path.Combine(buildPath, "rh8", "testresources-0.1.1234+8888-rh8-any.yak");
+            string yakFile = Path.Combine(buildPath, "rh8", "testresources-0.1.1234-rh8-any.yak");
             using (ZipArchive yak = ZipFile.Open(yakFile, ZipArchiveMode.Read))
             {
                 Assert.IsNotNull(yak.Entries.First(e => e.FullName == "shared/data.txt"));
@@ -334,7 +334,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                 Assert.IsNotNull(ghaTypes.FirstOrDefault(t => t.Name.StartsWith("ProjectComponent_Python_f071defa")));
             }
 
-            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "testrhino7build-0.1.1234+8888-rh7-any.yak")));
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "testrhino7build-0.1.1234-rh7-any.yak")));
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
@@ -353,7 +353,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "TestRhino7BuildWithImage.rhp")));
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "TestRhino7BuildWithImage.Components.gha")));
 
-            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "testrhino7buildwithimage-0.1.1234+8888-rh7-any.yak")));
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "testrhino7buildwithimage-0.1.1234-rh7-any.yak")));
 
             string ruiFile = Path.Combine(buildPath, "rh7", "TestRhino7BuildWithImage.rui");
             Assert.IsTrue(File.Exists(ruiFile));
@@ -624,7 +624,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             IProjectServer rhpServer = RhinoCode.ProjectServers.WherePasses(s_rhProjServerSpec).First();
             IProject project = rhpServer.CreateProject();
 
-            project.Add(new SourceCode(LanguageSpec.Python3, "MySource.py", "source", new Uri(Path.GetTempFileName())));
+            project.Add(new SourceCode(LanguageSpec.Python3, "MyCommand", "source", new Uri(Path.GetTempFileName())));
 
             ProjectCode command;
 
@@ -633,7 +633,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             Assert.Throws<LibraryCodeExistsException>(() =>
             {
-                project.Add(new SourceCode(LanguageSpec.Python3, "MySource.py3", "other-source", new Uri(Path.GetTempFileName())));
+                project.Add(new SourceCode(LanguageSpec.Python3, "MyCommand", "other-source", new Uri(Path.GetTempFileName())));
             });
         }
 
@@ -653,7 +653,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "TestHiddenCommandWithIcon.rhp")));
 
-            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testhiddencommandwithicon-0.1.1234+8888-rh8-any.yak")));
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testhiddencommandwithicon-0.1.1234-rh8-any.yak")));
 
             string ruiFile = Path.Combine(buildPath, "rh8", "TestHiddenCommandWithIcon.rui");
             Assert.IsTrue(File.Exists(ruiFile));
@@ -678,7 +678,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             project.Package(s_host, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
-            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testyakversion-0.1.1234+8888-rh8-any.yak")));
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testyakversion-0.1.1234-rh8-any.yak")));
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
@@ -693,7 +693,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             project.Package(s_host, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
-            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testyakbetaversion-0.1.1234-beta+8888-rh8-any.yak")));
+            Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testyakbetaversion-0.1.1234-beta-rh8-any.yak")));
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
