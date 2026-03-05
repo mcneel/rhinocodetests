@@ -19,7 +19,7 @@ namespace Rhino.Runtime.Code.Testing
         // we don't really pause the debug
         public override void Proceed(DebugAction action) { }
 
-        protected override bool IsPausingThread() => true;
+        protected override bool IsPausingThread() => Environment.CurrentManagedThreadId == 1;
         protected override DebugAction Pause() => DebugAction.Continue;
 
         protected override void OnStackFramePushed(ExecFrame pushed) => FramePushed?.Invoke(pushed);
