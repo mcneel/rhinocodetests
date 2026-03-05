@@ -624,7 +624,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             IProjectServer rhpServer = RhinoCode.ProjectServers.WherePasses(s_rhProjServerSpec).First();
             IProject project = rhpServer.CreateProject();
 
-            project.Add(new SourceCode(LanguageSpec.Python3, "MySource.py", "source", new Uri(Path.GetTempFileName())));
+            project.Add(new SourceCode(LanguageSpec.Python3, "MyCommand", "source", new Uri(Path.GetTempFileName())));
 
             ProjectCode command;
 
@@ -633,7 +633,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             Assert.Throws<LibraryCodeExistsException>(() =>
             {
-                project.Add(new SourceCode(LanguageSpec.Python3, "MySource.py3", "other-source", new Uri(Path.GetTempFileName())));
+                project.Add(new SourceCode(LanguageSpec.Python3, "MyCommand", "other-source", new Uri(Path.GetTempFileName())));
             });
         }
 
