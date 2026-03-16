@@ -1721,35 +1721,6 @@ import os
             return completions;
         }
 
-        static CSharpCompletionProvider.CompletionProvider GetCompletionProvider(Code code)
-        {
-            CSharpCompletionProvider.CompletionProvider provider =
-                CSharpCompletionProvider.CompletionProvider.Create(
-                    CSharpCompletionProvider.CompletionProvider.DefaultUsings,
-                    CSharpCompletionProvider.CompletionProvider.DefaultAssemblies.Select(r => r.Location).ToList()
-                );
-
-            AddCSharpReferences(provider, code.Language.Runtime.References);
-            AddCSharpReferences(provider, RhinoCode.Platforms.GetReferences());
-            AddCSharpReferences(provider, code.References);
-
-            if (code.QueryPackages()
-                    .TryGetReferences(out IEnumerable<CompileReference> references))
-            {
-                AddCSharpReferences(provider, references);
-            }
-
-            return provider;
-        }
-
-        static void AddCSharpReferences(CSharpCompletionProvider.CompletionProvider provider, IEnumerable<CompileReference> references)
-        {
-            foreach (string path in references.GetAssemblies().Select(r => r.Path))
-            {
-                provider.AddAssembly(path);
-            }
-        }
-
         [Test]
         public void TestCSharp_Compile_Unsafe_Error()
         {
