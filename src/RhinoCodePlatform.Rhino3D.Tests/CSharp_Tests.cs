@@ -1721,35 +1721,6 @@ import os
             return completions;
         }
 
-        static CSharpCompletionProvider.CompletionProvider GetCompletionProvider(Code code)
-        {
-            CSharpCompletionProvider.CompletionProvider provider =
-                CSharpCompletionProvider.CompletionProvider.Create(
-                    CSharpCompletionProvider.CompletionProvider.DefaultUsings,
-                    CSharpCompletionProvider.CompletionProvider.DefaultAssemblies.Select(r => r.Location).ToList()
-                );
-
-            AddCSharpReferences(provider, code.Language.Runtime.References);
-            AddCSharpReferences(provider, RhinoCode.Platforms.GetReferences());
-            AddCSharpReferences(provider, code.References);
-
-            if (code.QueryPackages()
-                    .TryGetReferences(out IEnumerable<CompileReference> references))
-            {
-                AddCSharpReferences(provider, references);
-            }
-
-            return provider;
-        }
-
-        static void AddCSharpReferences(CSharpCompletionProvider.CompletionProvider provider, IEnumerable<CompileReference> references)
-        {
-            foreach (string path in references.GetAssemblies().Select(r => r.Path))
-            {
-                provider.AddAssembly(path);
-            }
-        }
-
         [Test]
         public void TestCSharp_Compile_Unsafe_Error()
         {
@@ -8099,6 +8070,43 @@ GetResult r = ";
 
             CompletionInfo c = completions.First(c => c.Text == "gp");
             Assert.AreEqual(CompletionKind.Variable, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Signature_Nested()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81743
+            string s = @"
+using System;
+using Rhino;
+using Rhino.Geometry;
+Rhino.Geometry.Intersect.Intersection.BrepBrep(new Cylinder(), new Circle(";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + "\n");
+
+            SignatureInfo[] signatures = CompleteSignatureAtPosition(code, s.Length).ToArray();
+
+            Assert.That(signatures.Length, Is.EqualTo(8));
+
+            SignatureInfo c = signatures.FirstOrDefault(c => c.Text == "Circle()");
+            Assert.NotNull(c);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Signature_Nested_Parent()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81743
+            string s = @"
+using System;
+using Rhino;
+using Rhino.Geometry;
+Rhino.Geometry.Intersect.Intersection.BrepBrep(new Cylinder(), new Circle()";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + "\n");
+
+            SignatureInfo[] signatures = CompleteSignatureAtPosition(code, s.Length).ToArray();
+            Assert.That(signatures.Length, Is.EqualTo(2));
+
+            SignatureInfo c = signatures.FirstOrDefault(c => c.Text.StartsWith("bool BrepBrep("));
+            Assert.NotNull(c);
         }
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
