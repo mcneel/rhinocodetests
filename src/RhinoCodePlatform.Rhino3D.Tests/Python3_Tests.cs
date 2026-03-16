@@ -2280,8 +2280,7 @@ comps.CurveXCurve(");
 
             Assert.AreEqual("CurveXCurve(*args, **kwargs)", sig.Text);
 
-            Assert.AreEqual(@"
-Solve intersection events for two curves.
+            Assert.AreEqual(@"Solve intersection events for two curves.
 Input:
 	curve_a [Curve] - First curve
 	curve_b [Curve] - Second curve
@@ -2314,8 +2313,7 @@ comps.CurveXCurve(arg,");
 
             Assert.AreEqual("CurveXCurve(*args, **kwargs)", sig.Text);
 
-            Assert.AreEqual(@"
-Solve intersection events for two curves.
+            Assert.AreEqual(@"Solve intersection events for two curves.
 Input:
 	curve_a [Curve] - First curve
 	curve_b [Curve] - Second curve
@@ -3020,11 +3018,11 @@ from system.Collection.Generic import ");
 
         static IEnumerable<TestCaseData> GetTestEnvironsTextToSpecCases()
         {
-            yield return new("# r \"pip: numpy\"", "numpy", new PackageSpec[] { new("numpy") });
-            yield return new("# r \"pip: numpy>=1.2.3\"", "numpy>=1.2.3", new PackageSpec[] { new("numpy", "1.2.3", PackageSpec.VersionCompareRule.NewerThanOrEqual) });
+            yield return new("#r \"pip: numpy\"", "numpy", new PackageSpec[] { new("numpy") });
+            yield return new("#r \"pip: numpy>=1.2.3\"", "numpy>=1.2.3", new PackageSpec[] { new("numpy", "1.2.3", PackageSpec.VersionCompareRule.NewerThanOrEqual) });
 
-            yield return new("# r \"pip: git+https://github.com/huggingface/transformers.git\"", "git+https://github.com/huggingface/transformers.git", new PackageSpec[] { new("git+https://github.com/huggingface/transformers.git") });
-            yield return new("# r \"pip: git+https://github.com/huggingface/transformers.git@096f25ae1f501a084d8ff2dcaf25fbc2bd60eba4\"", "git+https://github.com/huggingface/transformers.git@096f25ae1f501a084d8ff2dcaf25fbc2bd60eba4", new PackageSpec[] { new("git+https://github.com/huggingface/transformers.git@096f25ae1f501a084d8ff2dcaf25fbc2bd60eba4") });
+            yield return new("#r \"pip: git+https://github.com/huggingface/transformers.git\"", "git+https://github.com/huggingface/transformers.git", new PackageSpec[] { new("git+https://github.com/huggingface/transformers.git") });
+            yield return new("#r \"pip: git+https://github.com/huggingface/transformers.git@096f25ae1f501a084d8ff2dcaf25fbc2bd60eba4\"", "git+https://github.com/huggingface/transformers.git@096f25ae1f501a084d8ff2dcaf25fbc2bd60eba4", new PackageSpec[] { new("git+https://github.com/huggingface/transformers.git@096f25ae1f501a084d8ff2dcaf25fbc2bd60eba4") });
         }
 
         [Test, TestCaseSource(nameof(GetTestEnvironsTextToSpecCases))]

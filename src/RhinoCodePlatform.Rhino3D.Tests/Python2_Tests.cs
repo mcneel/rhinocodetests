@@ -1342,8 +1342,7 @@ comps.CurveXCurve(");
 
             Assert.AreEqual("CurveXCurve()", sig.Text);
 
-            Assert.AreEqual(@"
-Solve intersection events for two curves.
+            Assert.AreEqual(@"Solve intersection events for two curves.
 Input:
 	curve_a [Curve] - First curve
 	curve_b [Curve] - Second curve
@@ -1376,8 +1375,7 @@ comps.CurveXCurve(arg,");
 
             Assert.AreEqual("CurveXCurve()", sig.Text);
 
-            Assert.AreEqual(@"
-Solve intersection events for two curves.
+            Assert.AreEqual(@"Solve intersection events for two curves.
 Input:
 	curve_a [Curve] - First curve
 	curve_b [Curve] - Second curve
