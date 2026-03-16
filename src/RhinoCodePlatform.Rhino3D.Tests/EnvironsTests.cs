@@ -372,7 +372,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
       diag = diags.First(d => d.Reference.Position.LineNumber == 27);
       Assert.AreEqual(DiagnosticSeverity.Error, diag.Severity);
-      Assert.IsTrue(diag.Message.StartsWith("Legacy package specification. Change to '# r \"nuget: Newtonsoft.Json, 13.0.3\"'"));
+      Assert.IsTrue(diag.Message.StartsWith("Legacy package specification. Change to '#r \"nuget: Newtonsoft.Json, 13.0.3\"'"));
     }
 
     [Test]
@@ -434,41 +434,41 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
       directives = py3.Environs.GetDirectives("jax[tpu]").ToArray();
       d = directives[0];
-      Assert.That(d.Text, Is.EqualTo("# r \"pip: jax[tpu]\""));
+      Assert.That(d.Text, Is.EqualTo("#r \"pip: jax[tpu]\""));
 
       directives = py3.Environs.GetDirectives("jax[tpu]>=1.2.3").ToArray();
       d = directives[0];
-      Assert.That(d.Text, Is.EqualTo("# r \"pip: jax[tpu]>=1.2.3\""));
+      Assert.That(d.Text, Is.EqualTo("#r \"pip: jax[tpu]>=1.2.3\""));
 
       // NuGet
       ILanguage cs = RhinoCode.Languages.QueryLatest(LanguageSpec.CSharp);
 
       directives = cs.Environs.GetDirectives("RestSharp, 1.2").ToArray();
       d = directives[0];
-      Assert.That(d.Text, Is.EqualTo("# r \"nuget: RestSharp, 1.2\""));
+      Assert.That(d.Text, Is.EqualTo("#r \"nuget: RestSharp, 1.2\""));
 
       directives = cs.Environs.GetDirectives("RestSharp, 1.2.*").ToArray();
       d = directives[0];
-      Assert.That(d.Text, Is.EqualTo("# r \"nuget: RestSharp, 1.2\""));
+      Assert.That(d.Text, Is.EqualTo("#r \"nuget: RestSharp, 1.2\""));
 
       directives = cs.Environs.GetDirectives("RestSharp>=1.2.*").ToArray();
       d = directives[0];
-      Assert.That(d.Text, Is.EqualTo("# r \"nuget: RestSharp, 1.2\""));
+      Assert.That(d.Text, Is.EqualTo("#r \"nuget: RestSharp, 1.2\""));
 
       // Yak
       IEnvirons yak = RhinoCode.PackageEnvirons.WherePasses(new EnvironsSpec("*.*.yak")).First();
 
       directives = yak.GetDirectives("LunchBox, 1.2").ToArray();
       d = directives[0];
-      Assert.That(d.Text, Is.EqualTo("# r \"yak: LunchBox, 1.2\""));
+      Assert.That(d.Text, Is.EqualTo("#r \"yak: LunchBox, 1.2\""));
 
       directives = yak.GetDirectives("LunchBox, 1.2.*").ToArray();
       d = directives[0];
-      Assert.That(d.Text, Is.EqualTo("# r \"yak: LunchBox, 1.2\""));
+      Assert.That(d.Text, Is.EqualTo("#r \"yak: LunchBox, 1.2\""));
 
       directives = yak.GetDirectives("LunchBox>=1.2.*").ToArray();
       d = directives[0];
-      Assert.That(d.Text, Is.EqualTo("# r \"yak: LunchBox, 1.2\""));
+      Assert.That(d.Text, Is.EqualTo("#r \"yak: LunchBox, 1.2\""));
 
       // Wheel
       ILanguage py2 = RhinoCode.Languages.QueryLatest(LanguageSpec.Python2);
@@ -493,27 +493,27 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       script = "#! python 3\n# loads cpython (fails ref)";
       code = py3.CreateCode(script);
       code.Text.Set(py3.Environs.GetDirectives("certifi>=1.2.3"));
-      Assert.That((string)code.Text, Is.EqualTo($"{script}\n# r \"pip: certifi>=1.2.3\""));
+      Assert.That((string)code.Text, Is.EqualTo($"{script}\n#r \"pip: certifi>=1.2.3\""));
 
       script = "#! python 3\n# loads cpython (fails ref)\n";
       code = py3.CreateCode(script);
       code.Text.Set(py3.Environs.GetDirectives("certifi>=1.2.3"));
-      Assert.That((string)code.Text, Is.EqualTo($"{script}# r \"pip: certifi>=1.2.3\"\n"));
+      Assert.That((string)code.Text, Is.EqualTo($"{script}#r \"pip: certifi>=1.2.3\"\n"));
 
       script = "#! python 3\r\n# loads cpython (fails ref)";
       code = py3.CreateCode(script);
       code.Text.Set(py3.Environs.GetDirectives("certifi>=1.2.3"));
-      Assert.That((string)code.Text, Is.EqualTo($"{script}\r\n# r \"pip: certifi>=1.2.3\""));
+      Assert.That((string)code.Text, Is.EqualTo($"{script}\r\n#r \"pip: certifi>=1.2.3\""));
 
       script = "#! python 3\r\n# loads cpython (fails ref)\r\n";
       code = py3.CreateCode(script);
       code.Text.Set(py3.Environs.GetDirectives("certifi>=1.2.3"));
-      Assert.That((string)code.Text, Is.EqualTo($"{script}# r \"pip: certifi>=1.2.3\"\r\n"));
+      Assert.That((string)code.Text, Is.EqualTo($"{script}#r \"pip: certifi>=1.2.3\"\r\n"));
 
       script = "#! python 3\n# loads cpython (fails ref)";
       code = py3.CreateCode(script + "\nm = 12");
       code.Text.Set(py3.Environs.GetDirectives("certifi>=1.2.3"));
-      Assert.That((string)code.Text, Is.EqualTo($"{script}\n# r \"pip: certifi>=1.2.3\"\nm = 12"));
+      Assert.That((string)code.Text, Is.EqualTo($"{script}\n#r \"pip: certifi>=1.2.3\"\nm = 12"));
     }
 
     [Test]
@@ -527,30 +527,30 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       // test inserting directives and matching line ending
       const string P = "#";
       script = $@"#! python 3
-{P} r ""pip: numpy>=2.3.1""
-{P} r ""pip: scipy>=1.16.0""
-{P} r ""pip: certifi>=2025.4.26""
-{P} r ""nuget: System.Runtime.WindowsRuntime, 4.3.0+0""
-{P} r ""yak: LunchBox, 2025.5.5""
-{P} r ""lib: RhinoCodePlatform.Rhino3D.dll""
-{P} r ""lib: GalapagosComponents.gha""
-{P} r ""lib: Galapagos.dll""
-{P} r ""lib: KangarooSolver.dll""
-{P} r ""lib: Kangaroo2Component.gha""
+{P}r ""pip: numpy>=2.3.1""
+{P}r ""pip: scipy>=1.16.0""
+{P}r ""pip: certifi>=2025.4.26""
+{P}r ""nuget: System.Runtime.WindowsRuntime, 4.3.0+0""
+{P}r ""yak: LunchBox, 2025.5.5""
+{P}r ""lib: RhinoCodePlatform.Rhino3D.dll""
+{P}r ""lib: GalapagosComponents.gha""
+{P}r ""lib: Galapagos.dll""
+{P}r ""lib: KangarooSolver.dll""
+{P}r ""lib: Kangaroo2Component.gha""
 ";
 
       expected = $@"#! python 3
-{P} r ""pip: numpy>=2.3.1""
-{P} r ""pip: scipy>=1.16.0""
-{P} r ""pip: certifi>=2025.4.26""
-{P} r ""nuget: System.Runtime.WindowsRuntime, 4.3.0+0""
-{P} r ""nuget: RestSharp, 112.1.0""
-{P} r ""yak: LunchBox, 2025.5.5""
-{P} r ""lib: RhinoCodePlatform.Rhino3D.dll""
-{P} r ""lib: GalapagosComponents.gha""
-{P} r ""lib: Galapagos.dll""
-{P} r ""lib: KangarooSolver.dll""
-{P} r ""lib: Kangaroo2Component.gha""
+{P}r ""pip: numpy>=2.3.1""
+{P}r ""pip: scipy>=1.16.0""
+{P}r ""pip: certifi>=2025.4.26""
+{P}r ""nuget: System.Runtime.WindowsRuntime, 4.3.0+0""
+{P}r ""nuget: RestSharp, 112.1.0""
+{P}r ""yak: LunchBox, 2025.5.5""
+{P}r ""lib: RhinoCodePlatform.Rhino3D.dll""
+{P}r ""lib: GalapagosComponents.gha""
+{P}r ""lib: Galapagos.dll""
+{P}r ""lib: KangarooSolver.dll""
+{P}r ""lib: Kangaroo2Component.gha""
 ";
 
       code = py3.CreateCode(script);
@@ -558,17 +558,17 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       Assert.That((string)code.Text, Is.EqualTo(expected));
 
       expected = $@"#! python 3
-{P} r ""pip: numpy>=2.3.1""
-{P} r ""pip: scipy>=1.16.0""
-{P} r ""pip: certifi>=2025.4.26""
-{P} r ""nuget: System.Runtime.WindowsRuntime, 4.3.0+0""
-{P} r ""nuget: RestSharp, 112.1.0""
-{P} r ""yak: LunchBox, 2025.5.5""
-{P} r ""lib: RhinoCodePlatform.Rhino3D.dll""
-{P} r ""lib: GalapagosComponents.gha""
-{P} r ""lib: Galapagos.dll""
-{P} r ""lib: KangarooSolver.dll""
-{P} r ""lib: Kangaroo2Component.gha""
+{P}r ""pip: numpy>=2.3.1""
+{P}r ""pip: scipy>=1.16.0""
+{P}r ""pip: certifi>=2025.4.26""
+{P}r ""nuget: System.Runtime.WindowsRuntime, 4.3.0+0""
+{P}r ""nuget: RestSharp, 112.1.0""
+{P}r ""yak: LunchBox, 2025.5.5""
+{P}r ""lib: RhinoCodePlatform.Rhino3D.dll""
+{P}r ""lib: GalapagosComponents.gha""
+{P}r ""lib: Galapagos.dll""
+{P}r ""lib: KangarooSolver.dll""
+{P}r ""lib: Kangaroo2Component.gha""
 ";
 
       code = py3.CreateCode(script);
@@ -594,15 +594,15 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
       code = py3.CreateCode(script);
       code.Text.Set(NuGetEnvirons.User.GetDirectives("RestSharp, 1.2.3"));
-      Assert.That((string)code.Text, Is.EqualTo($"{script}\r\n# r \"nuget: RestSharp, 1.2.3\""));
+      Assert.That((string)code.Text, Is.EqualTo($"{script}\r\n#r \"nuget: RestSharp, 1.2.3\""));
 
       code = py3.CreateCode(script + "\r\n");
       code.Text.Set(NuGetEnvirons.User.GetDirectives("RestSharp, 1.2.3"));
-      Assert.That((string)code.Text, Is.EqualTo($"{script}\r\n# r \"nuget: RestSharp, 1.2.3\"\r\n"));
+      Assert.That((string)code.Text, Is.EqualTo($"{script}\r\n#r \"nuget: RestSharp, 1.2.3\"\r\n"));
 
       code = py3.CreateCode(script + "\r\n");
       code.Text.Set(NuGetEnvirons.User.GetDirectives("RestSharp, 1.2.3+0"));
-      Assert.That((string)code.Text, Is.EqualTo($"{script}\r\n# r \"nuget: RestSharp, 1.2.3\"\r\n"));
+      Assert.That((string)code.Text, Is.EqualTo($"{script}\r\n#r \"nuget: RestSharp, 1.2.3\"\r\n"));
     }
 
     [Test]
@@ -616,12 +616,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       script = "#! python 3";
       code = py3.CreateCode(script);
       code.Text.Set(py3.Environs.GetDirectives("certifi>=1.2.3"));
-      Assert.That((string)code.Text, Is.EqualTo($"{script}\n# r \"pip: certifi>=1.2.3\""));
+      Assert.That((string)code.Text, Is.EqualTo($"{script}\n#r \"pip: certifi>=1.2.3\""));
 
       script = "#! python 3\n";
       code = py3.CreateCode(script);
       code.Text.Set(py3.Environs.GetDirectives("certifi>=1.2.3"));
-      Assert.That((string)code.Text, Is.EqualTo($"{script}# r \"pip: certifi>=1.2.3\"\n"));
+      Assert.That((string)code.Text, Is.EqualTo($"{script}#r \"pip: certifi>=1.2.3\"\n"));
     }
 
     static IEnumerable<TestCaseData> GetNuGetEnvironsTextToSpecBadSpecCases()
