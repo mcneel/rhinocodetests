@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\build\Common.Build.props" />
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+    <ProduceReferenceAssemblyInOutDir>true</ProduceReferenceAssemblyInOutDir>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(MSBuildProjectFile) == 'McNeel.Python.Runtime.csproj'">
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <ProduceReferenceAssemblyInOutDir>false</ProduceReferenceAssemblyInOutDir>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(MSBuildProjectFile) == 'Rhino.Runtime.Code.Languages.IronPython2.csproj' AND $([MSBuild]::IsOSPlatform('OSX'))">
+    <TargetFrameworks>net9.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <Import Condition="Exists('$(BasePath)..\RhinoCode.props')" Project="$(BasePath)..\RhinoCode.props" />
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory).editorconfig" />
+  </ItemGroup>
+</Project>
