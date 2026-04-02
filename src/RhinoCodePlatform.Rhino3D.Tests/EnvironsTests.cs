@@ -39,8 +39,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       // csharp 9
       Assert.That(versions.First().Major == 9);
 
-      // markdown 0.30
-      Assert.That(versions.Last().Major == 0);
+      // markdown 1.0
+      Assert.That(versions.Last().Major == 1);
     }
 
     [Test]
