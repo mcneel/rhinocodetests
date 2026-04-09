@@ -8104,6 +8104,103 @@ Rhino.Geometry.Intersect.Intersection.BrepBrep(new Cylinder(), new Circle()";
             Assert.NotNull(c);
         }
 
+        static IEnumerable<TestCaseData> TestCSharpEnvironmentExit()
+        {
+            string s;
+
+            s = @"
+using System;
+void Test() => Environment.Exit(-1);
+Test();
+";
+            yield return new(s) { TestName = nameof(TestCSharp_Environment_Exit) + "_Arrow" };
+
+            s = @"
+using System;
+void Test()
+{
+    Environment.Exit(-1);
+}
+Test();
+";
+            yield return new(s) { TestName = nameof(TestCSharp_Environment_Exit) + "_Body" };
+
+            s = @"
+using System;
+static void Test() => Environment.Exit(-1);
+Test();
+";
+            yield return new(s) { TestName = nameof(TestCSharp_Environment_Exit) + "_Static_Arrow" };
+
+            s = @"
+using System;
+static void Test()
+{
+    Environment.Exit(-1);
+}
+Test();
+";
+            yield return new(s) { TestName = nameof(TestCSharp_Environment_Exit) + "_Static_Body" };
+        }
+
+        [Test, TestCaseSource(nameof(TestCSharpEnvironmentExit))]
+        public void TestCSharp_Environment_Exit(string s)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86127
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+
+            ExitException ee = Assert.Throws<ExitException>(() => code.Run());
+            Assert.AreNotEqual(ee.Position, TextPosition.None);
+        }
+
+        static IEnumerable<TestCaseData> TestCSharpContextWriteLine()
+        {
+            string s;
+
+            s = @"
+using System;
+void Test() => Console.WriteLine();
+";
+            yield return new(s, true) { TestName = nameof(TestCSharp_Environment_Exit) + "_Arrow" };
+
+            s = @"
+using System;
+void Test()
+{
+    Console.WriteLine();
+}
+";
+            yield return new(s, true) { TestName = nameof(TestCSharp_Environment_Exit) + "_Body" };
+
+            s = @"
+using System;
+static void Test() => Console.WriteLine();
+";
+            yield return new(s, false) { TestName = nameof(TestCSharp_Environment_Exit) + "_Static_Arrow" };
+
+            s = @"
+using System;
+static void Test()
+{
+    Console.WriteLine();
+}
+";
+            yield return new(s, false) { TestName = nameof(TestCSharp_Environment_Exit) + "_Static_Body" };
+        }
+
+        [Test, TestCaseSource(nameof(TestCSharpContextWriteLine))]
+        public void TestCSharp_Context_WriteLine(string s, bool contextWrite)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86127
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s);
+            Assert.IsTrue(code.Text.TryGetTransformed(new RunContext(), out string xformed));
+
+            if (contextWrite)
+                Assert.IsTrue(xformed.Contains("__context__.WriteLine"));
+            else
+                Assert.IsFalse(xformed.Contains("__context__.WriteLine"));
+        }
+
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
     }
 }
