@@ -2245,7 +2245,7 @@ result = true;
         public void TestCSharp_Compile_LastInlineComment()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-85148
-            Code code = GetLanguage(LanguageSpec.CSharp9).CreateCode(@"
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(@"
 using System;
 Console.WriteLine(); // Comment");
 

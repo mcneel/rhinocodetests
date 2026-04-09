@@ -36,8 +36,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
                    .Select(l => l.Id.Version)
                    .OrderByDescending(v => v.ToVersion());
 
-      // csharp 9
-      Assert.That(versions.First().Major == 9);
+      // csharp 10
+      Assert.That(versions.First().Major == 10);
 
       // markdown 1.0
       Assert.That(versions.Last().Major == 1);
