@@ -2561,7 +2561,7 @@ Test();            // LINE 6
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.AreEqual(0, controls.Count);
+            Assert.IsTrue(controls.Pass);
         }
 
         [Test]
@@ -2599,7 +2599,7 @@ Test();            // LINE 8
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.AreEqual(0, controls.Count);
+            Assert.IsTrue(controls.Pass);
         }
 
         static IEnumerable<TestCaseData> GetLoopVariableSources()
@@ -2793,7 +2793,7 @@ int m = 42;
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.AreEqual(0, controls.Count);
+            Assert.IsTrue(controls.Pass);
         }
 
         [Test]

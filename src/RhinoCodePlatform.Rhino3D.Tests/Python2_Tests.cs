@@ -1591,7 +1591,7 @@ L1()
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.AreEqual(0, controls.Count);
+            Assert.IsTrue(controls.Pass);
         }
 
         [Test]
@@ -1627,7 +1627,7 @@ L1()
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.AreEqual(0, controls.Count);
+            Assert.IsTrue(controls.Pass);
         }
 
         [Test]
@@ -1665,7 +1665,7 @@ L1()
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.AreEqual(0, controls.Count);
+            Assert.IsTrue(controls.Pass);
         }
 
         [Test]
@@ -1683,7 +1683,7 @@ L1()
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.AreEqual(0, controls.Count);
+            Assert.IsTrue(controls.Pass);
         }
 
         [Test]

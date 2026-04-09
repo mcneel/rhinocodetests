@@ -396,7 +396,7 @@ import os
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.AreEqual(0, controls.Count);
+            Assert.IsTrue(controls.Pass);
         }
 
         [Test, TestCaseSource(nameof(GetPythons))]
