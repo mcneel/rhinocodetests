@@ -2498,8 +2498,7 @@ Test();            // LINE 5
             {
                 // start
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
-                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Line, 5),
+                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 5),
                 // entering level 2
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
                 new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 3),
@@ -2519,8 +2518,7 @@ Test();            // LINE 6
             {
                 // start
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
-                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Line, 6),
+                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 6),
                 // entering level 2
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
                 new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 4),
@@ -2539,8 +2537,7 @@ Test();            // LINE 5
             {
                 // start
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
-                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Line, 5),
+                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 5),
                 // entering level 2
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
                 new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 3),
@@ -2581,9 +2578,7 @@ Test();            // LINE 8
             {
                 // start
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 2),
-                new (StackActionKind.Swapped, ExecEvent.Line, 2, ExecEvent.Line, 5),
-                new (StackActionKind.Swapped, ExecEvent.Line, 5, ExecEvent.Line, 8),
+                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 8),
                 // entering level 2
                 new (StackActionKind.Pushed, ExecEvent.Call, 5, 0, 0),
                 new (StackActionKind.Swapped, ExecEvent.Call, 5, ExecEvent.Line, 6),
@@ -4580,7 +4575,7 @@ TRACE(2,0);TRACE(2,1);int total = 0;
 {object __roslynloopcache__i__ = default;bool __roslynloopstop__0__ = false;TRACE(3,1);for(int i =0; i < 3; i++)
 {
 __roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__0__)TRACE(3,1);__roslynloopstop__0__ = true;__roslynloopcache__i__ = i;    TRACE(5,1);total += i;
-}TRACE(3,1);}
+}TRACE(3,1);}TRACE(3,2);
 }
 }
 
@@ -4607,7 +4602,7 @@ TRACE(2,0);TRACE(2,1);int total = 0;
 {object __roslynloopcache__i__ = default;bool __roslynloopstop__0__ = false;TRACE(3,1);for(int i = 0; i < 3; i++)
 {__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__0__)TRACE(3,1);__roslynloopstop__0__ = true;__roslynloopcache__i__ = i;    TRACE(4,1);{object __roslynloopcache__j__ = default;bool __roslynloopstop__1__ = false;    TRACE(4,1);for (int j = 0; j < 2; j++)
 {__roslynloopcache__j__ = __roslynloopcache__j__ ?? j;if(__roslynloopstop__1__)TRACE(4,1);__roslynloopstop__1__ = true;__roslynloopcache__j__ = j;        TRACE(5,1);total += i + j;
-}TRACE(4,1);}}TRACE(3,1);}
+}TRACE(4,1);}}TRACE(3,1);}TRACE(3,2);
 }
 }
 
@@ -4636,7 +4631,7 @@ TRACE(2,0);TRACE(2,1);int total = 0;
 {
 __roslynloopcache__i__ = __roslynloopcache__i__ ?? i;__roslynloopcache__j__ = __roslynloopcache__j__ ?? j;if(__roslynloopstop__0__)TRACE(3,1);__roslynloopstop__0__ = true;__roslynloopcache__i__ = i;__roslynloopcache__j__ = j;    TRACE(5,1);total += i;
     TRACE(6,1);total += j;
-}TRACE(3,1);}
+}TRACE(3,1);}TRACE(3,2);
 }
 }
 
@@ -4703,7 +4698,7 @@ TRACE(5,0);TRACE(5,1);int total = 0;
 {object __roslynloopcache__i__ = default;bool __roslynloopstop__0__ = false;TRACE(6,1);foreach (int i in Enumerable.Range(0, 3))
 {__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__0__)TRACE(6,1);__roslynloopstop__0__ = true;__roslynloopcache__i__ = i;    TRACE(7,1);{object __roslynloopcache__j__ = default;bool __roslynloopstop__1__ = false;    TRACE(7,1);foreach (int j in Enumerable.Range(0, 3))
 {__roslynloopcache__j__ = __roslynloopcache__j__ ?? j;if(__roslynloopstop__1__)TRACE(7,1);__roslynloopstop__1__ = true;__roslynloopcache__j__ = j;        TRACE(8,1);total += i + j;
-}TRACE(7,1);}}TRACE(6,1);}
+}TRACE(7,1);}}TRACE(6,1);}TRACE(6,2);
 }
 }
 
