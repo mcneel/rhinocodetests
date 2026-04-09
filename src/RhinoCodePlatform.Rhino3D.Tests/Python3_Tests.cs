@@ -2672,7 +2672,7 @@ for m in range({THREAD_CHECK_COUNT}):
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.AreEqual(0, controls.Count);
+            Assert.IsTrue(controls.Pass);
         }
 
         static IEnumerable<TestCaseData> GetDebugTracingStackWatchFunctionL2Cases()
@@ -2727,7 +2727,7 @@ L1()
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.AreEqual(0, controls.Count);
+            Assert.IsTrue(controls.Pass);
         }
 
         static IEnumerable<TestCaseData> GetDebugTracingStackWatchFunctionL2ClassCases()
@@ -2792,7 +2792,7 @@ L1()
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.AreEqual(0, controls.Count);
+            Assert.IsTrue(controls.Pass);
         }
 
         static IEnumerable<TestCaseData> GetDebugTracingStackWatchFunctionL3Cases()
@@ -2858,7 +2858,7 @@ L1()
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-            Assert.AreEqual(0, controls.Count);
+            Assert.IsTrue(controls.Pass);
         }
 
         static IEnumerable<TestCaseData> GetDebugTracingPassMiddleCases()

@@ -11,10 +11,10 @@ namespace Rhino.Runtime.Code.Testing
     public sealed class StackAction
     {
         public StackActionKind Kind { get; }
-        
+
         public ExecEvent FromEventKind { get; }
         public int FromEventLine { get; }
-        
+
         public ExecEvent ToEventKind { get; }
         public int ToEventLine { get; }
 
@@ -33,12 +33,13 @@ namespace Rhino.Runtime.Code.Testing
         readonly Queue<StackAction> _queue = new();
         readonly Action<string> _reporter;
         readonly Action<object, object> _asserter;
+        bool _errored = false;
 
         public void Add(StackAction action) => _queue.Enqueue(action);
 
-        public int Count => _queue.Count;
         public StackAction Next() => _queue.Dequeue();
 
+        public bool Pass => !_errored && _queue.Count == 0;
         public bool SkipAssert { get; set; } = false;
 
         public DebugStackActionsWatcher(Action<string> reporter, Action<object, object> asserter)
@@ -58,9 +59,9 @@ namespace Rhino.Runtime.Code.Testing
             }
 
             StackAction expected = Next();
-            _asserter(expected.Kind, StackActionKind.Pushed);
-            _asserter(expected.FromEventKind, pushed.Event);
-            _asserter(expected.FromEventLine, pushed.Reference.Position.LineNumber);
+            TryAssert(expected.Kind, StackActionKind.Pushed);
+            TryAssert(expected.FromEventKind, pushed.Event);
+            TryAssert(expected.FromEventLine, pushed.Reference.Position.LineNumber);
         }
 
         protected override void OnStackFrameSwapped(ExecFrame popped, ExecFrame pushed)
@@ -74,14 +75,32 @@ namespace Rhino.Runtime.Code.Testing
             }
 
             StackAction expected = Next();
-            _asserter(expected.Kind, StackActionKind.Swapped);
-            _asserter(expected.FromEventKind, popped.Event);
-            _asserter(expected.FromEventLine, popped.Reference.Position.LineNumber);
-            _asserter(expected.ToEventKind, pushed.Event);
-            _asserter(expected.ToEventLine, pushed.Reference.Position.LineNumber);
+            TryAssert(expected.Kind, StackActionKind.Swapped);
+            TryAssert(expected.FromEventKind, popped.Event);
+            TryAssert(expected.FromEventLine, popped.Reference.Position.LineNumber);
+            TryAssert(expected.ToEventKind, pushed.Event);
+            TryAssert(expected.ToEventLine, pushed.Reference.Position.LineNumber);
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         public IEnumerator<StackAction> GetEnumerator() => _queue.GetEnumerator();
+
+        void TryAssert(object expected, object actual)
+        {
+            if (_errored)
+            {
+                return;
+            }
+
+            try
+            {
+                _asserter(expected, actual);
+            }
+            catch (Exception ex)
+            {
+                _reporter($"{nameof(DebugStackActionsWatcher)}: {ex.Message}");
+                _errored = true;
+            }
+        }
     }
 }

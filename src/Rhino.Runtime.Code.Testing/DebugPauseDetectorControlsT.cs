@@ -45,7 +45,7 @@ namespace Rhino.Runtime.Code.Testing
 
     public void Add(TStep step) => _debugSteps.Enqueue(step);
 
-        protected override bool IsPausingThread() => Environment.CurrentManagedThreadId == 1;
+    protected override bool IsPausingThread() => Environment.CurrentManagedThreadId == 1;
     protected override DebugAction Pause()
     {
       ExecFrame frame = m_results.CurrentThread.CurrentFrame;
