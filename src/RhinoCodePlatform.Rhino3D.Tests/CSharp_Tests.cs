@@ -2497,8 +2497,8 @@ Test();            // LINE 5
 ", new StackAction[]
             {
                 // start
-                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 5),
+                new (StackActionKind.Pushed, ExecEvent.Call, 5, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 5, ExecEvent.Line, 5),
                 // entering level 2
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
                 new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 3),
@@ -2517,8 +2517,8 @@ Test();            // LINE 6
 ", new StackAction[]
             {
                 // start
-                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 6),
+                new (StackActionKind.Pushed, ExecEvent.Call, 6, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 6, ExecEvent.Line, 6),
                 // entering level 2
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
                 new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 4),
@@ -2536,8 +2536,8 @@ Test();            // LINE 5
 ", new StackAction[]
             {
                 // start
-                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 5),
+                new (StackActionKind.Pushed, ExecEvent.Call, 5, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 5, ExecEvent.Line, 5),
                 // entering level 2
                 new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
                 new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 3),
@@ -2577,8 +2577,8 @@ Test();            // LINE 8
             var controls = new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
             {
                 // start
-                new (StackActionKind.Pushed, ExecEvent.Call, 2, 0, 0),
-                new (StackActionKind.Swapped, ExecEvent.Call, 2, ExecEvent.Line, 8),
+                new (StackActionKind.Pushed, ExecEvent.Call, 8, 0, 0),
+                new (StackActionKind.Swapped, ExecEvent.Call, 8, ExecEvent.Line, 8),
                 // entering level 2
                 new (StackActionKind.Pushed, ExecEvent.Call, 5, 0, 0),
                 new (StackActionKind.Swapped, ExecEvent.Call, 5, ExecEvent.Line, 6),
