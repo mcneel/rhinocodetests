@@ -2489,10 +2489,10 @@ static class T
 
         static IEnumerable<TestCaseData> GetL2Sources()
         {
-            yield return new($@"
-void Test() {{     // LINE 2
+            yield return new(@"
+void Test() {      // LINE 2
     int m = 42;    // LINE 3
-}}
+}
 Test();            // LINE 5
 ", new StackAction[]
             {
@@ -2509,11 +2509,11 @@ Test();            // LINE 5
             })
             { TestName = "TestCSharp_DebugTracing_StackWatch_Function_L2_CompactBrace" };
 
-            yield return new($@"
+            yield return new(@"
 void Test()        // LINE 2
-{{
+{
     int m = 42;    // LINE 4
-}}
+}
 Test();            // LINE 6
 ", new StackAction[]
             {
@@ -2530,11 +2530,11 @@ Test();            // LINE 6
             })
             { TestName = "TestCSharp_DebugTracing_StackWatch_Function_L2_ExpandedBrace" };
 
-            yield return new($@"
+            yield return new(@"
 void Test()        // LINE 2
-{{ int m = 42;     // LINE 3
-}}
-Test();            // LINE 6
+{ int m = 42;      // LINE 3
+}
+Test();            // LINE 5
 ", new StackAction[]
             {
                 // start
@@ -2568,13 +2568,13 @@ Test();            // LINE 6
         public void TestCSharp_DebugTracing_StackWatch_Function_L3()
         {
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
-            $@"
-void Test2() {{    // LINE 2
+            @"
+void Test2() {     // LINE 2
     int m = 42;    // LINE 3
-}}
-void Test() {{     // LINE 5
+}
+void Test() {      // LINE 5
     Test2();       // LINE 6
-}}
+}
 Test();            // LINE 8
 ");
             var controls = new DebugStackActionsWatcher(TestContext.Progress.WriteLine, Assert.AreEqual)
