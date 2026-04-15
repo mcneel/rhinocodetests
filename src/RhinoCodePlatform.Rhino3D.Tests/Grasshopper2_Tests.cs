@@ -65,32 +65,32 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       // There is an overload which takes a cancellation source.
       // There is also an async version called Start() which returns a task.
       // var solution = document.Solution.StartWait(); 
-      switch (solution.State)
+      switch (solution.Phase)
       {
-        case SolutionState.Faulted:
+        case SolutionPhase.Faulted:
           TestContext.WriteLine("Document solution faulted.");
           break;
 
-        case SolutionState.Cancelled:
+        case SolutionPhase.Cancelled:
           TestContext.WriteLine("Document solution was cancelled.");
           break;
 
-        case SolutionState.Completed:
+        case SolutionPhase.Completed:
           // TestContext.WriteLine($"Document solution completed in {solution.Age.TotalSeconds:0.0} seconds.");
           break;
 
-        case SolutionState.Ending:
-        case SolutionState.Running:
-        case SolutionState.Required:
+        case SolutionPhase.Ending:
+        case SolutionPhase.Running:
+        case SolutionPhase.Required:
           TestContext.WriteLine("Document solution did not correctly run to completion.");
           break;
 
         default:
-          TestContext.WriteLine("Unrecognised solution state: " + solution.State);
+          TestContext.WriteLine("Unrecognised solution state: " + solution.Phase);
           break;
       }
 
-      return solution.State == SolutionState.Completed;
+      return solution.Phase == SolutionPhase.Completed;
     }
 
     public static bool AssertTruthy(Document document)
