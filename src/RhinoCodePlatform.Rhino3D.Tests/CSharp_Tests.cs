@@ -8201,6 +8201,167 @@ static void Test()
                 Assert.IsFalse(xformed.Contains("__context__.WriteLine"));
         }
 
+        [Test]
+        public async Task TestCSharp_Compile_AsyncForEach()
+        {
+            // ensure code with async enumerator does not throw compile errors
+            var script = @"// #! csharp
+// async: true
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+
+async IAsyncEnumerable<int> CountAsync(int start, int count, [EnumeratorCancellation] CancellationToken ct = default)
+{
+    for (int i = 0; i < count; i++)
+    {
+        ct.ThrowIfCancellationRequested();
+        await Task.Delay(500, ct);     // async work between items
+        yield return start + i;        // emit one item at a time
+    }
+}
+
+await foreach (var n in CountAsync(10, 5, default))
+{
+    Console.WriteLine(n);
+}
+";
+
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(script);
+            Assert.DoesNotThrowAsync(() => code.RunAsync(new RunContext()));
+        }
+
+        [Test]
+        public void TestCSharp_DebugTracing_StaticFunction_BeforeLastLine()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-94580
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+using Rhino;
+
+Foo(Rhino.RhinoDoc.ActiveDoc);          // LINE 5
+Console.WriteLine();                    // LINE 6
+
+static void Foo(RhinoDoc doc)
+{
+  return;                               // LINE 10
+}
+
+static void Test(RhinoDoc doc)
+{
+  return;
+}
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new (5, ExecEvent.Line, DebugAction.StepIn),
+                new (10, ExecEvent.Line, DebugAction.StepOver),
+                new (5, ExecEvent.Return, DebugAction.StepOver),
+                new (6, ExecEvent.Line, DebugAction.StepIn),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 5));
+            controls.PauseOnStep += (step, frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test]
+        public void TestCSharp_DebugTracing_StaticFunction_LastLine()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-94580
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+using Rhino;
+
+Console.WriteLine();                    // LINE 5
+Foo(Rhino.RhinoDoc.ActiveDoc);          // LINE 6
+
+static void Foo(RhinoDoc doc)
+{
+  return;                               // LINE 10
+}
+
+static void Test(RhinoDoc doc)
+{
+  return;
+}
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new (5, ExecEvent.Line, DebugAction.StepOver),
+                new (6, ExecEvent.Line, DebugAction.StepIn),
+                new (10, ExecEvent.Line, DebugAction.StepOver),
+                new (6, ExecEvent.Return, DebugAction.StepOver),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 5));
+            controls.PauseOnStep += (step, frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test]
+        public void TestCSharp_DebugTracing_StaticFunction_FinalLine()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-94580
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+using Rhino;
+
+static void Foo(RhinoDoc doc)
+{
+  return;                               // LINE 7
+}
+
+static void Test(RhinoDoc doc)
+{
+  return;
+}
+
+Console.WriteLine();                    // LINE 15
+Foo(Rhino.RhinoDoc.ActiveDoc);          // LINE 16
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
+            {
+                new (15, ExecEvent.Line, DebugAction.StepOver),
+                new (16, ExecEvent.Line, DebugAction.StepIn),
+                new (7, ExecEvent.Line, DebugAction.StepOver),
+                new (16, ExecEvent.Return, DebugAction.StepOver),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 15));
+            controls.PauseOnStep += (step, frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
     }
 }
