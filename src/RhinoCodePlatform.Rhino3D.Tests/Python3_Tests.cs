@@ -3308,6 +3308,56 @@ from system.Collection.Generic import ");
             Assert.IsTrue(rpw.HasReports);
         }
 
+        [Test]
+        public void TestPython3_Complete_RhinoCommon_Plane_Static()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-94780
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+import Rhino.Geometry as rg
+p = rg.Plane.WorldXY
+p.");
+
+            string text = code.Text;
+            IEnumerable<CompletionInfo> completions =
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+            CompletionInfo cinfo;
+            bool result = true;
+
+            cinfo = completions.First(c => c.Text == "ClosestPoint");
+            // NOTE: this really should be method!
+            result &= CompletionKind.Function == cinfo.Kind;
+
+            cinfo = completions.First(c => c.Text == "WorldXY");
+            result &= CompletionKind.Property == cinfo.Kind;
+
+            Assert.True(result);
+        }
+
+        [Test]
+        public void TestPython3_Debug_BigInt()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85876
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+import math
+f = math.factorial(255)
+m = f
+print(m)        # LINE 5
+");
+
+            var breakpoint = new CodeReferenceBreakpoint(code, 5);
+            var controls = new DebugVerifyVarsControls(breakpoint, new ExpectedVariable[]
+            {
+                new("m"),
+            });
+
+            code.DebugControls = controls;
+            code.Debug(new DebugContext());
+
+            Assert.True(controls.Pass);
+        }
+
         static string GetIdentifier(ExecSlot variable)
         {
             return variable.Id.Identifier;
