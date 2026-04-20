@@ -8362,6 +8362,24 @@ Foo(Rhino.RhinoDoc.ActiveDoc);          // LINE 16
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
         }
 
+        [Test]
+        public void TestCSharp_Compile_LocalFunctionWithAccessModifier()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-94870
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+int m = 42;
+public double TestLocalFunctionWithAccessModifier()
+{
+    return 1.0d;
+}
+");
+
+            Assert.DoesNotThrow(() => code.Build(new BuildContext()));
+            Assert.DoesNotThrow(() => code.Build(new DebugContext()));
+        }
+
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
     }
 }
