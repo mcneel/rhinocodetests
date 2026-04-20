@@ -23,7 +23,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
   {
     protected static bool GetPackageVersions(PackageSpec spec, int count)
     {
-      IEnumerable<NuGetVersion> versions = NuGetEnvirons.User.GetPackageVersions(spec);
+      IEnumerable<NuGetVersion> versions = NuGetEnvirons.GetPackageVersions(spec);
       return versions.Count() == count;
     }
 
