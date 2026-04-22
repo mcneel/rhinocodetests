@@ -17,12 +17,6 @@ namespace Rhino.Runtime.Code.Tests
             protected override void OnTextChanged(TextChange args) { }
 
             protected override void OnTextReadOnlyChanged() { }
-
-            protected override bool Transform(string text, out string xformed)
-            {
-                xformed = default;
-                return false;
-            }
         }
 
         [Test, TestCaseSource(nameof(GetTestSearchCases))]
