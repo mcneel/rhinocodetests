@@ -10,12 +10,29 @@
     "name": "MyPlugin",
     "version": "0.1.0",
     "publisher": {
-      "email": "ehsan@mcneel.com",
-      "name": "Ehsan Iran-Nejad",
-      "company": "McNeel",
-      "phone": "\u002B1 (888)-888 8888",
-      "address": "Pacific Northwest",
-      "country": "USA"
+      "type": "group",
+      "data": {
+        "email": "ehsan@mcneel.com",
+        "members": [
+          {
+            "email": "ehsan@mcneel.com",
+            "name": "Ehsan Iran-Nejad",
+            "company": "McNeel",
+            "phone": "\u002B1 (888)-888 8888",
+            "address": "Pacific Northwest",
+            "country": "USA"
+          },
+          {
+            "email": "callum@mcneel.com",
+            "name": "Callum Sykes",
+            "company": "McNeel",
+            "phone": "\u002B1 (206) 545-7000",
+            "address": "146 N Canal St, Suite 320, Seattle, WA 98103",
+            "country": "USA",
+            "url": "https://www.rhino3d.com/"
+          }
+        ]
+      }
     },
     "description": "My Rhino/Grasshopper Plugin",
     "copyright": "Copyright \u00A9 2026 Ehsan Iran-Nejad",
@@ -90,7 +107,7 @@
         "version": "2.*.*"
       },
       "title": "Jack",
-      "uri": "test_commands_args/TestCommandArgs.py2",
+      "uri": "test_commands_args/TestCommandArgs_ehsan.py2",
       "description": "This is the best command ever"
     },
     {
@@ -173,7 +190,7 @@
         "version": "1.*.*"
       },
       "title": "component_with_preview.gh",
-      "uri": "test_gh_components/component_with_preview.gh",
+      "uri": "test_gh_components/component_with_preview_jack.gh",
       "scripts": [
         {
           "id": "c7afab8f-9ba4-4634-a06e-89126bbdc0e1",
@@ -205,6 +222,67 @@
           }
         }
       ]
+    },
+    {
+      "type": "components",
+      "id": "deec22d5-39f0-4955-92a3-0e1df6847ed8",
+      "language": {
+        "id": "*.*.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "test_empty_ghsource.gh",
+      "uri": "test_empty_ghsource.gh"
+    },
+    {
+      "type": "components",
+      "id": "0801ab63-9fd9-4277-9438-e1f73117655e",
+      "language": {
+        "id": "*.*.grasshopper",
+        "version": "1.*.*"
+      },
+      "title": "component_with_preview.gh",
+      "uri": "test_gh_components/component_with_preview.gh",
+      "scripts": [
+        {
+          "id": "0801ab63-9fd9-4277-9438-e1f73117655e",
+          "name": "Preview",
+          "nickname": "PP",
+          "description": "Some decription",
+          "subcat": "Default"
+        }
+      ]
+    }
+  ],
+  "libraries": [
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///Users/ein/gits/rhinocodetests/files/rhproj/libraries/testmodule/",
+        "language": {
+          "id": "*.*.python",
+          "version": "3.*.*"
+        }
+      }
+    },
+    {
+      "type": "uri",
+      "library": {
+        "base": "file:///Users/ein/gits/rhinocodetests/files/rhproj/libraries/TestAssembly_D/",
+        "language": {
+          "id": "*.*.*",
+          "version": "*.*.*"
+        }
+      }
+    }
+  ],
+  "resources": [
+    {
+      "id": "8061093e-0ca4-4471-b31a-18f51e64437a",
+      "uri": "test_debug_rhino_obj/testwrite2_dan.3dm"
+    },
+    {
+      "id": "c89909e4-557a-482a-bef7-b2e07ca3d5ae",
+      "uri": "file:///Users/ein/gits/rhinocodetests/files/rhproj/files/Rock.3dm"
     }
   ]
 }
