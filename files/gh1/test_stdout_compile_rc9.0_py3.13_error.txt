@@ -4,5 +4,5 @@ Solution exception:unexpected EOF while parsing
 The name 'm' does not exist in the current context \[1:
 Expected one or more names after 'import'  \[1:
 expected an indented block after function definition on line 52  \[10:
-unexpected token '\<newline\>'
-expected an indented block on component IPy2
+unexpected token '\<newline\>' \[1:
+expected an indented block \[10:
