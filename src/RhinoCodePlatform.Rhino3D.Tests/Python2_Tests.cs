@@ -1724,6 +1724,34 @@ pass_in_middle()            # LINE 9
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
         }
 
+        [Test]
+        public void TestPython2_ExecuteTrace_SyntaxError()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85987
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
+@"
+m = []
+s = m[0
+print(
+");
+
+            ExecuteException ee = Assert.Throws<ExecuteException>(() => code.Run(new RunContext()));
+            Assert.That(ee.Trace.Count, Is.EqualTo(2));
+
+            ExecuteTraceLine t;
+            ExecuteTraceLine[] traces = ee.Trace.ToArray();
+
+            t = traces[0];
+            Assert.True(t.Kind == ExecuteTraceLineKind.SourceLink);
+            Assert.True(t.TryGetReference(out CodeReference reference));
+            Assert.That(reference.Position.LineNumber, Is.EqualTo(4));
+
+            t = traces[1];
+            Assert.True(t.Kind == ExecuteTraceLineKind.Exception);
+            Assert.True(t.TryGetException(out string type, out string message));
+            Assert.That(type, Is.EqualTo("SyntaxError"));
+        }
+
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py2\", "test_*.py");
     }
 }
