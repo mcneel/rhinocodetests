@@ -26,6 +26,7 @@ using RhinoCodePlatform.Rhino3D.Languages.GH1;
 using Rhino.Runtime.Code.Languages.PythonNet;
 
 using RhinoCodePlatform.Rhino3D.Testing;
+using Rhino.Runtime.Code.Storage;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -3384,6 +3385,44 @@ print(
             Assert.True(t.Kind == ExecuteTraceLineKind.Exception);
             Assert.True(t.TryGetException(out string type, out string message));
             Assert.That(type, Is.EqualTo("SyntaxError"));
+        }
+
+        [Test]
+        public void TestPython3_ExecuteTrace_Imported()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85987
+            string fpath = string.Empty;
+            Assert.True(TryGetTestFile(@"py3\exec_trace\main_3.py", out fpath));
+
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(fpath.ToUri());
+
+            ExecuteException ee = Assert.Throws<ExecuteException>(() => code.Run(new RunContext()));
+            Assert.That(ee.Trace.Count, Is.EqualTo(4));
+
+            ExecuteTraceLine t;
+            ExecuteTraceLine[] traces = ee.Trace.ToArray();
+
+            t = traces[0];
+            Assert.True(t.Kind == ExecuteTraceLineKind.Text);
+
+            t = traces[1];
+            Assert.True(t.Kind == ExecuteTraceLineKind.SourceLink);
+            Assert.True(t.TryGetReference(out CodeReference reference));
+            Assert.That(reference.Position.LineNumber, Is.EqualTo(3));
+            Assert.True(t.TryGetFrame(out string frame));
+            Assert.That(frame, Is.EqualTo("<module>"));
+
+            t = traces[2];
+            Assert.True(t.Kind == ExecuteTraceLineKind.SourceLink);
+            Assert.True(t.TryGetReference(out reference));
+            Assert.That(reference.Position.LineNumber, Is.EqualTo(5));
+            Assert.True(t.TryGetFrame(out frame));
+            Assert.That(frame, Is.EqualTo("Test2"));
+
+            t = traces[3];
+            Assert.True(t.Kind == ExecuteTraceLineKind.Exception);
+            Assert.True(t.TryGetException(out string type, out string message));
+            Assert.That(type, Is.EqualTo(nameof(Exception)));
         }
 
         static string GetIdentifier(ExecSlot variable)

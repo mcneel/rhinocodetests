@@ -7,13 +7,12 @@ using System.Threading.Tasks;
 
 using NUnit.Framework;
 
-using Rhino;
-
 using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Execution.Debugging;
 using Rhino.Runtime.Code.Execution.Profiling;
+using Rhino.Runtime.Code.Storage;
 using Rhino.Runtime.Code.Platform;
 using Rhino.Runtime.Code.Testing;
 
@@ -1750,6 +1749,44 @@ print(
             Assert.True(t.Kind == ExecuteTraceLineKind.Exception);
             Assert.True(t.TryGetException(out string type, out string message));
             Assert.That(type, Is.EqualTo("SyntaxError"));
+        }
+
+        [Test]
+        public void TestPython2_ExecuteTrace_Imported()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85987
+            string fpath = string.Empty;
+            Assert.True(TryGetTestFile(@"py2\exec_trace\main_2.py", out fpath));
+
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(fpath.ToUri());
+
+            ExecuteException ee = Assert.Throws<ExecuteException>(() => code.Run(new RunContext()));
+            Assert.That(ee.Trace.Count, Is.EqualTo(4));
+
+            ExecuteTraceLine t;
+            ExecuteTraceLine[] traces = ee.Trace.ToArray();
+
+            t = traces[0];
+            Assert.True(t.Kind == ExecuteTraceLineKind.Text);
+
+            t = traces[1];
+            Assert.True(t.Kind == ExecuteTraceLineKind.SourceLink);
+            Assert.True(t.TryGetReference(out CodeReference reference));
+            Assert.That(reference.Position.LineNumber, Is.EqualTo(3));
+            Assert.True(t.TryGetFrame(out string frame));
+            Assert.That(frame, Is.EqualTo("<module>"));
+
+            t = traces[2];
+            Assert.True(t.Kind == ExecuteTraceLineKind.SourceLink);
+            Assert.True(t.TryGetReference(out reference));
+            Assert.That(reference.Position.LineNumber, Is.EqualTo(5));
+            Assert.True(t.TryGetFrame(out frame));
+            Assert.That(frame, Is.EqualTo("Test2"));
+
+            t = traces[3];
+            Assert.True(t.Kind == ExecuteTraceLineKind.Exception);
+            Assert.True(t.TryGetException(out string type, out string message));
+            Assert.That(type, Is.EqualTo(nameof(Exception)));
         }
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"py2\", "test_*.py");
