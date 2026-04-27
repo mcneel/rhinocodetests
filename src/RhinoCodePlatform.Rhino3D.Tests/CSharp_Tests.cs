@@ -2711,56 +2711,56 @@ foreach (int {INDEX_VAR} in Enumerable.Range(0, 3)) // line 6
                     }
 
                     else
-                    if (bp8.Matches(frame))
-                    {
-                        switch (bp8Counter)
+                        if (bp8.Matches(frame))
                         {
-                            // first arrive at line 8
-                            // i = 0
-                            case 0:
-                                ExecSlot er0 = getIndex(frame);
-                                // csharp does not stop twice on for loop so
-                                // i is not available in frame previous to this
-                                Assert.IsFalse(frame.HasModified(er0, prevFrame));
-                                Assert.IsTrue(er0.TryGetValue(out int v0));
-                                Assert.AreEqual(0, v0);
-                                break;
+                            switch (bp8Counter)
+                            {
+                                // first arrive at line 8
+                                // i = 0
+                                case 0:
+                                    ExecSlot er0 = getIndex(frame);
+                                    // csharp does not stop twice on for loop so
+                                    // i is not available in frame previous to this
+                                    Assert.IsFalse(frame.HasModified(er0, prevFrame));
+                                    Assert.IsTrue(er0.TryGetValue(out int v0));
+                                    Assert.AreEqual(0, v0);
+                                    break;
 
-                            // i = 1
-                            case 1:
-                                ExecSlot er1 = getIndex(frame);
-                                Assert.IsTrue(frame.HasModified(er1, prevFrame));      // i is modified!
-                                Assert.IsTrue(er1.TryGetValue(out int v1));
-                                Assert.AreEqual(1, v1);
+                                // i = 1
+                                case 1:
+                                    ExecSlot er1 = getIndex(frame);
+                                    Assert.IsTrue(frame.HasModified(er1, prevFrame));      // i is modified!
+                                    Assert.IsTrue(er1.TryGetValue(out int v1));
+                                    Assert.AreEqual(1, v1);
 
-                                ExecSlot ers0 = getSum(frame);
-                                Assert.IsInstanceOf<ExecSlot>(ers0);
-                                Assert.IsFalse(frame.HasModified(ers0, prevFrame));
-                                Assert.IsTrue(ers0.TryGetValue(out int sum0));
-                                Assert.AreEqual(0, sum0);
-                                break;
+                                    ExecSlot ers0 = getSum(frame);
+                                    Assert.IsInstanceOf<ExecSlot>(ers0);
+                                    Assert.IsFalse(frame.HasModified(ers0, prevFrame));
+                                    Assert.IsTrue(ers0.TryGetValue(out int sum0));
+                                    Assert.AreEqual(0, sum0);
+                                    break;
 
-                            // i = 2
-                            case 2:
-                                ExecSlot er2 = getIndex(frame);
-                                Assert.IsTrue(frame.HasModified(er2, prevFrame));      // i is modified!
-                                Assert.IsTrue(er2.TryGetValue(out int v2));
-                                Assert.AreEqual(2, v2);
+                                // i = 2
+                                case 2:
+                                    ExecSlot er2 = getIndex(frame);
+                                    Assert.IsTrue(frame.HasModified(er2, prevFrame));      // i is modified!
+                                    Assert.IsTrue(er2.TryGetValue(out int v2));
+                                    Assert.AreEqual(2, v2);
 
-                                ExecSlot ers1 = getSum(frame);
-                                // sum is not modified since it was 1 on entering loop on previous pause
-                                Assert.IsFalse(frame.HasModified(ers1, prevFrame));
-                                Assert.IsTrue(ers1.TryGetValue(out int sum1));
-                                Assert.AreEqual(1, sum1);
-                                break;
+                                    ExecSlot ers1 = getSum(frame);
+                                    // sum is not modified since it was 1 on entering loop on previous pause
+                                    Assert.IsFalse(frame.HasModified(ers1, prevFrame));
+                                    Assert.IsTrue(ers1.TryGetValue(out int sum1));
+                                    Assert.AreEqual(1, sum1);
+                                    break;
 
-                            // breakpoint 8 will never see sum as 2
-                            default:
-                                Assert.Fail("breakpoint 8 should never see sum as 2");
-                                break;
+                                // breakpoint 8 will never see sum as 2
+                                default:
+                                    Assert.Fail("breakpoint 8 should never see sum as 2");
+                                    break;
+                            }
+                            bp8Counter++;
                         }
-                        bp8Counter++;
-                    }
 
                     prevFrame = frame;
                 }
@@ -8378,6 +8378,52 @@ public double TestLocalFunctionWithAccessModifier()
 
             Assert.DoesNotThrow(() => code.Build(new BuildContext()));
             Assert.DoesNotThrow(() => code.Build(new DebugContext()));
+        }
+
+        [Test]
+        public void TestCSharp_ExecuteTrace()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85987
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+
+void Test1()
+{
+  throw new Exception(""Expected Exception"");
+}
+
+void Test2()
+{
+  Test1();
+}
+
+Test2();
+");
+
+            ExecuteException ee = Assert.Throws<ExecuteException>(() => code.Run(new RunContext()));
+            Assert.That(ee.Trace.Count, Is.EqualTo(4));
+
+            ExecuteTraceLine t;
+            ExecuteTraceLine[] traces = ee.Trace.ToArray();
+
+            t = traces[0];
+            Assert.True(t.Kind == ExecuteTraceLineKind.Exception);
+
+            t = traces[1];
+            Assert.True(t.Kind == ExecuteTraceLineKind.SourceLink);
+            Assert.True(t.TryGetFrame(out string frame));
+            Assert.That(frame, Is.EqualTo("Test1()"));
+
+            t = traces[2];
+            Assert.True(t.Kind == ExecuteTraceLineKind.SourceLink);
+            Assert.True(t.TryGetFrame(out frame));
+            Assert.That(frame, Is.EqualTo("Test2()"));
+
+            t = traces[3];
+            Assert.True(t.Kind == ExecuteTraceLineKind.SourceLink);
+            Assert.True(t.TryGetFrame(out frame));
+            Assert.That(frame, Is.EqualTo("Main()"));
         }
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
