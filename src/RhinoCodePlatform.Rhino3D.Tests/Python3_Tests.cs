@@ -3425,6 +3425,17 @@ print(
             Assert.That(type, Is.EqualTo(nameof(Exception)));
         }
 
+        [Test]
+        public void TestPython3_Relative_WHL_Reference()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-93679
+            string fpath = string.Empty;
+            Assert.True(TryGetTestFile(@"py3\relative_ref\relative_test.py", out fpath));
+
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(fpath.ToUri());
+            Assert.DoesNotThrow(() => code.RestorePackages());
+        }
+
         static string GetIdentifier(ExecSlot variable)
         {
             return variable.Id.Identifier;
