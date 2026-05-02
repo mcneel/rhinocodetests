@@ -3299,7 +3299,7 @@ from system.Collection.Generic import ");
             Assert.IsTrue(rpw.HasReports);
 
             code.Text.Set(@"
-#r ""pip: -e git+https://github.com/uiri/toml.git#egg=toml@f6e1e4c65b513544367fe88576ef1895eccded74""
+#r ""pip: -e git+https://github.com/uiri/toml.git@f6e1e4c65b513544367fe88576ef1895eccded74#egg=toml""
 
 
       ");
