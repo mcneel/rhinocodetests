@@ -1,0 +1,90 @@
+{
+  "host": {
+    "name": "Rhino3D",
+    "version": "9.0.26122\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "bar": {
+    "id": "3056f60b-a91d-4281-8479-58c4182caa48",
+    "tray": {
+      "id": "2da32a7f-fd94-4b69-a86a-d8406e066050",
+      "box": {
+        "id": "f5705104-8397-48e2-8a75-10bb0d17d3c7",
+        "imageId": "1630df78-76a4-4b72-ac3c-ce72cb3a8f8c"
+      }
+    }
+  },
+  "id": "05a466c9-4d3c-4b89-9380-4430e64a8ce7",
+  "identity": {
+    "name": "TestProjectCommandOrder",
+    "version": "0.1.0",
+    "publisher": {
+      "email": "ehsan@mcneel.com",
+      "name": "Ehsan Iran-Nejad",
+      "company": "McNeel",
+      "phone": "\u002B1 (888)-888 8888",
+      "address": "Pacific Northwest",
+      "country": "USA"
+    }
+  },
+  "settings": {
+    "buildPath": "build/",
+    "packageBuild": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "9.*"
+      },
+      "title": "Rhino3D (9.*)",
+      "slug": "rh9"
+    },
+    "packageServer": {
+      "id": "mcneel.yak.public",
+      "title": "McNeel Yak Server (yak.rhino3d.com)"
+    }
+  },
+  "codes": [
+    {
+      "id": "24cb4b6d-f9c1-4afa-8561-32e3ca95bd6a",
+      "language": {
+        "id": "*.*.csharp",
+        "version": "*.*.*"
+      },
+      "title": "First",
+      "uri": "TestCommandArgs.cs",
+      "description": "---",
+      "box": {
+        "id": "e856191a-1cad-427e-8778-3a4dc52bb69d",
+        "imageId": "4d3d81c6-0dfe-4851-a71d-734e436ffbb2"
+      }
+    },
+    {
+      "id": "c04eb77a-abd6-4b1a-a448-52ba450193c1",
+      "language": {
+        "id": "*.*.csharp",
+        "version": "*.*.*"
+      },
+      "title": "Second",
+      "uri": "TestCommandArgs.cs",
+      "description": "---",
+      "box": {
+        "id": "4f80b4e1-6484-4eb0-a8ab-32888b348edc",
+        "imageId": "063a8ca0-ee0d-4477-908b-8b56ddc4e736"
+      }
+    },
+    {
+      "id": "929ecf6b-0e13-4c09-ad25-645c1a227ce2",
+      "language": {
+        "id": "*.*.csharp",
+        "version": "*.*.*"
+      },
+      "title": "Third",
+      "uri": "TestCommandArgs.cs",
+      "description": "---",
+      "box": {
+        "id": "ad5d9be7-5dfa-49e9-8f55-44e2ea10e79a",
+        "imageId": "25de3c0e-b766-41a2-babd-ca97b26e45f8"
+      }
+    }
+  ]
+}

@@ -939,6 +939,73 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             }
         }
 
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestProjectCommandOrder.rhproj" })]
+        public void TestRhProj_ProjectCommandOrder(string rhprojfile)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-84223
+            IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
+
+            Guid og1 = new("24cb4b6d-f9c1-4afa-8561-32e3ca95bd6a");
+            Guid og2 = new("c04eb77a-abd6-4b1a-a448-52ba450193c1");
+            Guid og3 = new("929ecf6b-0e13-4c09-ad25-645c1a227ce2");
+
+            ProjectCode[] codes = project.GetCodes().ToArray();
+            Assert.That(codes[0].Id, Is.EqualTo(og1));
+            Assert.That(codes[1].Id, Is.EqualTo(og2));
+            Assert.That(codes[2].Id, Is.EqualTo(og3));
+
+            project.Promote(codes[0].Id);
+            codes = project.GetCodes().ToArray();
+            Assert.That(codes[0].Id, Is.EqualTo(og1));
+            Assert.That(codes[1].Id, Is.EqualTo(og2));
+            Assert.That(codes[2].Id, Is.EqualTo(og3));
+
+            project.Promote(codes[1].Id);
+            codes = project.GetCodes().ToArray();
+            Assert.That(codes[0].Id, Is.EqualTo(og2));
+            Assert.That(codes[1].Id, Is.EqualTo(og1));
+            Assert.That(codes[2].Id, Is.EqualTo(og3));
+
+            project.Demote(codes[0].Id);
+            codes = project.GetCodes().ToArray();
+            Assert.That(codes[0].Id, Is.EqualTo(og1));
+            Assert.That(codes[1].Id, Is.EqualTo(og2));
+            Assert.That(codes[2].Id, Is.EqualTo(og3));
+
+            project.Demote(codes[2].Id);
+            codes = project.GetCodes().ToArray();
+            Assert.That(codes[0].Id, Is.EqualTo(og1));
+            Assert.That(codes[1].Id, Is.EqualTo(og2));
+            Assert.That(codes[2].Id, Is.EqualTo(og3));
+        }
+
+        [Test, TestCaseSource(nameof(GetTestScript), new object[] { "rhproj", "TestProjectCommandOrder.rhproj" })]
+        public void TestRhProj_ProjectCommandBar(string rhprojfile)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-84223
+            Rhino3DProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile)) as Rhino3DProject;
+
+            Assert.That(project.Bar.Id, Is.EqualTo(new Guid("3056f60b-a91d-4281-8479-58c4182caa48")));
+            Assert.That(project.Bar.PrimaryTray.Id, Is.EqualTo(new Guid("2da32a7f-fd94-4b69-a86a-d8406e066050")));
+            Assert.That(project.Bar.PrimaryTray.Box.Id, Is.EqualTo(new Guid("f5705104-8397-48e2-8a75-10bb0d17d3c7")));
+            Assert.That(project.Bar.PrimaryTray.Box.ImageId, Is.EqualTo(new Guid("1630df78-76a4-4b72-ac3c-ce72cb3a8f8c")));
+
+            Rhino3DCommand c;
+            Rhino3DCommand[] codes = project.GetCodes().OfType<Rhino3DCommand>().ToArray();
+
+            c = codes[0];
+            Assert.That(c.Box.Id, Is.EqualTo(new Guid("e856191a-1cad-427e-8778-3a4dc52bb69d")));
+            Assert.That(c.Box.ImageId, Is.EqualTo(new Guid("4d3d81c6-0dfe-4851-a71d-734e436ffbb2")));
+
+            c = codes[1];
+            Assert.That(c.Box.Id, Is.EqualTo(new Guid("4f80b4e1-6484-4eb0-a8ab-32888b348edc")));
+            Assert.That(c.Box.ImageId, Is.EqualTo(new Guid("063a8ca0-ee0d-4477-908b-8b56ddc4e736")));
+
+            c = codes[2];
+            Assert.That(c.Box.Id, Is.EqualTo(new Guid("ad5d9be7-5dfa-49e9-8f55-44e2ea10e79a")));
+            Assert.That(c.Box.ImageId, Is.EqualTo(new Guid("25de3c0e-b766-41a2-babd-ca97b26e45f8")));
+        }
+
         static readonly BindingFlags s_protectedFlags = BindingFlags.NonPublic | BindingFlags.Instance;
     }
 }
