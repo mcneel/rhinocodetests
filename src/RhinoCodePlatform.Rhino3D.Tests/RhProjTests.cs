@@ -2,8 +2,10 @@ using System;
 using System.IO;
 using System.Linq;
 using System.IO.Compression;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Resources;
 
 using NUnit.Framework;
 
@@ -11,14 +13,11 @@ using Rhino.Runtime.Code;
 using Rhino.Runtime.Code.Languages;
 using Rhino.Runtime.Code.Platform;
 using Rhino.Runtime.Code.Projects;
-using Rhino.Runtime.Code.Diagnostics;
 using Rhino.Runtime.Code.Execution;
 using Rhino.Runtime.Code.Storage;
 
 using Mono.Cecil;
-using Mono.Cecil.Cil;
-using System.Resources;
-using System.Collections;
+using RhinoCodePlatform.Projects;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -168,8 +167,19 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             string ruiFile = Path.Combine(buildPath, "rh8", "TestMultiple.rui");
             string rui = File.ReadAllText(ruiFile);
-            Assert.IsTrue(rui.Contains("<icon guid=\"a55c3fa8-6202-45c1-8d79-e3641411fc18\">"));
-            Assert.IsTrue(rui.Contains("<icon guid=\"21ace57c-eb59-45b2-8e8a-c82b6b128d36\">"));
+
+            Rhino3DCommand c;
+            Rhino3DCommand[] commands = project.GetCodes().OfType<Rhino3DCommand>().ToArray();
+
+            c = commands[0];
+            Assert.IsTrue(rui.Contains("<tool_bar_item guid=\"a55c3fa8-6202-45c1-8d79-e3641411fc18\""));
+            Assert.IsTrue(rui.Contains($"<macro_item guid=\"{c.Box.Id.ToString().ToLower()}\""));
+            Assert.IsTrue(rui.Contains($"<icon guid=\"{c.Box.ImageId.ToString().ToLower()}\""));
+
+            c = commands[1];
+            Assert.IsTrue(rui.Contains("<tool_bar_item guid=\"21ace57c-eb59-45b2-8e8a-c82b6b128d36\""));
+            Assert.IsTrue(rui.Contains($"<macro_item guid=\"{c.Box.Id.ToString().ToLower()}\""));
+            Assert.IsTrue(rui.Contains($"<icon guid=\"{c.Box.ImageId.ToString().ToLower()}\""));
 
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testmultiple-0.1.1234-rh8-any.yak")));
 
@@ -211,8 +221,19 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             string ruiFile = Path.Combine(buildPath, "rh8", "TestMultipleExcluded.rui");
             string rui = File.ReadAllText(ruiFile);
-            Assert.IsTrue(rui.Contains("<icon guid=\"a55c3fa8-6202-45c1-8d79-e3641411fc18\">"));
-            Assert.IsFalse(rui.Contains("<icon guid=\"21ace57c-eb59-45b2-8e8a-c82b6b128d36\">"));
+
+            Rhino3DCommand c;
+            Rhino3DCommand[] commands = project.GetCodes().OfType<Rhino3DCommand>().ToArray();
+
+            c = commands[0];
+            Assert.IsTrue(rui.Contains("<tool_bar_item guid=\"a55c3fa8-6202-45c1-8d79-e3641411fc18\""));
+            Assert.IsTrue(rui.Contains($"<macro_item guid=\"{c.Box.Id.ToString().ToLower()}\""));
+            Assert.IsTrue(rui.Contains($"<icon guid=\"{c.Box.ImageId.ToString().ToLower()}\""));
+
+            c = commands[1];
+            Assert.IsFalse(rui.Contains("<tool_bar_item guid=\"21ace57c-eb59-45b2-8e8a-c82b6b128d36\""));
+            Assert.IsFalse(rui.Contains($"<macro_item guid=\"{c.Box.Id.ToString().ToLower()}\""));
+            Assert.IsFalse(rui.Contains($"<icon guid=\"{c.Box.ImageId.ToString().ToLower()}\""));
 
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testmultipleexcluded-0.1.1234-rh8-any.yak")));
 
@@ -658,12 +679,19 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             string ruiFile = Path.Combine(buildPath, "rh8", "TestHiddenCommandWithIcon.rui");
             Assert.IsTrue(File.Exists(ruiFile));
 
+            Rhino3DCommand c;
+            Rhino3DCommand[] commands = project.GetCodes().OfType<Rhino3DCommand>().ToArray();
+
+            c = commands[0];
             string rui = File.ReadAllText(ruiFile);
             Assert.IsTrue(rui.Contains("<tool_bar_item guid=\"561b03f8-e4d9-48ff-b594-3a53e223aca8\""));
-            Assert.IsTrue(rui.Contains("<icon guid=\"561b03f8-e4d9-48ff-b594-3a53e223aca8\""));
+            Assert.IsTrue(rui.Contains($"<macro_item guid=\"{c.Box.Id.ToString().ToLower()}\""));
+            Assert.IsTrue(rui.Contains($"<icon guid=\"{c.Box.ImageId.ToString().ToLower()}\""));
 
+            c = commands[1];
             Assert.IsFalse(rui.Contains("<tool_bar_item guid=\"a3b65e88-1deb-4068-b407-a95e084a9013\""));
-            Assert.IsFalse(rui.Contains("<icon guid=\"a3b65e88-1deb-4068-b407-a95e084a9013\""));
+            Assert.IsFalse(rui.Contains($"<macro_item guid=\"{c.Box.Id.ToString().ToLower()}\""));
+            Assert.IsFalse(rui.Contains($"<icon guid=\"{c.Box.ImageId.ToString().ToLower()}\""));
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
         }
@@ -769,8 +797,20 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string ruiFile = Path.Combine(buildPath, project.Settings.PackageBuild.Slug, "TestCommandDefaultIcon.rui");
             string rui = File.ReadAllText(ruiFile);
-            Assert.IsTrue(rui.Contains("<icon guid=\"a55c3fa8-6202-45c1-8d79-e3641411fc18\">"));
-            Assert.IsTrue(rui.Contains("<icon guid=\"21ace57c-eb59-45b2-8e8a-c82b6b128d36\">"));
+
+            Rhino3DCommand c;
+            Rhino3DCommand[] commands = project.GetCodes().OfType<Rhino3DCommand>().ToArray();
+
+            c = commands[0];
+            Assert.IsTrue(rui.Contains("<tool_bar_item guid=\"a55c3fa8-6202-45c1-8d79-e3641411fc18\""));
+            Assert.IsTrue(rui.Contains($"<macro_item guid=\"{c.Box.Id.ToString().ToLower()}\""));
+            Assert.IsTrue(rui.Contains($"<icon guid=\"{c.Box.ImageId.ToString().ToLower()}\""));
+
+            c = commands[1];
+            Assert.IsTrue(rui.Contains("<tool_bar_item guid=\"21ace57c-eb59-45b2-8e8a-c82b6b128d36\""));
+            Assert.IsTrue(rui.Contains($"<macro_item guid=\"{c.Box.Id.ToString().ToLower()}\""));
+            Assert.IsTrue(rui.Contains($"<icon guid=\"{c.Box.ImageId.ToString().ToLower()}\""));
+
             Assert.IsTrue(rui.Contains("<light><svg"));
             Assert.IsTrue(rui.Contains("<dark><svg"));
 
