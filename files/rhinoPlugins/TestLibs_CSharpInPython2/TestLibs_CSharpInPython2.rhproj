@@ -5,6 +5,16 @@
     "os": "windows",
     "arch": "x64"
   },
+  "bar": {
+    "id": "ea118ae3-545b-4527-ac79-fc161ee6ca86",
+    "tray": {
+      "id": "23c7ae26-bf47-48e0-87b3-244c0c05b48c",
+      "box": {
+        "id": "4925b1a4-9e46-4e34-8af4-5662735c6dfb",
+        "imageId": "ea2eebf0-d773-43a9-a1af-d40227a0af1d"
+      }
+    }
+  },
   "id": "58cc4446-2426-4132-b2a9-b7ae92cabf43",
   "identity": {
     "name": "TestLibs_CSharpInPython2",
@@ -20,16 +30,13 @@
   },
   "settings": {
     "buildPath": "build/",
-    "buildTarget": {
+    "packageBuild": {
       "host": {
         "name": "Rhino3D",
         "version": "8"
       },
       "title": "Rhino3D (8.*)",
       "slug": "rh8"
-    },
-    "publishTarget": {
-      "title": "McNeel Yak Server"
     }
   },
   "codes": [
@@ -40,7 +47,11 @@
         "version": "2.*.*"
       },
       "title": "TestCSharpInPython2",
-      "uri": "TestCSharpInPython2.py"
+      "uri": "TestCSharpInPython2.py",
+      "box": {
+        "id": "e5e822e2-a711-49db-8975-02a9c7a006c8",
+        "imageId": "5768d4ba-2fc1-4782-a37a-eb7ed1cd0986"
+      }
     }
   ],
   "libraries": [

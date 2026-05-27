@@ -5,10 +5,20 @@
     "os": "windows",
     "arch": "x64"
   },
+  "bar": {
+    "id": "41e5a4d4-4878-4624-aa83-d9320f9aa1b0",
+    "tray": {
+      "id": "699a1d8a-0310-43c7-b312-ff3ed6f23fbd",
+      "box": {
+        "id": "88d58746-b013-454a-a3b4-fe2dab385bcd",
+        "imageId": "c8d071ed-bf72-4a57-9567-384eb254ce65"
+      }
+    }
+  },
   "id": "d1c24497-5cd8-4b7e-a219-3e84c2deaea3",
   "identity": {
     "name": "TestLibraries",
-    "version": "0.1",
+    "version": "0.1.0",
     "publisher": {
       "email": "ehsan@mcneel.com",
       "name": "Ehsan Iran-Nejad",
@@ -16,20 +26,69 @@
       "phone": "\u002B1 (888)-888 8888",
       "address": "Pacific Northwest",
       "country": "USA"
+    },
+    "description": "Desc",
+    "image": {
+      "light": {
+        "type": "svg",
+        "data": "PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmlld0JveD0iMCAwIDQ4IDQ4IiBmaWxsLWRhcms9IiNGRkYiIHN0cm9rZS1kYXJrPSJub25lIj4NCiAgPGNpcmNsZSBmaWxsPSJub25lIiBmaWxsLWRhcms9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLWRhcms9IiNGRkYiIHN0cm9rZS13aWR0aD0iMSIgcj0iOC4wNjIyNTc3NjY3MjM2MzMiIGN4PSIyMy41IiBjeT0iMjEuNSIgLz4NCjwvc3ZnPg=="
+      },
+      "dark": {
+        "type": "svg",
+        "data": "PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmlld0JveD0iMCAwIDQ4IDQ4IiBmaWxsLWRhcms9IiNGRkYiIHN0cm9rZS1kYXJrPSJub25lIj4NCiAgPGNpcmNsZSBmaWxsPSJub25lIiBmaWxsLWRhcms9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLWRhcms9IiNGRkYiIHN0cm9rZS13aWR0aD0iMSIgcj0iMTIuMjA2NTU1MzY2NTE2MTEzIiBjeD0iMjIuNSIgY3k9IjIyLjUiIC8\u002BDQo8L3N2Zz4="
+      },
+      "packageIcon": {
+        "light": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAAYJJREFUeF7t2G1NA0EUheEjAQlIwAE4AAfgAByAA3AADsABOAAH4AAcQN7kTrKZlMB0ZtK9zXmS/mgLzd67Z3Y\u002BJDMzMzMzMzMzm\u002BpA0rmka0nP8XqM96f1H\u002B\u002BTwyj0O15fkl4kPUh6W3z\u002BGc2gUXvjclH0RTRjkyNJN4tG8D69\u002ByjoqeGuUvhHNIGGpVXu5jZF0CyGR9oknETxd/UXDWhCScJ/07Ma7/Fw68Xdp5GkKY2zuOhR0aV4UpBGmdpGKSmgsSlwt3jqj5RqGMy4WBJFslKgAcwCI5EoVo4p0ICr\u002BsNOFJ\u002BqAT3z/yY8V0YPq2lGx5W9w7Yryp0g/lzwqNUbhY/8vem4UHZ\u002BbH978VvEP80MUJSNUO/ipZwh/LaFXjXm7p6NTIl\u002BmrFfo/DShJYk8H\u002B3UXy66NcohhmBYojzX2lg3f86aTW5UxTDg5HCOAjlpIijsuM4A6Q5bKH5ntSMXkmuAnef8cw6gUKXLw4\u002BiHvLUDEzMzMzMzMzMzMzM2vyA1xiYE4BYEAIAAAAAElFTkSuQmCC",
+          "width": 64,
+          "height": 64
+        },
+        "dark": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAAdVJREFUeF7tmeFNxDAMRr8RGIER2AQ2gE1gA9gANuA2gA1gA9gANgA9KUYoOtRyNHFKvyflxzWJnTi2z2klY4wxxhhjjDHNOJV0K\u002BmhtLfS4jd9jPlXHEu6l/RR2rOkO0lXVeMZfTGOOcxdLSyeE2Uzj5IuJB3Vg/bAPMaGMZCxOkOcFNd\u002BLZs5FOYiA1nIXAUsmpPDpeec\u002BBTIQBYy/2LMLsTmiemlQebQRsBFW20\u002BCCMMFw4kKeIUV23NrugaKjGycZLVEjE/BTrQ1cPYs\u002BAkesdm5JohvACX5H\u002B\u002BN9QJ6E6n9\u002BkH4QWpnJVF9Ij9mgg91pBG1O9ZxL0iDWI/cwHozsg/X6C8ZeEzBbpTDUBBkm0A1pDG\u002BwAGYA1pbD4ENp8EWcBT/bAj6M48ABdCsOlSGLiQ8Eq7N7j/EJehzV\u002BHgUT00ikXoANdqcmvhpOgIOEdfmv4YIKuYU4/6PFS9GbUl6JBxOZl3bEA1wm55iDCCITDEjkBGfFtcfjNB7gocUqyOq87fwFzkYGsYd3\u002BJ0hS8UmL/2w2MydxMYaxzGEuMubMGxYWT8HCZsIYhAd54nvjWWyaxpxVb3wf1O1xg6Ph2rT4TV96bW\u002BMMcYYY4wxxhizCT4BzxOInd5YwKUAAAAASUVORK5CYII=",
+          "width": 64,
+          "height": 64
+        }
+      },
+      "projectIcon": {
+        "light": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAAJxJREFUSEvt0jEKAkEMBdCHhYUIghfwBGJpJVhYi2CnpRdQj\u002BDJ5ReCDC7L7oqN88rMEMJPqKpfGWGHEw5Ylh\u002BGmOCBNRZYYY9N\u002BbGPTJ7mnxyxLYtdJZZM3uSOcVnsIpknlibnlvdWWWgyb3LDrCx2kWvJQj\u002BZ41IW\u002B8i1ZKHv0vyKaVHvLdeShSbzxJLJv9b8JdeShQ7KvKr\u002B0RPHUgrlVKThRAAAAABJRU5ErkJggg==",
+          "width": 24,
+          "height": 24
+        },
+        "dark": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAANJJREFUSEvtkzEPwVAURs9gQGJks0kMNiazhDAwMDERidgs/H45CctNta/tJOkZv9e\u002B3t57LjT8Cx1gBEyAYTysQxs4AC/gBOyAI3AHpvHhsrSAJzCOB0AXWAOzeJCKlVt1EVtgEcMUbEtW5VlcgUEM83CgKdV/mQOrGOahLQ40Fa26xDAPVdSWVPplP2BFqpiKf7yPYRF6roopLKvshC9sYphBD7jFMBWXSM9/4eWPz85UxiXSc1V0Ng7UntsWK691\u002BReXSM/PH1scaOmeNzRU5w1iCxBefXTi/wAAAABJRU5ErkJggg==",
+          "width": 24,
+          "height": 24
+        },
+        "icoData": "AAABAAEAGBgAAAEAIAAVAQAAFgAAAIlQTkcNChoKAAAADUlIRFIAAAAYAAAAGAgGAAAA4Hc9\u002BAAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAC3SURBVEhL7dMxSgNBGIbhxw2kEEFJsWAVz2CTSgjiDbyIWKfKbTxPBKs0VtpFkWCZZorhMxqXtPOU7/zwLzMsTXOskwy/6HCLHlusscqhfUYZ9jjFAs94wTeuyrLXHB6qwzJjcY95xqHuMMtYecQ4Y63LEHq8Zay84zJj7dCCLS4yVnpsMtYOLVhjmrGY4BMfeTDUTXnQ2gQPOIv\u002Bw3//gzmuy5335cuf8JWDxxiX6zrPg6Zp/rYDUfcVplbjNZoAAAAASUVORK5CYII="
+      },
+      "categoryIcon": {
+        "light": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAAF5JREFUOE/t0CEOg0AQBdAXUkGvUNGeAkRxKDA0cP/DEJIVZMSyK\u002Bp4bv9OfibDLafHhhWv\u002BHllwPv0HmtKGiwxTNsUeWKKYU3BIQ5/0IUs65FKZvzwjQOl2nST2z/twQQExrz3NNQAAAAASUVORK5CYII=",
+          "width": 16,
+          "height": 16
+        },
+        "dark": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAAGFJREFUOE9jYBi2QIeBgSGIgYEhFEqD\u002BEQDWwYGBiU0MRDfBk0MKwDZhK4ZBpQZGBi00QXRAci5\u002BAAhebCf8QFC8gRtICRPeRiAACi0QYqRAYhvjSaGF4BsQk4HRNk8UgEAuP0HRb1xqlUAAAAASUVORK5CYII=",
+          "width": 16,
+          "height": 16
+        }
+      }
     }
   },
   "settings": {
     "buildPath": "build/",
-    "buildTarget": {
+    "packageBuild": {
       "host": {
         "name": "Rhino3D",
-        "version": "8"
+        "version": "8.*"
       },
       "title": "Rhino3D (8.*)",
       "slug": "rh8"
     },
-    "publishTarget": {
-      "title": "McNeel Yak Server"
+    "packageServer": {
+      "id": "mcneel.yak.public",
+      "title": "McNeel Yak Server (yak.rhino3d.com)"
     }
   },
   "codes": [
@@ -40,7 +99,11 @@
         "version": "*.*.*"
       },
       "title": "TestCLibrary",
-      "uri": "TestC#Library.cs"
+      "uri": "TestC#Library.cs",
+      "box": {
+        "id": "1cf1d246-1797-45dd-bf76-ba481b756be9",
+        "imageId": "e8249df0-4ab8-45f8-8b3d-4fb4f388f300"
+      }
     },
     {
       "id": "6ba4d493-b96a-405f-9c0a-59126cc06777",
@@ -49,7 +112,11 @@
         "version": "3.*.*"
       },
       "title": "TestPython3Library",
-      "uri": "TestPython3Library.py"
+      "uri": "TestPython3Library.py",
+      "box": {
+        "id": "58f50b6c-1d94-455a-bf56-4ec493081689",
+        "imageId": "29311e0c-22a7-4829-9884-642f15df38a3"
+      }
     },
     {
       "id": "abd279e8-7672-429c-9033-10dc87f4af2f",
@@ -58,7 +125,11 @@
         "version": "2.*.*"
       },
       "title": "TestPython2Library",
-      "uri": "TestPython2Library.py"
+      "uri": "TestPython2Library.py",
+      "box": {
+        "id": "65354841-430f-4a1f-b208-f5a98eaf95f8",
+        "imageId": "b20e914e-00e9-4917-9b3c-0f740ea0bace"
+      }
     }
   ],
   "libraries": [
