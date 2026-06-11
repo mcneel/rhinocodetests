@@ -24,6 +24,7 @@ using Rhino.Runtime.Code.Text;
 using System.Text.RegularExpressions;
 
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
+using Mono.Cecil;
 
 namespace RhinoCodePlatform.Rhino3D.Tests
 {
@@ -5181,25 +5182,73 @@ IList t = new ";
             Assert.GreaterOrEqual(completions.Length, 5);
 
             CompletionInfo c;
+            int index = 0;
 
-            c = completions[0];
-            Assert.AreEqual(nameof(System.Collections.ArrayList), c.Text);
-            Assert.AreEqual(CompletionKind.Class, c.Kind);
-
-            c = completions[1];
+            c = completions[index];
             Assert.AreEqual(nameof(System.Collections.CollectionBase), c.Text);
             Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
 
-            c = completions[2];
+            c = completions[index];
+            Assert.AreEqual(nameof(System.Collections.ArrayList), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
+
+            c = completions[index];
             Assert.AreEqual("List<T>", c.Text);
             Assert.AreEqual(CompletionKind.Class, c.Kind);
             Assert.AreEqual("List", c.CommitText);
+            index++;
 
-            int index = 3;
+            c = completions[index];
+            Assert.AreEqual(nameof(Rhino.Geometry.Polyline), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
+
+            c = completions[index];
+            Assert.AreEqual(nameof(Rhino.Geometry.Interpolator), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_ObjectCreation_Imported_IList_NET9_0()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-96184
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+// net9.0
+using System.Collections;
+using System.Collections.Generic;
+using Rhino.Geometry;
+IList t = new ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 5);
+
+            CompletionInfo c;
+            int index = 0;
+
+            c = completions[index];
+            Assert.AreEqual(nameof(System.Collections.CollectionBase), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
+
+            c = completions[index];
+            Assert.AreEqual(nameof(System.Collections.ArrayList), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
 
             c = completions[index];
             Assert.AreEqual("OrderedDictionary<TKey, TValue>", c.Text);
             Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
+
+            c = completions[index];
+            Assert.AreEqual("List<T>", c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            Assert.AreEqual("List", c.CommitText);
             index++;
 
             c = completions[index];
@@ -5377,34 +5426,104 @@ IList t = ";
             Assert.GreaterOrEqual(completions.Length, 9);
 
             CompletionInfo c;
+            int index = 0;
 
-            c = completions[0];
+            c = completions[index];
+            Assert.AreEqual(nameof(System.Collections.CollectionBase), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
+
+            c = completions[index];
             Assert.AreEqual(nameof(System.Collections.ArrayList), c.Text);
             Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
 
-            c = completions[1];
+            c = completions[index];
             Assert.AreEqual(nameof(System.Collections.IList), c.Text);
             Assert.AreEqual(CompletionKind.Interface, c.Kind);
+            index++;
 
-            c = completions[2];
+            c = completions[index];
             Assert.AreEqual(nameof(System.Collections.IList) + "<T>", c.Text);
             Assert.AreEqual(CompletionKind.Interface, c.Kind);
             Assert.AreEqual(nameof(System.Collections.IList), c.CommitText);
+            index++;
 
-            c = completions[3];
-            Assert.AreEqual(nameof(System.Collections.CollectionBase), c.Text);
-            Assert.AreEqual(CompletionKind.Class, c.Kind);
-
-            c = completions[4];
+            c = completions[index];
             Assert.AreEqual("List<T>", c.Text);
             Assert.AreEqual(CompletionKind.Class, c.Kind);
             Assert.AreEqual("List", c.CommitText);
+            index++;
 
-            int index = 5;
+            c = completions[index];
+            Assert.AreEqual(nameof(Rhino.Geometry.Polyline), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
+
+            c = completions[index];
+            Assert.AreEqual(nameof(Rhino.Geometry.Interpolator), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
+
+            c = completions[index];
+            Assert.AreEqual("new", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+            index++;
+
+            c = completions[index];
+            Assert.AreEqual("default", c.Text);
+            Assert.AreEqual(CompletionKind.Keyword, c.Kind);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Assignment_Imported_IList_NET9_0()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86465
+            string s = @"// #! csharp
+// net9.0
+using System.Collections;
+using System.Collections.Generic;
+using Rhino.Geometry;
+IList t = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length).ToArray();
+
+            Assert.GreaterOrEqual(completions.Length, 9);
+
+            CompletionInfo c;
+            int index = 0;
+
+            c = completions[index];
+            Assert.AreEqual(nameof(System.Collections.CollectionBase), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
+
+            c = completions[index];
+            Assert.AreEqual(nameof(System.Collections.ArrayList), c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
+
+            c = completions[index];
+            Assert.AreEqual(nameof(System.Collections.IList), c.Text);
+            Assert.AreEqual(CompletionKind.Interface, c.Kind);
+            index++;
+
+            c = completions[index];
+            Assert.AreEqual(nameof(System.Collections.IList) + "<T>", c.Text);
+            Assert.AreEqual(CompletionKind.Interface, c.Kind);
+            Assert.AreEqual(nameof(System.Collections.IList), c.CommitText);
+            index++;
 
             c = completions[index];
             Assert.AreEqual("OrderedDictionary<TKey, TValue>", c.Text);
             Assert.AreEqual(CompletionKind.Class, c.Kind);
+            index++;
+
+            c = completions[index];
+            Assert.AreEqual("List<T>", c.Text);
+            Assert.AreEqual(CompletionKind.Class, c.Kind);
+            Assert.AreEqual("List", c.CommitText);
             index++;
 
             c = completions[index];
@@ -8426,6 +8545,100 @@ Test2();
             Assert.That(frame, Is.EqualTo("Main()"));
         }
 
+        [Test]
+        public void TestCSharp_Compile_NET8_0()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-96184
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+using System;
+Console.WriteLine(""Test"");
+");
+
+            SourceBinary b = code.BuildBinary(new BuildContext());
+            EnsureTargetFramework(b, TargetFramework.NETCore(8, 0));
+        }
+
+        [Test]
+        public void TestCSharp_Compile_NET9_0()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-96184
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"// net9.0
+using System;
+Console.WriteLine(""Test"");
+");
+
+            SourceBinary b = code.BuildBinary(new BuildContext());
+            EnsureTargetFramework(b, TargetFramework.NETCore(9, 0));
+        }
+
+        [Test]
+        public void TestCSharp_Compile_NET10_0()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-96184
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"// net10.0
+using System;
+Console.WriteLine(""Test"");
+");
+
+            SourceBinary b = code.BuildBinary(new BuildContext());
+            EnsureTargetFramework(b, TargetFramework.NETCore(10, 0));
+        }
+
+        [Test]
+        public void TestCSharp_Compile_NETFramework_Long()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-96184
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"// netframework
+using System;
+Console.WriteLine(""Test"");
+");
+
+            SourceBinary b = code.BuildBinary(new BuildContext());
+            EnsureTargetFramework(b, TargetFramework.LatestNETFramework);
+        }
+
+        [Test]
+        public void TestCSharp_Compile_NETFramework()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-96184
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"// netfx
+using System;
+Console.WriteLine(""Test"");
+");
+
+            SourceBinary b = code.BuildBinary(new BuildContext());
+            EnsureTargetFramework(b, TargetFramework.LatestNETFramework);
+        }
+
+        [Test]
+        public void TestCSharp_Compile_NETStandard()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-96184
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"// netstandard
+using System;
+Console.WriteLine(""Test"");
+");
+
+            SourceBinary b = code.BuildBinary(new BuildContext());
+            EnsureTargetFramework(b, TargetFramework.LatestNETStandard);
+        }
+
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
+
+        static void EnsureTargetFramework(SourceBinary binary, TargetFramework framework)
+        {
+            const string ATTR = "System.Runtime.Versioning.TargetFrameworkAttribute";
+            using var ms = new MemoryStream(binary.Data);
+            using var asm = AssemblyDefinition.ReadAssembly(ms);
+            string fwstr = asm.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName == ATTR)?.ConstructorArguments[0].Value as string;
+            // e.g. ".NETCoreApp,Version=v8.0"
+            Assert.That(fwstr.StartsWith(framework.GetTargetFrameworkAttributeString()));
+        }
     }
 }

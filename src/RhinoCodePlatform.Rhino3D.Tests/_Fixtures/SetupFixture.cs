@@ -206,7 +206,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         static void LoadRhinoPlugins()
         {
-            string testPluginsPath = Path.Combine(s_settings.TestFilesDirectory, "rhinoPlugins");
+            string testPluginsPath = Path.GetFullPath(Path.Combine(s_settings.TestFilesDirectory, "rhinoPlugins"));
 
             if (Directory.Exists(testPluginsPath))
             {
@@ -233,7 +233,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         static void LoadGrasshopperPlugins()
         {
-            string testPluginsPath = Path.Combine(s_settings.TestFilesDirectory, "gh1Plugins");
+            string testPluginsPath = Path.GetFullPath(Path.Combine(s_settings.TestFilesDirectory, "gh1Plugins"));
 
             if (Directory.Exists(testPluginsPath))
             {
