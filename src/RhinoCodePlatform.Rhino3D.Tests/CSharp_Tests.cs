@@ -8629,6 +8629,204 @@ Console.WriteLine(""Test"");
             EnsureTargetFramework(b, TargetFramework.LatestNETStandard);
         }
 
+        [Test]
+        public void TestCSharp_Compile_NET8_0_Guards()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-96184
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"
+
+int Test() {
+#if NET8_0
+    return 42;
+#else
+    return 0;
+#endif
+}
+
+x = Test();
+");
+
+            RunContext c = GetRunContext();
+            c.Outputs.Set("x", 0);
+            code.Run(c);
+
+            int result = c.Outputs.Get<int>("x");
+            Assert.AreEqual(42, result);
+        }
+
+        [Test]
+        public void TestCSharp_Compile_NET9_0_Guards()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-96184
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"// net9.0
+
+int Test() {
+#if NET9_0
+    return 42;
+#else
+    return 0;
+#endif
+}
+
+x = Test();
+");
+
+            RunContext c = GetRunContext();
+            c.Outputs.Set("x", 0);
+            code.Run(c);
+
+            int result = c.Outputs.Get<int>("x");
+            Assert.AreEqual(42, result);
+        }
+
+        [Test]
+        public void TestCSharp_Compile_NET10_0_Guards()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-96184
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"// net10.0
+
+int Test() {
+#if NET10_0
+    return 42;
+#else
+    return 0;
+#endif
+}
+
+x = Test();
+");
+
+            RunContext c = GetRunContext();
+            c.Outputs.Set("x", 0);
+            code.Run(c);
+
+            int result = c.Outputs.Get<int>("x");
+            Assert.AreEqual(42, result);
+        }
+
+        [Test]
+        public void TestCSharp_Compile_NETX_OR_GREATER_Guards()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-96184
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"// net10.0
+
+int Test8() {
+#if NET8_0_OR_GREATER
+    return 42;
+#else
+    return 0;
+#endif
+}
+
+int Test9() {
+#if NET9_0_OR_GREATER
+    return 42;
+#else
+    return 0;
+#endif
+}
+
+int Test10() {
+#if NET10_0_OR_GREATER
+    return 42;
+#else
+    return 0;
+#endif
+}
+
+x = Test10() + Test9() + Test8();
+");
+
+            RunContext c = GetRunContext();
+            c.Outputs.Set("x", 0);
+            code.Run(c);
+
+            int result = c.Outputs.Get<int>("x");
+            Assert.AreEqual(42 * 3, result);
+        }
+
+        [Test]
+        public void TestCSharp_Compile_NETFramework_Long_Guards()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-96184
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"// netframework
+
+int Test() {
+#if NETFRAMEWORK
+    return 42;
+#else
+    return 0;
+#endif
+}
+
+x = Test();
+");
+
+            RunContext c = GetRunContext();
+            c.Outputs.Set("x", 0);
+            code.Run(c);
+
+            int result = c.Outputs.Get<int>("x");
+            Assert.AreEqual(42, result);
+        }
+
+        [Test]
+        public void TestCSharp_Compile_NETFramework_Guards()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-96184
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"// netfx
+
+int Test() {
+#if NETFRAMEWORK
+    return 42;
+#else
+    return 0;
+#endif
+}
+
+x = Test();
+");
+
+            RunContext c = GetRunContext();
+            c.Outputs.Set("x", 0);
+            code.Run(c);
+
+            int result = c.Outputs.Get<int>("x");
+            Assert.AreEqual(42, result);
+        }
+
+        [Test]
+        public void TestCSharp_Compile_NETStandard_Guards()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-96184
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"// netstandard
+
+int Test() {
+#if NETSTANDARD
+    return 42;
+#else
+    return 0;
+#endif
+}
+
+x = Test();
+");
+
+            RunContext c = GetRunContext();
+            c.Outputs.Set("x", 0);
+            code.Run(c);
+
+            int result = c.Outputs.Get<int>("x");
+            Assert.AreEqual(42, result);
+        }
+
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
 
         static void EnsureTargetFramework(SourceBinary binary, TargetFramework framework)
