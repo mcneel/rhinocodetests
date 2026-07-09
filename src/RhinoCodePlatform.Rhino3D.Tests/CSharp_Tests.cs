@@ -8827,6 +8827,57 @@ x = Test();
             Assert.AreEqual(42, result);
         }
 
+        [Test]
+        public void TestCSharp_Unassigned_Global_Compile()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-95196
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"using System;
+void Test() {
+  int m = M();
+  SomeCall(out int[] numbers);
+  int M()
+  {
+    return numbers[0];
+  }
+}
+
+void SomeCall(out int[] numbers)
+{
+  numbers = Array.Empty<int>();
+}
+
+Test();
+");
+
+            CompileException ex = Assert.Throws<CompileException>(() => code.Build(new BuildContext()));
+            Assert.AreEqual(3, ex.Diagnosis.First().Reference.Position.LineNumber);
+        }
+
+        [Test]
+        public void TestCSharp_Unassigned_Global_DebugCompile()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-95196
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"using System;
+int m = M();
+SomeCall(out int[] numbers);
+int M()
+{
+    // ensure breakpoint here does not try to capture global 'm' or 'numbers'
+    return 42;
+}
+
+void SomeCall(out int[] numbers)
+{
+  numbers = Array.Empty<int>();
+}
+");
+
+            code.DebugControls = new DebugContinueAllControls();
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
 
         static void EnsureTargetFramework(SourceBinary binary, TargetFramework framework)
