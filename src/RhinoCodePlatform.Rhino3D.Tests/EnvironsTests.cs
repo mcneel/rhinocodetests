@@ -228,7 +228,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       IPackageInfo pi = pinfos.FirstOrDefault(p => p.Id.StartsWith("G2ScriptComponents"));
       Assert.NotNull(pi);
 
-      Assert.IsTrue(pi.Description.StartsWith("Mixed Grasshopper v2 & Rhino Plugin"));
+      Assert.IsTrue(pi.Description.StartsWith("Components for the creation and execution of scripts."));
     }
 
     [Test]
