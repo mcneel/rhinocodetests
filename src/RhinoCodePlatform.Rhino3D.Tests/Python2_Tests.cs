@@ -1724,6 +1724,67 @@ pass_in_middle()            # LINE 9
         }
 
         [Test]
+        public void TestPython2_DebugTracing_CallStack_CrossFile_Returns()
+        {
+            // NOTE:
+            // returning from a scope that is running code in another file
+            // (e.g. a function in an imported module) must pop the leftover
+            // 'return' frame of that inner scope, even though the code
+            // references of the two frames do not match. otherwise 'return'
+            // frames accumulate and duplicate frames are left on the
+            // callstack on every call
+            TryGetTestFilesPath(out string fileDir);
+            string moduleDir = Path.Combine(fileDir, "py2", "debug_stack");
+
+            Code code = GetLanguage(LanguageSpec.Python2).CreateCode(
+$@"
+import sys
+sys.path.insert(0, r""{moduleDir}"")
+import debug_stack_mod
+def Test():
+    return debug_stack_mod.get_value()
+Test()
+Test()
+Test()
+");
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventDepthStep>
+            {
+                // pause on first Test() call. callstack: module
+                new (7, ExecEvent.Line, 1, true, DebugAction.StepIn),
+                // pause inside Test(). callstack: Test > module
+                new (6, ExecEvent.Line, 2, true, DebugAction.StepIn),
+                // pause inside debug_stack_mod.get_value() in the module file.
+                // callstack: get_value > Test > module
+                new (-1, ExecEvent.Line, 3, false, DebugAction.Continue),
+                // pause on second Test() call. 'return' frames of the completed
+                // call (get_value and Test) must be unrolled. callstack: module
+                new (8, ExecEvent.Line, 1, true, DebugAction.Continue),
+                // pause on third Test() call. callstack: module
+                new (9, ExecEvent.Line, 1, true, DebugAction.Continue),
+            };
+
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 7));
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 8));
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 9));
+
+            controls.PauseOnStep += (ExpectedPauseEventDepthStep step, ExecFrame frame) =>
+            {
+                Assert.AreEqual(step.Event, frame.Event);
+                if (step.Line > 0)
+                    Assert.AreEqual(step.Line, frame.Reference.Position.LineNumber);
+                if (step.InCodeFile)
+                    Assert.AreEqual(code.Uri, frame.Reference.Uri);
+                else
+                    Assert.AreNotEqual(code.Uri, frame.Reference.Uri);
+                Assert.AreEqual(step.Depth, controls.Results.CurrentThread.Frames.Length);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test]
         public void TestPython2_ExecuteTrace_SyntaxError()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-85987
