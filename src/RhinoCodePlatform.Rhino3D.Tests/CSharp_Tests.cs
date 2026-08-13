@@ -2598,69 +2598,6 @@ Test();            // LINE 8
             Assert.IsTrue(controls.Pass);
         }
 
-        [Test]
-        public void TestCSharp_DebugTracing_CallStack_CrossFile_Returns()
-        {
-            // NOTE:
-            // returning from a scope that is running code in another file
-            // (e.g. a method in a library source) must pop the leftover
-            // 'return' frame of that inner scope, even though the code
-            // references of the two frames do not match. otherwise 'return'
-            // frames accumulate and duplicate frames are left on the
-            // callstack on every call
-            ILanguage csharp = GetLanguage(LanguageSpec.CSharp);
-
-            TryGetTestFilesPath(out string fileDir);
-            ILanguageLibrary library = csharp.CreateLibrary(new Uri(Path.Combine(fileDir, "cs", "debug_stack")));
-
-            Code code = csharp.CreateCode(
-@"
-using StackDebug;
-int Test() {
-    return StackLib.GetValue();
-}
-Test();
-Test();
-Test();
-");
-            code.Libraries.Add(library);
-
-            var controls = new DebugPauseDetectorControls<ExpectedPauseEventDepthStep>
-            {
-                // pause on first Test() call. callstack: script
-                new (6, ExecEvent.Line, 1, true, DebugAction.StepIn),
-                // pause inside Test(). callstack: Test > script
-                new (4, ExecEvent.Line, 2, true, DebugAction.StepIn),
-                // pause inside StackLib.GetValue() in the library file.
-                // callstack: GetValue > Test > script
-                new (-1, ExecEvent.Line, 3, false, DebugAction.Continue),
-                // pause on second Test() call. 'return' frames of the completed
-                // call (GetValue and Test) must be unrolled. callstack: script
-                new (7, ExecEvent.Line, 1, true, DebugAction.Continue),
-                // pause on third Test() call. callstack: script
-                new (8, ExecEvent.Line, 1, true, DebugAction.Continue),
-            };
-
-            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 6));
-            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 7));
-            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 8));
-
-            controls.PauseOnStep += (ExpectedPauseEventDepthStep step, ExecFrame frame) =>
-            {
-                Assert.AreEqual(step.Event, frame.Event);
-                if (step.Line > 0)
-                    Assert.AreEqual(step.Line, frame.Reference.Position.LineNumber);
-                if (step.InCodeFile)
-                    Assert.AreEqual(code.Uri, frame.Reference.Uri);
-                else
-                    Assert.AreNotEqual(code.Uri, frame.Reference.Uri);
-                Assert.AreEqual(step.Depth, controls.Results.CurrentThread.Frames.Length);
-            };
-
-            code.DebugControls = controls;
-            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
-        }
-
         static IEnumerable<TestCaseData> GetLoopVariableSources()
         {
             const string INDEX_VAR = "i";
@@ -8938,6 +8875,64 @@ void SomeCall(out int[] numbers)
 ");
 
             code.DebugControls = new DebugContinueAllControls();
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test]
+        public void TestCSharp_DebugTracing_CallStack_CrossFile_Returns()
+        {
+            // NOTE:
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-97648
+            ILanguage csharp = GetLanguage(LanguageSpec.CSharp);
+
+            TryGetTestFilesPath(out string fileDir);
+            ILanguageLibrary library = csharp.CreateLibrary(new Uri(Path.Combine(fileDir, "cs", "debug_stack")));
+
+            Code code = csharp.CreateCode(
+@"
+using StackDebug;
+int Test() {
+    return StackLib.GetValue();
+}
+Test();
+Test();
+Test();
+");
+            code.Libraries.Add(library);
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventDepthStep>
+            {
+                // pause on first Test() call. callstack: script
+                new (6, ExecEvent.Line, 1, true, DebugAction.StepIn),
+                // pause inside Test(). callstack: Test > script
+                new (4, ExecEvent.Line, 2, true, DebugAction.StepIn),
+                // pause inside StackLib.GetValue() in the library file.
+                // callstack: GetValue > Test > script
+                new (-1, ExecEvent.Line, 3, false, DebugAction.Continue),
+                // pause on second Test() call. 'return' frames of the completed
+                // call (GetValue and Test) must be unrolled. callstack: script
+                new (7, ExecEvent.Line, 1, true, DebugAction.Continue),
+                // pause on third Test() call. callstack: script
+                new (8, ExecEvent.Line, 1, true, DebugAction.Continue),
+            };
+
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 6));
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 7));
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 8));
+
+            controls.PauseOnStep += (ExpectedPauseEventDepthStep step, ExecFrame frame) =>
+            {
+                Assert.AreEqual(step.Event, frame.Event);
+                if (step.Line > 0)
+                    Assert.AreEqual(step.Line, frame.Reference.Position.LineNumber);
+                if (step.InCodeFile)
+                    Assert.AreEqual(code.Uri, frame.Reference.Uri);
+                else
+                    Assert.AreNotEqual(code.Uri, frame.Reference.Uri);
+                Assert.AreEqual(step.Depth, controls.Results.CurrentThread.Frames.Length);
+            };
+
+            code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
         }
 
