@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <Reference Include="Rhino.Runtime.Code" HintPath="$(RhinoSystemDirectory)\Rhino.Runtime.Code.dll" Private="True" />
+    <Reference Include="Rhino.Runtime.Code" HintPath="$(RhinoSystemDirectory)\Rhino.Runtime.Code.Testing.dll" Private="True" />
 
     <Reference Include="RhinoCommon" HintPath="$(RhinoSystemDirectory)\RhinoCommon.dll" Private="False" />
     <Reference Include="RhinoCodePlatform.GH" HintPath="$(RhinoSystemDirectory)\RhinoCodePlatform.GH.dll" Private="False" />
@@ -36,7 +37,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Rhino.Runtime.Code.Testing\Rhino.Runtime.Code.Testing.csproj" />
     <ProjectReference Include="..\RhinoCodePlatform.Rhino3D.Testing\RhinoCodePlatform.Rhino3D.Testing.csproj" />
   </ItemGroup>
 

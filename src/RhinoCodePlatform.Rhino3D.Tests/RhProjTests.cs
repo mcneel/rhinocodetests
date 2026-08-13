@@ -125,7 +125,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "TestSingle.rhp")));
@@ -143,7 +143,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string rhpFile = Path.Combine(buildPath, "rh8", "TestMultiple.rhp");
@@ -194,7 +194,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string rhpFile = Path.Combine(buildPath, "rh8", "TestMultipleExcluded.rhp");
@@ -248,7 +248,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "TestSingleComponent.Components.gha")));
@@ -265,7 +265,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string rhpFile = Path.Combine(buildPath, "rh8", "TestLibraries.rhp");
@@ -295,7 +295,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string rhpFile = Path.Combine(buildPath, "rh8", "TestResources.rhp");
@@ -335,7 +335,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string rhpFile = Path.Combine(buildPath, "rh7", "TestRhino7Build.rhp");
@@ -368,7 +368,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh7", "TestRhino7BuildWithImage.rhp")));
@@ -394,7 +394,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string rhpFile = Path.Combine(buildPath, "rh7", "TestRhino7BuildWithGH.rhp");
@@ -416,7 +416,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string rhpFile = Path.Combine(buildPath, "rh7", "TestRhino7BuildWithExcluded.rhp");
@@ -438,7 +438,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string ghaFile = Path.Combine(buildPath, "rh7", "TestRhino7BuildWithExcludedComponent.Components.gha");
@@ -460,7 +460,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             ProjectBuildException ex = Assert.Throws<ProjectBuildException>(() =>
             {
-                project.Package(s_host, new SilentProgressReporter());
+                project.Package(s_host, project.Settings.PackageBuild, new SilentProgressReporter());
             });
 
             Assert.IsTrue(ex.Message.Contains("Rhino 7 projects can only contain Python 2 or Grasshopper commands"));
@@ -473,7 +473,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             ProjectBuildException ex = Assert.Throws<ProjectBuildException>(() =>
             {
-                project.Package(s_host, new SilentProgressReporter());
+                project.Package(s_host, project.Settings.PackageBuild, new SilentProgressReporter());
             });
 
             Assert.IsTrue(ex.Message.Contains("Rhino 7 projects can only contain Python 2 or Grasshopper commands"));
@@ -491,14 +491,14 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             Assert.DoesNotThrow(() =>
             {
-                project.Package(s_host, new SilentProgressReporter());
+                project.Package(s_host, project.Settings.PackageBuild, new SilentProgressReporter());
             });
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             ProjectBuildException ex = Assert.Throws<ProjectBuildException>(() =>
             {
-                projectNoHost.Package(s_host, new SilentProgressReporter());
+                projectNoHost.Package(s_host, project.Settings.PackageBuild, new SilentProgressReporter());
             });
 
             Assert.IsTrue(ex.Message.Contains("Project file is saved on Rhino 8.9 or earlier. Please re-save the project in Rhino 8.11 or above"));
@@ -511,7 +511,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             ProjectBuildException ex = Assert.Throws<ProjectBuildException>(() =>
             {
-                project.Package(s_host, new SilentProgressReporter());
+                project.Package(s_host, project.Settings.PackageBuild, new SilentProgressReporter());
             });
 
             Assert.IsTrue(ex.Message.Contains("Grasshopper file is saved on Rhino 8.9 or earlier. Please re-save the file in Rhino 8.11 or above"));
@@ -526,7 +526,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             ProjectBuildException ex = Assert.Throws<ProjectBuildException>(() =>
             {
-                project.Package(s_host, new SilentProgressReporter());
+                project.Package(s_host, project.Settings.PackageBuild, new SilentProgressReporter());
             });
 
             Assert.IsTrue(ex.Message.Contains("Grasshopper legacy RH_IN/RH_OUT params are only supported on Rhino 8.11 or above"));
@@ -670,7 +670,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             Assert.AreEqual(2, project.GetCodes().Count());
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "TestHiddenCommandWithIcon.rhp")));
 
@@ -703,7 +703,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testyakversion-0.1.1234-rh8-any.yak")));
@@ -718,7 +718,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             IProject project = RhinoCode.ProjectServers.CreateProject(new Uri(rhprojfile));
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, "beta", 8888);
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             Assert.IsTrue(File.Exists(Path.Combine(buildPath, "rh8", "testyakbetaversion-0.1.1234-beta-rh8-any.yak")));
@@ -733,7 +733,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string rhpFile = Path.Combine(buildPath, "rh8", "TestCommandHelpUri.rhp");
@@ -758,7 +758,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string rhpFile = Path.Combine(buildPath, "rh7", "TestRhino7CommandHelpUri.rhp");
@@ -792,7 +792,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string ruiFile = Path.Combine(buildPath, project.Settings.PackageBuild.Slug, "TestCommandDefaultIcon.rui");
@@ -825,7 +825,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string ruiFile = Path.Combine(buildPath, project.Settings.PackageBuild.Slug, "TestRhino7CommandDefaultIcon.rui");
@@ -858,7 +858,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string ghaFile = Path.Combine(buildPath, project.Settings.PackageBuild.Slug, "TestComponentDefaultIcon.Components.gha");
@@ -892,7 +892,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             DeleteDirectory(rhprojfile, project.Settings.BuildPath);
 
             project.Identity.Version = new ProjectVersion(0, 1, 1234, 8888);
-            project.Package(s_host, new NUnitProgressReporter());
+            project.Package(s_host, project.Settings.PackageBuild, new NUnitProgressReporter());
 
             string buildPath = Path.Combine(Path.GetDirectoryName(rhprojfile), project.Settings.BuildPath.ToString());
             string ghaFile = Path.Combine(buildPath, project.Settings.PackageBuild.Slug, "TestRhino7ComponentDefaultIcon.Components.gha");
