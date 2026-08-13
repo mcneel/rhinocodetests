@@ -1,13 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.5.33516.290
+# Visual Studio Version 18
+VisualStudioVersion = 18.8.12021.73 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RhinoCodePlatform.Rhino3D.Tests", "RhinoCodePlatform.Rhino3D.Tests\RhinoCodePlatform.Rhino3D.Tests.csproj", "{C5C81D12-AE78-4DE1-A06E-546C3F91D392}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhino.Runtime.Code.Testing", "Rhino.Runtime.Code.Testing\Rhino.Runtime.Code.Testing.csproj", "{C6F25A73-A5A1-4F3F-8F6C-8A56D35BBB2C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhino.Runtime.Code.Tests", "Rhino.Runtime.Code.Tests\Rhino.Runtime.Code.Tests.csproj", "{7E8AA522-FD73-43FB-9839-01F587A2A5A4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RhinoCodePlatform.Rhino3D.Testing", "RhinoCodePlatform.Rhino3D.Testing\RhinoCodePlatform.Rhino3D.Testing.csproj", "{55B6040C-9EDB-4CA5-98D9-BADF469183E1}"
 EndProject
@@ -31,22 +27,6 @@ Global
 		{C5C81D12-AE78-4DE1-A06E-546C3F91D392}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C5C81D12-AE78-4DE1-A06E-546C3F91D392}.Release|x64.ActiveCfg = Release|Any CPU
 		{C5C81D12-AE78-4DE1-A06E-546C3F91D392}.Release|x64.Build.0 = Release|Any CPU
-		{C6F25A73-A5A1-4F3F-8F6C-8A56D35BBB2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C6F25A73-A5A1-4F3F-8F6C-8A56D35BBB2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C6F25A73-A5A1-4F3F-8F6C-8A56D35BBB2C}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{C6F25A73-A5A1-4F3F-8F6C-8A56D35BBB2C}.Debug|x64.Build.0 = Debug|Any CPU
-		{C6F25A73-A5A1-4F3F-8F6C-8A56D35BBB2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C6F25A73-A5A1-4F3F-8F6C-8A56D35BBB2C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C6F25A73-A5A1-4F3F-8F6C-8A56D35BBB2C}.Release|x64.ActiveCfg = Release|Any CPU
-		{C6F25A73-A5A1-4F3F-8F6C-8A56D35BBB2C}.Release|x64.Build.0 = Release|Any CPU
-		{7E8AA522-FD73-43FB-9839-01F587A2A5A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7E8AA522-FD73-43FB-9839-01F587A2A5A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7E8AA522-FD73-43FB-9839-01F587A2A5A4}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{7E8AA522-FD73-43FB-9839-01F587A2A5A4}.Debug|x64.Build.0 = Debug|Any CPU
-		{7E8AA522-FD73-43FB-9839-01F587A2A5A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7E8AA522-FD73-43FB-9839-01F587A2A5A4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7E8AA522-FD73-43FB-9839-01F587A2A5A4}.Release|x64.ActiveCfg = Release|Any CPU
-		{7E8AA522-FD73-43FB-9839-01F587A2A5A4}.Release|x64.Build.0 = Release|Any CPU
 		{55B6040C-9EDB-4CA5-98D9-BADF469183E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{55B6040C-9EDB-4CA5-98D9-BADF469183E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55B6040C-9EDB-4CA5-98D9-BADF469183E1}.Debug|x64.ActiveCfg = Debug|Any CPU

@@ -1,5 +1,5 @@
-#pragma warning disable SYSLIB1045 // Convert to 'GeneratedRegexAttribute'.
 #pragma warning disable IDE0090 // Use 'new(...)'
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 using System;
 using System.IO;
 using System.Linq;
@@ -113,7 +113,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
             string uriStr = scriptPath.ToString().ToLower();
 
             Uri = scriptPath;
-            Name = Uri.GetEndpointTitle();
+            Name = Uri.GetName();
             IsAsync = uriStr.Contains("_async");
             IsDebug = uriStr.Contains("_debug");
             IsProfile = uriStr.Contains("_profile");
@@ -178,9 +178,9 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
         public void TestSkip() => _isSkipped.TestSkip();
 
-        public string GetRhinoFile() => Path.ChangeExtension(Uri.ToPath(), ".3dm");
+        public string GetRhinoFile() => Path.ChangeExtension(Uri.ToNormPath(), ".3dm");
 
-        public string GetErrorsFile() => Path.ChangeExtension(Uri.ToPath(), ".txt");
+        public string GetErrorsFile() => Path.ChangeExtension(Uri.ToNormPath(), ".txt");
 
         public void AssertError(string errorMessage)
         {

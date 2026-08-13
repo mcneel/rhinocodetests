@@ -50,7 +50,7 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
     public static Document OpenDocument(ScriptInfo scriptInfo)
     {
-      string file = scriptInfo.Uri.ToPath();
+      string file = scriptInfo.Uri.ToNormPath();
       var io = new DocumentIO(default, false, false, false);
       if (!io.Open(file) || io.Document is null)
       {
