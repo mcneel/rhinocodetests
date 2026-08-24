@@ -1,9 +1,12 @@
 using System;
 using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 using NUnit.Framework;
+
+using GH_IO.Serialization;
 
 using Rhino;
 using Rhino.Runtime.Code;
@@ -2136,6 +2139,142 @@ public class Script_Instance : GH_ScriptInstance
             // collect parameters from RunScript and apply to component
             script.ParamsCollect();
             Assert.AreEqual(expected, script.Text);
+        }
+
+        [Test]
+        public void TestGH1_Component_Params_UnwrapData_Default()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86062
+            // output parameters unwrap collections by default
+            var param = new GHP.Parameters.ScriptVariableParam("a");
+            Assert.IsTrue(param.ExpandsItems);
+
+            // flag carries into the shared script parameter model
+            ScriptParam sparam = ((IScriptParameter)param).CreateScriptParam();
+            Assert.IsTrue(sparam.Expands ?? false);
+
+            param.ExpandsItems = false;
+            sparam = ((IScriptParameter)param).CreateScriptParam();
+            Assert.IsFalse(sparam.Expands ?? true);
+        }
+
+        [Test]
+        public void TestGH1_Component_Params_UnwrapData_Archive()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86062
+            // 'ExpandsItems' is only written to the archive when unwrapping is off
+            var defaultChunk = new GH_LooseChunk("param");
+            new GHP.Parameters.ScriptVariableParam("a").Write(defaultChunk);
+            Assert.IsFalse(defaultChunk.ItemExists("ExpandsItems"));
+
+            // archives without the key (older archives) must default to unwrapping on
+            var fresh = new GHP.Parameters.ScriptVariableParam("a");
+            fresh.Read(defaultChunk);
+            Assert.IsTrue(fresh.ExpandsItems);
+
+            // unwrap-off round-trips
+            var offChunk = new GH_LooseChunk("param");
+            new GHP.Parameters.ScriptVariableParam("a") { ExpandsItems = false }.Write(offChunk);
+            Assert.IsTrue(offChunk.ItemExists("ExpandsItems"));
+
+            fresh = new GHP.Parameters.ScriptVariableParam("a");
+            fresh.Read(offChunk);
+            Assert.IsFalse(fresh.ExpandsItems);
+        }
+
+        [Test]
+        public void TestGH1_Component_Execute_UnwrapData_Python3_Dict()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86062
+            // by default a dictionary assigned to an output is unwrapped into its keys.
+            // when 'Unwrap Data' is off, the dictionary must pass through as a single item.
+            // python defaults to guid marshalling so this exercises the GuidMarshOut converter
+            IScriptObject script = GHP.Components.Python3Component.Create("Test", @"a = {'x': 1, 'y': 2}") as IScriptObject;
+            script.CaptureOutput = false;
+
+            IGH_Component component = (IGH_Component)script;
+            var doc = new GH_Document();
+            doc.Objects.Add(component);
+            doc.Enabled = true;
+
+            doc.NewSolution(expireAllObjects: true);
+
+            GHP.Parameters.ScriptVariableParam a_param = (GHP.Parameters.ScriptVariableParam)component.Params.Output[0];
+            Assert.AreEqual(2, a_param.VolatileData.DataCount);
+
+            a_param.ExpandsItems = false;
+            doc.NewSolution(expireAllObjects: true);
+
+            Assert.AreEqual(1, a_param.VolatileData.DataCount);
+            Assert.IsNotNull(a_param.VolatileData.AllData(true).First().ScriptVariable());
+        }
+
+        [Test]
+        public void TestGH1_Component_Execute_UnwrapData_Python3_List()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86062
+            IScriptObject script = GHP.Components.Python3Component.Create("Test", @"a = [1, 2, 3]") as IScriptObject;
+            script.CaptureOutput = false;
+
+            IGH_Component component = (IGH_Component)script;
+            var doc = new GH_Document();
+            doc.Objects.Add(component);
+            doc.Enabled = true;
+
+            doc.NewSolution(expireAllObjects: true);
+
+            GHP.Parameters.ScriptVariableParam a_param = (GHP.Parameters.ScriptVariableParam)component.Params.Output[0];
+            Assert.AreEqual(3, a_param.VolatileData.DataCount);
+
+            a_param.ExpandsItems = false;
+            doc.NewSolution(expireAllObjects: true);
+
+            Assert.AreEqual(1, a_param.VolatileData.DataCount);
+            Assert.IsNotNull(a_param.VolatileData.AllData(true).First().ScriptVariable());
+        }
+
+        [Test]
+        public void TestGH1_Component_Execute_UnwrapData_CSharp_Dictionary()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-86062
+            // a .NET type implementing IDictionary assigned to an output must pass
+            // through as a single item when 'Unwrap Data' is off.
+            // csharp defaults to no guid marshalling so this exercises the ExpandConverter
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test", @"
+using System;
+using System.Collections.Generic;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(object x, object y, out object a)
+    {
+        a = new Dictionary<string, object> { [""u""] = 1, [""v""] = 2, [""w""] = 3 };
+    }
+}
+") as IScriptObject;
+            script.CaptureOutput = false;
+
+            IGH_Component component = (IGH_Component)script;
+            var doc = new GH_Document();
+            doc.Objects.Add(component);
+            doc.Enabled = true;
+
+            doc.NewSolution(expireAllObjects: true);
+
+            GHP.Parameters.ScriptVariableParam a_param = (GHP.Parameters.ScriptVariableParam)component.Params.Output[0];
+            Assert.AreEqual(3, a_param.VolatileData.DataCount);
+
+            a_param.ExpandsItems = false;
+            doc.NewSolution(expireAllObjects: true);
+
+            Assert.AreEqual(1, a_param.VolatileData.DataCount);
+            Assert.IsInstanceOf<IDictionary>(a_param.VolatileData.AllData(true).First().ScriptVariable());
         }
 
         static string EnsureCRLF(string input) => input.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
