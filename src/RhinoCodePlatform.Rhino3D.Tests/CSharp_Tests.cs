@@ -1774,6 +1774,39 @@ unsafe
         }
 
         [Test]
+        public void TestCSharp_Complete_Provider_AfterDiagnose()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-98043
+            // Code.TryDiagnose brackets its own Begin/EndSupport on the code.
+            // e.g. GH1 script component diagnoses the code when collecting
+            // parameters while the editor is open. this must not tear down
+            // the support session (workspace and completion provider) held
+            // by the open editor on the same code
+            string s = "using System.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            // NOTE:
+            // not using CompleteAtPosition() here. that helper brackets each
+            // Complete call with its own Begin/EndSupport which would recreate
+            // the completion provider and mask the regression. this test holds
+            // a single long-lived session like an open editor does
+            ISupport support = code.Language.Support;
+            support.BeginSupport(code);
+            try
+            {
+                Assert.IsNotEmpty(support.Complete(SupportRequest.Empty, code, s.Length, CompleteOptions.Empty));
+
+                Assert.True(code.TryDiagnose(new DiagnoseOptions { Errors = true }, out IEnumerable<Diagnostic> _));
+
+                Assert.IsNotEmpty(support.Complete(SupportRequest.Empty, code, s.Length, CompleteOptions.Empty));
+            }
+            finally
+            {
+                support.EndSupport(code);
+            }
+        }
+
+        [Test]
         public void TestCSharp_ScriptInstance_Complete_Self()
         {
             string s = @"// #! csharp
