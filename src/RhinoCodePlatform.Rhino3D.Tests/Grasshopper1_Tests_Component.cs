@@ -1205,7 +1205,8 @@ public class Script_Instance : GH_ScriptInstance
         {
             // https://github.com/mcneel/rhino/commit/1a06f12095ac2031197a3e264a0e89588e24ff39
             // https://github.com/mcneel/rhino/commit/0b1febc688eab7680746f6452e98d41ecda80aad
-            IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
+            // RunScript now follows script indentation: https://mcneel.myjetbrains.com/youtrack/issue/RH-94747
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test");
 
             // change the script
             script.Text = @"using System;
@@ -1257,10 +1258,10 @@ using Grasshopper.Kernel.Types;
 public class Script_Instance : GH_ScriptInstance
 {
     private void RunScript(
-		DataTree<object> x,
-		DataTree<object> y,
-		object z,
-		ref object a)
+        DataTree<object> x,
+        DataTree<object> y,
+        object z,
+        ref object a)
     {
     }
 }
@@ -1352,7 +1353,8 @@ public class Script_Instance : GH_ScriptInstance
         public void TestGH1_Component_ParamsApply_CSharp_AsyncRunScript()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-85144
-            IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
+            // RunScript now follows script indentation: https://mcneel.myjetbrains.com/youtrack/issue/RH-94747
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test");
 
             // change the script
             script.Text = @"
@@ -1397,9 +1399,9 @@ using Grasshopper.Kernel;
 public class Script_Instance : GH_ScriptInstance
 {
     private async void RunScript(
-		object x,
-		object y,
-		System.Collections.Generic.List<object> z)
+        object x,
+        object y,
+        System.Collections.Generic.List<object> z)
     {
     }
 }
@@ -1410,7 +1412,8 @@ public class Script_Instance : GH_ScriptInstance
         public void TestGH1_Component_ParamsApply_CSharp_AsyncRunScript_CompileError()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-85144
-            IScriptObject script = GHP.Components.CSharpComponent.Create("Test") as IScriptObject;
+            // RunScript now follows script indentation: https://mcneel.myjetbrains.com/youtrack/issue/RH-94747
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test");
 
             // change the script
             script.Text = @"
@@ -1455,10 +1458,10 @@ using Grasshopper.Kernel;
 public class Script_Instance : GH_ScriptInstance
 {
     private async void RunScript(
-		object x,
-		object y,
-		System.Collections.Generic.List<object> z,
-		ref object a)
+        object x,
+        object y,
+        System.Collections.Generic.List<object> z,
+        ref object a)
     {
     }
 }
@@ -1656,6 +1659,7 @@ public class Script_Instance : GH_ScriptInstance
         [Test]
         public void TestGH1_Component_CreateAPI_CustomScriptAndParamsToScript_CSharp()
         {
+            // RunScript now follows script indentation: https://mcneel.myjetbrains.com/youtrack/issue/RH-94747
             GHP.Components.CSharpComponent c = GHP.Components.CSharpComponent.Create("Test", @"using System;
 using System.Linq;
 using System.Collections;
@@ -1732,9 +1736,9 @@ using Grasshopper.Kernel.Types;
 public class Script_Instance : GH_ScriptInstance
 {
     private void RunScript(
-		List<double> first,
-		Rhino.Collections.Point3dList second,
-		ref object output)
+        List<double> first,
+        Rhino.Collections.Point3dList second,
+        ref object output)
     {
     }
 }
