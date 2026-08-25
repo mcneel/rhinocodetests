@@ -1268,6 +1268,595 @@ public class Script_Instance : GH_ScriptInstance
 ", script.Text);
         }
 
+        [Test]
+        public void TestGH1_Component_ParamsApply_CSharp_RunScriptComments_Unchanged()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-94747
+            // when the signature already matches the component parameters, the
+            // text is left untouched so comments and their alignment survive
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test");
+
+            const string SOURCE = @"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(
+        object x,       // input x
+        object y,       // input y
+        object z,
+        ref object a)
+    {
+        a = null;
+    }
+}
+";
+            script.Text = SOURCE;
+
+            script.ReBuild();
+            script.ParamsCollect();
+            script.ParamsApply();
+
+            Assert.AreEqual(EnsureCRLF(SOURCE), EnsureCRLF(script.Text));
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsApply_CSharp_RunScriptComments_TrailingComments()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-94747
+            // inline comments trailing a parameter must be carried over when the
+            // signature is regenerated. comments are matched to parameters by name
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test");
+
+            script.Text = @"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(
+        object x,       // input x
+        object y,       // input y
+        object z,
+        ref object a)
+    {
+        a = null;
+    }
+}
+";
+
+            script.ReBuild();
+            script.ParamsCollect();
+
+            IGH_Component component = (IGH_Component)script;
+            component.Params.RegisterInputParam(new GHP.Parameters.ScriptVariableParam("w") { Access = GH_ParamAccess.list });
+
+            // zui calls this automatically when parameter is added
+            ((IGH_VariableParameterComponent)component).VariableParameterMaintenance();
+
+            script.ReBuild();
+            script.ParamsApply();
+
+            Assert.AreEqual(EnsureCRLF(@"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(
+        object x, // input x
+        object y, // input y
+        object z,
+        List<object> w,
+        ref object a)
+    {
+        a = null;
+    }
+}
+"), EnsureCRLF(script.Text));
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsApply_CSharp_RunScriptComments_LeadingComments()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-94747
+            // comments on the lines before a parameter must stay on their own
+            // lines above that parameter. both line and block comments are kept
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test");
+
+            script.Text = @"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(
+        // first input
+        object x,
+        /* second input */
+        object y,
+        ref object a)
+    {
+        a = null;
+    }
+}
+";
+
+            script.ReBuild();
+            script.ParamsCollect();
+
+            IGH_Component component = (IGH_Component)script;
+            component.Params.RegisterInputParam(new GHP.Parameters.ScriptVariableParam("w") { Access = GH_ParamAccess.list });
+
+            // zui calls this automatically when parameter is added
+            ((IGH_VariableParameterComponent)component).VariableParameterMaintenance();
+
+            script.ReBuild();
+            script.ParamsApply();
+
+            Assert.AreEqual(EnsureCRLF(@"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(
+        // first input
+        object x,
+        /* second input */
+        object y,
+        List<object> w,
+        ref object a)
+    {
+        a = null;
+    }
+}
+"), EnsureCRLF(script.Text));
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsApply_CSharp_RunScriptComments_LastParam()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-94747
+            // a comment on the last parameter would swallow the closing parenthesis
+            // so the parenthesis is pushed to its own line
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test");
+
+            script.Text = @"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(
+        object x,
+        object y,
+        ref object a  // the output
+        )
+    {
+        a = null;
+    }
+}
+";
+
+            script.ReBuild();
+            script.ParamsCollect();
+
+            IGH_Component component = (IGH_Component)script;
+            component.Params.RegisterInputParam(new GHP.Parameters.ScriptVariableParam("w") { Access = GH_ParamAccess.list });
+
+            // zui calls this automatically when parameter is added
+            ((IGH_VariableParameterComponent)component).VariableParameterMaintenance();
+
+            script.ReBuild();
+            script.ParamsApply();
+
+            Assert.AreEqual(EnsureCRLF(@"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(
+        object x,
+        object y,
+        List<object> w,
+        ref object a // the output
+        )
+    {
+        a = null;
+    }
+}
+"), EnsureCRLF(script.Text));
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsApply_CSharp_RunScriptIndent_TwoSpace()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-94747
+            // multiline signature follows the indentation of the RunScript line.
+            // parameters are indented one level deeper i.e. the method indent doubled
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test");
+
+            script.Text = @"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+  private void RunScript(object x, object y, object z, ref object a)
+  {
+  }
+}
+";
+
+            script.ParamsCollect();
+
+            // long parameter types push the signature past the max width
+            script.Inputs.ElementAt(0).Access = ScriptParamAccess.Tree;
+            script.Inputs.ElementAt(1).Access = ScriptParamAccess.Tree;
+
+            script.ParamsApply();
+
+            Assert.AreEqual(EnsureCRLF(@"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+  private void RunScript(
+    DataTree<object> x,
+    DataTree<object> y,
+    object z,
+    ref object a)
+  {
+  }
+}
+"), EnsureCRLF(script.Text));
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsApply_CSharp_RunScriptIndent_Tabs()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-94747
+            // indentation style of the script is followed. tabs stay tabs.
+            // '~' marks a tab character so the expected text stays readable here
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test");
+
+            script.Text = @"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+~private void RunScript(object x, object y, object z, ref object a)
+~{
+~}
+}
+".Replace("~", "\t");
+
+            script.ParamsCollect();
+
+            // long parameter types push the signature past the max width
+            script.Inputs.ElementAt(0).Access = ScriptParamAccess.Tree;
+            script.Inputs.ElementAt(1).Access = ScriptParamAccess.Tree;
+
+            script.ParamsApply();
+
+            Assert.AreEqual(EnsureCRLF(@"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+~private void RunScript(
+~~DataTree<object> x,
+~~DataTree<object> y,
+~~object z,
+~~ref object a)
+~{
+~}
+}
+".Replace("~", "\t")), EnsureCRLF(script.Text));
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsApply_CSharp_RunScriptIndent_NoIndent()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-94747
+            // there is no indentation to follow when RunScript sits at column zero
+            // so parameters fall back to two tabs.
+            // '~' marks a tab character so the expected text stays readable here
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test");
+
+            script.Text = @"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+private void RunScript(object x, object y, object z, ref object a)
+{
+}
+}
+";
+
+            script.ParamsCollect();
+
+            // long parameter types push the signature past the max width
+            script.Inputs.ElementAt(0).Access = ScriptParamAccess.Tree;
+            script.Inputs.ElementAt(1).Access = ScriptParamAccess.Tree;
+
+            script.ParamsApply();
+
+            Assert.AreEqual(EnsureCRLF(@"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+private void RunScript(
+~~DataTree<object> x,
+~~DataTree<object> y,
+~~object z,
+~~ref object a)
+{
+}
+}
+".Replace("~", "\t")), EnsureCRLF(script.Text));
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsApply_CSharp_RunScriptIndent_CommentsForceMultiline()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-94747
+            // a short signature is normally kept on one line. carrying comments
+            // forces one parameter per line, indented per the script style
+            IScriptObject script = GHP.Components.CSharpComponent.Create("Test");
+
+            script.Text = @"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+  private void RunScript(object x /* the x */, object y, ref object a)
+  {
+  }
+}
+";
+
+            script.ReBuild();
+            script.ParamsCollect();
+
+            IGH_Component component = (IGH_Component)script;
+            component.Params.RegisterInputParam(new GHP.Parameters.ScriptVariableParam("z"));
+
+            // zui calls this automatically when parameter is added
+            ((IGH_VariableParameterComponent)component).VariableParameterMaintenance();
+
+            script.ReBuild();
+            script.ParamsApply();
+
+            Assert.AreEqual(EnsureCRLF(@"using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+public class Script_Instance : GH_ScriptInstance
+{
+  private void RunScript(
+    object x, /* the x */
+    object y,
+    object z,
+    ref object a)
+  {
+  }
+}
+"), EnsureCRLF(script.Text));
+        }
+
+        [Test]
+        public void TestGH1_Component_ParamsCollect_Python3_Multiline_TwoSpaceIndent()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-94747
+            // continuation lines of a multiline RunScript follow the indentation
+            // style detected in the script. here the script indents with 2 spaces
+            IScriptObject script = GHP.Components.Python3Component.Create("Test", @"
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+  def RunScript(self, x, y):
+    return
+") as IScriptObject;
+
+            // build so there is a code to apply params to
+            script.ReBuild();
+
+            IGH_Component component = (IGH_Component)script;
+            // create a few long parameters to push RunScript signature to become multiline
+            // zui calls .VariableParameterMaintenance this automatically when parameter is added
+            component.Params.RegisterInputParam(new GHP.Parameters.ScriptVariableParam("z") { Access = GH_ParamAccess.list });
+            ((IGH_VariableParameterComponent)component).VariableParameterMaintenance();
+
+            component.Params.RegisterInputParam(new GHP.Parameters.ScriptVariableParam("u") { Access = GH_ParamAccess.tree });
+            ((IGH_VariableParameterComponent)component).VariableParameterMaintenance();
+
+            component.Params.RegisterInputParam(new GHP.Parameters.ScriptVariableParam("v") { Access = GH_ParamAccess.list });
+            ((IGH_VariableParameterComponent)component).VariableParameterMaintenance();
+
+            Assert.AreEqual(EnsureCRLF(@"
+import System
+import Rhino
+import Grasshopper
+
+import rhinoscriptsyntax as rs
+
+class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+  def RunScript(self,
+      x,
+      y,
+      z: System.Collections.Generic.List[object],
+      u: Grasshopper.DataTree[object],
+      v: System.Collections.Generic.List[object]):
+    return
+"), EnsureCRLF(script.Text));
+        }
+
         [Test, TestCaseSource(nameof(GetTestScript), new object[] { "gh1ui", "test_csharp_runScriptAsync_rc8.15.ghx" })]
         public void TestGH1_Component_RunScript_CSharp_Async(string ghfile)
         {
