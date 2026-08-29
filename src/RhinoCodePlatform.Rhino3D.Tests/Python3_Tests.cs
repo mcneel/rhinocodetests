@@ -1993,6 +1993,27 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         }
 
         [Test]
+        public void TestPython3_ScriptInstance_Convert_DefaultIndentsWithSpaces()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-98171
+            const string P = "#";
+            var script = new Grasshopper1Script($@"
+{P}! python 3
+""""""Grasshopper Script""""""
+a = ""Hello Python 3 in Grasshopper!""
+print(a)
+
+");
+
+            // NOTE:
+            // no indent style given. unset must fall back to spaces
+            script.ConvertToScriptInstance(addSolve: false, addPreview: false, FormatOptions.Empty);
+
+            Assert.IsFalse(script.Text.Contains('\t'), $"expected space indents:\n{script.Text}");
+            StringAssert.Contains("    def RunScript(self):", script.Text);
+        }
+
+        [Test]
         public void TestPython3_ScriptInstance_Convert_IndentTabs()
         {
             const string P = "#";

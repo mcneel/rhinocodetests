@@ -8969,6 +8969,47 @@ Test();
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
         }
 
+        [Test]
+        public void TestCSharp_Format_DefaultIndentsWithSpaces()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-98171
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"public class Test
+{
+public void Run()
+{
+int x = 42;
+}
+}
+");
+
+            string result = code.Language.Support.Format(SupportRequest.Empty, code, FormatOptions.Empty);
+
+            // unset IndentWithSpaces must fall back to spaces like every other
+            // language path does. this used to default to tabs.
+            Assert.IsFalse(result.Contains('\t'), $"expected space indents:\n{result}");
+            StringAssert.Contains("    public void Run()", result);
+        }
+
+        [Test]
+        public void TestCSharp_Format_IndentWithTabs()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-98171
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"public class Test
+{
+public void Run()
+{
+int x = 42;
+}
+}
+");
+
+            string result = code.Language.Support.Format(SupportRequest.Empty, code, new FormatOptions { IndentWithSpaces = false });
+
+            StringAssert.Contains("\tpublic void Run()", result);
+        }
+
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");
 
         static void EnsureTargetFramework(SourceBinary binary, TargetFramework framework)
