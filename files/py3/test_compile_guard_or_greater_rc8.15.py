@@ -1,5 +1,6 @@
 #! python3
 
 result = False
-if __context__.CompileGuards.Contains("RHINO_8_OR_GREATER"):
+_, context = __this__.TryGetContext()
+if context.CompileGuards.Contains("RHINO_8_OR_GREATER"):
     result = True

@@ -2364,7 +2364,7 @@ await Task.Delay(1000);
                 var ctx = new RunContext($"Thread {i}");
                 _ = code.RunAsync(ctx);
 
-                Assert.AreEqual(ctx.Id, code.ContextTracker.CurrentContext);
+                Assert.AreEqual(ctx.Id, code.ContextTracker.CurrentContextId);
                 Interlocked.Increment(ref counter);
             });
 
