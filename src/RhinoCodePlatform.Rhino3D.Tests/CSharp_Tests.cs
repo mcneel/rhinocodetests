@@ -1774,6 +1774,39 @@ unsafe
         }
 
         [Test]
+        public void TestCSharp_Complete_Provider_AfterDiagnose()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-98043
+            // Code.TryDiagnose brackets its own Begin/EndSupport on the code.
+            // e.g. GH1 script component diagnoses the code when collecting
+            // parameters while the editor is open. this must not tear down
+            // the support session (workspace and completion provider) held
+            // by the open editor on the same code
+            string s = "using System.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            // NOTE:
+            // not using CompleteAtPosition() here. that helper brackets each
+            // Complete call with its own Begin/EndSupport which would recreate
+            // the completion provider and mask the regression. this test holds
+            // a single long-lived session like an open editor does
+            ISupport support = code.Language.Support;
+            support.BeginSupport(code);
+            try
+            {
+                Assert.IsNotEmpty(support.Complete(SupportRequest.Empty, code, s.Length, CompleteOptions.Empty));
+
+                Assert.True(code.TryDiagnose(new DiagnoseOptions { Errors = true }, out IEnumerable<Diagnostic> _));
+
+                Assert.IsNotEmpty(support.Complete(SupportRequest.Empty, code, s.Length, CompleteOptions.Empty));
+            }
+            finally
+            {
+                support.EndSupport(code);
+            }
+        }
+
+        [Test]
         public void TestCSharp_ScriptInstance_Complete_Self()
         {
             string s = @"// #! csharp
@@ -2331,7 +2364,7 @@ await Task.Delay(1000);
                 var ctx = new RunContext($"Thread {i}");
                 _ = code.RunAsync(ctx);
 
-                Assert.AreEqual(ctx.Id, code.ContextTracker.CurrentContext);
+                Assert.AreEqual(ctx.Id, code.ContextTracker.CurrentContextId);
                 Interlocked.Increment(ref counter);
             });
 
@@ -8934,6 +8967,47 @@ Test();
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        [Test]
+        public void TestCSharp_Format_DefaultIndentsWithSpaces()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-98171
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"public class Test
+{
+public void Run()
+{
+int x = 42;
+}
+}
+");
+
+            string result = code.Language.Support.Format(SupportRequest.Empty, code, FormatOptions.Empty);
+
+            // unset IndentWithSpaces must fall back to spaces like every other
+            // language path does. this used to default to tabs.
+            Assert.IsFalse(result.Contains('\t'), $"expected space indents:\n{result}");
+            StringAssert.Contains("    public void Run()", result);
+        }
+
+        [Test]
+        public void TestCSharp_Format_IndentWithTabs()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-98171
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
+@"public class Test
+{
+public void Run()
+{
+int x = 42;
+}
+}
+");
+
+            string result = code.Language.Support.Format(SupportRequest.Empty, code, new FormatOptions { IndentWithSpaces = false });
+
+            StringAssert.Contains("\tpublic void Run()", result);
         }
 
         static IEnumerable<object[]> GetTestScripts() => GetTestScripts(@"cs\", "test_*.cs");

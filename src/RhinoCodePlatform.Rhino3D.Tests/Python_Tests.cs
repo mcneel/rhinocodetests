@@ -38,7 +38,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
             Code code = GetLanguage(spec).CreateCode($@"
 result = False
-if __context__.CompileGuards.Contains(""RHINO_{major}_{minor}""):
+_, context = __this__.TryGetContext()
+if context.CompileGuards.Contains(""RHINO_{major}_{minor}""):
     result = True
 ");
 
@@ -145,7 +146,8 @@ class MyComponent(  component      ):
             const int THREAD_COUNT = 5;
             const string CID_NAME = "__cid__";
             Code code = GetLanguage(spec).CreateCode($@"
-{CID_NAME} = __context__.Id.Id
+_, context = __this__.TryGetContext()
+{CID_NAME} = context.Id.Id
 ");
 
             code.Outputs.Add(CID_NAME);
@@ -189,7 +191,7 @@ class MyComponent(  component      ):
 
                 ctx.Inputs[CTX_CHECK_NAME] = () =>
                 {
-                    Assert.AreEqual(ctx.Id, code.ContextTracker.CurrentContext);
+                    Assert.AreEqual(ctx.Id, code.ContextTracker.CurrentContextId);
                     checked_context = true;
                 };
 

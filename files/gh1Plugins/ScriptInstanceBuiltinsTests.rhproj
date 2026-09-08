@@ -1,8 +1,24 @@
 {
+  "host": {
+    "name": "Rhino3D",
+    "version": "9.0.26251\u002B1000",
+    "os": "windows",
+    "arch": "x64"
+  },
+  "bar": {
+    "id": "a3cb6754-b6a8-4586-b2d7-aeec71173c58",
+    "tray": {
+      "id": "3d314b27-75e5-40f7-b0a5-4d807ecd2b55",
+      "box": {
+        "id": "7cb449df-42a8-4914-8b3a-7bf78387d574",
+        "imageId": "a20a0c4e-8c83-4a77-a629-b3d62fa2d18b"
+      }
+    }
+  },
   "id": "e0a2c616-dd85-4dab-9a8b-54cd58bb9de1",
   "identity": {
     "name": "ScriptInstanceBuiltinsTests",
-    "version": "0.1",
+    "version": "0.1.0",
     "publisher": {
       "email": "ehsan@mcneel.com",
       "name": "Ehsan Iran-Nejad",
@@ -10,20 +26,69 @@
       "phone": "\u002B1 (888)-888 8888",
       "address": "Pacific Northwest",
       "country": "USA"
+    },
+    "description": "DD",
+    "image": {
+      "light": {
+        "type": "svg",
+        "data": "PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmlld0JveD0iMCAwIDQ4IDQ4IiBmaWxsLWRhcms9IiNGRkYiIHN0cm9rZS1kYXJrPSJub25lIj4NCiAgPGxpbmUgc3Ryb2tlPSIjMDAwIiBzdHJva2UtZGFyaz0iI0ZGRiIgc3Ryb2tlLXdpZHRoPSIxIiB4MT0iMzcuNSIgeTE9IjguNSIgeDI9IjE0LjUiIHkyPSIzMC41IiAvPg0KPC9zdmc\u002B"
+      },
+      "dark": {
+        "type": "svg",
+        "data": "PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmlld0JveD0iMCAwIDQ4IDQ4IiBmaWxsLWRhcms9IiNGRkYiIHN0cm9rZS1kYXJrPSJub25lIj4NCiAgPGxpbmUgc3Ryb2tlPSIjMDAwIiBzdHJva2UtZGFyaz0iI0ZGRiIgc3Ryb2tlLXdpZHRoPSIxIiB4MT0iMjguNSIgeTE9IjkuNSIgeDI9IjEwLjUiIHkyPSIyOS41IiAvPg0KPC9zdmc\u002B"
+      },
+      "packageIcon": {
+        "light": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAAKNJREFUeF7t2EENAkEUBNGSgBQkIAVH4AAcgQNwAA4gnTAJGQc7Xe\u002Byh3\u002Bq0\u002B42SJIkSdqoPfD4Pesk\u002BgVcgd18XN1/fJ0j8DG\u002BkPHAeT40GPF51jk1x1\u002BMN75P4t/AYT6sLt/yI77uxybxN\u002BON7zLin83x99YhIxNWbXxWHOPn4\u002BqMb11u8z3vcjsfGhjfHl\u002B53EZec5UrjiRJkiRJkiRJG/AFRkw4UFdDTrwAAAAASUVORK5CYII=",
+          "width": 64,
+          "height": 64
+        },
+        "dark": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAAJ5JREFUeF7t1kENwkAYROGRUClIQEodgQNwAg7ASesAMgmnX0HDe99lk53TJE13EkmSJEk6jkuSZV5S3JLsSU4zIGj5T5LzDAjWX/meOOjy/dxb/j4Dgv7oNnr55wwI\u002Bsa/kryJ7z26fD3oQwdd3pU3AwJ0eVcevbwrb4b/Dl2\u002BXHnk8q68GRCgy7vyqOWrb/x1XkqSJEmSJEmSJB3ZF3Z4L\u002BMQZOzAAAAAAElFTkSuQmCC",
+          "width": 64,
+          "height": 64
+        }
+      },
+      "projectIcon": {
+        "light": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAAGNJREFUSEvtyKESQVEABcCVJEVSJEVijOQHpJcUiSApkuTv9dPMnJHuxmX4o1lG0xz3zJYFPpktS7wzW1Z4Zbas8cxs2eCR2bLFLbNlh2tmyxGXzJYTpsyWPc6ZTYeMYRh\u002B9wXX1AW7BKFLuwAAAABJRU5ErkJggg==",
+          "width": 24,
+          "height": 24
+        },
+        "dark": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAAFtJREFUSEvtyCETAWEABcAlSpJmBE2SNEmSrkl3SdIkv19/\u002BQVmvo3L8K9WOGQ2fbDJbHlhl9ky45jZMuGc2XLDNbPlgntmywmPzJY9npktW7wzW9ZYModh\u002BGFfE9IE/KdDzy0AAAAASUVORK5CYII=",
+          "width": 24,
+          "height": 24
+        },
+        "icoData": "AAABAAEAGBgAAAEAIADGAAAAFgAAAIlQTkcNChoKAAAADUlIRFIAAAAYAAAAGAgGAAAA4Hc9\u002BAAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAABoSURBVEhL7dKhsgFQAEXRRZEUSZEUiTEv\u002BQFJUiRFUiTJ3\u002BunMedJd8WdN8MPTTLANMOXZrhmbJnjlbFlgWfGliUeGVtWuGdsWeOWsWXzn7dsccnY8odzxpYDThlbdjhmbNpnGIbhc2/ftAW8gxdhfwAAAABJRU5ErkJggg=="
+      },
+      "categoryIcon": {
+        "light": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAAFBJREFUOE/tzyEKhAAURdFjMAgiEwYM7kUwGAzCBPe/FvtLX8Qw4Im3Xf7RJ8MVM6aMVQvGjFUrvhmrtjvfO/qMVT90GasOtBmrBjQZXw86ASFOAo7mMcW7AAAAAElFTkSuQmCC",
+          "width": 16,
+          "height": 16
+        },
+        "dark": {
+          "bytes": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAAERJREFUOE9jYBgRQIKBgUEfXZBYwM/AwOCGLkgsYGdgYPBDFyQFhKILkAL8GRgY2NAFiQUgP4P8ThYAhbY4uuAoGOwAAGROAjfygPqrAAAAAElFTkSuQmCC",
+          "width": 16,
+          "height": 16
+        }
+      }
     }
   },
   "settings": {
     "buildPath": "build/",
-    "buildTarget": {
-      "appName": "Rhino3D",
-      "appVersion": {
-        "major": 8
+    "packageBuild": {
+      "host": {
+        "name": "Rhino3D",
+        "version": "9.*"
       },
-      "title": "Rhino3D (8.*)",
-      "slug": "rh8"
+      "title": "Rhino3D (9.*)",
+      "slug": "rh9"
     },
-    "publishTarget": {
-      "title": "McNeel Yak Server"
+    "packageServer": {
+      "id": "mcneel.yak.public",
+      "title": "McNeel Yak Server (yak.rhino3d.com)"
     }
   },
   "codes": [
@@ -31,7 +96,7 @@
       "type": "components",
       "id": "e165b0cd-4aa8-4a22-aab9-c8de375bf382",
       "language": {
-        "id": "*.gh1.grasshopper",
+        "id": "*.*.grasshopper",
         "version": "1.*.*"
       },
       "title": "ScriptInstanceBuiltinsTests.ghx",
