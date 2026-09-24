@@ -234,6 +234,8 @@ namespace RhinoCodePlatform.Rhino3D.Tests
     [Test]
     public void TestEnvirons_Parse_And_Diagnostics()
     {
+      var env = (CPythonEnvirons)GetLanguage(LanguageSpec.Python3).Environs;
+
       Code code = GetLanguage(LanguageSpec.Python3).CreateCode(@"#! python 3
 
 # shorthands
@@ -270,52 +272,52 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       int index = 0;
       entry = entries.ElementAt(index);
       Assert.AreEqual(1, entry.Directive.SpecSet.Count);
-      Assert.Contains(CPythonPackageSpec.Parse("pandas").First(), entry.Directive.SpecSet.ToArray());
+      Assert.Contains(env.ParsePackageSpecs("pandas").First(), entry.Directive.SpecSet.ToArray());
 
       index++;
       entry = entries.ElementAt(index);
       Assert.AreEqual(1, entry.Directive.SpecSet.Count);
-      // Assert.Contains(CPythonPackageSpec.Parse("path/to/package.whl").First(), entry.Directive.SpecSet.ToArray());
+      // Assert.Contains(env.ParsePackageSpecs("path/to/package.whl").First(), entry.Directive.SpecSet.ToArray());
 
       index++;
       entry = entries.ElementAt(index);
       Assert.AreEqual(1, entry.Directive.SpecSet.Count);
-      Assert.Contains(CPythonPackageSpec.Parse("git+https://github.com/huggingface/transformers.git").First(), entry.Directive.SpecSet.ToArray());
+      Assert.Contains(env.ParsePackageSpecs("git+https://github.com/huggingface/transformers.git").First(), entry.Directive.SpecSet.ToArray());
 
       index++;
       entry = entries.ElementAt(index);
       Assert.AreEqual(1, entry.Directive.SpecSet.Count);
-      Assert.Contains(CPythonPackageSpec.Parse("pandas").First(), entry.Directive.SpecSet.ToArray());
+      Assert.Contains(env.ParsePackageSpecs("pandas").First(), entry.Directive.SpecSet.ToArray());
 
       index++;
       entry = entries.ElementAt(index);
       Assert.AreEqual(1, entry.Directive.SpecSet.Count);
-      Assert.Contains(CPythonPackageSpec.Parse("git+https://github.com/huggingface/transformers.git@096f25ae1f501a084d8ff2dcaf25fbc2bd60eba4").First(), entry.Directive.SpecSet.ToArray());
+      Assert.Contains(env.ParsePackageSpecs("git+https://github.com/huggingface/transformers.git@096f25ae1f501a084d8ff2dcaf25fbc2bd60eba4").First(), entry.Directive.SpecSet.ToArray());
 
       index++;
       entry = entries.ElementAt(index);
       Assert.AreEqual(1, entry.Directive.SpecSet.Count);
-      Assert.Contains(CPythonPackageSpec.Parse("package --index-url https://custom.pypi.org/simple").First(), entry.Directive.SpecSet.ToArray());
+      Assert.Contains(env.ParsePackageSpecs("package --index-url https://custom.pypi.org/simple").First(), entry.Directive.SpecSet.ToArray());
 
       index++;
       entry = entries.ElementAt(index);
       Assert.AreEqual(1, entry.Directive.SpecSet.Count);
-      Assert.Contains(CPythonPackageSpec.Parse("package --find-links https://example.com/packages").First(), entry.Directive.SpecSet.ToArray());
+      Assert.Contains(env.ParsePackageSpecs("package --find-links https://example.com/packages").First(), entry.Directive.SpecSet.ToArray());
 
       index++;
       entry = entries.ElementAt(index);
       Assert.AreEqual(1, entry.Directive.SpecSet.Count);
-      Assert.Contains(CPythonPackageSpec.Parse("--editable /Users/ein/Downloads").First(), entry.Directive.SpecSet.ToArray());
+      Assert.Contains(env.ParsePackageSpecs("--editable /Users/ein/Downloads").First(), entry.Directive.SpecSet.ToArray());
 
       index++;
       entry = entries.ElementAt(index);
       Assert.AreEqual(1, entry.Directive.SpecSet.Count);
-      Assert.Contains(CPythonPackageSpec.Parse("--editable /somewhere/missing").First(), entry.Directive.SpecSet.ToArray());
+      Assert.Contains(env.ParsePackageSpecs("--editable /somewhere/missing").First(), entry.Directive.SpecSet.ToArray());
 
       index++;
       entry = entries.ElementAt(index);
       Assert.AreEqual(1, entry.Directive.SpecSet.Count);
-      Assert.Contains(CPythonPackageSpec.Parse("--editable git+https://github.com/huggingface/transformers.git").First(), entry.Directive.SpecSet.ToArray());
+      Assert.Contains(env.ParsePackageSpecs("--editable git+https://github.com/huggingface/transformers.git").First(), entry.Directive.SpecSet.ToArray());
 
       index++;
       entry = entries.ElementAt(index);

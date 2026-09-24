@@ -2963,20 +2963,22 @@ from system.Collection.Generic import ");
         [Test]
         public void TestPython3_Environs_PackageSpec_NormalizedId_Match()
         {
-            CPythonPackageSpec spec = CPythonPackageSpec.Parse("wood-nano").First();
+            var env = (CPythonEnvirons)GetLanguage(LanguageSpec.Python3).Environs;
+
+            CPythonPackageSpec spec = env.ParsePackageSpecs("wood-nano").First();
 
             CPythonPackageSpec normSpec;
 
-            normSpec = CPythonPackageSpec.Parse("wood_nano==0.0.1").First();
+            normSpec = env.ParsePackageSpecs("wood_nano==0.0.1").First();
             Assert.IsTrue(spec.Matches(normSpec));
 
-            normSpec = CPythonPackageSpec.Parse("wood--nano==0.0.1").First();
+            normSpec = env.ParsePackageSpecs("wood--nano==0.0.1").First();
             Assert.IsTrue(spec.Matches(normSpec));
 
-            normSpec = CPythonPackageSpec.Parse("wood__nano==0.0.1").First();
+            normSpec = env.ParsePackageSpecs("wood__nano==0.0.1").First();
             Assert.IsTrue(spec.Matches(normSpec));
 
-            normSpec = CPythonPackageSpec.Parse("wood.-nano==0.0.1").First();
+            normSpec = env.ParsePackageSpecs("wood.-nano==0.0.1").First();
             Assert.IsTrue(spec.Matches(normSpec));
         }
 
@@ -3162,22 +3164,58 @@ from system.Collection.Generic import ");
         }
 
         [Test]
+        public void TestPython3_Environs_Specs_ToVersionString()
+        {
+            // NOTE:
+            // pip install arguments are built from ToVersionString so a 4th release
+            // number must not turn into '+build' e.g. '4.6.0.66' -> '4.6.0+66'
+            var testCases = new List<(CPythonPackageVersion spec, string expected)>
+            {
+                (new CPythonPackageVersion("4.6.0.66"),             "4.6.0.66"),
+                (new CPythonPackageVersion("4.8.0.76"),             "4.8.0.76"),
+                (new CPythonPackageVersion("1.2.3.4.5"),            "1.2.3.4.5"),
+                (new CPythonPackageVersion("1.0"),                  "1.0"),
+                (new CPythonPackageVersion("1.2.3"),                "1.2.3"),
+                (new CPythonPackageVersion("v1.0"),                 "1.0"),
+                (new CPythonPackageVersion("1.2.3rc3"),             "1.2.3rc3"),
+                (new CPythonPackageVersion("1.2.3.post1"),          "1.2.3.post1"),
+                (new CPythonPackageVersion("1.0.dev456"),           "1.0.dev456"),
+                (new CPythonPackageVersion("1.0rc1+abc123"),        "1.0rc1+abc123"),
+                (new CPythonPackageVersion("2.0.1+cu118"),          "2.0.1+cu118"),
+                (new CPythonPackageVersion("1!2.0"),                "1!2.0"),
+            };
+
+            foreach ((CPythonPackageVersion spec, string expected) in testCases)
+            {
+                Assert.That(spec.ToVersionString(), Is.EqualTo(expected));
+            }
+
+            var pkgSpec = new CPythonPackageSpec("opencv-contrib-python", new CPythonPackageVersion("4.6.0.66"), PackageSpec.VersionCompareRule.Exact);
+            Assert.That(pkgSpec.ToPackageString(), Is.EqualTo("opencv-contrib-python==4.6.0.66"));
+
+            pkgSpec = new CPythonPackageSpec("opencv-contrib-python", new CPythonPackageVersion("4.6.0.66"), PackageSpec.VersionCompareRule.NewerThanOrEqual);
+            Assert.That(pkgSpec.ToPackageString(), Is.EqualTo("opencv-contrib-python>=4.6.0.66"));
+        }
+
+        [Test]
         public void TestPython3_Environs_Specs_ParseExtras()
         {
+            var env = (CPythonEnvirons)GetLanguage(LanguageSpec.Python3).Environs;
+
             CPythonPackageSpec[] specs;
             CPythonPackageSpec spec;
 
-            specs = CPythonPackageSpec.Parse("jax").ToArray();
+            specs = env.ParsePackageSpecs("jax").ToArray();
             Assert.That(specs.Length, Is.EqualTo(1));
             spec = specs[0];
             Assert.That(spec.ToPackageString(), Is.EqualTo("jax"));
 
-            specs = CPythonPackageSpec.Parse("jax[tpu]").ToArray();
+            specs = env.ParsePackageSpecs("jax[tpu]").ToArray();
             Assert.That(specs.Length, Is.EqualTo(1));
             spec = specs[0];
             Assert.That(spec.ToPackageString(), Is.EqualTo("jax[tpu]"));
 
-            specs = CPythonPackageSpec.Parse("requests[security] uvicorn[standard]>=1.2").ToArray();
+            specs = env.ParsePackageSpecs("requests[security] uvicorn[standard]>=1.2").ToArray();
             Assert.That(specs.Length, Is.EqualTo(2));
             spec = specs[0];
             Assert.That(spec.ToPackageString(), Is.EqualTo("requests[security]"));
@@ -3239,8 +3277,10 @@ from system.Collection.Generic import ");
         [Test]
         public void TestPython3_Environs_SpecsWithMeta()
         {
-            CPythonPackageSpec s1 = CPythonPackageSpec.Parse("-e git+https://github.com/uiri/toml.git#egg=toml").First();
-            CPythonPackageSpec s2 = CPythonPackageSpec.Parse("--editable git+https://github.com/uiri/toml.git#egg=toml").First();
+            var env = (CPythonEnvirons)GetLanguage(LanguageSpec.Python3).Environs;
+
+            CPythonPackageSpec s1 = env.ParsePackageSpecs("-e git+https://github.com/uiri/toml.git#egg=toml").First();
+            CPythonPackageSpec s2 = env.ParsePackageSpecs("--editable git+https://github.com/uiri/toml.git#egg=toml").First();
 
             Assert.That(s1, Is.InstanceOf<CPythonPackageArgsSpec>());
             Assert.That(s2, Is.InstanceOf<CPythonPackageArgsSpec>());
@@ -3249,6 +3289,100 @@ from system.Collection.Generic import ");
             Assert.That(s1.ToPackageSpecString(), Is.EqualTo(s2.ToPackageString()));
             Assert.That(s1.ToPackageString(), Is.EqualTo(s2.ToPackageSpecString()));
             Assert.That(s1.ToPackageString(), Is.EqualTo(s2.ToPackageString()));
+        }
+
+        // spec, isValid, name, version, extras, specifiers, url, marker
+        // extras and specifiers are compared unordered since python does not keep their order
+        static IEnumerable<TestCaseData> GetTryParsePackageSpecCases()
+        {
+            string[] none = Array.Empty<string>();
+
+            // names
+            yield return new("numpy", true, "numpy", null, none, none, null, null);
+            yield return new("NumPy", true, "NumPy", null, none, none, null, null);
+            yield return new("opencv-contrib-python", true, "opencv-contrib-python", null, none, none, null, null);
+            yield return new("python-dateutil", true, "python-dateutil", null, none, none, null, null);
+            yield return new("zope.interface", true, "zope.interface", null, none, none, null, null);
+            yield return new("ruamel_yaml", true, "ruamel_yaml", null, none, none, null, null);
+            yield return new("a", true, "a", null, none, none, null, null);
+            yield return new("  numpy==1.26.0  ", true, "numpy", "1.26.0", none, new[] { "==1.26.0" }, null, null);
+
+            // exact pins
+            yield return new("numpy==1.26.0", true, "numpy", "1.26.0", none, new[] { "==1.26.0" }, null, null);
+            yield return new("opencv-contrib-python==4.8.0.76", true, "opencv-contrib-python", "4.8.0.76", none, new[] { "==4.8.0.76" }, null, null);
+            yield return new("transformers==4.52.0.dev0", true, "transformers", "4.52.0.dev0", none, new[] { "==4.52.0.dev0" }, null, null);
+            yield return new("Django==4.2.0rc1", true, "Django", "4.2.0rc1", none, new[] { "==4.2.0rc1" }, null, null);
+            yield return new("numpy==v1.0", true, "numpy", "1.0", none, new[] { "==v1.0" }, null, null);
+            yield return new("numpy==1!2.0", true, "numpy", "1!2.0", none, new[] { "==1!2.0" }, null, null);
+            yield return new("torch==2.0.1+cu118", true, "torch", "2.0.1+cu118", none, new[] { "==2.0.1+cu118" }, null, null);
+            yield return new("numpy===1.26.0", true, "numpy", "1.26.0", none, new[] { "===1.26.0" }, null, null);
+            yield return new("numpy===foobar", true, "numpy", null, none, new[] { "===foobar" }, null, null);
+
+            // ranges and wildcards have no single version
+            yield return new("numpy>=1.2", true, "numpy", null, none, new[] { ">=1.2" }, null, null);
+            yield return new("numpy<=1.2", true, "numpy", null, none, new[] { "<=1.2" }, null, null);
+            yield return new("numpy>1.2", true, "numpy", null, none, new[] { ">1.2" }, null, null);
+            yield return new("numpy<2", true, "numpy", null, none, new[] { "<2" }, null, null);
+            yield return new("numpy!=1.5", true, "numpy", null, none, new[] { "!=1.5" }, null, null);
+            yield return new("numpy~=1.2", true, "numpy", null, none, new[] { "~=1.2" }, null, null);
+            yield return new("numpy==1.26.*", true, "numpy", null, none, new[] { "==1.26.*" }, null, null);
+
+            // multiple rules
+            yield return new("scikit-learn>=1.2,<2", true, "scikit-learn", null, none, new[] { ">=1.2", "<2" }, null, null);
+            yield return new("numpy>=1.2,<2,!=1.5", true, "numpy", null, none, new[] { ">=1.2", "<2", "!=1.5" }, null, null);
+            yield return new("numpy >= 1.2 , < 2", true, "numpy", null, none, new[] { ">=1.2", "<2" }, null, null);
+            yield return new("numpy (>=1.2)", true, "numpy", null, none, new[] { ">=1.2" }, null, null);
+            yield return new("numpy>=1.2,", true, "numpy", null, none, new[] { ">=1.2" }, null, null);
+
+            // extras
+            yield return new("requests[security]", true, "requests", null, new[] { "security" }, none, null, null);
+            yield return new("requests[security,socks]==2.31.0", true, "requests", "2.31.0", new[] { "security", "socks" }, new[] { "==2.31.0" }, null, null);
+            yield return new("requests[ socks ]", true, "requests", null, new[] { "socks" }, none, null, null);
+
+            // markers
+            yield return new("numpy; python_version>\"3.8\"", true, "numpy", null, none, none, null, "python_version > \"3.8\"");
+            yield return new("pywin32; sys_platform == 'win32'", true, "pywin32", null, none, none, null, "sys_platform == \"win32\"");
+            yield return new("numpy>=1.2; python_version >= \"3.9\" and os_name == \"nt\"", true, "numpy", null, none, new[] { ">=1.2" }, null, "python_version >= \"3.9\" and os_name == \"nt\"");
+
+            // direct references
+            yield return new("foo @ git+https://github.com/x/foo.git", true, "foo", null, none, none, "git+https://github.com/x/foo.git", null);
+            yield return new("foo @ https://example.com/foo-1.0-py3-none-any.whl", true, "foo", null, none, none, "https://example.com/foo-1.0-py3-none-any.whl", null);
+            yield return new("foo[bar] @ git+https://github.com/x/foo.git@v1.0 ; python_version > \"3.8\"", true, "foo", null, new[] { "bar" }, none, "git+https://github.com/x/foo.git@v1.0", "python_version > \"3.8\"");
+
+            // pip reads this as a package named 'name-1.2', not version 1.2
+            yield return new("name-1.2", true, "name-1.2", null, none, none, null, null);
+
+            // invalid
+            yield return new("", false, null, null, none, none, null, null);
+            yield return new("   ", false, null, null, none, none, null, null);
+            yield return new("numpy==", false, null, null, none, none, null, null);
+            yield return new("==1.2", false, null, null, none, none, null, null);
+            yield return new("bad spec!", false, null, null, none, none, null, null);
+            yield return new("numpy scipy", false, null, null, none, none, null, null);
+            yield return new("numpy[", false, null, null, none, none, null, null);
+            yield return new("-numpy", false, null, null, none, none, null, null);
+            yield return new("numpy --pre", false, null, null, none, none, null, null);
+            yield return new("-e git+https://github.com/x/foo.git", false, null, null, none, none, null, null);
+            yield return new("git+https://github.com/x/foo.git", false, null, null, none, none, null, null);
+            yield return new("./foo.whl", false, null, null, none, none, null, null);
+        }
+
+        [Test, TestCaseSource(nameof(GetTryParsePackageSpecCases))]
+        public void TestPython3_Environs_TryParsePackageSpec(string spec, bool isValid, string name, string version, string[] extras, string[] specifiers, string url, string marker)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-98841
+            ILanguage py3 = GetLanguage(LanguageSpec.Python3);
+            dynamic runtime = py3.Runtime;
+
+            bool parsed = runtime.TryParsePackageSpec(spec, out string pName, out string pVersion, out string[] pExtras, out string[] pSpecifiers, out string pUrl, out string pMarker);
+
+            Assert.AreEqual(isValid, parsed, "parsed");
+            Assert.AreEqual(name, pName, "name");
+            Assert.AreEqual(version, pVersion, "version");
+            CollectionAssert.AreEquivalent(extras, pExtras, "extras");
+            CollectionAssert.AreEquivalent(specifiers, pSpecifiers, "specifiers");
+            Assert.AreEqual(url, pUrl, "url");
+            Assert.AreEqual(marker, pMarker, "marker");
         }
 
         [Test]
