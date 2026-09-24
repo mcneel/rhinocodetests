@@ -8983,7 +8983,9 @@ int x = 42;
 }
 ");
 
+            code.Language.Support.BeginSupport(code);
             string result = code.Language.Support.Format(SupportRequest.Empty, code, FormatOptions.Empty);
+            code.Language.Support.EndSupport(code);
 
             // unset IndentWithSpaces must fall back to spaces like every other
             // language path does. this used to default to tabs.
@@ -9005,7 +9007,9 @@ int x = 42;
 }
 ");
 
+            code.Language.Support.BeginSupport(code);
             string result = code.Language.Support.Format(SupportRequest.Empty, code, new FormatOptions { IndentWithSpaces = false });
+            code.Language.Support.EndSupport(code);
 
             StringAssert.Contains("\tpublic void Run()", result);
         }
