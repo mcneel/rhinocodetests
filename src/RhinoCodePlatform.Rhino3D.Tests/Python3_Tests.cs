@@ -3162,6 +3162,40 @@ from system.Collection.Generic import ");
         }
 
         [Test]
+        public void TestPython3_Environs_Specs_ToVersionString()
+        {
+            // NOTE:
+            // pip install arguments are built from ToVersionString so a 4th release
+            // number must not turn into '+build' e.g. '4.6.0.66' -> '4.6.0+66'
+            var testCases = new List<(CPythonPackageVersion spec, string expected)>
+            {
+                (new CPythonPackageVersion("4.6.0.66"),             "4.6.0.66"),
+                (new CPythonPackageVersion("4.8.0.76"),             "4.8.0.76"),
+                (new CPythonPackageVersion("1.2.3.4.5"),            "1.2.3.4.5"),
+                (new CPythonPackageVersion("1.0"),                  "1.0"),
+                (new CPythonPackageVersion("1.2.3"),                "1.2.3"),
+                (new CPythonPackageVersion("v1.0"),                 "1.0"),
+                (new CPythonPackageVersion("1.2.3rc3"),             "1.2.3rc3"),
+                (new CPythonPackageVersion("1.2.3.post1"),          "1.2.3.post1"),
+                (new CPythonPackageVersion("1.0.dev456"),           "1.0.dev456"),
+                (new CPythonPackageVersion("1.0rc1+abc123"),        "1.0rc1+abc123"),
+                (new CPythonPackageVersion("2.0.1+cu118"),          "2.0.1+cu118"),
+                (new CPythonPackageVersion("1!2.0"),                "1!2.0"),
+            };
+
+            foreach ((CPythonPackageVersion spec, string expected) in testCases)
+            {
+                Assert.That(spec.ToVersionString(), Is.EqualTo(expected));
+            }
+
+            var pkgSpec = new CPythonPackageSpec("opencv-contrib-python", new CPythonPackageVersion("4.6.0.66"), PackageSpec.VersionCompareRule.Exact);
+            Assert.That(pkgSpec.ToPackageString(), Is.EqualTo("opencv-contrib-python==4.6.0.66"));
+
+            pkgSpec = new CPythonPackageSpec("opencv-contrib-python", new CPythonPackageVersion("4.6.0.66"), PackageSpec.VersionCompareRule.NewerThanOrEqual);
+            Assert.That(pkgSpec.ToPackageString(), Is.EqualTo("opencv-contrib-python>=4.6.0.66"));
+        }
+
+        [Test]
         public void TestPython3_Environs_Specs_ParseExtras()
         {
             CPythonPackageSpec[] specs;
