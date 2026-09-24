@@ -281,8 +281,10 @@ namespace RhinoCodePlatform.Rhino3D.Tests
 
       index++;
       entry = entries.ElementAt(index);
-      Assert.AreEqual(1, entry.Directive.SpecSet.Count);
-      Assert.Contains(env.Parse("git+https://github.com/huggingface/transformers.git").First(), entry.Directive.SpecSet.ToArray());
+      PackageSpec[] specs = entry.Directive.SpecSet.ToArray();
+      Assert.AreEqual(2, specs.Length);  // numpy and transformers
+      Assert.Contains(env.Parse("numpy").First(), specs);
+      Assert.Contains(env.Parse("git+https://github.com/huggingface/transformers.git").First(), specs);
 
       index++;
       entry = entries.ElementAt(index);
