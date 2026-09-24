@@ -2965,20 +2965,20 @@ from system.Collection.Generic import ");
         {
             var env = (CPythonEnvirons)GetLanguage(LanguageSpec.Python3).Environs;
 
-            CPythonPackageSpec spec = env.ParsePackageSpecs("wood-nano").First();
+            CPythonPackageSpec spec = env.Parse("wood-nano").First();
 
             CPythonPackageSpec normSpec;
 
-            normSpec = env.ParsePackageSpecs("wood_nano==0.0.1").First();
+            normSpec = env.Parse("wood_nano==0.0.1").First();
             Assert.IsTrue(spec.Matches(normSpec));
 
-            normSpec = env.ParsePackageSpecs("wood--nano==0.0.1").First();
+            normSpec = env.Parse("wood--nano==0.0.1").First();
             Assert.IsTrue(spec.Matches(normSpec));
 
-            normSpec = env.ParsePackageSpecs("wood__nano==0.0.1").First();
+            normSpec = env.Parse("wood__nano==0.0.1").First();
             Assert.IsTrue(spec.Matches(normSpec));
 
-            normSpec = env.ParsePackageSpecs("wood.-nano==0.0.1").First();
+            normSpec = env.Parse("wood.-nano==0.0.1").First();
             Assert.IsTrue(spec.Matches(normSpec));
         }
 
@@ -3205,17 +3205,17 @@ from system.Collection.Generic import ");
             CPythonPackageSpec[] specs;
             CPythonPackageSpec spec;
 
-            specs = env.ParsePackageSpecs("jax").ToArray();
+            specs = env.Parse("jax").ToArray();
             Assert.That(specs.Length, Is.EqualTo(1));
             spec = specs[0];
             Assert.That(spec.ToPackageString(), Is.EqualTo("jax"));
 
-            specs = env.ParsePackageSpecs("jax[tpu]").ToArray();
+            specs = env.Parse("jax[tpu]").ToArray();
             Assert.That(specs.Length, Is.EqualTo(1));
             spec = specs[0];
             Assert.That(spec.ToPackageString(), Is.EqualTo("jax[tpu]"));
 
-            specs = env.ParsePackageSpecs("requests[security] uvicorn[standard]>=1.2").ToArray();
+            specs = env.Parse("requests[security] uvicorn[standard]>=1.2").ToArray();
             Assert.That(specs.Length, Is.EqualTo(2));
             spec = specs[0];
             Assert.That(spec.ToPackageString(), Is.EqualTo("requests[security]"));
@@ -3279,8 +3279,8 @@ from system.Collection.Generic import ");
         {
             var env = (CPythonEnvirons)GetLanguage(LanguageSpec.Python3).Environs;
 
-            CPythonPackageSpec s1 = env.ParsePackageSpecs("-e git+https://github.com/uiri/toml.git#egg=toml").First();
-            CPythonPackageSpec s2 = env.ParsePackageSpecs("--editable git+https://github.com/uiri/toml.git#egg=toml").First();
+            CPythonPackageSpec s1 = env.Parse("-e git+https://github.com/uiri/toml.git#egg=toml").First();
+            CPythonPackageSpec s2 = env.Parse("--editable git+https://github.com/uiri/toml.git#egg=toml").First();
 
             Assert.That(s1, Is.InstanceOf<CPythonPackageArgsSpec>());
             Assert.That(s2, Is.InstanceOf<CPythonPackageArgsSpec>());
