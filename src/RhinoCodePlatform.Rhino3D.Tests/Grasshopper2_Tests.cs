@@ -60,6 +60,12 @@ namespace RhinoCodePlatform.Rhino3D.Tests
       return io.Document;
     }
 
+    // kept here so test methods do not touch gh2 types (see NOTE in TestGH2_Script)
+    public static Code CreateCode(string text)
+    {
+      return new RhinoCodePlatform.Rhino3D.Languages.GH2.Grasshopper2Script(text).CreateCode();
+    }
+
     public static bool AssertTruthy(Solution solution)
     {
       // There is an overload which takes a cancellation source.
