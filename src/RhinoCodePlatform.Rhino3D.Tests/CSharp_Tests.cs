@@ -23,6 +23,7 @@ using Rhino.Runtime.Code.Testing;
 using Rhino.Runtime.Code.Text;
 using System.Text.RegularExpressions;
 
+using RhinoCodePlatform.GH.Context;
 using RhinoCodePlatform.Rhino3D.Languages.GH1;
 using Mono.Cecil;
 
@@ -392,6 +393,82 @@ public class Script_Instance
             code.Debug(new DebugContext() { OutputStream = swallow });
 
             Assert.True(controls.Pass);
+        }
+
+        [Test]
+        public void TestCSharp_DebugVars_GH1ScriptInstance_RunScriptParams()
+        {
+            // detect RunScript parameters are visible when debugging.
+            // this could happen if roslyn trace-injector filters out method parameters
+            Code code = new Grasshopper1Script(@"// #! csharp
+using System;
+using Grasshopper.Kernel;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(int x, int y, ref object a)
+    {
+        a = x + y; // line 9
+    }
+}
+").CreateCode();
+
+            AssertRunScriptParamsVisible(code, 9);
+        }
+
+        [Test]
+        public void TestCSharp_DebugVars_GH2ScriptInstance_RunScriptParams()
+        {
+            // detect RunScript parameters are visible when debugging.
+            // this could happen if roslyn trace-injector filters out method parameters
+            Code code = Grasshopper2_Tests_Utils.CreateCode(@"// #! csharp
+using System;
+using Grasshopper2.Components;
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(int x, int y, ref object a)
+    {
+        a = x + y; // line 9
+    }
+}
+");
+
+            AssertRunScriptParamsVisible(code, 9);
+        }
+
+        static void AssertRunScriptParamsVisible(Code code, int line)
+        {
+            // run once so the script creates its instance, then debug RunScript
+            // on it the way grasshopper does
+            var ctx = new RunContext { Outputs = { [ScriptRunGroup.SCRIPTINSTANCE_VAR] = default } };
+            code.Run(ctx);
+            object instance = ctx.Outputs.Get(ScriptRunGroup.SCRIPTINSTANCE_VAR);
+            MethodInfo runScript = instance.GetType().GetMethod("RunScript", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            // DebugVerifyVarsControls expected checks always pass so collect slots instead
+            var visible = new Dictionary<string, object>();
+            var controls = new DebugVerifyVarsControls(new CodeReferenceBreakpoint(code, line), Array.Empty<ExpectedVariable>())
+            {
+                OnReceivedExpected = slot =>
+                {
+                    visible[slot.Id.Identifier] = slot.TryGetValue(out object value) ? value : default;
+                    return true;
+                }
+            };
+            code.DebugControls = controls;
+
+            using (DebugContext dctx = new())
+            {
+                using DebugGroup g = code.DebugWith(dctx);
+                runScript.Invoke(instance, new object[] { 21, 21, null });
+            }
+
+            Assert.True(controls.Pass);
+            Assert.True(visible.TryGetValue("x", out object x));
+            Assert.AreEqual(21, x);
+            Assert.True(visible.TryGetValue("y", out object y));
+            Assert.AreEqual(21, y);
         }
 
         [Test]
