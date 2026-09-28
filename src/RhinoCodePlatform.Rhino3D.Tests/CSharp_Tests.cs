@@ -413,7 +413,7 @@ public class Script_Instance : GH_ScriptInstance
 }
 ").CreateCode();
 
-            AssertRunScriptParamsVisible(code, 9);
+            AssertRunScriptParams(code, 9);
         }
 
         [Test]
@@ -434,40 +434,36 @@ public class Script_Instance : GH_ScriptInstance
 }
 ");
 
-            AssertRunScriptParamsVisible(code, 9);
+            AssertRunScriptParams(code, 9);
         }
 
-        static void AssertRunScriptParamsVisible(Code code, int line)
+        static void AssertRunScriptParams(Code code, int line)
         {
-            // run once so the script creates its instance, then debug RunScript
-            // on it the way grasshopper does
-            var ctx = new RunContext { Outputs = { [ScriptRunGroup.SCRIPTINSTANCE_VAR] = default } };
-            code.Run(ctx);
-            object instance = ctx.Outputs.Get(ScriptRunGroup.SCRIPTINSTANCE_VAR);
-            MethodInfo runScript = instance.GetType().GetMethod("RunScript", BindingFlags.Instance | BindingFlags.NonPublic);
-
-            // DebugVerifyVarsControls expected checks always pass so collect slots instead
-            var visible = new Dictionary<string, object>();
-            var controls = new DebugVerifyVarsControls(new CodeReferenceBreakpoint(code, line), Array.Empty<ExpectedVariable>())
+            var expected = new Dictionary<string, object>();
+            var controls = new DebugVerifyVarsControls(new CodeReferenceBreakpoint(code, line), new ExpectedVariable[] { new("this"), new("x"), new("y"), new("a") })
             {
-                OnReceivedExpected = slot =>
+                OnReceivedExpected = s =>
                 {
-                    visible[slot.Id.Identifier] = slot.TryGetValue(out object value) ? value : default;
+                    expected[s.Id.Identifier] = s.TryGetValue(out object value) ? value : default;
                     return true;
                 }
             };
             code.DebugControls = controls;
 
-            using (DebugContext dctx = new())
-            {
-                using DebugGroup g = code.DebugWith(dctx);
-                runScript.Invoke(instance, new object[] { 21, 21, null });
-            }
+            // run once so the script creates its instance, then debug RunScript on it the way grasshopper does
+            var ctx = new DebugContext { Outputs = { [ScriptRunGroup.SCRIPTINSTANCE_VAR] = default } };
+            code.Debug(ctx);
+            object instance = ctx.Outputs.Get(ScriptRunGroup.SCRIPTINSTANCE_VAR);
+            MethodInfo runScript = instance.GetType().GetMethod("RunScript", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            using DebugGroup g = code.DebugWith(new DebugContext());
+            runScript.Invoke(instance, new object[] { 21, 21, null });
 
             Assert.True(controls.Pass);
-            Assert.True(visible.TryGetValue("x", out object x));
+            Assert.AreEqual(expected.Count, 4);
+            Assert.True(expected.TryGetValue("x", out object x));
             Assert.AreEqual(21, x);
-            Assert.True(visible.TryGetValue("y", out object y));
+            Assert.True(expected.TryGetValue("y", out object y));
             Assert.AreEqual(21, y);
         }
 
