@@ -2879,6 +2879,37 @@ foreach (int {INDEX_VAR} in Enumerable.Range(0, 3)) // line 6
             Assert.AreEqual(3, bp8Counter);
         }
 
+        static IEnumerable<TestCaseData> GetDebugTracingIfStatementCases()
+        {
+            const string L = "using System.Linq;\nvar list = new System.Collections.Generic.List<int>{1};\nint n = 0;\n";
+
+            yield return new("using System.Linq;\nint n = 0;\nif (n > 0) n++;\n") { TestName = "TestCSharp_DebugTracing_If_PlainCondition" };
+            yield return new(L + "if (list.Any(x => x.Equals(1))) n++;\n") { TestName = "TestCSharp_DebugTracing_If_LambdaInvocationBody" };
+            yield return new(L + "if (list.Any(x => x > 0)) n++;\n") { TestName = "TestCSharp_DebugTracing_If_LambdaCondition" };
+            yield return new(L + "if (list.Any(x => x > 0)) { n++; }\n") { TestName = "TestCSharp_DebugTracing_If_LambdaCondition_Block" };
+            yield return new(L + "if (list.Any(x => x > 0)) n++; else n--;\n") { TestName = "TestCSharp_DebugTracing_If_LambdaCondition_Else" };
+            yield return new("int n = 0;\nif (n > 0) n++;\nelse if (n < 0) n--;\n") { TestName = "TestCSharp_DebugTracing_ElseIf_PlainConditions" };
+            yield return new(L + "if (n > 0) n++;\nelse if (list.Any(x => x > 0)) n--;\n") { TestName = "TestCSharp_DebugTracing_ElseIf_LambdaCondition" };
+            yield return new(L + "if (list.Any(x => x > 0)) { if (n == 0) n++; }\n") { TestName = "TestCSharp_DebugTracing_If_NestedInLambdaConditionBody" };
+            yield return new(L + "while (list.Any(x => x > n)) n++;\n") { TestName = "TestCSharp_DebugTracing_While_LambdaCondition" };
+            yield return new("var d = new System.Collections.Generic.Dictionary<int,int> { [0] = 42 };\n"
+                           + "if (d.TryGetValue(0, out int v1)\n      && d.TryGetValue(0, out int v2))\n{\n  System.Console.WriteLine(v1);\n  System.Console.WriteLine(v2);\n}\n"
+                           + "else\n{\n  System.Console.WriteLine(\"else\");\n}\n") { TestName = "TestCSharp_DebugTracing_If_OutVarsNotInElse" };
+            yield return new("object o = 1;\nint n = 0;\nif (o is int i && i > 0) n++; else n--;\n") { TestName = "TestCSharp_DebugTracing_If_PatternVarNotInElse" };
+            yield return new("int n = 0;\nusing (var s = new System.IO.MemoryStream()) if (s.Length == 0) n++;\n") { TestName = "TestCSharp_DebugTracing_Using_IfBody" };
+        }
+
+        [Test, TestCaseSource(nameof(GetDebugTracingIfStatementCases))]
+        public void TestCSharp_DebugTracing_IfStatement(string source)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99122
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(source);
+
+            code.DebugControls = new DebugContinueAllControls();
+
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
         [Test]
         public void TestCSharp_DebugTracing_StackWatch_L1_Single()
         {
