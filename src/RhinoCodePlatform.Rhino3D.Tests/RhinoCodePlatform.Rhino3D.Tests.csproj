@@ -2,7 +2,7 @@
   <PropertyGroup>
     <!-- Disabled since Rhino.Inside in net48 has problem loading GHPython (System.__ComObject issue) -->
     <!--<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('Windows'))">net48;net7.0-windows</TargetFrameworks>-->
-    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('Windows'))">net7.0-windows</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('Windows'))">net7.0-windows;net9.0-windows</TargetFrameworks>
     <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('OSX'))">net7.0</TargetFrameworks>
     <NoWarn>$(NoWarn);SYSLIB0014</NoWarn>
   </PropertyGroup>
