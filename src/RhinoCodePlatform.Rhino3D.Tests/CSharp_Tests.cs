@@ -4649,6 +4649,162 @@ func_test_error();                              // LINE 7
             }
         }
 
+        // RH-99666: handled exception must not stop debugger from pausing on later breakpoints
+        static readonly string s_csharpExceptionHandledScript = @"
+using System;
+static void FirstFunction()
+{
+    Console.WriteLine(""Start of FirstFunction"");     // LINE 5
+    throw new Exception(""First Problem"");             // LINE / EXCEPTION 6
+}
+static void SecondFunction()
+{
+    Console.WriteLine(""Start of SecondFunction"");    // LINE 10
+    throw new Exception(""Second Problem"");            // LINE / EXCEPTION 11
+}
+try
+{
+    FirstFunction();
+}
+catch (Exception error)
+{
+    Console.WriteLine($""FirstFunction run: {error.Message}"");
+}
+try
+{
+    SecondFunction();
+}
+catch (Exception error)
+{
+    Console.WriteLine($""SecondFunction run: {error.Message}"");
+}
+";
+
+        // SecondFunction exception is uncaught and escapes the run
+        static readonly string s_csharpExceptionUncaughtScript = @"
+using System;
+static void FirstFunction()
+{
+    Console.WriteLine(""Start of FirstFunction"");     // LINE 5
+    throw new Exception(""First Problem"");             // LINE / EXCEPTION 6
+}
+static void SecondFunction()
+{
+    Console.WriteLine(""Start of SecondFunction"");    // LINE 10
+    throw new Exception(""Second Problem"");            // LINE / EXCEPTION 11
+}
+try
+{
+    FirstFunction();
+}
+catch (Exception error)
+{
+    Console.WriteLine($""FirstFunction run: {error.Message}"");
+}
+SecondFunction();
+";
+
+        [Test]
+        public void TestCSharp_DebugTracing_Continue_Exception_Handled_Breakpoints_PauseOnNone()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s_csharpExceptionHandledScript);
+
+            DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnNone, new[] { 5, 10 },
+                new(5, ExecEvent.Line, DebugAction.Continue),
+                new(10, ExecEvent.Line, DebugAction.Continue)
+            );
+        }
+
+        [Test]
+        public void TestCSharp_DebugTracing_Continue_Exception_Handled_Breakpoints_PauseOnUncaught()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s_csharpExceptionHandledScript);
+
+            DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnUncaught, new[] { 5, 10 },
+                new(5, ExecEvent.Line, DebugAction.Continue),
+                new(10, ExecEvent.Line, DebugAction.Continue)
+            );
+        }
+
+        [Test]
+        public void TestCSharp_DebugTracing_Continue_Exception_Handled_Breakpoints_PauseOnAny()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s_csharpExceptionHandledScript);
+
+            DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnAny, new[] { 5, 10 },
+                new(5, ExecEvent.Line, DebugAction.Continue),
+                new(6, ExecEvent.Exception, DebugAction.Continue),
+                new(10, ExecEvent.Line, DebugAction.Continue),
+                new(11, ExecEvent.Exception, DebugAction.Continue)
+            );
+        }
+
+        [Test]
+        public void TestCSharp_DebugTracing_Continue_Exception_Uncaught_Breakpoints_PauseOnNone()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s_csharpExceptionUncaughtScript);
+
+            DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnNone, new[] { 5, 10 },
+                new(5, ExecEvent.Line, DebugAction.Continue),
+                new(10, ExecEvent.Line, DebugAction.Continue)
+            );
+        }
+
+        [Test]
+        public void TestCSharp_DebugTracing_Continue_Exception_Uncaught_Breakpoints_PauseOnUncaught()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s_csharpExceptionUncaughtScript);
+
+            DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnUncaught, new[] { 5, 10 },
+                new(5, ExecEvent.Line, DebugAction.Continue),
+                new(10, ExecEvent.Line, DebugAction.Continue),
+                new(11, ExecEvent.Exception, DebugAction.Continue)
+            );
+        }
+
+        [Test]
+        public void TestCSharp_DebugTracing_Continue_Exception_Uncaught_Breakpoints_PauseOnAny()
+        {
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s_csharpExceptionUncaughtScript);
+
+            DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnAny, new[] { 5, 10 },
+                new(5, ExecEvent.Line, DebugAction.Continue),
+                new(6, ExecEvent.Exception, DebugAction.Continue),
+                new(10, ExecEvent.Line, DebugAction.Continue),
+                new(11, ExecEvent.Exception, DebugAction.Continue)
+            );
+        }
+
+        static void DebugWithExceptionPolicy(Code code, DebugPauseOnExceptionPolicy policy, int[] breakpoints, params ExpectedPauseEventStep[] steps)
+        {
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>();
+            foreach (ExpectedPauseEventStep step in steps)
+                controls.Add(step);
+
+            controls.SetPauseOnExceptionPolicy(policy);
+            foreach (int line in breakpoints)
+                controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, line));
+
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            try
+            {
+                code.Debug(new DebugContext());
+            }
+            catch (ExecuteException ex)
+            {
+                if (ex.InnerException is TestException te)
+                    throw te;
+            }
+        }
+
         [Test]
         public void TestCSharp_DebugTracing_Exception_StopDebug()
         {

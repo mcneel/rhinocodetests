@@ -1485,6 +1485,140 @@ func_test_error()
             }
         }
 
+        // RH-99666: handled exception must not stop debugger from pausing on later breakpoints
+        static readonly string s_pythonExceptionHandledScript = @"
+def first_function():                       # CALL 2
+    print('Start of first_function')        # LINE 3
+    raise Exception('First Problem')        # LINE / EXCEPTION 4
+def second_function():                      # CALL 5
+    print('Start of second_function')       # LINE 6
+    raise Exception('Second Problem')       # LINE / EXCEPTION 7
+try:
+    first_function()
+except Exception as error:
+    print('first_function run: ' + str(error))
+try:
+    second_function()
+except Exception as error:
+    print('second_function run: ' + str(error))
+";
+
+        // second_function exception is uncaught and escapes the run
+        static readonly string s_pythonExceptionUncaughtScript = @"
+def first_function():                       # CALL 2
+    print('Start of first_function')        # LINE 3
+    raise Exception('First Problem')        # LINE / EXCEPTION 4
+def second_function():                      # CALL 5
+    print('Start of second_function')       # LINE 6
+    raise Exception('Second Problem')       # LINE / EXCEPTION 7
+try:
+    first_function()
+except Exception as error:
+    print('first_function run: ' + str(error))
+second_function()
+";
+
+        [Test, TestCaseSource(nameof(GetPythons))]
+        public void TestPython_DebugTracing_Continue_Exception_Handled_Breakpoints_PauseOnNone(LanguageSpec spec)
+        {
+            Code code = GetLanguage(spec).CreateCode(s_pythonExceptionHandledScript);
+
+            DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnNone, new[] { 3, 6 },
+                new(3, ExecEvent.Line, DebugAction.Continue),
+                new(6, ExecEvent.Line, DebugAction.Continue)
+            );
+        }
+
+        [Test, TestCaseSource(nameof(GetPythons))]
+        public void TestPython_DebugTracing_Continue_Exception_Handled_Breakpoints_PauseOnUncaught(LanguageSpec spec)
+        {
+            Code code = GetLanguage(spec).CreateCode(s_pythonExceptionHandledScript);
+
+            DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnUncaught, new[] { 3, 6 },
+                new(3, ExecEvent.Line, DebugAction.Continue),
+                new(6, ExecEvent.Line, DebugAction.Continue)
+            );
+        }
+
+        [Test, TestCaseSource(nameof(GetPythons))]
+        public void TestPython_DebugTracing_Continue_Exception_Handled_Breakpoints_PauseOnAny(LanguageSpec spec)
+        {
+            Code code = GetLanguage(spec).CreateCode(s_pythonExceptionHandledScript);
+
+            DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnAny, new[] { 3, 6 },
+                new(3, ExecEvent.Line, DebugAction.Continue),
+                new(4, ExecEvent.Exception, DebugAction.Continue),
+                new(6, ExecEvent.Line, DebugAction.Continue),
+                new(7, ExecEvent.Exception, DebugAction.Continue)
+            );
+        }
+
+        [Test, TestCaseSource(nameof(GetPythons))]
+        public void TestPython_DebugTracing_Continue_Exception_Uncaught_Breakpoints_PauseOnNone(LanguageSpec spec)
+        {
+            Code code = GetLanguage(spec).CreateCode(s_pythonExceptionUncaughtScript);
+
+            DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnNone, new[] { 3, 6 },
+                new(3, ExecEvent.Line, DebugAction.Continue),
+                new(6, ExecEvent.Line, DebugAction.Continue)
+            );
+        }
+
+        [Test, TestCaseSource(nameof(GetPythons))]
+        public void TestPython_DebugTracing_Continue_Exception_Uncaught_Breakpoints_PauseOnUncaught(LanguageSpec spec)
+        {
+            Code code = GetLanguage(spec).CreateCode(s_pythonExceptionUncaughtScript);
+
+            DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnUncaught, new[] { 3, 6 },
+                new(3, ExecEvent.Line, DebugAction.Continue),
+                new(6, ExecEvent.Line, DebugAction.Continue),
+                new(7, ExecEvent.Exception, DebugAction.Continue)
+            );
+        }
+
+        [Test, TestCaseSource(nameof(GetPythons))]
+        public void TestPython_DebugTracing_Continue_Exception_Uncaught_Breakpoints_PauseOnAny(LanguageSpec spec)
+        {
+            Code code = GetLanguage(spec).CreateCode(s_pythonExceptionUncaughtScript);
+
+            DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnAny, new[] { 3, 6 },
+                new(3, ExecEvent.Line, DebugAction.Continue),
+                new(4, ExecEvent.Exception, DebugAction.Continue),
+                new(6, ExecEvent.Line, DebugAction.Continue),
+                new(7, ExecEvent.Exception, DebugAction.Continue)
+            );
+        }
+
+        static void DebugWithExceptionPolicy(Code code, DebugPauseOnExceptionPolicy policy, int[] breakpoints, params ExpectedPauseEventStep[] steps)
+        {
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>();
+            foreach (ExpectedPauseEventStep step in steps)
+                controls.Add(step);
+
+            controls.SetPauseOnExceptionPolicy(policy);
+            foreach (int line in breakpoints)
+                controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, line));
+
+            controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
+            {
+                bool pass = frame.Event == step.Event && frame.Reference.Position.LineNumber == step.Line;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"{step.Line} !! {frame.Event} {frame.Reference.Position}");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            try
+            {
+                code.Debug(new DebugContext());
+            }
+            catch (ExecuteException ex)
+            {
+                if (ex.InnerException is TestException te)
+                    throw te;
+            }
+        }
+
         [Test, TestCaseSource(nameof(GetPythons))]
         public void TestPython_DebugTracing_Pass_Single(LanguageSpec spec)
         {
