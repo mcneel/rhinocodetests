@@ -4501,6 +4501,7 @@ func_test_error();                              // LINE 7
         [Test, TestCaseSource(nameof(GetDebugActionCases))]
         public void TestCSharp_DebugTracing_Exception_StepOver(DebugAction action)
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99666
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
@@ -4514,7 +4515,7 @@ func_test_error();                              // LINE 7
             var controls = new DebugPauseDetectorControls<ExpectedPauseEventStep>
             {
                 new ( 7, ExecEvent.Line, DebugAction.StepOver),
-                new ( 7, ExecEvent.Exception, action),
+                new ( 5, ExecEvent.Exception, action),
             };
             controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 7));
             controls.PauseOnStep += (ExpectedPauseEventStep step, ExecFrame frame) =>
@@ -4707,6 +4708,7 @@ SecondFunction();
         [Test]
         public void TestCSharp_DebugTracing_Continue_Exception_Handled_Breakpoints_PauseOnNone()
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99666
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s_csharpExceptionHandledScript);
 
             DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnNone, new[] { 5, 10 },
@@ -4718,6 +4720,7 @@ SecondFunction();
         [Test]
         public void TestCSharp_DebugTracing_Continue_Exception_Handled_Breakpoints_PauseOnUncaught()
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99666
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s_csharpExceptionHandledScript);
 
             DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnUncaught, new[] { 5, 10 },
@@ -4729,6 +4732,7 @@ SecondFunction();
         [Test]
         public void TestCSharp_DebugTracing_Continue_Exception_Handled_Breakpoints_PauseOnAny()
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99666
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s_csharpExceptionHandledScript);
 
             DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnAny, new[] { 5, 10 },
@@ -4742,6 +4746,7 @@ SecondFunction();
         [Test]
         public void TestCSharp_DebugTracing_Continue_Exception_Uncaught_Breakpoints_PauseOnNone()
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99666
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s_csharpExceptionUncaughtScript);
 
             DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnNone, new[] { 5, 10 },
@@ -4753,6 +4758,7 @@ SecondFunction();
         [Test]
         public void TestCSharp_DebugTracing_Continue_Exception_Uncaught_Breakpoints_PauseOnUncaught()
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99666
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s_csharpExceptionUncaughtScript);
 
             DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnUncaught, new[] { 5, 10 },
@@ -4765,6 +4771,7 @@ SecondFunction();
         [Test]
         public void TestCSharp_DebugTracing_Continue_Exception_Uncaught_Breakpoints_PauseOnAny()
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99666
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s_csharpExceptionUncaughtScript);
 
             DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnAny, new[] { 5, 10 },
