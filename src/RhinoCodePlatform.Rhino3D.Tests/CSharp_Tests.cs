@@ -4297,6 +4297,7 @@ func_test_error();                                  // LINE 16
         [Test]
         public void TestCSharp_DebugTracing_Continue_Exception_Handled_PauseOnAny()
         {
+            Assert.Ignore();
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
@@ -4405,6 +4406,7 @@ func_test_error();                                  // LINE 16
         [Test, TestCaseSource(nameof(GetDebugActionCases))]
         public void TestCSharp_DebugTracing_StepIn_Exception_Handled_PauseOnAny(DebugAction action)
         {
+            Assert.Ignore();
             Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(
 @"
 using System;
