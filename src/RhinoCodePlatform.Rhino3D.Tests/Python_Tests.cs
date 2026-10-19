@@ -1521,6 +1521,7 @@ second_function()
         [Test, TestCaseSource(nameof(GetPythons))]
         public void TestPython_DebugTracing_Continue_Exception_Handled_Breakpoints_PauseOnNone(LanguageSpec spec)
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99666
             Code code = GetLanguage(spec).CreateCode(s_pythonExceptionHandledScript);
 
             DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnNone, new[] { 3, 6 },
@@ -1532,6 +1533,7 @@ second_function()
         [Test, TestCaseSource(nameof(GetPythons))]
         public void TestPython_DebugTracing_Continue_Exception_Handled_Breakpoints_PauseOnUncaught(LanguageSpec spec)
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99666
             Code code = GetLanguage(spec).CreateCode(s_pythonExceptionHandledScript);
 
             DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnUncaught, new[] { 3, 6 },
@@ -1543,6 +1545,7 @@ second_function()
         [Test, TestCaseSource(nameof(GetPythons))]
         public void TestPython_DebugTracing_Continue_Exception_Handled_Breakpoints_PauseOnAny(LanguageSpec spec)
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99666
             Code code = GetLanguage(spec).CreateCode(s_pythonExceptionHandledScript);
 
             DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnAny, new[] { 3, 6 },
@@ -1556,6 +1559,7 @@ second_function()
         [Test, TestCaseSource(nameof(GetPythons))]
         public void TestPython_DebugTracing_Continue_Exception_Uncaught_Breakpoints_PauseOnNone(LanguageSpec spec)
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99666
             Code code = GetLanguage(spec).CreateCode(s_pythonExceptionUncaughtScript);
 
             DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnNone, new[] { 3, 6 },
@@ -1567,6 +1571,7 @@ second_function()
         [Test, TestCaseSource(nameof(GetPythons))]
         public void TestPython_DebugTracing_Continue_Exception_Uncaught_Breakpoints_PauseOnUncaught(LanguageSpec spec)
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99666
             Code code = GetLanguage(spec).CreateCode(s_pythonExceptionUncaughtScript);
 
             DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnUncaught, new[] { 3, 6 },
@@ -1579,6 +1584,7 @@ second_function()
         [Test, TestCaseSource(nameof(GetPythons))]
         public void TestPython_DebugTracing_Continue_Exception_Uncaught_Breakpoints_PauseOnAny(LanguageSpec spec)
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99666
             Code code = GetLanguage(spec).CreateCode(s_pythonExceptionUncaughtScript);
 
             DebugWithExceptionPolicy(code, DebugPauseOnExceptionPolicy.PauseOnAny, new[] { 3, 6 },
