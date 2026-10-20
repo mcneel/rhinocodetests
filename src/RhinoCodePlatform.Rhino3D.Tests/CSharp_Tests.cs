@@ -4229,7 +4229,6 @@ int f = m;
             {
                 // before
                 new (3, ExecEvent.Line, DebugAction.StepOver),
-                new (3, ExecEvent.Line, DebugAction.StepOver),  // FIXME should not be here
 
                 // 2
                 new (4, ExecEvent.Line, DebugAction.StepOver),
@@ -4237,7 +4236,7 @@ int f = m;
 
                 // 1
                 new (4, ExecEvent.Line, DebugAction.StepOver),
-                // new ( 3, ExecEvent.Line, DebugAction.StepOver),  // FIXME shoud be here
+                new (3, ExecEvent.Line, DebugAction.StepOver),
 
                 // after
                 new (6, ExecEvent.Line, DebugAction.StepOver),
@@ -4253,6 +4252,760 @@ int f = m;
 
             code.DebugControls = controls;
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        static IEnumerable<TestCaseData> GetStepOverLoopSlotsCases()
+        {
+            // for: loop line shows the value from the pass that just ended; body shows the new one
+            yield return new(@"
+int sum = 0;                            // LINE 2
+for (int i = 0; i < 3; i++)             // LINE 3
+{                                       // LINE 4
+    sum += i;                           // LINE 5
+}                                       // LINE 6
+int done = sum;                         // LINE 7
+", "i sum", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "sum=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=1 sum=0", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=1 sum=1", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=2 sum=1", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=2 sum=3", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "sum=3", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_For_Basic" };
+
+            // foreach: loop line shows the item from the pass that just ended; body shows the new one
+            yield return new(@"
+int sum = 0;                            // LINE 2
+foreach (int i in new[] { 0, 1, 2 })    // LINE 3
+{                                       // LINE 4
+    sum += i;                           // LINE 5
+}                                       // LINE 6
+int done = sum;                         // LINE 7
+", "i sum", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "sum=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=1 sum=0", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=1 sum=1", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=2 sum=1", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=2 sum=3", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "sum=3", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_ForEach_Basic" };
+
+            // while: one stop on the loop line before each condition check, including the last one
+            yield return new(@"
+int m = 3;                              // LINE 2
+while (m > 0)                           // LINE 3
+{                                       // LINE 4
+    m -= 1;                             // LINE 5
+}                                       // LINE 6
+int done = m;                           // LINE 7
+", "m", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "m=3", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "m=3", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "m=2", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "m=2", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "m=1", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "m=1", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "m=0", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "m=0", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_While_Basic" };
+
+            // do-while: stop on "do" before the loop, then on the "while (...)" line before each condition check
+            yield return new(@"
+int m = 3;                              // LINE 2
+do                                      // LINE 3
+{                                       // LINE 4
+    m -= 1;                             // LINE 5
+} while (m > 0);                        // LINE 6
+int done = m;                           // LINE 7
+", "m", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "m=3", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "m=3", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "m=2", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "m=2", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "m=1", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "m=1", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "m=0", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "m=0", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_DoWhile_Basic" };
+
+            // for: body without braces, on its own line and on the loop line
+            yield return new(@"
+int a = 0;                              // LINE 2
+for (int i = 0; i < 2; i++)             // LINE 3
+    a += i;                             // LINE 4
+int b = 0;                              // LINE 5
+for (int j = 0; j < 2; j++) b += j;     // LINE 6
+int done = a + b;                       // LINE 7
+", "i j a b", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "a=0", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "i=0 a=0", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=0 a=0", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "i=1 a=0", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=1 a=1", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "a=1", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "a=1 b=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "j=0 a=1 b=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "j=0 a=1 b=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "j=1 a=1 b=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "j=1 a=1 b=1", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "a=1 b=1", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_For_No_Braces" };
+
+            // foreach: body without braces, on its own line and on the loop line
+            yield return new(@"
+int a = 0;                              // LINE 2
+foreach (int i in new[] { 0, 1 })       // LINE 3
+    a += i;                             // LINE 4
+int b = 0;                              // LINE 5
+foreach (int j in new[] { 0, 1 }) b += j;// LINE 6
+int done = a + b;                       // LINE 7
+", "i j a b", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "a=0", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "i=0 a=0", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=0 a=0", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "i=1 a=0", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=1 a=1", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "a=1", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "a=1 b=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "j=0 a=1 b=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "j=0 a=1 b=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "j=1 a=1 b=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "j=1 a=1 b=1", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "a=1 b=1", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_ForEach_No_Braces" };
+
+            // for in for (RH-89539): one stop on the inner loop line when entering it, not two
+            yield return new(@"
+int count = 0;                          // LINE 2
+for (int i = 0; i < 2; i++)             // LINE 3
+{                                       // LINE 4
+    for (int j = 0; j < 2; j++)         // LINE 5
+    {                                   // LINE 6
+        count += 1;                     // LINE 7
+    }                                   // LINE 8
+}                                       // LINE 9
+int done = count;                       // LINE 10
+", "i j count", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "count=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=0 count=0", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=0 j=0 count=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=0 j=0 count=1", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=0 j=1 count=1", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=0 j=1 count=2", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=0 count=2", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=1 count=2", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=1 j=0 count=2", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=1 j=0 count=3", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=1 j=1 count=3", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=1 j=1 count=4", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=1 count=4", DebugAction.StepOver),
+                new (10, ExecEvent.Line, "count=4", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_For_Nested" };
+
+            // foreach in foreach: one stop on the inner loop line when entering it, not two
+            yield return new(@"
+int count = 0;                          // LINE 2
+foreach (int i in new[] { 0, 1 })       // LINE 3
+{                                       // LINE 4
+    foreach (int j in new[] { 0, 1 })   // LINE 5
+    {                                   // LINE 6
+        count += 1;                     // LINE 7
+    }                                   // LINE 8
+}                                       // LINE 9
+int done = count;                       // LINE 10
+", "i j count", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "count=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=0 count=0", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=0 j=0 count=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=0 j=0 count=1", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=0 j=1 count=1", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=0 j=1 count=2", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=0 count=2", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=1 count=2", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=1 j=0 count=2", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=1 j=0 count=3", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=1 j=1 count=3", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=1 j=1 count=4", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=1 count=4", DebugAction.StepOver),
+                new (10, ExecEvent.Line, "count=4", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_ForEach_Nested" };
+
+            // for in foreach: mixed loop kinds behave the same as same-kind nesting
+            yield return new(@"
+int count = 0;                          // LINE 2
+foreach (int i in new[] { 0, 1 })       // LINE 3
+{                                       // LINE 4
+    for (int j = 0; j < 2; j++)         // LINE 5
+    {                                   // LINE 6
+        count += 1;                     // LINE 7
+    }                                   // LINE 8
+}                                       // LINE 9
+int done = count;                       // LINE 10
+", "i j count", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "count=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=0 count=0", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=0 j=0 count=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=0 j=0 count=1", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=0 j=1 count=1", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=0 j=1 count=2", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=0 count=2", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=1 count=2", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=1 j=0 count=2", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=1 j=0 count=3", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=1 j=1 count=3", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=1 j=1 count=4", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=1 count=4", DebugAction.StepOver),
+                new (10, ExecEvent.Line, "count=4", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_For_In_ForEach" };
+
+            // while in for: inner while stops once on entry and once after its last check
+            yield return new(@"
+int count = 0;                          // LINE 2
+for (int i = 0; i < 2; i++)             // LINE 3
+{                                       // LINE 4
+    int k = 0;                          // LINE 5
+    while (k < 2)                       // LINE 6
+    {                                   // LINE 7
+        k += 1;                         // LINE 8
+    }                                   // LINE 9
+    count += k;                         // LINE 10
+}                                       // LINE 11
+int done = count;                       // LINE 12
+", "i k count", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "count=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=0 count=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=0 k=0 count=0", DebugAction.StepOver),
+                new ( 8, ExecEvent.Line, "i=0 k=0 count=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=0 k=1 count=0", DebugAction.StepOver),
+                new ( 8, ExecEvent.Line, "i=0 k=1 count=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=0 k=2 count=0", DebugAction.StepOver),
+                new (10, ExecEvent.Line, "i=0 k=2 count=0", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=0 count=2", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=1 count=2", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=1 k=0 count=2", DebugAction.StepOver),
+                new ( 8, ExecEvent.Line, "i=1 k=0 count=2", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=1 k=1 count=2", DebugAction.StepOver),
+                new ( 8, ExecEvent.Line, "i=1 k=1 count=2", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=1 k=2 count=2", DebugAction.StepOver),
+                new (10, ExecEvent.Line, "i=1 k=2 count=2", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=1 count=4", DebugAction.StepOver),
+                new (12, ExecEvent.Line, "count=4", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_While_In_For" };
+
+            // for: continue still stops on the loop line, break goes straight past it
+            yield return new(@"
+int sum = 0;                            // LINE 2
+for (int i = 0; i < 5; i++)             // LINE 3
+{                                       // LINE 4
+    if (i == 1)                         // LINE 5
+        continue;                       // LINE 6
+    if (i == 3)                         // LINE 7
+        break;                          // LINE 8
+    sum += i;                           // LINE 9
+}                                       // LINE 10
+int done = sum;                         // LINE 11
+", "i sum", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "sum=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 9, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=1 sum=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=1 sum=0", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=1 sum=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=2 sum=0", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=2 sum=0", DebugAction.StepOver),
+                new ( 9, ExecEvent.Line, "i=2 sum=0", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=2 sum=2", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=3 sum=2", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=3 sum=2", DebugAction.StepOver),
+                new ( 8, ExecEvent.Line, "i=3 sum=2", DebugAction.StepOver),
+                new (11, ExecEvent.Line, "sum=2", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_For_Break_Continue" };
+
+            // foreach: continue still stops on the loop line, break goes straight past it
+            yield return new(@"
+int sum = 0;                            // LINE 2
+foreach (int i in new[] { 0, 1, 2, 3, 4 })// LINE 3
+{                                       // LINE 4
+    if (i == 1)                         // LINE 5
+        continue;                       // LINE 6
+    if (i == 3)                         // LINE 7
+        break;                          // LINE 8
+    sum += i;                           // LINE 9
+}                                       // LINE 10
+int done = sum;                         // LINE 11
+", "i sum", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "sum=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 9, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=1 sum=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=1 sum=0", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=1 sum=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=2 sum=0", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=2 sum=0", DebugAction.StepOver),
+                new ( 9, ExecEvent.Line, "i=2 sum=0", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=2 sum=2", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=3 sum=2", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=3 sum=2", DebugAction.StepOver),
+                new ( 8, ExecEvent.Line, "i=3 sum=2", DebugAction.StepOver),
+                new (11, ExecEvent.Line, "sum=2", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_ForEach_Break_Continue" };
+
+            // while: continue still stops on the loop line, break goes straight past it
+            yield return new(@"
+int sum = 0;                            // LINE 2
+int i = -1;                             // LINE 3
+while (i < 4)                           // LINE 4
+{                                       // LINE 5
+    i += 1;                             // LINE 6
+    if (i == 1)                         // LINE 7
+        continue;                       // LINE 8
+    if (i == 3)                         // LINE 9
+        break;                          // LINE 10
+    sum += i;                           // LINE 11
+}                                       // LINE 12
+int done = sum;                         // LINE 13
+", "i sum", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "sum=0", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "i=-1 sum=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=-1 sum=0", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 9, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new (11, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=1 sum=0", DebugAction.StepOver),
+                new ( 8, ExecEvent.Line, "i=1 sum=0", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "i=1 sum=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=1 sum=0", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=2 sum=0", DebugAction.StepOver),
+                new ( 9, ExecEvent.Line, "i=2 sum=0", DebugAction.StepOver),
+                new (11, ExecEvent.Line, "i=2 sum=0", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "i=2 sum=2", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=2 sum=2", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=3 sum=2", DebugAction.StepOver),
+                new ( 9, ExecEvent.Line, "i=3 sum=2", DebugAction.StepOver),
+                new (10, ExecEvent.Line, "i=3 sum=2", DebugAction.StepOver),
+                new (13, ExecEvent.Line, "i=3 sum=2", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_While_Break_Continue" };
+
+            // do-while: continue still stops on the "while (...)" line
+            yield return new(@"
+int sum = 0;                            // LINE 2
+int i = 0;                              // LINE 3
+do                                      // LINE 4
+{                                       // LINE 5
+    i += 1;                             // LINE 6
+    if (i == 2)                         // LINE 7
+        continue;                       // LINE 8
+    sum += i;                           // LINE 9
+} while (i < 3);                        // LINE 10
+int done = sum;                         // LINE 11
+", "i sum", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "sum=0", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=1 sum=0", DebugAction.StepOver),
+                new ( 9, ExecEvent.Line, "i=1 sum=0", DebugAction.StepOver),
+                new (10, ExecEvent.Line, "i=1 sum=1", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=1 sum=1", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=2 sum=1", DebugAction.StepOver),
+                new ( 8, ExecEvent.Line, "i=2 sum=1", DebugAction.StepOver),
+                new (10, ExecEvent.Line, "i=2 sum=1", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=2 sum=1", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "i=3 sum=1", DebugAction.StepOver),
+                new ( 9, ExecEvent.Line, "i=3 sum=1", DebugAction.StepOver),
+                new (10, ExecEvent.Line, "i=3 sum=4", DebugAction.StepOver),
+                new (11, ExecEvent.Line, "i=3 sum=4", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_DoWhile_Continue" };
+
+            // loops whose body never runs: one stop on the loop line, then the next line
+            yield return new(@"
+int n = 0;                              // LINE 2
+for (int i = 0; i < n; i++)             // LINE 3
+{                                       // LINE 4
+    n += 1;                             // LINE 5
+}                                       // LINE 6
+foreach (int k in new int[0])           // LINE 7
+{                                       // LINE 8
+    n += 1;                             // LINE 9
+}                                       // LINE 10
+while (n > 0)                           // LINE 11
+{                                       // LINE 12
+    n -= 1;                             // LINE 13
+}                                       // LINE 14
+int done = n;                           // LINE 15
+", "i k n", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "n=0", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "n=0", DebugAction.StepOver),
+                new (11, ExecEvent.Line, "n=0", DebugAction.StepOver),
+                new (15, ExecEvent.Line, "n=0", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_Loops_Zero_Passes" };
+
+            // for that reuses a variable declared before it: loop line shows the value before the step
+            yield return new(@"
+int i = 0;                              // LINE 2
+int sum = 0;                            // LINE 3
+for (i = 0; i < 3; i++)                 // LINE 4
+{                                       // LINE 5
+    sum += i;                           // LINE 6
+}                                       // LINE 7
+int done = i;                           // LINE 8
+", "i sum", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=0", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=1 sum=0", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "i=1 sum=1", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=2 sum=1", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "i=2 sum=3", DebugAction.StepOver),
+                new ( 8, ExecEvent.Line, "i=3 sum=3", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_For_Outer_Variable" };
+
+            // for that reuses a variable declared without a value (int i;): i shows once it has a value
+            yield return new(@"
+int i;                                  // LINE 2
+int sum = 0;                            // LINE 3
+for (i = 0; i < 3; i++)                 // LINE 4
+{                                       // LINE 5
+    sum += i;                           // LINE 6
+}                                       // LINE 7
+int done = sum;                         // LINE 8
+", "i sum", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "sum=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=1 sum=0", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "i=1 sum=1", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "i=2 sum=1", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "i=2 sum=3", DebugAction.StepOver),
+                new ( 8, ExecEvent.Line, "i=3 sum=3", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_For_Outer_Unassigned" };
+
+            // variable declared without a value shows only on lines where it has one
+            yield return new(@"
+int x;                                  // LINE 2
+int y = 1;                              // LINE 3
+if (y > 0)                              // LINE 4
+    x = 2;                              // LINE 5
+else                                    // LINE 6
+    x = 3;                              // LINE 7
+int done = x;                           // LINE 8
+", "x y", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "y=1", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "y=1", DebugAction.StepOver),
+                new ( 8, ExecEvent.Line, "x=2 y=1", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_Unassigned_Variable" };
+
+            // variable declared without a value next to a local function: script still builds
+            yield return new(@"
+int x;                                  // LINE 2
+int Get() { return 5; }                 // LINE 3
+x = Get();                              // LINE 4
+int done = x;                           // LINE 5
+", "x", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 4, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "x=5", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_Unassigned_With_Local_Function" };
+
+            // for with two loop variables: both show the values from the pass that just ended
+            yield return new(@"
+int sum = 0;                            // LINE 2
+for (int i = 0, j = 10; i < 2; i++, j--)// LINE 3
+{                                       // LINE 4
+    sum += j;                           // LINE 5
+}                                       // LINE 6
+int done = sum;                         // LINE 7
+", "i j sum", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "sum=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=0 j=10 sum=0", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=0 j=10 sum=10", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "i=1 j=9 sum=10", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "i=1 j=9 sum=19", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "sum=19", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_For_Multi_Variable" };
+
+            // for (;;) exited with break: loop line stops between passes, not after break
+            yield return new(@"
+int n = 0;                              // LINE 2
+for (;;)                                // LINE 3
+{                                       // LINE 4
+    n += 1;                             // LINE 5
+    if (n == 2)                         // LINE 6
+        break;                          // LINE 7
+}                                       // LINE 8
+int done = n;                           // LINE 9
+", "n", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "n=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "n=0", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "n=1", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "n=1", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "n=1", DebugAction.StepOver),
+                new ( 6, ExecEvent.Line, "n=2", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "n=2", DebugAction.StepOver),
+                new ( 9, ExecEvent.Line, "n=2", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_For_Infinite_Break" };
+
+            // foreach (var (a, b) in ...): both variables behave like a normal foreach item
+            yield return new(@"
+int sum = 0;                            // LINE 2
+foreach (var (a, b) in new[] { (1, 2), (3, 4) })// LINE 3
+{                                       // LINE 4
+    sum += a * b;                       // LINE 5
+}                                       // LINE 6
+int done = sum;                         // LINE 7
+", "a b sum", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 2, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "sum=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "a=1 b=2 sum=0", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "a=1 b=2 sum=2", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "a=3 b=4 sum=2", DebugAction.StepOver),
+                new ( 3, ExecEvent.Line, "a=3 b=4 sum=14", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "sum=14", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_ForEach_Deconstruct" };
+
+            // loops inside a function behave the same as top-level loops
+            yield return new(@"
+int Sum(int[] values)                   // LINE 2
+{                                       // LINE 3
+    int total = 0;                      // LINE 4
+    foreach (int v in values)           // LINE 5
+    {                                   // LINE 6
+        total += v;                     // LINE 7
+    }                                   // LINE 8
+    for (int i = 0; i < 2; i++)         // LINE 9
+    {                                   // LINE 10
+        total += i;                     // LINE 11
+    }                                   // LINE 12
+    return total;                       // LINE 13
+}                                       // LINE 14
+
+int result = Sum(new[] { 4, 5 });       // LINE 16
+", "v i total", new ExpectedPauseEventSlotsStep[]
+            {
+                new ( 4, ExecEvent.Line, "", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "total=0", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "v=4 total=0", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "v=4 total=4", DebugAction.StepOver),
+                new ( 7, ExecEvent.Line, "v=5 total=4", DebugAction.StepOver),
+                new ( 5, ExecEvent.Line, "v=5 total=9", DebugAction.StepOver),
+                new ( 9, ExecEvent.Line, "total=9", DebugAction.StepOver),
+                new (11, ExecEvent.Line, "i=0 total=9", DebugAction.StepOver),
+                new ( 9, ExecEvent.Line, "i=0 total=9", DebugAction.StepOver),
+                new (11, ExecEvent.Line, "i=1 total=9", DebugAction.StepOver),
+                new ( 9, ExecEvent.Line, "i=1 total=10", DebugAction.StepOver),
+                new (13, ExecEvent.Line, "total=10", DebugAction.StepOver),
+                new (16, ExecEvent.Return, "", DebugAction.StepOver),
+            })
+            { TestName = "TestCSharp_DebugTracing_StepOver_LoopSlots_Loops_In_Function" };
+        }
+
+        [Test, TestCaseSource(nameof(GetStepOverLoopSlotsCases))]
+        public void TestCSharp_DebugTracing_StepOver_LoopSlots(string source, string watch, ExpectedPauseEventSlotsStep[] actions)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85276
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-89539
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(source);
+            string[] watched = watch.Split(' ');
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventSlotsStep>();
+            foreach (ExpectedPauseEventSlotsStep step in actions)
+                controls.Add(step);
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, actions[0].Line));
+            controls.PauseOnStep += (ExpectedPauseEventSlotsStep step, ExecFrame frame) =>
+            {
+                // slots are only checked on line pauses
+                string slots = ExecEvent.Line == frame.Event ? GetWatchedSlots(frame, watched) : string.Empty;
+                bool pass = frame.Event == step.Event
+                         && frame.Reference.Position.LineNumber == step.Line
+                         && slots == step.Slots;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"Expected: {step.Event} [{step.Line}: {step.Slots}] !! {frame.Event} [{frame.Reference.Position.LineNumber}: {slots}]");
+                Assert.IsTrue(pass);
+            };
+
+            code.DebugControls = controls;
+            Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
+        }
+
+        static string GetWatchedSlots(ExecFrame frame, string[] watched)
+        {
+            var values = new List<string>();
+            foreach (string name in watched)
+            {
+                if (frame.GetSlots().FirstOrDefault(s => s.Id.Identifier == name) is ExecSlot slot
+                      && slot.TryGetValue(out object value))
+                {
+                    values.Add($"{name}={value}");
+                }
+            }
+            return string.Join(" ", values);
+        }
+
+        const string LOOPS_RUNSCRIPT_BODY = @"
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(int x, int y, ref object a)
+    {
+        int sum = 0;                        // LINE 9
+        for (int i = 0; i < x; i++)         // LINE 10
+        {
+            sum += i;                       // LINE 12
+        }
+        foreach (int k in new[] { y, y })   // LINE 14
+        {
+            sum += k;                       // LINE 16
+        }
+        a = sum;                            // LINE 18
+    }
+}
+";
+
+        [Test]
+        public void TestCSharp_DebugTracing_StepOver_LoopSlots_GH1ScriptInstance()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85276
+            Code code = new Grasshopper1Script(@"// #! csharp
+using System;
+using Grasshopper.Kernel;
+" + LOOPS_RUNSCRIPT_BODY).CreateCode();
+
+            AssertRunScriptLoopSlots(code);
+        }
+
+        [Test]
+        public void TestCSharp_DebugTracing_StepOver_LoopSlots_GH2ScriptInstance()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85276
+            Code code = Grasshopper2_Tests_Utils.CreateCode(@"// #! csharp
+using System;
+using Grasshopper2.Components;
+" + LOOPS_RUNSCRIPT_BODY);
+
+            AssertRunScriptLoopSlots(code);
+        }
+
+        static void AssertRunScriptLoopSlots(Code code)
+        {
+            string[] watched = { "i", "k", "sum" };
+
+            // run once so the script creates its instance, then debug RunScript on it the way grasshopper does
+            code.DebugControls = new DebugContinueAllControls();
+            var ctx = new DebugContext { Outputs = { [ScriptRunGroup.SCRIPTINSTANCE_VAR] = default } };
+            code.Debug(ctx);
+            object instance = ctx.Outputs.Get(ScriptRunGroup.SCRIPTINSTANCE_VAR);
+            MethodInfo runScript = instance.GetType().GetMethod("RunScript", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            var controls = new DebugPauseDetectorControls<ExpectedPauseEventSlotsStep>
+            {
+                new ( 9, ExecEvent.Line, "", DebugAction.StepOver),
+                new (10, ExecEvent.Line, "sum=0", DebugAction.StepOver),
+                new (12, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new (10, ExecEvent.Line, "i=0 sum=0", DebugAction.StepOver),
+                new (12, ExecEvent.Line, "i=1 sum=0", DebugAction.StepOver),
+                new (10, ExecEvent.Line, "i=1 sum=1", DebugAction.StepOver),
+                new (14, ExecEvent.Line, "sum=1", DebugAction.StepOver),
+                new (16, ExecEvent.Line, "k=5 sum=1", DebugAction.StepOver),
+                new (14, ExecEvent.Line, "k=5 sum=6", DebugAction.StepOver),
+                new (16, ExecEvent.Line, "k=5 sum=6", DebugAction.StepOver),
+                new (14, ExecEvent.Line, "k=5 sum=11", DebugAction.StepOver),
+                new (18, ExecEvent.Line, "sum=11", DebugAction.StepOver),
+            };
+            controls.Breakpoints.Add(new CodeReferenceBreakpoint(code, 9));
+            controls.PauseOnStep += (ExpectedPauseEventSlotsStep step, ExecFrame frame) =>
+            {
+                string slots = ExecEvent.Line == frame.Event ? GetWatchedSlots(frame, watched) : string.Empty;
+                bool pass = frame.Event == step.Event
+                         && frame.Reference.Position.LineNumber == step.Line
+                         && slots == step.Slots;
+                if (!pass)
+                    TestContext.Progress.WriteLine($"Expected: {step.Event} [{step.Line}: {step.Slots}] !! {frame.Event} [{frame.Reference.Position.LineNumber}: {slots}]");
+                Assert.IsTrue(pass);
+            };
+            code.DebugControls = controls;
+
+            object[] args = { 2, 5, null };
+            using (DebugGroup g = code.DebugWith(new DebugContext()))
+            {
+                runScript.Invoke(instance, args);
+            }
+
+            Assert.AreEqual(11, args[2]);
         }
 
         [Test]
@@ -4854,13 +5607,19 @@ func_test_error();                              // LINE 7
         }
 
         static readonly Regex s_sourceIdFinder = new(@"\[Rhino.Runtime.Code.Execution.SourceFrameAttribute\((?<id>.+?)\)\]");
-        static readonly Regex s_traceFinder = new(@"Rhino.+?RoslynTracer.Trace\(.+?,\s(?<trace>\d+),\s(?<event>\d+),.+?\);");
-
         static string GetDebugTracedSource(Code code)
         {
-            code.Text.TryGetTransformed(new DebugContext(), out string tracedSource);
+            // short trace calls, same as the editor 'open traced' command
+            var context = new DebugContext
+            {
+                Options = {
+                    ["csharp.tracer.format"] = "TRACE({2},{3});",
+                    ["csharp.tracer.conditionFormat"] = "TRACE_COND({2},{3})",
+                }
+            };
+
+            code.Text.TryGetTransformed(context, out string tracedSource);
             tracedSource = s_sourceIdFinder.Replace(tracedSource, "[ID($1)]");
-            tracedSource = s_traceFinder.Replace(tracedSource, "TRACE($1,$2);");
             return tracedSource;
         }
 
@@ -4881,10 +5640,10 @@ for(int i =0; i < 3; i++)
 sealed class __RhinoCodeScript__{[ID(""Main()"")]
 public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
 TRACE(2,0);TRACE(2,1);int total = 0;
-{object __roslynloopcache__i__ = default;bool __roslynloopstop__0__ = false;TRACE(3,1);for(int i =0; i < 3; i++)
+TRACE(3,1);for(int i =0; i < 3; TRACE(3,1),i++)
 {
-__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__0__)TRACE(3,1);__roslynloopstop__0__ = true;__roslynloopcache__i__ = i;    TRACE(5,1);total += i;
-}TRACE(3,1);}TRACE(3,2);
+    TRACE(5,1);total += i;
+}TRACE(3,2);
 }
 }
 
@@ -4908,10 +5667,10 @@ for(int i = 0; i < 3; i++)
 sealed class __RhinoCodeScript__{[ID(""Main()"")]
 public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
 TRACE(2,0);TRACE(2,1);int total = 0;
-{object __roslynloopcache__i__ = default;bool __roslynloopstop__0__ = false;TRACE(3,1);for(int i = 0; i < 3; i++)
-{__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__0__)TRACE(3,1);__roslynloopstop__0__ = true;__roslynloopcache__i__ = i;    TRACE(4,1);{object __roslynloopcache__j__ = default;bool __roslynloopstop__1__ = false;    TRACE(4,1);for (int j = 0; j < 2; j++)
-{__roslynloopcache__j__ = __roslynloopcache__j__ ?? j;if(__roslynloopstop__1__)TRACE(4,1);__roslynloopstop__1__ = true;__roslynloopcache__j__ = j;        TRACE(5,1);total += i + j;
-}TRACE(4,1);}}TRACE(3,1);}TRACE(3,2);
+TRACE(3,1);for(int i = 0; i < 3; TRACE(3,1),i++)
+{    TRACE(4,1);for (int j = 0; j < 2; TRACE(4,1),j++)
+{        TRACE(5,1);total += i + j;
+}}TRACE(3,2);
 }
 }
 
@@ -4936,11 +5695,11 @@ for(int i =0,j = 1; i < 3; i++, j++)
 sealed class __RhinoCodeScript__{[ID(""Main()"")]
 public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
 TRACE(2,0);TRACE(2,1);int total = 0;
-{object __roslynloopcache__i__ = default;object __roslynloopcache__j__ = default;bool __roslynloopstop__0__ = false;TRACE(3,1);for(int i =0,j = 1; i < 3; i++, j++)
+TRACE(3,1);for(int i =0,j = 1; i < 3; TRACE(3,1),i++, j++)
 {
-__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;__roslynloopcache__j__ = __roslynloopcache__j__ ?? j;if(__roslynloopstop__0__)TRACE(3,1);__roslynloopstop__0__ = true;__roslynloopcache__i__ = i;__roslynloopcache__j__ = j;    TRACE(5,1);total += i;
+    TRACE(5,1);total += i;
     TRACE(6,1);total += j;
-}TRACE(3,1);}TRACE(3,2);
+}TRACE(3,2);
 }
 }
 
@@ -4971,10 +5730,10 @@ using System.Linq;
 sealed class __RhinoCodeScript__{[ID(""Main()"")]
 public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
 TRACE(5,0);TRACE(5,1);int total = 0;
-{object __roslynloopcache__i__ = default;bool __roslynloopstop__0__ = false;TRACE(6,1);foreach (int i in Enumerable.Range(0, 3))
+TRACE(6,1);{object __roslynloopcache__i__ = default;bool __roslynloopstop__0__ = false;foreach (int i in Enumerable.Range(0, 3))
 {
 __roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__0__)TRACE(6,1);__roslynloopstop__0__ = true;__roslynloopcache__i__ = i;    TRACE(8,1);total += i;
-}TRACE(6,1);}TRACE(10,1);int f = total;TRACE(10,2);
+}if(__roslynloopstop__0__)TRACE(6,1);}TRACE(10,1);int f = total;TRACE(10,2);
 }
 }
 
@@ -5004,10 +5763,10 @@ using System.Linq;
 sealed class __RhinoCodeScript__{[ID(""Main()"")]
 public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
 TRACE(5,0);TRACE(5,1);int total = 0;
-{object __roslynloopcache__i__ = default;bool __roslynloopstop__0__ = false;TRACE(6,1);foreach (int i in Enumerable.Range(0, 3))
-{__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__0__)TRACE(6,1);__roslynloopstop__0__ = true;__roslynloopcache__i__ = i;    TRACE(7,1);{object __roslynloopcache__j__ = default;bool __roslynloopstop__1__ = false;    TRACE(7,1);foreach (int j in Enumerable.Range(0, 3))
+TRACE(6,1);{object __roslynloopcache__i__ = default;bool __roslynloopstop__0__ = false;foreach (int i in Enumerable.Range(0, 3))
+{__roslynloopcache__i__ = __roslynloopcache__i__ ?? i;if(__roslynloopstop__0__)TRACE(6,1);__roslynloopstop__0__ = true;__roslynloopcache__i__ = i;    TRACE(7,1);{object __roslynloopcache__j__ = default;bool __roslynloopstop__1__ = false;foreach (int j in Enumerable.Range(0, 3))
 {__roslynloopcache__j__ = __roslynloopcache__j__ ?? j;if(__roslynloopstop__1__)TRACE(7,1);__roslynloopstop__1__ = true;__roslynloopcache__j__ = j;        TRACE(8,1);total += i + j;
-}TRACE(7,1);}}TRACE(6,1);}TRACE(6,2);
+}if(__roslynloopstop__1__)TRACE(7,1);}}if(__roslynloopstop__0__)TRACE(6,1);}TRACE(6,2);
 }
 }
 
