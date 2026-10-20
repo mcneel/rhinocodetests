@@ -2094,6 +2094,7 @@ using System.Drawing;
 
 using Rhino;
 using Rhino.Geometry;
+using Rhino.Collections;
 
 using Grasshopper;
 using Grasshopper.Kernel;
