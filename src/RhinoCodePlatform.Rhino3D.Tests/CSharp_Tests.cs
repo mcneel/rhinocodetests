@@ -660,12 +660,14 @@ Console.WriteLine(a);
 // #! csharp
 // Grasshopper Script
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 
 using Rhino;
 using Rhino.Geometry;
+using Rhino.Collections;
 
 using Grasshopper;
 using Grasshopper.Kernel;
@@ -716,12 +718,14 @@ Console.WriteLine(a);");
 // #! csharp
 // Grasshopper Script
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 
 using Rhino;
 using Rhino.Geometry;
+using Rhino.Collections;
 
 using Grasshopper;
 using Grasshopper.Kernel;
@@ -778,12 +782,14 @@ int Test()
 // #! csharp
 // Grasshopper Script
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 
 using Rhino;
 using Rhino.Geometry;
+using Rhino.Collections;
 
 using Grasshopper;
 using Grasshopper.Kernel;
@@ -846,12 +852,14 @@ int Test(int x, int y)
 // #! csharp
 // Grasshopper Script
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 
 using Rhino;
 using Rhino.Geometry;
+using Rhino.Collections;
 
 using Grasshopper;
 using Grasshopper.Kernel;
