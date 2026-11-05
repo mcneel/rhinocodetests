@@ -2300,9 +2300,9 @@ __context__.Outputs[""__gh_scriptinstance__""] = new Script_Instance();class Scr
 }
 ",
 @"
-#region Usings
+// #region Usings
 using System;
-#endregion
+// #endregion
 
 sealed class __RhinoCodeScript__{[Rhino.Runtime.Code.Execution.SourceFrameAttribute(""Main()"")]
 public void __RunScript__(Rhino.Runtime.Code.IThisCode __this__,Rhino.Runtime.Code.Execution.RunContext __context__){
