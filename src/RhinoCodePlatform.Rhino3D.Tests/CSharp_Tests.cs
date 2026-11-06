@@ -1725,14 +1725,765 @@ import os
 
         static IEnumerable<CompletionInfo> CompleteAtPosition(Code code, int position, CompleteOptions? options = default)
         {
+#if RC8_38
+            // NOTE:
+            // since RH-99778, completion right after a space, '(' or ',' offers only what is
+            // very likely wanted there (an enum value, a ref or out variable, a type after new),
+            // or nothing, until a character is typed.
+            // most tests here were written before that change. they expect the list offered there
+            // before: the best matches first (true/false, a variable of the expected type, ...),
+            // then everything else in scope, and they check its first items and its length.
+            // this helper sets BeforeTyping = true, which brings that list back.
+            // it changes nothing once a character is typed.
+            // the RH-99778 tests right after this helper check what is offered now.
+            // options is a nullable struct, so BeforeTyping is set on a copy.
+            var opts = new CompleteOptions(options ?? CompleteOptions.Empty);
+            if (!opts.BeforeTyping.HasValue)
+                opts.BeforeTyping = true;
+#else
+            CompleteOptions opts = options ?? CompleteOptions.Empty;
+#endif
+
             code.Language.Support.BeginSupport(code);
-            IEnumerable<CompletionInfo> completions = code.Language.Support.Complete(SupportRequest.Empty, code, position, options ?? CompleteOptions.Empty);
+            IEnumerable<CompletionInfo> completions = code.Language.Support.Complete(SupportRequest.Empty, code, position, opts);
             code.Language.Support.EndSupport(code);
 
             // NOTE:
             // using sortText to order completions to match Monaco behaviour
             return completions.Order(new CompletionInfoComparer());
         }
+
+#if RC8_38
+        // NOTE:
+        // RH-99778: completion right after a space, '(' or ',' with nothing typed yet.
+        // each test below is a case of the RH-99778 manual test, with its number and expected result.
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_Return()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 1: nothing (before: everything in scope)
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Brep b = null;
+
+Brep MakeBrep()
+{
+    return ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"
+}");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.IsEmpty(completions);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_Return_Enum()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 2: CurveKnotStyle and its values
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+CurveKnotStyle style = CurveKnotStyle.Chord;
+
+CurveKnotStyle Knots()
+{
+    return ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"
+}");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+
+            Assert.AreEqual(7, completions.Length);
+            Assert.AreEqual("CurveKnotStyle", completions[0].Text);
+            Assert.Contains("CurveKnotStyle.Uniform", names);
+            Assert.Contains("CurveKnotStyle.Chord", names);
+            Assert.Contains("CurveKnotStyle.ChordSquareRoot", names);
+            Assert.Contains("CurveKnotStyle.UniformPeriodic", names);
+            Assert.Contains("CurveKnotStyle.ChordPeriodic", names);
+            Assert.Contains("CurveKnotStyle.ChordSquareRootPeriodic", names);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_ReturnNew()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 3: types (before: nothing)
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Plane MakePlane()
+{
+    return new ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"
+}");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.IsNotEmpty(completions);
+            foreach (CompletionInfo c in completions)
+                Assert.IsTrue(c.Kind == CompletionKind.Class || c.Kind == CompletionKind.Struct || c.Kind == CompletionKind.Interface
+                           || c.Kind == CompletionKind.Enum || c.Kind == CompletionKind.Module || c.Kind == CompletionKind.TypeParameter, c.Text);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_ReturnNew_Type()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 4: nothing (before: about 120 keywords and functions)
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Plane MakePlane()
+{
+    return new Plane ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"
+}");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.IsEmpty(completions);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_Case()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 5: nothing (before: everything in scope)
+            string s = @"// #! csharp
+using System;
+
+int n = 0;
+
+switch (n)
+{
+    case ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"
+}");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.IsEmpty(completions);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_Case_Enum()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 6: CurveKnotStyle and its values
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+CurveKnotStyle style = CurveKnotStyle.Chord;
+
+switch (style)
+{
+    case ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"
+}");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+
+            Assert.AreEqual(7, completions.Length);
+            Assert.AreEqual("CurveKnotStyle", completions[0].Text);
+            Assert.Contains("CurveKnotStyle.Uniform", names);
+            Assert.Contains("CurveKnotStyle.Chord", names);
+            Assert.Contains("CurveKnotStyle.ChordSquareRoot", names);
+            Assert.Contains("CurveKnotStyle.UniformPeriodic", names);
+            Assert.Contains("CurveKnotStyle.ChordPeriodic", names);
+            Assert.Contains("CurveKnotStyle.ChordSquareRootPeriodic", names);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_Assignment_Declaration()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 7: nothing (before: everything in scope)
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Brep b = null;
+
+Brep b2 = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.IsEmpty(completions);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_Assignment_Var()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 8: nothing (before: everything in scope)
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Brep b = null;
+
+var x = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.IsEmpty(completions);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_Assignment_Existing()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 9: nothing (before: everything in scope)
+            string s = @"// #! csharp
+using System;
+
+double tolerance = 0.01;
+
+tolerance = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.IsEmpty(completions);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_Arguments_First()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 10: nothing (before: everything in scope)
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Brep b = null;
+
+var v = Rhino.Geometry.Intersect.Intersection.BrepBrep(";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.IsEmpty(completions);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_Arguments_Second()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 11: nothing (before: everything in scope)
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Brep b = null;
+
+var v = Rhino.Geometry.Intersect.Intersection.BrepBrep(b, ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.IsEmpty(completions);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_If()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 12: nothing (before: everything in scope)
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Brep b = null;
+
+if (";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.IsEmpty(completions);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_Parenthesis()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 13: nothing (before: everything in scope)
+            string s = @"// #! csharp
+using System;
+
+double tolerance = 0.01;
+
+var d = (";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.IsEmpty(completions);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_Assignment_Enum()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 14: CurveKnotStyle and its values
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+CurveKnotStyle style = CurveKnotStyle.Chord;
+
+CurveKnotStyle k = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+
+            Assert.AreEqual(7, completions.Length);
+            Assert.AreEqual("CurveKnotStyle", completions[0].Text);
+            Assert.Contains("CurveKnotStyle.Uniform", names);
+            Assert.Contains("CurveKnotStyle.Chord", names);
+            Assert.Contains("CurveKnotStyle.ChordSquareRoot", names);
+            Assert.Contains("CurveKnotStyle.UniformPeriodic", names);
+            Assert.Contains("CurveKnotStyle.ChordPeriodic", names);
+            Assert.Contains("CurveKnotStyle.ChordSquareRootPeriodic", names);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_Assignment_Bool()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 15: true, false
+            string s = @"// #! csharp
+using System;
+
+bool flag = true;
+
+bool on = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+
+            Assert.AreEqual(2, completions.Length);
+            Assert.Contains("false", names);
+            Assert.Contains("true", names);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_Arguments_Bool()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 16: true, false
+            string s = @"// #! csharp
+using System;
+
+bool flag = true;
+
+void SetFlag(bool on) { }
+
+SetFlag(";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+
+            Assert.AreEqual(2, completions.Length);
+            Assert.Contains("false", names);
+            Assert.Contains("true", names);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_Arguments_Enum()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 17: CurveKnotStyle and its values
+            string s = @"// #! csharp
+using System;
+using System.Collections.Generic;
+using Rhino.Geometry;
+
+CurveKnotStyle style = CurveKnotStyle.Chord;
+
+var c = Curve.CreateInterpolatedCurve(new List<Point3d>(), 3, ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+
+            Assert.AreEqual(7, completions.Length);
+            Assert.AreEqual("CurveKnotStyle", completions[0].Text);
+            Assert.Contains("CurveKnotStyle.Uniform", names);
+            Assert.Contains("CurveKnotStyle.Chord", names);
+            Assert.Contains("CurveKnotStyle.ChordSquareRoot", names);
+            Assert.Contains("CurveKnotStyle.UniformPeriodic", names);
+            Assert.Contains("CurveKnotStyle.ChordPeriodic", names);
+            Assert.Contains("CurveKnotStyle.ChordSquareRootPeriodic", names);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_Arguments_Out()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 18: out, out Curve[], true, false
+            // ("out Curve[] " ends with a space, ready for the variable name)
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Brep b = null;
+double tolerance = 0.01;
+Curve[] curves = null;
+
+var v = Rhino.Geometry.Intersect.Intersection.BrepBrep(b, b, tolerance, ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+
+            Assert.AreEqual(4, completions.Length);
+            Assert.Contains("out", names);
+            Assert.Contains("out Curve[] ", names);
+            Assert.Contains("false", names);
+            Assert.Contains("true", names);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_Arguments_OutVariable()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 19: curves
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Brep b = null;
+double tolerance = 0.01;
+Curve[] curves = null;
+
+var v = Rhino.Geometry.Intersect.Intersection.BrepBrep(b, b, tolerance, out ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.AreEqual(1, completions.Length);
+            Assert.AreEqual("curves", completions[0].Text);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_New_Declaration()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 20: types, Plane first (unchanged)
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Plane p = new ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.IsNotEmpty(completions);
+            Assert.AreEqual("Plane", completions[0].Text);
+            foreach (CompletionInfo c in completions)
+                Assert.IsTrue(c.Kind == CompletionKind.Class || c.Kind == CompletionKind.Struct || c.Kind == CompletionKind.Interface
+                           || c.Kind == CompletionKind.Enum || c.Kind == CompletionKind.Module || c.Kind == CompletionKind.TypeParameter, c.Text);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_New_Argument()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 21: types (before: nothing)
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+var c2 = Curve.CreateInterpolatedCurve(new ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.IsNotEmpty(completions);
+            foreach (CompletionInfo c in completions)
+                Assert.IsTrue(c.Kind == CompletionKind.Class || c.Kind == CompletionKind.Struct || c.Kind == CompletionKind.Interface
+                           || c.Kind == CompletionKind.Enum || c.Kind == CompletionKind.Module || c.Kind == CompletionKind.TypeParameter, c.Text);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_New_Assignment()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 22: types (before: nothing)
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Plane pl = Plane.WorldXY;
+
+pl = new ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.IsNotEmpty(completions);
+            foreach (CompletionInfo c in completions)
+                Assert.IsTrue(c.Kind == CompletionKind.Class || c.Kind == CompletionKind.Struct || c.Kind == CompletionKind.Interface
+                           || c.Kind == CompletionKind.Enum || c.Kind == CompletionKind.Module || c.Kind == CompletionKind.TypeParameter, c.Text);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_AfterName()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 23: nothing (before: about 120 keywords and functions)
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Brep b = null;
+
+var y = b ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.IsEmpty(completions);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_If_AfterName()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 24: nothing (before: about 120 keywords and functions)
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Brep b = null;
+
+if (b ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.IsEmpty(completions);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_AfterValue()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 25: nothing (before: about 120 keywords and functions)
+            string s = @"// #! csharp
+using System;
+
+double tolerance = 0.01;
+
+tolerance * 2 ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+
+            Assert.IsEmpty(completions);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Typed_Arguments_Bool()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 26: once a character is typed, the list is the same with or without BeforeTyping
+            string s = @"// #! csharp
+using System;
+
+bool flag = true;
+
+void SetFlag(bool on) { }
+
+SetFlag(fl";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            string[] names = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).Select(c => c.Text).ToArray();
+            string[] namesBeforeTyping = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = true }).Select(c => c.Text).ToArray();
+
+            Assert.IsNotEmpty(names);
+            Assert.AreEqual(namesBeforeTyping, names);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_Typed_Arguments_Enum()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 27: once a character is typed, the list is the same with or without BeforeTyping
+            string s = @"// #! csharp
+using System;
+using System.Collections.Generic;
+using Rhino.Geometry;
+
+CurveKnotStyle style = CurveKnotStyle.Chord;
+
+var c = Curve.CreateInterpolatedCurve(new List<Point3d>(), 3, st";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            string[] names = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).Select(c => c.Text).ToArray();
+            string[] namesBeforeTyping = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = true }).Select(c => c.Text).ToArray();
+
+            Assert.IsNotEmpty(names);
+            Assert.AreEqual(namesBeforeTyping, names);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_NothingTyped_Members()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 28: the members of Brep (unchanged)
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Brep b = null;
+
+b.";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = false }).ToArray();
+            string[] names = completions.Select(c => c.Text).ToArray();
+
+            Assert.Greater(completions.Length, 50);
+            Assert.Contains("CapPlanarHoles", names);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_BeforeTyping_Return()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 1 with BeforeTyping: everything in scope, as before
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Brep b = null;
+
+Brep MakeBrep()
+{
+    return ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"
+}");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = true }).ToArray();
+
+            Assert.Greater(completions.Length, 100);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_BeforeTyping_Case()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 5 with BeforeTyping: everything in scope, as before
+            string s = @"// #! csharp
+using System;
+
+int n = 0;
+
+switch (n)
+{
+    case ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + @"
+}");
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = true }).ToArray();
+
+            Assert.Greater(completions.Length, 100);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_BeforeTyping_Assignment_Declaration()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 7 with BeforeTyping: everything in scope, as before
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Brep b = null;
+
+Brep b2 = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = true }).ToArray();
+
+            Assert.Greater(completions.Length, 100);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_BeforeTyping_Assignment_Existing()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 9 with BeforeTyping: everything in scope, as before
+            string s = @"// #! csharp
+using System;
+
+double tolerance = 0.01;
+
+tolerance = ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = true }).ToArray();
+
+            Assert.Greater(completions.Length, 100);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_BeforeTyping_If()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 12 with BeforeTyping: everything in scope, as before
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Brep b = null;
+
+if (";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = true }).ToArray();
+
+            Assert.Greater(completions.Length, 100);
+        }
+
+        [Test]
+        public void TestCSharp_Complete_BeforeTyping_AfterName()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99778
+            // case 23 with BeforeTyping: about 120 keywords and functions, as before
+            string s = @"// #! csharp
+using System;
+using Rhino.Geometry;
+
+Brep b = null;
+
+var y = b ";
+            Code code = GetLanguage(LanguageSpec.CSharp).CreateCode(s + Environment.NewLine);
+
+            CompletionInfo[] completions = CompleteAtPosition(code, s.Length, new CompleteOptions { BeforeTyping = true }).ToArray();
+
+            Assert.Greater(completions.Length, 100);
+        }
+#endif
 
         static IEnumerable<SignatureInfo> CompleteSignatureAtPosition(Code code, int position, CompleteSignatureOptions? options = default)
         {
