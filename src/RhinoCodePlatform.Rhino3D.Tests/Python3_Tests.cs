@@ -3647,6 +3647,40 @@ Test()
             Assert.DoesNotThrow(() => code.Debug(new DebugContext()));
         }
 
+        [Test]
+        public void TestPython3_DotNet_IList_Indexer()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-99953
+            // ArrayList.Adapter reads the python list from .NET while pythonnet has released the GIL.
+            // 1000 string items so new objects are created and the finalizer queue gets flushed too
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+from System.Collections import ArrayList
+
+items = [str(i) for i in range(1000)]
+wrapped = ArrayList.Adapter(items)
+
+for i in range(len(items)):
+    assert wrapped[i] == str(i)
+
+wrapped[0] = 'first'
+wrapped.Insert(1, 'second')
+
+# changes must show up in the original list, proving it was wrapped and not copied
+result = items[0] == 'first' and items[1] == 'second'
+");
+
+            var ctx = new RunContext
+            {
+                AutoApplyParams = true,
+                Outputs = { ["result"] = false }
+            };
+
+            code.Run(ctx);
+
+            Assert.IsTrue(ctx.Outputs.Get<bool>("result"));
+        }
+
         static string GetIdentifier(ExecSlot variable)
         {
             return variable.Id.Identifier;
