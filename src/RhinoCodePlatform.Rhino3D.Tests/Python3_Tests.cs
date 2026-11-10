@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using NUnit.Framework;
+using TestCaseAttribute = NUnit.Framework.TestCaseAttribute;
 
 using Rhino;
 
@@ -3681,7 +3682,7 @@ result = items[0] == 'first' and items[1] == 'second'
             Assert.IsTrue(ctx.Outputs.Get<bool>("result"));
         }
 
-        [Test, TestCase("3.2.1")]
+        [TestCase("3.2.1")]
         public void TestPython3_PythonNet_UpstreamVersion(string expected)
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-100153
