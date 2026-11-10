@@ -1989,6 +1989,63 @@ First()
         }
 
         [Test]
+        public void TestPython3_Pickle_Point3d()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-77321
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+import pickle
+import Rhino.Geometry as rg
+
+p = rg.Point3d(1, 2, 3)
+q = pickle.loads(pickle.dumps(p))
+
+result = isinstance(q, rg.Point3d) and q == p
+");
+
+            var ctx = new RunContext
+            {
+                AutoApplyParams = true,
+                Outputs = { ["result"] = false }
+            };
+            code.Run(ctx);
+
+            Assert.IsTrue(ctx.Outputs.Get<bool>("result"));
+        }
+
+        [Test]
+        public void TestPython3_Copy_Point3d()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-77321
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+import copy
+import Rhino.Geometry as rg
+
+a = rg.Point3d(1, 2, 3)
+b = copy.copy(a)
+c = copy.deepcopy(a)
+
+# copies must be separate objects with the same value
+b.X = 10
+c.Y = 20
+
+shallow = b.X == 10 and b.Y == 2 and a.X == 1
+deep = c.X == 1 and c.Y == 20 and a.Y == 2
+");
+
+            var ctx = new RunContext
+            {
+                AutoApplyParams = true,
+                Outputs = { ["shallow"] = false, ["deep"] = false }
+            };
+            code.Run(ctx);
+
+            Assert.IsTrue(ctx.Outputs.Get<bool>("shallow"));
+            Assert.IsTrue(ctx.Outputs.Get<bool>("deep"));
+        }
+
+        [Test]
         public void TestPython3_StructInitAllKwargs()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-83233
