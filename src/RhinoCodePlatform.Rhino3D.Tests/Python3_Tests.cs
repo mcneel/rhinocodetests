@@ -825,6 +825,71 @@ import ");
             Assert.IsNotEmpty(completions);
         }
 
+        [Test]
+        public void TestPython3_Complete_EnvironSitePackage()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-100198
+            ILanguage py3 = GetLanguage(LanguageSpec.Python3);
+
+            // module is written straight into the environ site folder, as pip would, to stay offline
+            var environ = (CPythonEnviron)py3.Environs.CreateEnviron($"{SetupFixture.RHINOCODE_PYTHON_VENV_PREFIX}complete_site");
+            string site = environ.GetSitePath();
+            Directory.CreateDirectory(site);
+            File.WriteAllText(Path.Combine(site, "rh100198_pkg.py"),
+@"
+class Widget:
+    def __init__(self, size: int):
+        self.size = size
+
+    @property
+    def Width(self) -> float:
+        return 0.0
+
+    def Grow(self) -> None:
+        pass
+");
+
+            // call assignment is not replayed by live evaluation, so completion must come from the language server
+            Code code = py3.CreateCode(
+@"
+import rh100198_pkg as R
+q = R.Widget(1)
+q.");
+            code.Environ = environ;
+
+            string text = code.Text;
+            IEnumerable<CompletionInfo> completions =
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+
+            Assert.IsTrue(completions.Any(c => c.Text == "Width"));
+            Assert.IsTrue(completions.Any(c => c.Text == "Grow"));
+        }
+
+        [Test]
+        public void TestPython3_Complete_EnvironSitePackage_Rhino3dm()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-100198
+            ILanguage py3 = GetLanguage(LanguageSpec.Python3);
+            Code code = py3.CreateCode(
+@"#! python 3
+#r ""pip: rhino3dm==9.2.0b0""
+import rhino3dm as R
+p: R.Point3d = R.Point3d(0, 0, 0)
+p.");
+
+            // install the package, as running the script once would
+            code.Environ = py3.Environs.CreateEnviron($"{SetupFixture.RHINOCODE_PYTHON_VENV_PREFIX}complete_rhino3dm");
+            code.RestorePackages(new RestoreProgressWatcher());
+
+            string text = code.Text;
+            IEnumerable<CompletionInfo> completions =
+                code.Language.Support.Complete(SupportRequest.Empty, code, text.Length, CompleteOptions.Empty);
+
+            Assert.IsTrue(completions.Any(c => c.Text == "X"));
+            Assert.IsTrue(completions.Any(c => c.Text == "Y"));
+            Assert.IsTrue(completions.Any(c => c.Text == "Z"));
+        }
+
         // https://mcneel.myjetbrains.com/youtrack/issue/RH-81189
         [Test]
         public void TestPython3_Complete_LastIndex()
