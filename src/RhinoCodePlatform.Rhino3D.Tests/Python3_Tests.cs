@@ -3681,6 +3681,24 @@ result = items[0] == 'first' and items[1] == 'second'
             Assert.IsTrue(ctx.Outputs.Get<bool>("result"));
         }
 
+        [Test, TestCase("3.2.1")]
+        public void TestPython3_PythonNet_UpstreamVersion(string expected)
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-100153
+            // pythonnet's assembly version follows Rhino, so its upstream release is kept as UpstreamVersion metadata.
+            // update the expected value when pythonnet is merged with a newer upstream release
+
+            System.Reflection.Assembly pythonnet = AppDomain.CurrentDomain.GetAssemblies()
+                                                                          .FirstOrDefault(a => a.GetName().Name == "McNeel.Python.Runtime");
+            Assert.That(pythonnet, Is.Not.Null, "pythonnet assembly is not loaded");
+
+            string upstream = pythonnet.GetCustomAttributes(typeof(System.Reflection.AssemblyMetadataAttribute), false)
+                                       .Cast<System.Reflection.AssemblyMetadataAttribute>()
+                                       .FirstOrDefault(m => m.Key == "UpstreamVersion")?.Value;
+
+            Assert.That(upstream, Is.EqualTo(expected));
+        }
+
         static string GetIdentifier(ExecSlot variable)
         {
             return variable.Id.Identifier;
