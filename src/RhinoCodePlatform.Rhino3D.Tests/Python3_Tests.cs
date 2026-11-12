@@ -2046,6 +2046,39 @@ deep = c.X == 1 and c.Y == 20 and a.Y == 2
         }
 
         [Test]
+        public void TestPython3_StaticAndInstanceOverload_SameName()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-85062
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+import Rhino.Display as rd
+import System.Drawing as sd
+
+# static overload: ViewCapture.CaptureToBitmap(ViewCaptureSettings)
+settings = rd.ViewCaptureSettings(view, sd.Size(200, 100), 72)
+static_ok = rd.ViewCapture.CaptureToBitmap(settings) is not None
+
+# instance overload: ViewCapture().CaptureToBitmap(RhinoView) must keep working
+capture = rd.ViewCapture()
+capture.Width = 200
+capture.Height = 100
+instance_ok = capture.CaptureToBitmap(view) is not None
+");
+
+            using Rhino.RhinoDoc doc = CreateDoc();
+            var ctx = new RunContext
+            {
+                AutoApplyParams = true,
+                Inputs = { ["view"] = doc.Views.ActiveView },
+                Outputs = { ["static_ok"] = false, ["instance_ok"] = false }
+            };
+            code.Run(ctx);
+
+            Assert.IsTrue(ctx.Outputs.Get<bool>("static_ok"));
+            Assert.IsTrue(ctx.Outputs.Get<bool>("instance_ok"));
+        }
+
+        [Test]
         public void TestPython3_StructInitAllKwargs()
         {
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-83233
