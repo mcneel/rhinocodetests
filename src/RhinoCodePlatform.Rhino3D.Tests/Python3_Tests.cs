@@ -2051,31 +2051,31 @@ deep = c.X == 1 and c.Y == 20 and a.Y == 2
             // https://mcneel.myjetbrains.com/youtrack/issue/RH-85062
             Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
-import Rhino.Display as rd
-import System.Drawing as sd
+from Rhino.Geometry import SubDEdgeSharpness
 
-# static overload: ViewCapture.CaptureToBitmap(ViewCaptureSettings)
-settings = rd.ViewCaptureSettings(view, sd.Size(200, 100), 72)
-static_ok = rd.ViewCapture.CaptureToBitmap(settings) is not None
+# SubDEdgeSharpness.ToPercentageText has a static and an instance overload with
+# the same name and arity:
+#   static string ToPercentageText(double sharpness)
+#   string ToPercentageText(bool orderMinToMax)
 
-# instance overload: ViewCapture().CaptureToBitmap(RhinoView) must keep working
-capture = rd.ViewCapture()
-capture.Width = 200
-capture.Height = 100
-instance_ok = capture.CaptureToBitmap(view) is not None
+# static overload, called on the type, must not be bound as the instance overload
+static_text = SubDEdgeSharpness.ToPercentageText(2.0)
+
+# instance overload, called on an instance, must keep working
+sharpness = SubDEdgeSharpness(1.0, 3.0)
+instance_text = sharpness.ToPercentageText(True)
 ");
 
-            using Rhino.RhinoDoc doc = CreateDoc();
-            var ctx = new RunContext
-            {
-                AutoApplyParams = true,
-                Inputs = { ["view"] = doc.Views.ActiveView },
-                Outputs = { ["static_ok"] = false, ["instance_ok"] = false }
-            };
+            RunContext ctx = GetRunContext();
+            ctx.Outputs.Set("static_text", string.Empty);
+            ctx.Outputs.Set("instance_text", string.Empty);
             code.Run(ctx);
 
-            Assert.IsTrue(ctx.Outputs.Get<bool>("static_ok"));
-            Assert.IsTrue(ctx.Outputs.Get<bool>("instance_ok"));
+            string expectedStatic = Rhino.Geometry.SubDEdgeSharpness.ToPercentageText(2.0);
+            string expectedInstance = new Rhino.Geometry.SubDEdgeSharpness(1.0, 3.0).ToPercentageText(true);
+
+            Assert.AreEqual(expectedStatic, ctx.Outputs.Get<string>("static_text"));
+            Assert.AreEqual(expectedInstance, ctx.Outputs.Get<string>("instance_text"));
         }
 
         [Test]
