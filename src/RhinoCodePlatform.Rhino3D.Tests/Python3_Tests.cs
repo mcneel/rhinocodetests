@@ -190,6 +190,57 @@ func_call_test(5, 5)
         }
 
         [Test]
+        public void TestPython3_RuntimeErrorLine_DotNetError_InScript()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-80604
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81920
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+import System
+
+System.Int32.Parse('x')
+");
+
+            ExecuteException ex = Assert.Throws<ExecuteException>(() => code.Run(GetRunContext()));
+            Assert.AreEqual(4, ex.Position.LineNumber);
+        }
+
+        [Test]
+        public void TestPython3_RuntimeErrorLine_DotNetError_InFunction()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-80604
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81920
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+import System
+
+def parse(text):
+    return System.Int32.Parse(text)
+
+parse('x')
+");
+
+            ExecuteException ex = Assert.Throws<ExecuteException>(() => code.Run(GetRunContext()));
+            Assert.AreEqual(5, ex.Position.LineNumber);
+        }
+
+        [Test]
+        public void TestPython3_RuntimeErrorLine_DotNetError_FileNotFound()
+        {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-80604
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-81920
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+import System
+
+System.IO.File.ReadAllText('no-such-file.txt')
+");
+
+            ExecuteException ex = Assert.Throws<ExecuteException>(() => code.Run(GetRunContext()));
+            Assert.AreEqual(4, ex.Position.LineNumber);
+        }
+
+        [Test]
         public void TestPython3_DebugStop()
         {
             Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
