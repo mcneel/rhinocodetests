@@ -240,11 +240,11 @@ System.IO.File.ReadAllText('no-such-file.txt')
             Assert.AreEqual(4, ex.Position.LineNumber);
         }
 
-        // https://mcneel.myjetbrains.com/youtrack/issue/RH-100238
-        // errors in python code that .NET calls back into must not be thrown back into .NET (crashes Rhino)
         [Test]
         public void TestPython3_CallbackError_Delegate()
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-100238
+            // errors in python code that .NET calls back into must not be thrown back into .NET (crashes Rhino)
             Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import System
@@ -267,6 +267,8 @@ result = True
         [Test]
         public void TestPython3_CallbackError_EventHandler()
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-100238
+            // errors in python event handlers raised by .NET must not be thrown back into .NET (crashes Rhino)
             Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 from System.Collections.ObjectModel import ObservableCollection
@@ -290,6 +292,8 @@ result = True
         [Test]
         public void TestPython3_CallbackError_EventHandler_WrongParameters()
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-100238
+            // calling a handler with the wrong parameters raises TypeError, which must not be thrown back into .NET
             Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 from System.Collections.ObjectModel import ObservableCollection
@@ -313,6 +317,8 @@ result = True
         [Test]
         public void TestPython3_CallbackError_DotNetErrorInDelegate()
         {
+            // https://mcneel.myjetbrains.com/youtrack/issue/RH-100238
+            // a .NET error raised inside a python delegate must not be thrown back into .NET either
             Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
 @"
 import System
