@@ -240,6 +240,98 @@ System.IO.File.ReadAllText('no-such-file.txt')
             Assert.AreEqual(4, ex.Position.LineNumber);
         }
 
+        // https://mcneel.myjetbrains.com/youtrack/issue/RH-100238
+        // errors in python code that .NET calls back into must not be thrown back into .NET (crashes Rhino)
+        [Test]
+        public void TestPython3_CallbackError_Delegate()
+        {
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+import System
+from System.Collections.Generic import List
+
+def callback(item):
+    raise Exception('error in delegate')
+
+List[int]([1, 2, 3]).ForEach(System.Action[int](callback))
+
+result = True
+");
+
+            RunContext ctx = GetRunContext();
+            Assert.DoesNotThrow(() => code.Run(ctx));
+            Assert.True(ctx.Outputs.TryGet("result", out bool data));
+            Assert.True(data);
+        }
+
+        [Test]
+        public void TestPython3_CallbackError_EventHandler()
+        {
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+from System.Collections.ObjectModel import ObservableCollection
+
+def on_changed(sender, args):
+    raise Exception('error in event handler')
+
+items = ObservableCollection[int]()
+items.CollectionChanged += on_changed
+items.Add(1)
+
+result = True
+");
+
+            RunContext ctx = GetRunContext();
+            Assert.DoesNotThrow(() => code.Run(ctx));
+            Assert.True(ctx.Outputs.TryGet("result", out bool data));
+            Assert.True(data);
+        }
+
+        [Test]
+        public void TestPython3_CallbackError_EventHandler_WrongParameters()
+        {
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+from System.Collections.ObjectModel import ObservableCollection
+
+def on_changed():
+    pass
+
+items = ObservableCollection[int]()
+items.CollectionChanged += on_changed
+items.Add(1)
+
+result = True
+");
+
+            RunContext ctx = GetRunContext();
+            Assert.DoesNotThrow(() => code.Run(ctx));
+            Assert.True(ctx.Outputs.TryGet("result", out bool data));
+            Assert.True(data);
+        }
+
+        [Test]
+        public void TestPython3_CallbackError_DotNetErrorInDelegate()
+        {
+            Code code = GetLanguage(LanguageSpec.Python3).CreateCode(
+@"
+import System
+from System.Collections.Generic import List
+
+def callback(item):
+    System.Int32.Parse('x')
+
+List[int]([1, 2, 3]).ForEach(System.Action[int](callback))
+
+result = True
+");
+
+            RunContext ctx = GetRunContext();
+            Assert.DoesNotThrow(() => code.Run(ctx));
+            Assert.True(ctx.Outputs.TryGet("result", out bool data));
+            Assert.True(data);
+        }
+
         [Test]
         public void TestPython3_DebugStop()
         {
